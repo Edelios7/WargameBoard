@@ -120,5 +120,11 @@
       "my": { "type": "int" },
       "opponent": { "type": "int" }
     }
-  }
+  },
+
+  "dashboardWelcome": "Welcome to Wargame Board",
+  "dashboardArmiesSubtitle": "Create, edit and organize all your armies.",
+  "dashboardBattlesSubtitle": "Prepare your games and check their history.",
+  "dashboardCollectionSubtitle": "Manage your models, painting and boxes.",
+  "dashboardStatisticsSubtitle": "Analyze your performance and army progress."
 }

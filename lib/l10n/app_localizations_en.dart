@@ -215,4 +215,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String battleScoreLine(int my, int opponent) {
     return '$my - $opponent';
   }
+
+  @override
+  String get dashboardWelcome => 'Welcome to Wargame Board';
+
+  @override
+  String get dashboardArmiesSubtitle =>
+      'Create, edit and organize all your armies.';
+
+  @override
+  String get dashboardBattlesSubtitle =>
+      'Prepare your games and check their history.';
+
+  @override
+  String get dashboardCollectionSubtitle =>
+      'Manage your models, painting and boxes.';
+
+  @override
+  String get dashboardStatisticsSubtitle =>
+      'Analyze your performance and army progress.';
 }

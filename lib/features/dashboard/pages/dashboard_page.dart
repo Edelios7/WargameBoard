@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_text_styles.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shell/navigation.dart';
 import '../widgets/dashboard_card.dart';
 
@@ -10,6 +11,8 @@ class DashboardPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+
     void goTo(AppTab tab) =>
         ref.read(selectedTabProvider.notifier).state = tab;
 
@@ -21,7 +24,7 @@ class DashboardPage extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Dashboard",
+              l10n.navDashboard,
               style: AppTextStyles.title.copyWith(
                 fontSize: 34,
               ),
@@ -30,7 +33,7 @@ class DashboardPage extends ConsumerWidget {
             const SizedBox(height: 8),
 
             Text(
-              "Bienvenue sur Wargame Board",
+              l10n.dashboardWelcome,
               style: AppTextStyles.body,
             ),
 
@@ -45,33 +48,29 @@ class DashboardPage extends ConsumerWidget {
                 children: [
                   DashboardCard(
                     image: "assets/images/dashboard/armies.png",
-                    title: "Armées",
-                    subtitle:
-                        "Crée, modifie et organise toutes tes armées.",
+                    title: l10n.navArmies,
+                    subtitle: l10n.dashboardArmiesSubtitle,
                     onTap: () => goTo(AppTab.armies),
                   ),
 
                   DashboardCard(
                     image: "assets/images/dashboard/battles.png",
-                    title: "Batailles",
-                    subtitle:
-                        "Prépare tes parties et consulte leur historique.",
+                    title: l10n.navBattles,
+                    subtitle: l10n.dashboardBattlesSubtitle,
                     onTap: () => goTo(AppTab.battles),
                   ),
 
                   DashboardCard(
                     image: "assets/images/dashboard/collection.png",
-                    title: "Collection",
-                    subtitle:
-                        "Gère tes figurines, peintures et boîtes.",
+                    title: l10n.navCollection,
+                    subtitle: l10n.dashboardCollectionSubtitle,
                     onTap: () => goTo(AppTab.collection),
                   ),
 
                   DashboardCard(
                     image: "assets/images/dashboard/statistics.png",
-                    title: "Statistiques",
-                    subtitle:
-                        "Analyse tes performances et l'évolution de tes armées.",
+                    title: l10n.navStatistics,
+                    subtitle: l10n.dashboardStatisticsSubtitle,
                     onTap: () => goTo(AppTab.statistics),
                   ),
                 ],

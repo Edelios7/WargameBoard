@@ -38,14 +38,17 @@ class SidebarItem extends StatelessWidget {
             size: 20,
           ),
           const SizedBox(width: 12),
-          Text(
-            title,
-            style: TextStyle(
-              color: selected
-                  ? AppColors.textPrimary
-                  : AppColors.textSecondary,
-              fontWeight:
-                  selected ? FontWeight.w600 : FontWeight.w500,
+          Expanded(
+            child: Text(
+              title,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: selected
+                    ? AppColors.textPrimary
+                    : AppColors.textSecondary,
+                fontWeight:
+                    selected ? FontWeight.w600 : FontWeight.w500,
+              ),
             ),
           ),
         ],

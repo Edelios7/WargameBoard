@@ -104,59 +104,69 @@ class _DashboardCardState extends State<DashboardCard> {
 
                   Padding(
                     padding: const EdgeInsets.all(28),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AnimatedDefaultTextStyle(
-                          duration: const Duration(milliseconds: 180),
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: hovering ? 36 : 34,
-                            fontWeight: FontWeight.bold,
+                    child: SingleChildScrollView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AnimatedDefaultTextStyle(
+                            duration: const Duration(milliseconds: 180),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: hovering ? 36 : 34,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            child: Text(
+                              widget.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                          child: Text(widget.title),
-                        ),
 
-                        const SizedBox(height: 10),
+                          const SizedBox(height: 10),
 
-                        SizedBox(
-                          width: 250,
-                          child: AnimatedDefaultTextStyle(
+                          AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 180),
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: .90),
                               fontSize: hovering ? 18 : 17,
                             ),
-                            child: Text(widget.subtitle),
-                          ),
-                        ),
-
-                        const Spacer(),
-
-                        AnimatedAlign(
-                          duration: const Duration(milliseconds: 180),
-                          alignment: hovering
-                              ? Alignment.bottomRight
-                              : Alignment.bottomLeft,
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 180),
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: hovering
-                                  ? Colors.deepPurpleAccent.withValues(alpha: .20)
-                                  : Colors.transparent,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.arrow_forward_rounded,
-                              size: 42,
-                              color: hovering
-                                  ? Colors.deepPurpleAccent
-                                  : Colors.white70,
+                            child: Text(
+                              widget.subtitle,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: AnimatedAlign(
+                      duration: const Duration(milliseconds: 180),
+                      alignment: hovering
+                          ? Alignment.bottomRight
+                          : Alignment.bottomLeft,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: hovering
+                              ? Colors.deepPurpleAccent.withValues(alpha: .20)
+                              : Colors.transparent,
+                          shape: BoxShape.circle,
                         ),
-                      ],
+                        child: Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 42,
+                          color: hovering
+                              ? Colors.deepPurpleAccent
+                              : Colors.white70,
+                        ),
+                      ),
                     ),
                   ),
                 ],

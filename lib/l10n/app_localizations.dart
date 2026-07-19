@@ -481,6 +481,36 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'{my} - {opponent}'**
   String battleScoreLine(int my, int opponent);
+
+  /// No description provided for @dashboardWelcome.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bienvenue sur Wargame Board'**
+  String get dashboardWelcome;
+
+  /// No description provided for @dashboardArmiesSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Crée, modifie et organise toutes tes armées.'**
+  String get dashboardArmiesSubtitle;
+
+  /// No description provided for @dashboardBattlesSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prépare tes parties et consulte leur historique.'**
+  String get dashboardBattlesSubtitle;
+
+  /// No description provided for @dashboardCollectionSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gère tes figurines, peintures et boîtes.'**
+  String get dashboardCollectionSubtitle;
+
+  /// No description provided for @dashboardStatisticsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyse tes performances et l\'évolution de tes armées.'**
+  String get dashboardStatisticsSubtitle;
 }
 
 class _AppLocalizationsDelegate
