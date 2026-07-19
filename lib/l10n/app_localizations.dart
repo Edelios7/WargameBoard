@@ -140,11 +140,41 @@ abstract class AppLocalizations {
   /// **'Statistiques'**
   String get navStatistics;
 
+  /// No description provided for @navSettings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paramètres'**
+  String get navSettings;
+
   /// No description provided for @versionLabel.
   ///
   /// In fr, this message translates to:
   /// **'Version 0.1'**
   String get versionLabel;
+
+  /// No description provided for @settingsLanguageTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Langue'**
+  String get settingsLanguageTitle;
+
+  /// No description provided for @settingsLanguageSystem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Système'**
+  String get settingsLanguageSystem;
+
+  /// No description provided for @settingsLanguageFrench.
+  ///
+  /// In fr, this message translates to:
+  /// **'Français'**
+  String get settingsLanguageFrench;
+
+  /// No description provided for @settingsLanguageEnglish.
+  ///
+  /// In fr, this message translates to:
+  /// **'English'**
+  String get settingsLanguageEnglish;
 
   /// No description provided for @catalogSearchHint.
   ///

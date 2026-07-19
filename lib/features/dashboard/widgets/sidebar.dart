@@ -76,6 +76,12 @@ class Sidebar extends StatelessWidget {
             l10n.navStatistics,
           ),
 
+          _item(
+            6,
+            Icons.settings_rounded,
+            l10n.navSettings,
+          ),
+
           const Spacer(),
 
           Opacity(

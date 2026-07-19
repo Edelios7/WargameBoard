@@ -23,6 +23,14 @@ Whenever a table changes shape (new column/table), bump `schemaVersion` in `app_
 ```
 dart run build_runner build --delete-conflicting-outputs
 ```
+If `schemaVersion` gets bumped several times in quick succession during
+active development, the local dev database file (Windows:
+`%USERPROFILE%\Documents\wargame_board.sqlite`) can end up with its
+stored version out of sync with its actual columns, causing
+`duplicate column name` errors on launch. If that happens, just move
+the file aside (don't hard-delete without checking first) — it's
+disposable dev/seed data, not real user data — and relaunch to
+recreate it fresh via `onCreate`.
 
 ## Build and test commands
 - `flutter analyze` — must be 0 errors before committing.

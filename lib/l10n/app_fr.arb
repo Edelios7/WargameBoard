@@ -9,7 +9,13 @@
   "navBattles": "Batailles",
   "navCollection": "Collection",
   "navStatistics": "Statistiques",
+  "navSettings": "Paramètres",
   "versionLabel": "Version 0.1",
+
+  "settingsLanguageTitle": "Langue",
+  "settingsLanguageSystem": "Système",
+  "settingsLanguageFrench": "Français",
+  "settingsLanguageEnglish": "English",
 
   "catalogSearchHint": "Rechercher une unité...",
   "catalogEmptyResults": "Aucune unité trouvée",

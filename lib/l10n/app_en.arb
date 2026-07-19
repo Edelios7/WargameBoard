@@ -9,7 +9,13 @@
   "navBattles": "Battles",
   "navCollection": "Collection",
   "navStatistics": "Statistics",
+  "navSettings": "Settings",
   "versionLabel": "Version 0.1",
+
+  "settingsLanguageTitle": "Language",
+  "settingsLanguageSystem": "System",
+  "settingsLanguageFrench": "Français",
+  "settingsLanguageEnglish": "English",
 
   "catalogSearchHint": "Search for a unit...",
   "catalogEmptyResults": "No unit found",

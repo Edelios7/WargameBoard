@@ -11,6 +11,7 @@ enum AppTab {
   battles,
   collection,
   statistics,
+  settings,
 }
 
 final selectedTabProvider = StateProvider<AppTab>((ref) => AppTab.dashboard);

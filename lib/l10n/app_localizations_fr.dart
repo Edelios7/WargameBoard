@@ -30,7 +30,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navStatistics => 'Statistiques';
 
   @override
+  String get navSettings => 'Paramètres';
+
+  @override
   String get versionLabel => 'Version 0.1';
+
+  @override
+  String get settingsLanguageTitle => 'Langue';
+
+  @override
+  String get settingsLanguageSystem => 'Système';
+
+  @override
+  String get settingsLanguageFrench => 'Français';
+
+  @override
+  String get settingsLanguageEnglish => 'English';
 
   @override
   String get catalogSearchHint => 'Rechercher une unité...';

@@ -7,6 +7,7 @@ import '../features/armies/pages/armies_page.dart';
 import '../features/battle/pages/battle_page.dart';
 import '../features/catalog/pages/catalog_page.dart';
 import '../features/collection/pages/collection_page.dart';
+import '../features/settings/pages/settings_page.dart';
 import '../features/statistics/pages/statistics_page.dart';
 import 'navigation.dart';
 
@@ -20,6 +21,7 @@ class AppShell extends ConsumerWidget {
     AppTab.battles: BattlePage(),
     AppTab.collection: CollectionPage(),
     AppTab.statistics: StatisticsPage(),
+    AppTab.settings: SettingsPage(),
   };
 
   @override
