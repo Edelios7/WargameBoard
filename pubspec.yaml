@@ -1,0 +1,76 @@
+name: wargameboard
+description: "Wargame Board"
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # ===========================
+  # Internationalisation
+  # ===========================
+  intl: ^0.20.2
+
+  # ===========================
+  # Navigation
+  # ===========================
+  go_router: ^16.0.0
+
+  # ===========================
+  # Gestion d'état
+  # ===========================
+  flutter_riverpod: ^2.6.1
+
+  # ===========================
+  # Animations
+  # ===========================
+  flutter_animate: ^4.5.2
+
+  # ===========================
+  # Base de données
+  # ===========================
+  drift: ^2.28.1
+  sqlite3_flutter_libs: ^0.5.39
+  sqlite3: ^2.9.3
+  path_provider: ^2.1.5
+  path: ^1.9.1
+
+  # ===========================
+  # Sérialisation JSON
+  # ===========================
+  json_annotation: ^4.9.0
+
+  # ===========================
+  # Utilitaires
+  # ===========================
+  uuid: ^4.5.1
+  equatable: ^2.0.7
+  collection: ^1.19.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+  build_runner: ^2.5.4
+  drift_dev: ^2.28.1
+  json_serializable: ^6.9.5
+
+flutter:
+  generate: true
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/images/dashboard/

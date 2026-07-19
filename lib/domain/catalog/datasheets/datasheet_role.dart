@@ -1,0 +1,15 @@
+enum DatasheetRole {
+  character,
+  battleline,
+  infantry,
+  vehicle,
+  monster,
+  mounted,
+  beast,
+  swarm,
+  aircraft,
+  fortification,
+  dedicatedTransport,
+  epicHero,
+  other,
+}
