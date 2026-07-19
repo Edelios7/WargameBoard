@@ -17,12 +17,21 @@ class ArmyRepository {
   Future<String> createArmy({
     required String name,
     required String factionId,
+    int? pointsLimit,
   }) {
-    return database.armyDao.createArmy(name: name, factionId: factionId);
+    return database.armyDao.createArmy(
+      name: name,
+      factionId: factionId,
+      pointsLimit: pointsLimit,
+    );
   }
 
   Future<void> deleteArmy(String armyId) {
     return database.armyDao.deleteArmy(armyId);
+  }
+
+  Future<int> updateModelCount(String armyUnitId, int modelCount) {
+    return database.armyDao.updateModelCount(armyUnitId, modelCount);
   }
 
   Future<String> addUnit({

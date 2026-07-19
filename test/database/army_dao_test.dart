@@ -78,4 +78,41 @@ void main() {
     expect(army!.units, isEmpty);
     expect(army.totalPoints, 0);
   });
+
+  test('updateModelCount clamps to the datasheet min/max range', () async {
+    final armyId = await database.armyDao.createArmy(
+      name: 'Escouade test',
+      factionId: seedFactionId,
+    );
+    final results = await database.datasheetDao.search('Death Company');
+    final unitId = await database.armyDao.addUnit(
+      armyId: armyId,
+      datasheetId: results.single.id,
+      modelCount: 5,
+    );
+
+    final tooHigh = await database.armyDao.updateModelCount(unitId, 99);
+    expect(tooHigh, 10);
+
+    final tooLow = await database.armyDao.updateModelCount(unitId, 1);
+    expect(tooLow, 5);
+  });
+
+  test('isOverLimit reflects the army points limit', () async {
+    final armyId = await database.armyDao.createArmy(
+      name: 'Liste limitée',
+      factionId: seedFactionId,
+      pointsLimit: 50,
+    );
+    final results = await database.datasheetDao.search('Captain');
+    await database.armyDao.addUnit(
+      armyId: armyId,
+      datasheetId: results.single.id,
+      modelCount: 1,
+    );
+
+    final army = await database.armyDao.getArmy(armyId);
+    expect(army!.pointsLimit, 50);
+    expect(army.isOverLimit, isTrue);
+  });
 }

@@ -283,6 +283,24 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'{count} figurines'**
   String armyBuilderModelCount(int count);
+
+  /// No description provided for @armyBuilderPointsLimitLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Limite de points (optionnel)'**
+  String get armyBuilderPointsLimitLabel;
+
+  /// No description provided for @armyBuilderPointsWithLimit.
+  ///
+  /// In fr, this message translates to:
+  /// **'{points} / {limit} pts'**
+  String armyBuilderPointsWithLimit(int points, int limit);
+
+  /// No description provided for @armyBuilderOverLimit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Limite de points dépassée'**
+  String get armyBuilderOverLimit;
 }
 
 class _AppLocalizationsDelegate

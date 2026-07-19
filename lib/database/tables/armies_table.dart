@@ -11,6 +11,8 @@ class Armies extends Table {
 
   TextColumn get notes => text().nullable()();
 
+  IntColumn get pointsLimit => integer().nullable()();
+
   DateTimeColumn get createdAt =>
       dateTime().withDefault(currentDateAndTime)();
 

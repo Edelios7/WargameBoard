@@ -109,4 +109,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String armyBuilderModelCount(int count) {
     return '$count figurines';
   }
+
+  @override
+  String get armyBuilderPointsLimitLabel => 'Limite de points (optionnel)';
+
+  @override
+  String armyBuilderPointsWithLimit(int points, int limit) {
+    return '$points / $limit pts';
+  }
+
+  @override
+  String get armyBuilderOverLimit => 'Limite de points dépassée';
 }

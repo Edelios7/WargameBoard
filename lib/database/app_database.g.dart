@@ -12123,6 +12123,17 @@ class $ArmiesTable extends Armies with TableInfo<$ArmiesTable, Army> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _pointsLimitMeta = const VerificationMeta(
+    'pointsLimit',
+  );
+  @override
+  late final GeneratedColumn<int> pointsLimit = GeneratedColumn<int>(
+    'points_limit',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -12153,6 +12164,7 @@ class $ArmiesTable extends Armies with TableInfo<$ArmiesTable, Army> {
     factionId,
     name,
     notes,
+    pointsLimit,
     createdAt,
     updatedAt,
   ];
@@ -12195,6 +12207,15 @@ class $ArmiesTable extends Armies with TableInfo<$ArmiesTable, Army> {
         notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
       );
     }
+    if (data.containsKey('points_limit')) {
+      context.handle(
+        _pointsLimitMeta,
+        pointsLimit.isAcceptableOrUnknown(
+          data['points_limit']!,
+          _pointsLimitMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -12232,6 +12253,10 @@ class $ArmiesTable extends Armies with TableInfo<$ArmiesTable, Army> {
         DriftSqlType.string,
         data['${effectivePrefix}notes'],
       ),
+      pointsLimit: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}points_limit'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -12254,6 +12279,7 @@ class Army extends DataClass implements Insertable<Army> {
   final String factionId;
   final String name;
   final String? notes;
+  final int? pointsLimit;
   final DateTime createdAt;
   final DateTime updatedAt;
   const Army({
@@ -12261,6 +12287,7 @@ class Army extends DataClass implements Insertable<Army> {
     required this.factionId,
     required this.name,
     this.notes,
+    this.pointsLimit,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -12272,6 +12299,9 @@ class Army extends DataClass implements Insertable<Army> {
     map['name'] = Variable<String>(name);
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
+    }
+    if (!nullToAbsent || pointsLimit != null) {
+      map['points_limit'] = Variable<int>(pointsLimit);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -12286,6 +12316,9 @@ class Army extends DataClass implements Insertable<Army> {
       notes: notes == null && nullToAbsent
           ? const Value.absent()
           : Value(notes),
+      pointsLimit: pointsLimit == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pointsLimit),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -12301,6 +12334,7 @@ class Army extends DataClass implements Insertable<Army> {
       factionId: serializer.fromJson<String>(json['factionId']),
       name: serializer.fromJson<String>(json['name']),
       notes: serializer.fromJson<String?>(json['notes']),
+      pointsLimit: serializer.fromJson<int?>(json['pointsLimit']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -12313,6 +12347,7 @@ class Army extends DataClass implements Insertable<Army> {
       'factionId': serializer.toJson<String>(factionId),
       'name': serializer.toJson<String>(name),
       'notes': serializer.toJson<String?>(notes),
+      'pointsLimit': serializer.toJson<int?>(pointsLimit),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -12323,6 +12358,7 @@ class Army extends DataClass implements Insertable<Army> {
     String? factionId,
     String? name,
     Value<String?> notes = const Value.absent(),
+    Value<int?> pointsLimit = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => Army(
@@ -12330,6 +12366,7 @@ class Army extends DataClass implements Insertable<Army> {
     factionId: factionId ?? this.factionId,
     name: name ?? this.name,
     notes: notes.present ? notes.value : this.notes,
+    pointsLimit: pointsLimit.present ? pointsLimit.value : this.pointsLimit,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -12339,6 +12376,9 @@ class Army extends DataClass implements Insertable<Army> {
       factionId: data.factionId.present ? data.factionId.value : this.factionId,
       name: data.name.present ? data.name.value : this.name,
       notes: data.notes.present ? data.notes.value : this.notes,
+      pointsLimit: data.pointsLimit.present
+          ? data.pointsLimit.value
+          : this.pointsLimit,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -12351,6 +12391,7 @@ class Army extends DataClass implements Insertable<Army> {
           ..write('factionId: $factionId, ')
           ..write('name: $name, ')
           ..write('notes: $notes, ')
+          ..write('pointsLimit: $pointsLimit, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -12358,8 +12399,15 @@ class Army extends DataClass implements Insertable<Army> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, factionId, name, notes, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+    id,
+    factionId,
+    name,
+    notes,
+    pointsLimit,
+    createdAt,
+    updatedAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -12368,6 +12416,7 @@ class Army extends DataClass implements Insertable<Army> {
           other.factionId == this.factionId &&
           other.name == this.name &&
           other.notes == this.notes &&
+          other.pointsLimit == this.pointsLimit &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -12377,6 +12426,7 @@ class ArmiesCompanion extends UpdateCompanion<Army> {
   final Value<String> factionId;
   final Value<String> name;
   final Value<String?> notes;
+  final Value<int?> pointsLimit;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -12385,6 +12435,7 @@ class ArmiesCompanion extends UpdateCompanion<Army> {
     this.factionId = const Value.absent(),
     this.name = const Value.absent(),
     this.notes = const Value.absent(),
+    this.pointsLimit = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -12394,6 +12445,7 @@ class ArmiesCompanion extends UpdateCompanion<Army> {
     required String factionId,
     required String name,
     this.notes = const Value.absent(),
+    this.pointsLimit = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -12405,6 +12457,7 @@ class ArmiesCompanion extends UpdateCompanion<Army> {
     Expression<String>? factionId,
     Expression<String>? name,
     Expression<String>? notes,
+    Expression<int>? pointsLimit,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -12414,6 +12467,7 @@ class ArmiesCompanion extends UpdateCompanion<Army> {
       if (factionId != null) 'faction_id': factionId,
       if (name != null) 'name': name,
       if (notes != null) 'notes': notes,
+      if (pointsLimit != null) 'points_limit': pointsLimit,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -12425,6 +12479,7 @@ class ArmiesCompanion extends UpdateCompanion<Army> {
     Value<String>? factionId,
     Value<String>? name,
     Value<String?>? notes,
+    Value<int?>? pointsLimit,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
@@ -12434,6 +12489,7 @@ class ArmiesCompanion extends UpdateCompanion<Army> {
       factionId: factionId ?? this.factionId,
       name: name ?? this.name,
       notes: notes ?? this.notes,
+      pointsLimit: pointsLimit ?? this.pointsLimit,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -12455,6 +12511,9 @@ class ArmiesCompanion extends UpdateCompanion<Army> {
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
     }
+    if (pointsLimit.present) {
+      map['points_limit'] = Variable<int>(pointsLimit.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -12474,6 +12533,7 @@ class ArmiesCompanion extends UpdateCompanion<Army> {
           ..write('factionId: $factionId, ')
           ..write('name: $name, ')
           ..write('notes: $notes, ')
+          ..write('pointsLimit: $pointsLimit, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -19368,6 +19428,7 @@ typedef $$ArmiesTableCreateCompanionBuilder =
       required String factionId,
       required String name,
       Value<String?> notes,
+      Value<int?> pointsLimit,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -19378,6 +19439,7 @@ typedef $$ArmiesTableUpdateCompanionBuilder =
       Value<String> factionId,
       Value<String> name,
       Value<String?> notes,
+      Value<int?> pointsLimit,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -19409,6 +19471,11 @@ class $$ArmiesTableFilterComposer
 
   ColumnFilters<String> get notes => $composableBuilder(
     column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get pointsLimit => $composableBuilder(
+    column: $table.pointsLimit,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -19452,6 +19519,11 @@ class $$ArmiesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get pointsLimit => $composableBuilder(
+    column: $table.pointsLimit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -19483,6 +19555,11 @@ class $$ArmiesTableAnnotationComposer
 
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<int> get pointsLimit => $composableBuilder(
+    column: $table.pointsLimit,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -19523,6 +19600,7 @@ class $$ArmiesTableTableManager
                 Value<String> factionId = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
+                Value<int?> pointsLimit = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -19531,6 +19609,7 @@ class $$ArmiesTableTableManager
                 factionId: factionId,
                 name: name,
                 notes: notes,
+                pointsLimit: pointsLimit,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -19541,6 +19620,7 @@ class $$ArmiesTableTableManager
                 required String factionId,
                 required String name,
                 Value<String?> notes = const Value.absent(),
+                Value<int?> pointsLimit = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -19549,6 +19629,7 @@ class $$ArmiesTableTableManager
                 factionId: factionId,
                 name: name,
                 notes: notes,
+                pointsLimit: pointsLimit,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,

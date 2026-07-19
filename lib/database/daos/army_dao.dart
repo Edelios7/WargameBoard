@@ -9,6 +9,7 @@ import '../tables/datasheet_costs_table.dart';
 import '../tables/datasheets_table.dart';
 import '../tables/editions_table.dart';
 import '../tables/factions_table.dart';
+import '../tables/unit_sizes_table.dart';
 
 part 'army_dao.g.dart';
 
@@ -20,6 +21,7 @@ part 'army_dao.g.dart';
     Datasheets,
     DatasheetCosts,
     Editions,
+    UnitSizes,
   ],
 )
 class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
@@ -30,10 +32,16 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
   Future<String> createArmy({
     required String name,
     required String factionId,
+    int? pointsLimit,
   }) async {
     final id = _uuid.v4();
     await into(armies).insert(
-      ArmiesCompanion.insert(id: id, factionId: factionId, name: name),
+      ArmiesCompanion.insert(
+        id: id,
+        factionId: factionId,
+        name: name,
+        pointsLimit: Value(pointsLimit),
+      ),
     );
     return id;
   }
@@ -64,6 +72,30 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     return (delete(armyUnits)..where((t) => t.id.equals(armyUnitId))).go();
   }
 
+  /// Met à jour le nombre de figurines d'une unité, borné par les
+  /// tailles min/max de sa datasheet. Retourne la valeur réellement
+  /// appliquée (après éventuel ajustement).
+  Future<int> updateModelCount(String armyUnitId, int modelCount) async {
+    final unit = await (select(armyUnits)
+          ..where((t) => t.id.equals(armyUnitId)))
+        .getSingle();
+
+    final size = await (select(unitSizes)
+          ..where((t) => t.datasheetId.equals(unit.datasheetId))
+          ..limit(1))
+        .getSingleOrNull();
+
+    var clamped = modelCount;
+    if (size != null) {
+      clamped = clamped.clamp(size.minimumModels, size.maximumModels);
+    }
+
+    await (update(armyUnits)..where((t) => t.id.equals(armyUnitId)))
+        .write(ArmyUnitsCompanion(modelCount: Value(clamped)));
+
+    return clamped;
+  }
+
   Future<List<ArmyListItem>> listArmies() async {
     final query = select(armies).join([
       innerJoin(factions, factions.id.equalsExp(armies.factionId)),
@@ -81,6 +113,7 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         factionId: faction.id,
         factionName: faction.name,
         totalPoints: await _totalPoints(army.id),
+        pointsLimit: army.pointsLimit,
       ));
     }
     return result;
@@ -109,6 +142,10 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         editions.id.equalsExp(datasheetCosts.editionId) &
             editions.isCurrent.equals(true),
       ),
+      leftOuterJoin(
+        unitSizes,
+        unitSizes.datasheetId.equalsExp(armyUnits.datasheetId),
+      ),
     ])
       ..where(armyUnits.armyId.equals(armyId))
       ..orderBy([OrderingTerm.asc(armyUnits.displayOrder)]);
@@ -120,6 +157,7 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
       final unit = row.readTable(armyUnits);
       final datasheet = row.readTable(datasheets);
       final cost = row.readTableOrNull(datasheetCosts);
+      final size = row.readTableOrNull(unitSizes);
       final points = cost?.points ?? 0;
       totalPoints += points;
       units.add(ArmyUnitDetails(
@@ -127,6 +165,8 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         datasheetId: datasheet.id,
         datasheetName: datasheet.name,
         modelCount: unit.modelCount,
+        minimumModels: size?.minimumModels ?? unit.modelCount,
+        maximumModels: size?.maximumModels ?? unit.modelCount,
         points: points,
       ));
     }
@@ -139,6 +179,7 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
       notes: army.notes,
       units: units,
       totalPoints: totalPoints,
+      pointsLimit: army.pointsLimit,
     );
   }
 

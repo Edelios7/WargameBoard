@@ -146,7 +146,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   // =========================
   // Migrations
@@ -163,6 +163,9 @@ class AppDatabase extends _$AppDatabase {
           if (from < 2) {
             await m.createTable(armies);
             await m.createTable(armyUnits);
+          }
+          if (from < 3) {
+            await m.addColumn(armies, armies.pointsLimit);
           }
         },
 

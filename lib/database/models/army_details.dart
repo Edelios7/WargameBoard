@@ -4,6 +4,7 @@ class ArmyListItem {
   final String factionId;
   final String factionName;
   final int totalPoints;
+  final int? pointsLimit;
 
   const ArmyListItem({
     required this.id,
@@ -11,7 +12,10 @@ class ArmyListItem {
     required this.factionId,
     required this.factionName,
     required this.totalPoints,
+    this.pointsLimit,
   });
+
+  bool get isOverLimit => pointsLimit != null && totalPoints > pointsLimit!;
 }
 
 class ArmyUnitDetails {
@@ -19,6 +23,8 @@ class ArmyUnitDetails {
   final String datasheetId;
   final String datasheetName;
   final int modelCount;
+  final int minimumModels;
+  final int maximumModels;
   final int points;
 
   const ArmyUnitDetails({
@@ -26,6 +32,8 @@ class ArmyUnitDetails {
     required this.datasheetId,
     required this.datasheetName,
     required this.modelCount,
+    required this.minimumModels,
+    required this.maximumModels,
     required this.points,
   });
 }
@@ -38,6 +46,7 @@ class ArmyDetails {
   final String? notes;
   final List<ArmyUnitDetails> units;
   final int totalPoints;
+  final int? pointsLimit;
 
   const ArmyDetails({
     required this.id,
@@ -47,5 +56,8 @@ class ArmyDetails {
     this.notes,
     required this.units,
     required this.totalPoints,
+    this.pointsLimit,
   });
+
+  bool get isOverLimit => pointsLimit != null && totalPoints > pointsLimit!;
 }

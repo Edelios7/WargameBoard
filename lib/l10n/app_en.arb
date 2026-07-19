@@ -59,5 +59,15 @@
     "placeholders": {
       "count": { "type": "int" }
     }
-  }
+  },
+
+  "armyBuilderPointsLimitLabel": "Points limit (optional)",
+  "armyBuilderPointsWithLimit": "{points} / {limit} pts",
+  "@armyBuilderPointsWithLimit": {
+    "placeholders": {
+      "points": { "type": "int" },
+      "limit": { "type": "int" }
+    }
+  },
+  "armyBuilderOverLimit": "Points limit exceeded"
 }

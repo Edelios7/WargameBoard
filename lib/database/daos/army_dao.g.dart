@@ -10,6 +10,7 @@ mixin _$ArmyDaoMixin on DatabaseAccessor<AppDatabase> {
   $DatasheetsTable get datasheets => attachedDatabase.datasheets;
   $DatasheetCostsTable get datasheetCosts => attachedDatabase.datasheetCosts;
   $EditionsTable get editions => attachedDatabase.editions;
+  $UnitSizesTable get unitSizes => attachedDatabase.unitSizes;
   ArmyDaoManager get managers => ArmyDaoManager(this);
 }
 
@@ -31,4 +32,6 @@ class ArmyDaoManager {
       );
   $$EditionsTableTableManager get editions =>
       $$EditionsTableTableManager(_db.attachedDatabase, _db.editions);
+  $$UnitSizesTableTableManager get unitSizes =>
+      $$UnitSizesTableTableManager(_db.attachedDatabase, _db.unitSizes);
 }

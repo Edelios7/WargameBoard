@@ -202,20 +202,42 @@ class _ArmyDetail extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(.18),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.primary.withOpacity(.4)),
-            ),
-            child: Text(
-              l10n.pointsSuffix(army.totalPoints),
-              style: AppTextStyles.body.copyWith(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
+          Row(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: (army.isOverLimit ? AppColors.error : AppColors.primary)
+                      .withOpacity(.18),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: (army.isOverLimit
+                            ? AppColors.error
+                            : AppColors.primary)
+                        .withOpacity(.4),
+                  ),
+                ),
+                child: Text(
+                  army.pointsLimit != null
+                      ? l10n.armyBuilderPointsWithLimit(
+                          army.totalPoints, army.pointsLimit!)
+                      : l10n.pointsSuffix(army.totalPoints),
+                  style: AppTextStyles.body.copyWith(
+                    color:
+                        army.isOverLimit ? AppColors.error : AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
-            ),
+              if (army.isOverLimit) ...[
+                const SizedBox(width: 10),
+                Text(
+                  l10n.armyBuilderOverLimit,
+                  style: AppTextStyles.caption.copyWith(color: AppColors.error),
+                ),
+              ],
+            ],
           ),
           const SizedBox(height: 24),
           FilledButton.icon(
@@ -273,6 +295,48 @@ class _ArmyDetail extends ConsumerWidget {
                                   ],
                                 ),
                               ),
+                              if (unit.maximumModels > unit.minimumModels) ...[
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.remove_circle_outline_rounded,
+                                    size: 20,
+                                  ),
+                                  color: AppColors.textSecondary,
+                                  onPressed: unit.modelCount <=
+                                          unit.minimumModels
+                                      ? null
+                                      : () async {
+                                          await ref
+                                              .read(armyRepositoryProvider)
+                                              .updateModelCount(
+                                                unit.id,
+                                                unit.modelCount - 1,
+                                              );
+                                          ref.invalidate(selectedArmyProvider);
+                                          ref.invalidate(armiesListProvider);
+                                        },
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.add_circle_outline_rounded,
+                                    size: 20,
+                                  ),
+                                  color: AppColors.textSecondary,
+                                  onPressed: unit.modelCount >=
+                                          unit.maximumModels
+                                      ? null
+                                      : () async {
+                                          await ref
+                                              .read(armyRepositoryProvider)
+                                              .updateModelCount(
+                                                unit.id,
+                                                unit.modelCount + 1,
+                                              );
+                                          ref.invalidate(selectedArmyProvider);
+                                          ref.invalidate(armiesListProvider);
+                                        },
+                                ),
+                              ],
                               Text(
                                 l10n.pointsSuffix(unit.points),
                                 style: AppTextStyles.body,

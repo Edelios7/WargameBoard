@@ -16,11 +16,13 @@ class CreateArmyDialog extends ConsumerStatefulWidget {
 
 class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
   final _nameController = TextEditingController();
+  final _pointsLimitController = TextEditingController();
   String? _factionId;
 
   @override
   void dispose() {
     _nameController.dispose();
+    _pointsLimitController.dispose();
     super.dispose();
   }
 
@@ -31,6 +33,7 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
     final armyId = await ref.read(armyRepositoryProvider).createArmy(
           name: _nameController.text.trim(),
           factionId: factionId,
+          pointsLimit: int.tryParse(_pointsLimitController.text.trim()),
         );
 
     ref.invalidate(armiesListProvider);
@@ -105,6 +108,22 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
                     onChanged: (value) => setState(() => _factionId = value),
                   );
                 },
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _pointsLimitController,
+                keyboardType: TextInputType.number,
+                style: AppTextStyles.body,
+                decoration: InputDecoration(
+                  labelText: l10n.armyBuilderPointsLimitLabel,
+                  labelStyle: AppTextStyles.caption,
+                  filled: true,
+                  fillColor: AppColors.background,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
               ),
               const SizedBox(height: 24),
               Row(
