@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../l10n/app_localizations.dart';
 import 'sidebar_item.dart';
 
 class Sidebar extends StatelessWidget {
@@ -16,6 +17,8 @@ class Sidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: 240,
       decoration: BoxDecoration(
@@ -31,7 +34,7 @@ class Sidebar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Wargame Board",
+            l10n.appTitle,
             style: AppTextStyles.title,
           ),
 
@@ -40,31 +43,37 @@ class Sidebar extends StatelessWidget {
           _item(
             0,
             Icons.home_rounded,
-            "Dashboard",
+            l10n.navDashboard,
           ),
 
           _item(
             1,
-            Icons.groups_rounded,
-            "Armées",
+            Icons.auto_stories_rounded,
+            l10n.navCatalog,
           ),
 
           _item(
             2,
-            Icons.sports_martial_arts_rounded,
-            "Batailles",
+            Icons.groups_rounded,
+            l10n.navArmies,
           ),
 
           _item(
             3,
-            Icons.inventory_2_rounded,
-            "Collection",
+            Icons.sports_martial_arts_rounded,
+            l10n.navBattles,
           ),
 
           _item(
             4,
+            Icons.inventory_2_rounded,
+            l10n.navCollection,
+          ),
+
+          _item(
+            5,
             Icons.bar_chart_rounded,
-            "Statistiques",
+            l10n.navStatistics,
           ),
 
           const Spacer(),
@@ -72,7 +81,7 @@ class Sidebar extends StatelessWidget {
           Opacity(
             opacity: .45,
             child: Text(
-              "Version 0.1",
+              l10n.versionLabel,
               style: AppTextStyles.body,
             ),
           ),

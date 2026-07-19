@@ -1,5 +1,46 @@
 {
   "@@locale": "en",
 
-  "appTitle": "Wargame Board"
+  "appTitle": "Wargame Board",
+
+  "navDashboard": "Dashboard",
+  "navCatalog": "Catalog",
+  "navArmies": "Armies",
+  "navBattles": "Battles",
+  "navCollection": "Collection",
+  "navStatistics": "Statistics",
+  "versionLabel": "Version 0.1",
+
+  "catalogSearchHint": "Search for a unit...",
+  "catalogEmptyResults": "No unit found",
+  "catalogSelectPrompt": "Select a unit to see its datasheet",
+  "catalogLoadError": "Error loading catalog: {error}",
+  "@catalogLoadError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "sectionUnitSize": "Unit size",
+  "sectionProfiles": "Profiles",
+  "sectionWeapons": "Weapons",
+  "sectionKeywords": "Keywords",
+  "sectionAbilities": "Abilities",
+  "sectionEquipment": "Equipment",
+
+  "unitSizeRange": "{min} - {max} models (default: {defaultSize})",
+  "@unitSizeRange": {
+    "placeholders": {
+      "min": { "type": "int" },
+      "max": { "type": "int" },
+      "defaultSize": { "type": "int" }
+    }
+  },
+
+  "pointsSuffix": "{points} pts",
+  "@pointsSuffix": {
+    "placeholders": {
+      "points": { "type": "int" }
+    }
+  }
 }

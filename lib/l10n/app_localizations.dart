@@ -103,6 +103,120 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Wargame Board'**
   String get appTitle;
+
+  /// No description provided for @navDashboard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dashboard'**
+  String get navDashboard;
+
+  /// No description provided for @navCatalog.
+  ///
+  /// In fr, this message translates to:
+  /// **'Catalogue'**
+  String get navCatalog;
+
+  /// No description provided for @navArmies.
+  ///
+  /// In fr, this message translates to:
+  /// **'Armées'**
+  String get navArmies;
+
+  /// No description provided for @navBattles.
+  ///
+  /// In fr, this message translates to:
+  /// **'Batailles'**
+  String get navBattles;
+
+  /// No description provided for @navCollection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Collection'**
+  String get navCollection;
+
+  /// No description provided for @navStatistics.
+  ///
+  /// In fr, this message translates to:
+  /// **'Statistiques'**
+  String get navStatistics;
+
+  /// No description provided for @versionLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Version 0.1'**
+  String get versionLabel;
+
+  /// No description provided for @catalogSearchHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher une unité...'**
+  String get catalogSearchHint;
+
+  /// No description provided for @catalogEmptyResults.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune unité trouvée'**
+  String get catalogEmptyResults;
+
+  /// No description provided for @catalogSelectPrompt.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionnez une unité pour voir sa fiche'**
+  String get catalogSelectPrompt;
+
+  /// No description provided for @catalogLoadError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur de chargement du catalogue : {error}'**
+  String catalogLoadError(String error);
+
+  /// No description provided for @sectionUnitSize.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effectif'**
+  String get sectionUnitSize;
+
+  /// No description provided for @sectionProfiles.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profils'**
+  String get sectionProfiles;
+
+  /// No description provided for @sectionWeapons.
+  ///
+  /// In fr, this message translates to:
+  /// **'Armes'**
+  String get sectionWeapons;
+
+  /// No description provided for @sectionKeywords.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mots-clés'**
+  String get sectionKeywords;
+
+  /// No description provided for @sectionAbilities.
+  ///
+  /// In fr, this message translates to:
+  /// **'Capacités'**
+  String get sectionAbilities;
+
+  /// No description provided for @sectionEquipment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Équipement'**
+  String get sectionEquipment;
+
+  /// No description provided for @unitSizeRange.
+  ///
+  /// In fr, this message translates to:
+  /// **'{min} - {max} figurines (par défaut : {defaultSize})'**
+  String unitSizeRange(int min, int max, int defaultSize);
+
+  /// No description provided for @pointsSuffix.
+  ///
+  /// In fr, this message translates to:
+  /// **'{points} pts'**
+  String pointsSuffix(int points);
 }
 
 class _AppLocalizationsDelegate

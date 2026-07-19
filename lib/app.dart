@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'core/theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
 import 'shell/app_shell.dart';
 
@@ -15,10 +16,7 @@ class WargameBoardApp extends StatelessWidget {
       onGenerateTitle: (context) =>
           AppLocalizations.of(context)!.appTitle,
 
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        useMaterial3: true,
-      ),
+      theme: AppTheme.darkTheme,
 
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -28,8 +26,6 @@ class WargameBoardApp extends StatelessWidget {
       ],
 
       supportedLocales: AppLocalizations.supportedLocales,
-
-      locale: const Locale('fr'),
 
       home: const AppShell(),
     );

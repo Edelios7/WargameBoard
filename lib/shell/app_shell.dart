@@ -4,6 +4,7 @@ import '../features/dashboard/pages/dashboard_page.dart';
 import '../features/dashboard/widgets/sidebar.dart';
 import '../features/armies/pages/armies_page.dart';
 import '../features/battle/pages/battle_page.dart';
+import '../features/catalog/pages/catalog_page.dart';
 import '../features/collection/pages/collection_page.dart';
 import '../features/statistics/pages/statistics_page.dart';
 
@@ -19,6 +20,7 @@ class _AppShellState extends State<AppShell> {
 
   final List<Widget> pages = const [
     DashboardPage(),
+    CatalogPage(),
     ArmiesPage(),
     BattlePage(),
     CollectionPage(),
