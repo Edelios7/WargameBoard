@@ -18,6 +18,7 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
   final _nameController = TextEditingController();
   final _pointsLimitController = TextEditingController();
   String? _factionId;
+  String? _detachmentId;
 
   @override
   void dispose() {
@@ -34,6 +35,7 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
           name: _nameController.text.trim(),
           factionId: factionId,
           pointsLimit: int.tryParse(_pointsLimitController.text.trim()),
+          detachmentId: _detachmentId,
         );
 
     ref.invalidate(armiesListProvider);
@@ -105,10 +107,61 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
                           ),
                         )
                         .toList(),
-                    onChanged: (value) => setState(() => _factionId = value),
+                    onChanged: (value) => setState(() {
+                      _factionId = value;
+                      _detachmentId = null;
+                    }),
                   );
                 },
               ),
+              if (_factionId != null) ...[
+                const SizedBox(height: 16),
+                Consumer(
+                  builder: (context, ref, _) {
+                    final detachmentsAsync = ref.watch(
+                      detachmentsForFactionProvider(_factionId!),
+                    );
+                    return detachmentsAsync.when(
+                      loading: () => const LinearProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                      error: (_, __) => const SizedBox.shrink(),
+                      data: (detachments) {
+                        if (detachments.isEmpty) return const SizedBox.shrink();
+                        return DropdownButtonFormField<String?>(
+                          initialValue: _detachmentId,
+                          dropdownColor: AppColors.surface,
+                          style: AppTextStyles.body,
+                          decoration: InputDecoration(
+                            labelText: l10n.armyBuilderDetachmentLabel,
+                            labelStyle: AppTextStyles.caption,
+                            filled: true,
+                            fillColor: AppColors.background,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          items: [
+                            DropdownMenuItem<String?>(
+                              value: null,
+                              child: Text(l10n.armyBuilderDetachmentNone),
+                            ),
+                            ...detachments.map(
+                              (d) => DropdownMenuItem<String?>(
+                                value: d.id,
+                                child: Text(d.name),
+                              ),
+                            ),
+                          ],
+                          onChanged: (value) =>
+                              setState(() => _detachmentId = value),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
               const SizedBox(height: 16),
               TextField(
                 controller: _pointsLimitController,

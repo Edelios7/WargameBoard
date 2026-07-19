@@ -62,6 +62,11 @@
   "armyBuilderAddUnit": "Ajouter une unité",
   "armyBuilderEmptyUnits": "Aucune unité dans cette armée",
   "armyBuilderDeleteArmy": "Supprimer l'armée",
+  "armyBuilderDetachmentLabel": "Détachement (optionnel)",
+  "armyBuilderDetachmentNone": "Aucun",
+  "armyBuilderEnhancementLabel": "Enhancement",
+  "armyBuilderEnhancementNone": "Aucun",
+  "armyBuilderChooseEnhancement": "Choisir un enhancement",
   "armyBuilderModelCount": "{count} figurines",
   "@armyBuilderModelCount": {
     "placeholders": {

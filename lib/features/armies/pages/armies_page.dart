@@ -115,6 +115,66 @@ class ArmiesPage extends ConsumerWidget {
   }
 }
 
+Future<void> _pickEnhancement(
+  BuildContext context,
+  WidgetRef ref,
+  String detachmentId,
+  ArmyUnitDetails unit,
+) async {
+  final l10n = AppLocalizations.of(context)!;
+  final options =
+      await ref.read(armyRepositoryProvider).getEnhancementsForDetachment(
+            detachmentId,
+          );
+
+  if (!context.mounted) return;
+
+  final selected = await showDialog<String?>(
+    context: context,
+    builder: (context) => Dialog(
+      backgroundColor: AppColors.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 400),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              ListTile(
+                title: Text(
+                  l10n.armyBuilderEnhancementNone,
+                  style: AppTextStyles.body,
+                ),
+                onTap: () => Navigator.of(context).pop(''),
+              ),
+              ...options.map(
+                (option) => ListTile(
+                  title: Text(option.name, style: AppTextStyles.body),
+                  subtitle: Text(
+                    l10n.pointsSuffix(option.points),
+                    style: AppTextStyles.caption,
+                  ),
+                  onTap: () => Navigator.of(context).pop(option.id),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  if (selected == null) return; // dialog dismissed, no change
+
+  await ref.read(armyRepositoryProvider).setUnitEnhancement(
+        unit.id,
+        selected.isEmpty ? null : selected,
+      );
+  ref.invalidate(selectedArmyProvider);
+  ref.invalidate(armiesListProvider);
+}
+
 class _ArmyListItem extends StatelessWidget {
   final ArmyListItem army;
   final bool selected;
@@ -192,7 +252,12 @@ class _ArmyDetail extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
-                    Text(army.factionName, style: AppTextStyles.caption),
+                    Text(
+                      army.detachmentName != null
+                          ? '${army.factionName} · ${army.detachmentName}'
+                          : army.factionName,
+                      style: AppTextStyles.caption,
+                    ),
                   ],
                 ),
               ),
@@ -299,6 +364,24 @@ class _ArmyDetail extends ConsumerWidget {
                                       ),
                                       style: AppTextStyles.caption,
                                     ),
+                                    if (army.detachmentId != null) ...[
+                                      const SizedBox(height: 4),
+                                      InkWell(
+                                        onTap: () => _pickEnhancement(
+                                          context,
+                                          ref,
+                                          army.detachmentId!,
+                                          unit,
+                                        ),
+                                        child: Text(
+                                          unit.enhancementName ??
+                                              l10n.armyBuilderChooseEnhancement,
+                                          style: AppTextStyles.caption.copyWith(
+                                            color: AppColors.primary,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ],
                                 ),
                               ),

@@ -1,6 +1,7 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wargameboard/database/app_database.dart';
+import 'package:wargameboard/database/seed/detachment_seed.dart';
 import 'package:wargameboard/database/seed/faction_seed.dart';
 
 void main() {
@@ -114,5 +115,39 @@ void main() {
     final army = await database.armyDao.getArmy(armyId);
     expect(army!.pointsLimit, 50);
     expect(army.isOverLimit, isTrue);
+  });
+
+  test('detachment and enhancement points are included in the total',
+      () async {
+    final armyId = await database.armyDao.createArmy(
+      name: 'Liste avec détachement',
+      factionId: seedFactionId,
+      detachmentId: detAngelicHost,
+    );
+    final results = await database.datasheetDao.search('Captain');
+    final unitId = await database.armyDao.addUnit(
+      armyId: armyId,
+      datasheetId: results.single.id,
+      modelCount: 1,
+    );
+
+    final beforeEnhancement = await database.armyDao.getArmy(armyId);
+    final basePoints = beforeEnhancement!.totalPoints;
+
+    await database.armyDao.setUnitEnhancement(unitId, enhDeathVisions);
+
+    final army = await database.armyDao.getArmy(armyId);
+    expect(army!.detachmentName, 'Angelic Host');
+    expect(army.units.single.enhancementName, 'Death Visions of Sanguinius');
+    expect(army.units.single.enhancementPoints, 25);
+    expect(army.totalPoints, basePoints + 25);
+
+    final detachments =
+        await database.armyDao.getDetachmentsForFaction(seedFactionId);
+    expect(detachments.map((d) => d.id), contains(detAngelicHost));
+
+    final options =
+        await database.armyDao.getEnhancementsForDetachment(detAngelicHost);
+    expect(options, hasLength(3));
   });
 }

@@ -7,7 +7,9 @@ import '../tables/armies_table.dart';
 import '../tables/army_units_table.dart';
 import '../tables/datasheet_costs_table.dart';
 import '../tables/datasheets_table.dart';
+import '../tables/detachments_table.dart';
 import '../tables/editions_table.dart';
+import '../tables/enhancements_table.dart';
 import '../tables/factions_table.dart';
 import '../tables/unit_sizes_table.dart';
 
@@ -22,6 +24,8 @@ part 'army_dao.g.dart';
     DatasheetCosts,
     Editions,
     UnitSizes,
+    Detachments,
+    Enhancements,
   ],
 )
 class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
@@ -33,6 +37,7 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     required String name,
     required String factionId,
     int? pointsLimit,
+    String? detachmentId,
   }) async {
     final id = _uuid.v4();
     await into(armies).insert(
@@ -41,6 +46,7 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         factionId: factionId,
         name: name,
         pointsLimit: Value(pointsLimit),
+        detachmentId: Value(detachmentId),
       ),
     );
     return id;
@@ -96,6 +102,48 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     return clamped;
   }
 
+  /// Attache (ou retire, si `enhancementId` est null) un enhancement à
+  /// une unité.
+  Future<void> setUnitEnhancement(
+    String armyUnitId,
+    String? enhancementId,
+  ) {
+    return (update(armyUnits)..where((t) => t.id.equals(armyUnitId))).write(
+      ArmyUnitsCompanion(enhancementId: Value(enhancementId)),
+    );
+  }
+
+  Future<List<DetachmentOption>> getDetachmentsForFaction(
+    String factionId,
+  ) async {
+    final rows = await (select(detachments)
+          ..where((t) => t.factionId.equals(factionId)))
+        .get();
+    return rows
+        .map((d) => DetachmentOption(
+              id: d.id,
+              name: d.name,
+              description: d.description,
+            ))
+        .toList();
+  }
+
+  Future<List<EnhancementOption>> getEnhancementsForDetachment(
+    String detachmentId,
+  ) async {
+    final rows = await (select(enhancements)
+          ..where((t) => t.detachmentId.equals(detachmentId)))
+        .get();
+    return rows
+        .map((e) => EnhancementOption(
+              id: e.id,
+              name: e.name,
+              points: e.points,
+              description: e.description,
+            ))
+        .toList();
+  }
+
   Future<List<ArmyListItem>> listArmies() async {
     final query = select(armies).join([
       innerJoin(factions, factions.id.equalsExp(armies.factionId)),
@@ -122,6 +170,10 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
   Future<ArmyDetails?> getArmy(String armyId) async {
     final headerQuery = select(armies).join([
       innerJoin(factions, factions.id.equalsExp(armies.factionId)),
+      leftOuterJoin(
+        detachments,
+        detachments.id.equalsExp(armies.detachmentId),
+      ),
     ])
       ..where(armies.id.equals(armyId));
 
@@ -130,6 +182,7 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
 
     final army = headerRow.readTable(armies);
     final faction = headerRow.readTable(factions);
+    final detachment = headerRow.readTableOrNull(detachments);
 
     final unitsQuery = select(armyUnits).join([
       innerJoin(datasheets, datasheets.id.equalsExp(armyUnits.datasheetId)),
@@ -146,6 +199,10 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         unitSizes,
         unitSizes.datasheetId.equalsExp(armyUnits.datasheetId),
       ),
+      leftOuterJoin(
+        enhancements,
+        enhancements.id.equalsExp(armyUnits.enhancementId),
+      ),
     ])
       ..where(armyUnits.armyId.equals(armyId))
       ..orderBy([OrderingTerm.asc(armyUnits.displayOrder)]);
@@ -158,8 +215,10 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
       final datasheet = row.readTable(datasheets);
       final cost = row.readTableOrNull(datasheetCosts);
       final size = row.readTableOrNull(unitSizes);
-      final points = cost?.points ?? 0;
-      totalPoints += points;
+      final enhancement = row.readTableOrNull(enhancements);
+      final datasheetPoints = cost?.points ?? 0;
+      final enhancementPoints = enhancement?.points ?? 0;
+      totalPoints += datasheetPoints + enhancementPoints;
       units.add(ArmyUnitDetails(
         id: unit.id,
         datasheetId: datasheet.id,
@@ -167,7 +226,10 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         modelCount: unit.modelCount,
         minimumModels: size?.minimumModels ?? unit.modelCount,
         maximumModels: size?.maximumModels ?? unit.modelCount,
-        points: points,
+        datasheetPoints: datasheetPoints,
+        enhancementId: enhancement?.id,
+        enhancementName: enhancement?.name,
+        enhancementPoints: enhancementPoints,
       ));
     }
 
@@ -176,6 +238,8 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
       name: army.name,
       factionId: faction.id,
       factionName: faction.name,
+      detachmentId: detachment?.id,
+      detachmentName: detachment?.name,
       notes: army.notes,
       units: units,
       totalPoints: totalPoints,
@@ -194,6 +258,10 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         editions.id.equalsExp(datasheetCosts.editionId) &
             editions.isCurrent.equals(true),
       ),
+      leftOuterJoin(
+        enhancements,
+        enhancements.id.equalsExp(armyUnits.enhancementId),
+      ),
     ])
       ..where(armyUnits.armyId.equals(armyId));
 
@@ -201,6 +269,8 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     var total = 0;
     for (final row in rows) {
       total += row.readTable(datasheetCosts).points;
+      final enhancement = row.readTableOrNull(enhancements);
+      total += enhancement?.points ?? 0;
     }
     return total;
   }

@@ -320,6 +320,36 @@ abstract class AppLocalizations {
   /// **'Supprimer l\'armée'**
   String get armyBuilderDeleteArmy;
 
+  /// No description provided for @armyBuilderDetachmentLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détachement (optionnel)'**
+  String get armyBuilderDetachmentLabel;
+
+  /// No description provided for @armyBuilderDetachmentNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun'**
+  String get armyBuilderDetachmentNone;
+
+  /// No description provided for @armyBuilderEnhancementLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enhancement'**
+  String get armyBuilderEnhancementLabel;
+
+  /// No description provided for @armyBuilderEnhancementNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun'**
+  String get armyBuilderEnhancementNone;
+
+  /// No description provided for @armyBuilderChooseEnhancement.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir un enhancement'**
+  String get armyBuilderChooseEnhancement;
+
   /// No description provided for @armyBuilderModelCount.
   ///
   /// In fr, this message translates to:

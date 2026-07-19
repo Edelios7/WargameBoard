@@ -127,6 +127,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String get armyBuilderDeleteArmy => 'Supprimer l\'armée';
 
   @override
+  String get armyBuilderDetachmentLabel => 'Détachement (optionnel)';
+
+  @override
+  String get armyBuilderDetachmentNone => 'Aucun';
+
+  @override
+  String get armyBuilderEnhancementLabel => 'Enhancement';
+
+  @override
+  String get armyBuilderEnhancementNone => 'Aucun';
+
+  @override
+  String get armyBuilderChooseEnhancement => 'Choisir un enhancement';
+
+  @override
   String armyBuilderModelCount(int count) {
     return '$count figurines';
   }

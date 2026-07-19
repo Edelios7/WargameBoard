@@ -24,3 +24,16 @@ final selectedArmyProvider = FutureProvider<ArmyDetails?>((ref) async {
   final repository = ref.watch(armyRepositoryProvider);
   return repository.getArmy(armyId);
 });
+
+final detachmentsForFactionProvider =
+    FutureProvider.family<List<DetachmentOption>, String>((ref, factionId) {
+  final repository = ref.watch(armyRepositoryProvider);
+  return repository.getDetachmentsForFaction(factionId);
+});
+
+final enhancementsForDetachmentProvider =
+    FutureProvider.family<List<EnhancementOption>, String>(
+        (ref, detachmentId) {
+  final repository = ref.watch(armyRepositoryProvider);
+  return repository.getEnhancementsForDetachment(detachmentId);
+});

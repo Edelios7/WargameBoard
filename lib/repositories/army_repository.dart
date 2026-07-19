@@ -18,11 +18,13 @@ class ArmyRepository {
     required String name,
     required String factionId,
     int? pointsLimit,
+    String? detachmentId,
   }) {
     return database.armyDao.createArmy(
       name: name,
       factionId: factionId,
       pointsLimit: pointsLimit,
+      detachmentId: detachmentId,
     );
   }
 
@@ -32,6 +34,20 @@ class ArmyRepository {
 
   Future<int> updateModelCount(String armyUnitId, int modelCount) {
     return database.armyDao.updateModelCount(armyUnitId, modelCount);
+  }
+
+  Future<void> setUnitEnhancement(String armyUnitId, String? enhancementId) {
+    return database.armyDao.setUnitEnhancement(armyUnitId, enhancementId);
+  }
+
+  Future<List<DetachmentOption>> getDetachmentsForFaction(String factionId) {
+    return database.armyDao.getDetachmentsForFaction(factionId);
+  }
+
+  Future<List<EnhancementOption>> getEnhancementsForDetachment(
+    String detachmentId,
+  ) {
+    return database.armyDao.getEnhancementsForDetachment(detachmentId);
   }
 
   Future<String> addUnit({

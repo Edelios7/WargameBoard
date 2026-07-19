@@ -126,6 +126,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get armyBuilderDeleteArmy => 'Delete army';
 
   @override
+  String get armyBuilderDetachmentLabel => 'Detachment (optional)';
+
+  @override
+  String get armyBuilderDetachmentNone => 'None';
+
+  @override
+  String get armyBuilderEnhancementLabel => 'Enhancement';
+
+  @override
+  String get armyBuilderEnhancementNone => 'None';
+
+  @override
+  String get armyBuilderChooseEnhancement => 'Choose an enhancement';
+
+  @override
   String armyBuilderModelCount(int count) {
     return '$count models';
   }

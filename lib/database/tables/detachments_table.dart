@@ -1,21 +1,15 @@
 import 'package:drift/drift.dart';
 
-import 'detachments_table.dart';
 import 'factions_table.dart';
 
-class Armies extends Table {
+class Detachments extends Table {
   TextColumn get id => text()();
 
   TextColumn get factionId => text().references(Factions, #id)();
 
-  TextColumn get detachmentId =>
-      text().nullable().references(Detachments, #id)();
-
   TextColumn get name => text()();
 
-  TextColumn get notes => text().nullable()();
-
-  IntColumn get pointsLimit => integer().nullable()();
+  TextColumn get description => text().nullable()();
 
   DateTimeColumn get createdAt =>
       dateTime().withDefault(currentDateAndTime)();

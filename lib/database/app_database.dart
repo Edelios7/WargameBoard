@@ -41,6 +41,9 @@ import 'tables/weapon_ability_links_table.dart';
 import 'tables/datasheet_keyword_links_table.dart';
 import 'tables/datasheet_ability_links_table.dart';
 
+import 'tables/detachments_table.dart';
+import 'tables/enhancements_table.dart';
+
 import 'tables/armies_table.dart';
 import 'tables/army_units_table.dart';
 
@@ -110,6 +113,10 @@ part 'app_database.g.dart';
     DatasheetKeywordLinks,
     DatasheetAbilityLinks,
 
+    // ===== DETACHMENTS =====
+    Detachments,
+    Enhancements,
+
     // ===== ARMIES =====
     Armies,
     ArmyUnits,
@@ -164,7 +171,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   // =========================
   // Migrations
@@ -190,6 +197,12 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 5) {
             await m.createTable(battles);
+          }
+          if (from < 6) {
+            await m.createTable(detachments);
+            await m.createTable(enhancements);
+            await m.addColumn(armies, armies.detachmentId);
+            await m.addColumn(armyUnits, armyUnits.enhancementId);
           }
         },
 
