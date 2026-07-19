@@ -172,4 +172,48 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get statsNoCollection => 'Pas encore de figurines en collection';
+
+  @override
+  String get battleNewBattle => 'Nouvelle partie';
+
+  @override
+  String get battleOpponentLabel => 'Adversaire';
+
+  @override
+  String get battleMissionLabel => 'Mission';
+
+  @override
+  String get battleArmyLabel => 'Armée utilisée';
+
+  @override
+  String get battleArmyNone => 'Aucune';
+
+  @override
+  String get battleResultLabel => 'Résultat';
+
+  @override
+  String get battleResultVictory => 'Victoire';
+
+  @override
+  String get battleResultDefeat => 'Défaite';
+
+  @override
+  String get battleResultDraw => 'Match nul';
+
+  @override
+  String get battleMyScoreLabel => 'Mon score';
+
+  @override
+  String get battleOpponentScoreLabel => 'Score adverse';
+
+  @override
+  String get battleNotesLabel => 'Notes (optionnel)';
+
+  @override
+  String get battleEmptyList => 'Aucune partie enregistrée';
+
+  @override
+  String battleScoreLine(int my, int opponent) {
+    return '$my - $opponent';
+  }
 }

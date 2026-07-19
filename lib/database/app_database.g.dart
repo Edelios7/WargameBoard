@@ -13620,6 +13620,636 @@ class OwnedMiniaturesCompanion extends UpdateCompanion<OwnedMiniature> {
   }
 }
 
+class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BattlesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _armyIdMeta = const VerificationMeta('armyId');
+  @override
+  late final GeneratedColumn<String> armyId = GeneratedColumn<String>(
+    'army_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _opponentNameMeta = const VerificationMeta(
+    'opponentName',
+  );
+  @override
+  late final GeneratedColumn<String> opponentName = GeneratedColumn<String>(
+    'opponent_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _missionNameMeta = const VerificationMeta(
+    'missionName',
+  );
+  @override
+  late final GeneratedColumn<String> missionName = GeneratedColumn<String>(
+    'mission_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<BattleResult?, String> result =
+      GeneratedColumn<String>(
+        'result',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<BattleResult?>($BattlesTable.$converterresultn);
+  static const VerificationMeta _myScoreMeta = const VerificationMeta(
+    'myScore',
+  );
+  @override
+  late final GeneratedColumn<int> myScore = GeneratedColumn<int>(
+    'my_score',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _opponentScoreMeta = const VerificationMeta(
+    'opponentScore',
+  );
+  @override
+  late final GeneratedColumn<int> opponentScore = GeneratedColumn<int>(
+    'opponent_score',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _playedAtMeta = const VerificationMeta(
+    'playedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> playedAt = GeneratedColumn<DateTime>(
+    'played_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    armyId,
+    opponentName,
+    missionName,
+    result,
+    myScore,
+    opponentScore,
+    notes,
+    playedAt,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'battles';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Battle> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('army_id')) {
+      context.handle(
+        _armyIdMeta,
+        armyId.isAcceptableOrUnknown(data['army_id']!, _armyIdMeta),
+      );
+    }
+    if (data.containsKey('opponent_name')) {
+      context.handle(
+        _opponentNameMeta,
+        opponentName.isAcceptableOrUnknown(
+          data['opponent_name']!,
+          _opponentNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('mission_name')) {
+      context.handle(
+        _missionNameMeta,
+        missionName.isAcceptableOrUnknown(
+          data['mission_name']!,
+          _missionNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('my_score')) {
+      context.handle(
+        _myScoreMeta,
+        myScore.isAcceptableOrUnknown(data['my_score']!, _myScoreMeta),
+      );
+    }
+    if (data.containsKey('opponent_score')) {
+      context.handle(
+        _opponentScoreMeta,
+        opponentScore.isAcceptableOrUnknown(
+          data['opponent_score']!,
+          _opponentScoreMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('played_at')) {
+      context.handle(
+        _playedAtMeta,
+        playedAt.isAcceptableOrUnknown(data['played_at']!, _playedAtMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Battle map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Battle(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      armyId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}army_id'],
+      ),
+      opponentName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}opponent_name'],
+      ),
+      missionName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mission_name'],
+      ),
+      result: $BattlesTable.$converterresultn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}result'],
+        ),
+      ),
+      myScore: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}my_score'],
+      ),
+      opponentScore: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}opponent_score'],
+      ),
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      playedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}played_at'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BattlesTable createAlias(String alias) {
+    return $BattlesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<BattleResult, String, String> $converterresult =
+      const EnumNameConverter<BattleResult>(BattleResult.values);
+  static JsonTypeConverter2<BattleResult?, String?, String?> $converterresultn =
+      JsonTypeConverter2.asNullable($converterresult);
+}
+
+class Battle extends DataClass implements Insertable<Battle> {
+  final String id;
+  final String? armyId;
+  final String? opponentName;
+  final String? missionName;
+  final BattleResult? result;
+  final int? myScore;
+  final int? opponentScore;
+  final String? notes;
+  final DateTime playedAt;
+  final DateTime createdAt;
+  const Battle({
+    required this.id,
+    this.armyId,
+    this.opponentName,
+    this.missionName,
+    this.result,
+    this.myScore,
+    this.opponentScore,
+    this.notes,
+    required this.playedAt,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || armyId != null) {
+      map['army_id'] = Variable<String>(armyId);
+    }
+    if (!nullToAbsent || opponentName != null) {
+      map['opponent_name'] = Variable<String>(opponentName);
+    }
+    if (!nullToAbsent || missionName != null) {
+      map['mission_name'] = Variable<String>(missionName);
+    }
+    if (!nullToAbsent || result != null) {
+      map['result'] = Variable<String>(
+        $BattlesTable.$converterresultn.toSql(result),
+      );
+    }
+    if (!nullToAbsent || myScore != null) {
+      map['my_score'] = Variable<int>(myScore);
+    }
+    if (!nullToAbsent || opponentScore != null) {
+      map['opponent_score'] = Variable<int>(opponentScore);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['played_at'] = Variable<DateTime>(playedAt);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  BattlesCompanion toCompanion(bool nullToAbsent) {
+    return BattlesCompanion(
+      id: Value(id),
+      armyId: armyId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(armyId),
+      opponentName: opponentName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(opponentName),
+      missionName: missionName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(missionName),
+      result: result == null && nullToAbsent
+          ? const Value.absent()
+          : Value(result),
+      myScore: myScore == null && nullToAbsent
+          ? const Value.absent()
+          : Value(myScore),
+      opponentScore: opponentScore == null && nullToAbsent
+          ? const Value.absent()
+          : Value(opponentScore),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      playedAt: Value(playedAt),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory Battle.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Battle(
+      id: serializer.fromJson<String>(json['id']),
+      armyId: serializer.fromJson<String?>(json['armyId']),
+      opponentName: serializer.fromJson<String?>(json['opponentName']),
+      missionName: serializer.fromJson<String?>(json['missionName']),
+      result: $BattlesTable.$converterresultn.fromJson(
+        serializer.fromJson<String?>(json['result']),
+      ),
+      myScore: serializer.fromJson<int?>(json['myScore']),
+      opponentScore: serializer.fromJson<int?>(json['opponentScore']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      playedAt: serializer.fromJson<DateTime>(json['playedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'armyId': serializer.toJson<String?>(armyId),
+      'opponentName': serializer.toJson<String?>(opponentName),
+      'missionName': serializer.toJson<String?>(missionName),
+      'result': serializer.toJson<String?>(
+        $BattlesTable.$converterresultn.toJson(result),
+      ),
+      'myScore': serializer.toJson<int?>(myScore),
+      'opponentScore': serializer.toJson<int?>(opponentScore),
+      'notes': serializer.toJson<String?>(notes),
+      'playedAt': serializer.toJson<DateTime>(playedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  Battle copyWith({
+    String? id,
+    Value<String?> armyId = const Value.absent(),
+    Value<String?> opponentName = const Value.absent(),
+    Value<String?> missionName = const Value.absent(),
+    Value<BattleResult?> result = const Value.absent(),
+    Value<int?> myScore = const Value.absent(),
+    Value<int?> opponentScore = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
+    DateTime? playedAt,
+    DateTime? createdAt,
+  }) => Battle(
+    id: id ?? this.id,
+    armyId: armyId.present ? armyId.value : this.armyId,
+    opponentName: opponentName.present ? opponentName.value : this.opponentName,
+    missionName: missionName.present ? missionName.value : this.missionName,
+    result: result.present ? result.value : this.result,
+    myScore: myScore.present ? myScore.value : this.myScore,
+    opponentScore: opponentScore.present
+        ? opponentScore.value
+        : this.opponentScore,
+    notes: notes.present ? notes.value : this.notes,
+    playedAt: playedAt ?? this.playedAt,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  Battle copyWithCompanion(BattlesCompanion data) {
+    return Battle(
+      id: data.id.present ? data.id.value : this.id,
+      armyId: data.armyId.present ? data.armyId.value : this.armyId,
+      opponentName: data.opponentName.present
+          ? data.opponentName.value
+          : this.opponentName,
+      missionName: data.missionName.present
+          ? data.missionName.value
+          : this.missionName,
+      result: data.result.present ? data.result.value : this.result,
+      myScore: data.myScore.present ? data.myScore.value : this.myScore,
+      opponentScore: data.opponentScore.present
+          ? data.opponentScore.value
+          : this.opponentScore,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      playedAt: data.playedAt.present ? data.playedAt.value : this.playedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Battle(')
+          ..write('id: $id, ')
+          ..write('armyId: $armyId, ')
+          ..write('opponentName: $opponentName, ')
+          ..write('missionName: $missionName, ')
+          ..write('result: $result, ')
+          ..write('myScore: $myScore, ')
+          ..write('opponentScore: $opponentScore, ')
+          ..write('notes: $notes, ')
+          ..write('playedAt: $playedAt, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    armyId,
+    opponentName,
+    missionName,
+    result,
+    myScore,
+    opponentScore,
+    notes,
+    playedAt,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Battle &&
+          other.id == this.id &&
+          other.armyId == this.armyId &&
+          other.opponentName == this.opponentName &&
+          other.missionName == this.missionName &&
+          other.result == this.result &&
+          other.myScore == this.myScore &&
+          other.opponentScore == this.opponentScore &&
+          other.notes == this.notes &&
+          other.playedAt == this.playedAt &&
+          other.createdAt == this.createdAt);
+}
+
+class BattlesCompanion extends UpdateCompanion<Battle> {
+  final Value<String> id;
+  final Value<String?> armyId;
+  final Value<String?> opponentName;
+  final Value<String?> missionName;
+  final Value<BattleResult?> result;
+  final Value<int?> myScore;
+  final Value<int?> opponentScore;
+  final Value<String?> notes;
+  final Value<DateTime> playedAt;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const BattlesCompanion({
+    this.id = const Value.absent(),
+    this.armyId = const Value.absent(),
+    this.opponentName = const Value.absent(),
+    this.missionName = const Value.absent(),
+    this.result = const Value.absent(),
+    this.myScore = const Value.absent(),
+    this.opponentScore = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.playedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BattlesCompanion.insert({
+    required String id,
+    this.armyId = const Value.absent(),
+    this.opponentName = const Value.absent(),
+    this.missionName = const Value.absent(),
+    this.result = const Value.absent(),
+    this.myScore = const Value.absent(),
+    this.opponentScore = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.playedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id);
+  static Insertable<Battle> custom({
+    Expression<String>? id,
+    Expression<String>? armyId,
+    Expression<String>? opponentName,
+    Expression<String>? missionName,
+    Expression<String>? result,
+    Expression<int>? myScore,
+    Expression<int>? opponentScore,
+    Expression<String>? notes,
+    Expression<DateTime>? playedAt,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (armyId != null) 'army_id': armyId,
+      if (opponentName != null) 'opponent_name': opponentName,
+      if (missionName != null) 'mission_name': missionName,
+      if (result != null) 'result': result,
+      if (myScore != null) 'my_score': myScore,
+      if (opponentScore != null) 'opponent_score': opponentScore,
+      if (notes != null) 'notes': notes,
+      if (playedAt != null) 'played_at': playedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BattlesCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? armyId,
+    Value<String?>? opponentName,
+    Value<String?>? missionName,
+    Value<BattleResult?>? result,
+    Value<int?>? myScore,
+    Value<int?>? opponentScore,
+    Value<String?>? notes,
+    Value<DateTime>? playedAt,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return BattlesCompanion(
+      id: id ?? this.id,
+      armyId: armyId ?? this.armyId,
+      opponentName: opponentName ?? this.opponentName,
+      missionName: missionName ?? this.missionName,
+      result: result ?? this.result,
+      myScore: myScore ?? this.myScore,
+      opponentScore: opponentScore ?? this.opponentScore,
+      notes: notes ?? this.notes,
+      playedAt: playedAt ?? this.playedAt,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (armyId.present) {
+      map['army_id'] = Variable<String>(armyId.value);
+    }
+    if (opponentName.present) {
+      map['opponent_name'] = Variable<String>(opponentName.value);
+    }
+    if (missionName.present) {
+      map['mission_name'] = Variable<String>(missionName.value);
+    }
+    if (result.present) {
+      map['result'] = Variable<String>(
+        $BattlesTable.$converterresultn.toSql(result.value),
+      );
+    }
+    if (myScore.present) {
+      map['my_score'] = Variable<int>(myScore.value);
+    }
+    if (opponentScore.present) {
+      map['opponent_score'] = Variable<int>(opponentScore.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (playedAt.present) {
+      map['played_at'] = Variable<DateTime>(playedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BattlesCompanion(')
+          ..write('id: $id, ')
+          ..write('armyId: $armyId, ')
+          ..write('opponentName: $opponentName, ')
+          ..write('missionName: $missionName, ')
+          ..write('result: $result, ')
+          ..write('myScore: $myScore, ')
+          ..write('opponentScore: $opponentScore, ')
+          ..write('notes: $notes, ')
+          ..write('playedAt: $playedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -13674,6 +14304,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $OwnedMiniaturesTable ownedMiniatures = $OwnedMiniaturesTable(
     this,
   );
+  late final $BattlesTable battles = $BattlesTable(this);
   late final GameSystemDao gameSystemDao = GameSystemDao(this as AppDatabase);
   late final FactionDao factionDao = FactionDao(this as AppDatabase);
   late final AbilityDao abilityDao = AbilityDao(this as AppDatabase);
@@ -13682,6 +14313,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final DatasheetDao datasheetDao = DatasheetDao(this as AppDatabase);
   late final ArmyDao armyDao = ArmyDao(this as AppDatabase);
   late final CollectionDao collectionDao = CollectionDao(this as AppDatabase);
+  late final BattleDao battleDao = BattleDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -13716,6 +14348,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     armies,
     armyUnits,
     ownedMiniatures,
+    battles,
   ];
 }
 
@@ -20868,6 +21501,302 @@ typedef $$OwnedMiniaturesTableProcessedTableManager =
       OwnedMiniature,
       PrefetchHooks Function()
     >;
+typedef $$BattlesTableCreateCompanionBuilder =
+    BattlesCompanion Function({
+      required String id,
+      Value<String?> armyId,
+      Value<String?> opponentName,
+      Value<String?> missionName,
+      Value<BattleResult?> result,
+      Value<int?> myScore,
+      Value<int?> opponentScore,
+      Value<String?> notes,
+      Value<DateTime> playedAt,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+typedef $$BattlesTableUpdateCompanionBuilder =
+    BattlesCompanion Function({
+      Value<String> id,
+      Value<String?> armyId,
+      Value<String?> opponentName,
+      Value<String?> missionName,
+      Value<BattleResult?> result,
+      Value<int?> myScore,
+      Value<int?> opponentScore,
+      Value<String?> notes,
+      Value<DateTime> playedAt,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$BattlesTableFilterComposer
+    extends Composer<_$AppDatabase, $BattlesTable> {
+  $$BattlesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get armyId => $composableBuilder(
+    column: $table.armyId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get opponentName => $composableBuilder(
+    column: $table.opponentName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get missionName => $composableBuilder(
+    column: $table.missionName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<BattleResult?, BattleResult, String>
+  get result => $composableBuilder(
+    column: $table.result,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get myScore => $composableBuilder(
+    column: $table.myScore,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get opponentScore => $composableBuilder(
+    column: $table.opponentScore,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get playedAt => $composableBuilder(
+    column: $table.playedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BattlesTableOrderingComposer
+    extends Composer<_$AppDatabase, $BattlesTable> {
+  $$BattlesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get armyId => $composableBuilder(
+    column: $table.armyId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get opponentName => $composableBuilder(
+    column: $table.opponentName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get missionName => $composableBuilder(
+    column: $table.missionName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get result => $composableBuilder(
+    column: $table.result,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get myScore => $composableBuilder(
+    column: $table.myScore,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get opponentScore => $composableBuilder(
+    column: $table.opponentScore,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get playedAt => $composableBuilder(
+    column: $table.playedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BattlesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BattlesTable> {
+  $$BattlesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get armyId =>
+      $composableBuilder(column: $table.armyId, builder: (column) => column);
+
+  GeneratedColumn<String> get opponentName => $composableBuilder(
+    column: $table.opponentName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get missionName => $composableBuilder(
+    column: $table.missionName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<BattleResult?, String> get result =>
+      $composableBuilder(column: $table.result, builder: (column) => column);
+
+  GeneratedColumn<int> get myScore =>
+      $composableBuilder(column: $table.myScore, builder: (column) => column);
+
+  GeneratedColumn<int> get opponentScore => $composableBuilder(
+    column: $table.opponentScore,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get playedAt =>
+      $composableBuilder(column: $table.playedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$BattlesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BattlesTable,
+          Battle,
+          $$BattlesTableFilterComposer,
+          $$BattlesTableOrderingComposer,
+          $$BattlesTableAnnotationComposer,
+          $$BattlesTableCreateCompanionBuilder,
+          $$BattlesTableUpdateCompanionBuilder,
+          (Battle, BaseReferences<_$AppDatabase, $BattlesTable, Battle>),
+          Battle,
+          PrefetchHooks Function()
+        > {
+  $$BattlesTableTableManager(_$AppDatabase db, $BattlesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BattlesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BattlesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BattlesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> armyId = const Value.absent(),
+                Value<String?> opponentName = const Value.absent(),
+                Value<String?> missionName = const Value.absent(),
+                Value<BattleResult?> result = const Value.absent(),
+                Value<int?> myScore = const Value.absent(),
+                Value<int?> opponentScore = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> playedAt = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BattlesCompanion(
+                id: id,
+                armyId: armyId,
+                opponentName: opponentName,
+                missionName: missionName,
+                result: result,
+                myScore: myScore,
+                opponentScore: opponentScore,
+                notes: notes,
+                playedAt: playedAt,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> armyId = const Value.absent(),
+                Value<String?> opponentName = const Value.absent(),
+                Value<String?> missionName = const Value.absent(),
+                Value<BattleResult?> result = const Value.absent(),
+                Value<int?> myScore = const Value.absent(),
+                Value<int?> opponentScore = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> playedAt = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BattlesCompanion.insert(
+                id: id,
+                armyId: armyId,
+                opponentName: opponentName,
+                missionName: missionName,
+                result: result,
+                myScore: myScore,
+                opponentScore: opponentScore,
+                notes: notes,
+                playedAt: playedAt,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BattlesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BattlesTable,
+      Battle,
+      $$BattlesTableFilterComposer,
+      $$BattlesTableOrderingComposer,
+      $$BattlesTableAnnotationComposer,
+      $$BattlesTableCreateCompanionBuilder,
+      $$BattlesTableUpdateCompanionBuilder,
+      (Battle, BaseReferences<_$AppDatabase, $BattlesTable, Battle>),
+      Battle,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -20930,4 +21859,6 @@ class $AppDatabaseManager {
       $$ArmyUnitsTableTableManager(_db, _db.armyUnits);
   $$OwnedMiniaturesTableTableManager get ownedMiniatures =>
       $$OwnedMiniaturesTableTableManager(_db, _db.ownedMiniatures);
+  $$BattlesTableTableManager get battles =>
+      $$BattlesTableTableManager(_db, _db.battles);
 }

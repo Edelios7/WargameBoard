@@ -99,5 +99,26 @@
   "statsPaintingProgress": "Painting progress",
   "statsPointsByArmy": "Points by army",
   "statsNoArmies": "No army created yet",
-  "statsNoCollection": "No models in your collection yet"
+  "statsNoCollection": "No models in your collection yet",
+
+  "battleNewBattle": "New battle",
+  "battleOpponentLabel": "Opponent",
+  "battleMissionLabel": "Mission",
+  "battleArmyLabel": "Army used",
+  "battleArmyNone": "None",
+  "battleResultLabel": "Result",
+  "battleResultVictory": "Victory",
+  "battleResultDefeat": "Defeat",
+  "battleResultDraw": "Draw",
+  "battleMyScoreLabel": "My score",
+  "battleOpponentScoreLabel": "Opponent score",
+  "battleNotesLabel": "Notes (optional)",
+  "battleEmptyList": "No battles logged yet",
+  "battleScoreLine": "{my} - {opponent}",
+  "@battleScoreLine": {
+    "placeholders": {
+      "my": { "type": "int" },
+      "opponent": { "type": "int" }
+    }
+  }
 }

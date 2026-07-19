@@ -171,4 +171,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statsNoCollection => 'No models in your collection yet';
+
+  @override
+  String get battleNewBattle => 'New battle';
+
+  @override
+  String get battleOpponentLabel => 'Opponent';
+
+  @override
+  String get battleMissionLabel => 'Mission';
+
+  @override
+  String get battleArmyLabel => 'Army used';
+
+  @override
+  String get battleArmyNone => 'None';
+
+  @override
+  String get battleResultLabel => 'Result';
+
+  @override
+  String get battleResultVictory => 'Victory';
+
+  @override
+  String get battleResultDefeat => 'Defeat';
+
+  @override
+  String get battleResultDraw => 'Draw';
+
+  @override
+  String get battleMyScoreLabel => 'My score';
+
+  @override
+  String get battleOpponentScoreLabel => 'Opponent score';
+
+  @override
+  String get battleNotesLabel => 'Notes (optional)';
+
+  @override
+  String get battleEmptyList => 'No battles logged yet';
+
+  @override
+  String battleScoreLine(int my, int opponent) {
+    return '$my - $opponent';
+  }
 }

@@ -99,5 +99,26 @@
   "statsPaintingProgress": "Progression peinture",
   "statsPointsByArmy": "Points par armée",
   "statsNoArmies": "Pas encore d'armée créée",
-  "statsNoCollection": "Pas encore de figurines en collection"
+  "statsNoCollection": "Pas encore de figurines en collection",
+
+  "battleNewBattle": "Nouvelle partie",
+  "battleOpponentLabel": "Adversaire",
+  "battleMissionLabel": "Mission",
+  "battleArmyLabel": "Armée utilisée",
+  "battleArmyNone": "Aucune",
+  "battleResultLabel": "Résultat",
+  "battleResultVictory": "Victoire",
+  "battleResultDefeat": "Défaite",
+  "battleResultDraw": "Match nul",
+  "battleMyScoreLabel": "Mon score",
+  "battleOpponentScoreLabel": "Score adverse",
+  "battleNotesLabel": "Notes (optionnel)",
+  "battleEmptyList": "Aucune partie enregistrée",
+  "battleScoreLine": "{my} - {opponent}",
+  "@battleScoreLine": {
+    "placeholders": {
+      "my": { "type": "int" },
+      "opponent": { "type": "int" }
+    }
+  }
 }

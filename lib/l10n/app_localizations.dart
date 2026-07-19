@@ -397,6 +397,90 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Pas encore de figurines en collection'**
   String get statsNoCollection;
+
+  /// No description provided for @battleNewBattle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle partie'**
+  String get battleNewBattle;
+
+  /// No description provided for @battleOpponentLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adversaire'**
+  String get battleOpponentLabel;
+
+  /// No description provided for @battleMissionLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mission'**
+  String get battleMissionLabel;
+
+  /// No description provided for @battleArmyLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Armée utilisée'**
+  String get battleArmyLabel;
+
+  /// No description provided for @battleArmyNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune'**
+  String get battleArmyNone;
+
+  /// No description provided for @battleResultLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résultat'**
+  String get battleResultLabel;
+
+  /// No description provided for @battleResultVictory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Victoire'**
+  String get battleResultVictory;
+
+  /// No description provided for @battleResultDefeat.
+  ///
+  /// In fr, this message translates to:
+  /// **'Défaite'**
+  String get battleResultDefeat;
+
+  /// No description provided for @battleResultDraw.
+  ///
+  /// In fr, this message translates to:
+  /// **'Match nul'**
+  String get battleResultDraw;
+
+  /// No description provided for @battleMyScoreLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mon score'**
+  String get battleMyScoreLabel;
+
+  /// No description provided for @battleOpponentScoreLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Score adverse'**
+  String get battleOpponentScoreLabel;
+
+  /// No description provided for @battleNotesLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notes (optionnel)'**
+  String get battleNotesLabel;
+
+  /// No description provided for @battleEmptyList.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune partie enregistrée'**
+  String get battleEmptyList;
+
+  /// No description provided for @battleScoreLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'{my} - {opponent}'**
+  String battleScoreLine(int my, int opponent);
 }
 
 class _AppLocalizationsDelegate
