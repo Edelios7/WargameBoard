@@ -119,4 +119,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get armyBuilderOverLimit => 'Points limit exceeded';
+
+  @override
+  String get collectionAddEntry => 'Add to collection';
+
+  @override
+  String get collectionEmpty => 'Your collection is empty';
+
+  @override
+  String collectionQuantityLabel(int count) {
+    return '$count owned';
+  }
+
+  @override
+  String get collectionAssembled => 'Assembled';
+
+  @override
+  String get collectionPrimed => 'Primed';
+
+  @override
+  String get collectionPainted => 'Painted';
+
+  @override
+  String get collectionQuantityDialogLabel => 'Quantity';
+
+  @override
+  String collectionSummaryLine(int entries, int models, int painted) {
+    return '$entries units · $models models · $painted painted';
+  }
 }

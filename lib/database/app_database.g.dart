@@ -12958,6 +12958,668 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
   }
 }
 
+class $OwnedMiniaturesTable extends OwnedMiniatures
+    with TableInfo<$OwnedMiniaturesTable, OwnedMiniature> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OwnedMiniaturesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _datasheetIdMeta = const VerificationMeta(
+    'datasheetId',
+  );
+  @override
+  late final GeneratedColumn<String> datasheetId = GeneratedColumn<String>(
+    'datasheet_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _quantityMeta = const VerificationMeta(
+    'quantity',
+  );
+  @override
+  late final GeneratedColumn<int> quantity = GeneratedColumn<int>(
+    'quantity',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _assembledMeta = const VerificationMeta(
+    'assembled',
+  );
+  @override
+  late final GeneratedColumn<int> assembled = GeneratedColumn<int>(
+    'assembled',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _primedMeta = const VerificationMeta('primed');
+  @override
+  late final GeneratedColumn<int> primed = GeneratedColumn<int>(
+    'primed',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _paintedMeta = const VerificationMeta(
+    'painted',
+  );
+  @override
+  late final GeneratedColumn<int> painted = GeneratedColumn<int>(
+    'painted',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _purchaseDateMeta = const VerificationMeta(
+    'purchaseDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> purchaseDate = GeneratedColumn<DateTime>(
+    'purchase_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _purchasePriceMeta = const VerificationMeta(
+    'purchasePrice',
+  );
+  @override
+  late final GeneratedColumn<double> purchasePrice = GeneratedColumn<double>(
+    'purchase_price',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    datasheetId,
+    quantity,
+    assembled,
+    primed,
+    painted,
+    notes,
+    purchaseDate,
+    purchasePrice,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'owned_miniatures';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OwnedMiniature> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('datasheet_id')) {
+      context.handle(
+        _datasheetIdMeta,
+        datasheetId.isAcceptableOrUnknown(
+          data['datasheet_id']!,
+          _datasheetIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_datasheetIdMeta);
+    }
+    if (data.containsKey('quantity')) {
+      context.handle(
+        _quantityMeta,
+        quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_quantityMeta);
+    }
+    if (data.containsKey('assembled')) {
+      context.handle(
+        _assembledMeta,
+        assembled.isAcceptableOrUnknown(data['assembled']!, _assembledMeta),
+      );
+    }
+    if (data.containsKey('primed')) {
+      context.handle(
+        _primedMeta,
+        primed.isAcceptableOrUnknown(data['primed']!, _primedMeta),
+      );
+    }
+    if (data.containsKey('painted')) {
+      context.handle(
+        _paintedMeta,
+        painted.isAcceptableOrUnknown(data['painted']!, _paintedMeta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('purchase_date')) {
+      context.handle(
+        _purchaseDateMeta,
+        purchaseDate.isAcceptableOrUnknown(
+          data['purchase_date']!,
+          _purchaseDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('purchase_price')) {
+      context.handle(
+        _purchasePriceMeta,
+        purchasePrice.isAcceptableOrUnknown(
+          data['purchase_price']!,
+          _purchasePriceMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  OwnedMiniature map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OwnedMiniature(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      datasheetId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}datasheet_id'],
+      )!,
+      quantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}quantity'],
+      )!,
+      assembled: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}assembled'],
+      )!,
+      primed: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}primed'],
+      )!,
+      painted: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}painted'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      purchaseDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}purchase_date'],
+      ),
+      purchasePrice: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}purchase_price'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $OwnedMiniaturesTable createAlias(String alias) {
+    return $OwnedMiniaturesTable(attachedDatabase, alias);
+  }
+}
+
+class OwnedMiniature extends DataClass implements Insertable<OwnedMiniature> {
+  final String id;
+  final String datasheetId;
+  final int quantity;
+  final int assembled;
+  final int primed;
+  final int painted;
+  final String? notes;
+  final DateTime? purchaseDate;
+  final double? purchasePrice;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const OwnedMiniature({
+    required this.id,
+    required this.datasheetId,
+    required this.quantity,
+    required this.assembled,
+    required this.primed,
+    required this.painted,
+    this.notes,
+    this.purchaseDate,
+    this.purchasePrice,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['datasheet_id'] = Variable<String>(datasheetId);
+    map['quantity'] = Variable<int>(quantity);
+    map['assembled'] = Variable<int>(assembled);
+    map['primed'] = Variable<int>(primed);
+    map['painted'] = Variable<int>(painted);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    if (!nullToAbsent || purchaseDate != null) {
+      map['purchase_date'] = Variable<DateTime>(purchaseDate);
+    }
+    if (!nullToAbsent || purchasePrice != null) {
+      map['purchase_price'] = Variable<double>(purchasePrice);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  OwnedMiniaturesCompanion toCompanion(bool nullToAbsent) {
+    return OwnedMiniaturesCompanion(
+      id: Value(id),
+      datasheetId: Value(datasheetId),
+      quantity: Value(quantity),
+      assembled: Value(assembled),
+      primed: Value(primed),
+      painted: Value(painted),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      purchaseDate: purchaseDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(purchaseDate),
+      purchasePrice: purchasePrice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(purchasePrice),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory OwnedMiniature.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OwnedMiniature(
+      id: serializer.fromJson<String>(json['id']),
+      datasheetId: serializer.fromJson<String>(json['datasheetId']),
+      quantity: serializer.fromJson<int>(json['quantity']),
+      assembled: serializer.fromJson<int>(json['assembled']),
+      primed: serializer.fromJson<int>(json['primed']),
+      painted: serializer.fromJson<int>(json['painted']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      purchaseDate: serializer.fromJson<DateTime?>(json['purchaseDate']),
+      purchasePrice: serializer.fromJson<double?>(json['purchasePrice']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'datasheetId': serializer.toJson<String>(datasheetId),
+      'quantity': serializer.toJson<int>(quantity),
+      'assembled': serializer.toJson<int>(assembled),
+      'primed': serializer.toJson<int>(primed),
+      'painted': serializer.toJson<int>(painted),
+      'notes': serializer.toJson<String?>(notes),
+      'purchaseDate': serializer.toJson<DateTime?>(purchaseDate),
+      'purchasePrice': serializer.toJson<double?>(purchasePrice),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  OwnedMiniature copyWith({
+    String? id,
+    String? datasheetId,
+    int? quantity,
+    int? assembled,
+    int? primed,
+    int? painted,
+    Value<String?> notes = const Value.absent(),
+    Value<DateTime?> purchaseDate = const Value.absent(),
+    Value<double?> purchasePrice = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => OwnedMiniature(
+    id: id ?? this.id,
+    datasheetId: datasheetId ?? this.datasheetId,
+    quantity: quantity ?? this.quantity,
+    assembled: assembled ?? this.assembled,
+    primed: primed ?? this.primed,
+    painted: painted ?? this.painted,
+    notes: notes.present ? notes.value : this.notes,
+    purchaseDate: purchaseDate.present ? purchaseDate.value : this.purchaseDate,
+    purchasePrice: purchasePrice.present
+        ? purchasePrice.value
+        : this.purchasePrice,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  OwnedMiniature copyWithCompanion(OwnedMiniaturesCompanion data) {
+    return OwnedMiniature(
+      id: data.id.present ? data.id.value : this.id,
+      datasheetId: data.datasheetId.present
+          ? data.datasheetId.value
+          : this.datasheetId,
+      quantity: data.quantity.present ? data.quantity.value : this.quantity,
+      assembled: data.assembled.present ? data.assembled.value : this.assembled,
+      primed: data.primed.present ? data.primed.value : this.primed,
+      painted: data.painted.present ? data.painted.value : this.painted,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      purchaseDate: data.purchaseDate.present
+          ? data.purchaseDate.value
+          : this.purchaseDate,
+      purchasePrice: data.purchasePrice.present
+          ? data.purchasePrice.value
+          : this.purchasePrice,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OwnedMiniature(')
+          ..write('id: $id, ')
+          ..write('datasheetId: $datasheetId, ')
+          ..write('quantity: $quantity, ')
+          ..write('assembled: $assembled, ')
+          ..write('primed: $primed, ')
+          ..write('painted: $painted, ')
+          ..write('notes: $notes, ')
+          ..write('purchaseDate: $purchaseDate, ')
+          ..write('purchasePrice: $purchasePrice, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    datasheetId,
+    quantity,
+    assembled,
+    primed,
+    painted,
+    notes,
+    purchaseDate,
+    purchasePrice,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OwnedMiniature &&
+          other.id == this.id &&
+          other.datasheetId == this.datasheetId &&
+          other.quantity == this.quantity &&
+          other.assembled == this.assembled &&
+          other.primed == this.primed &&
+          other.painted == this.painted &&
+          other.notes == this.notes &&
+          other.purchaseDate == this.purchaseDate &&
+          other.purchasePrice == this.purchasePrice &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class OwnedMiniaturesCompanion extends UpdateCompanion<OwnedMiniature> {
+  final Value<String> id;
+  final Value<String> datasheetId;
+  final Value<int> quantity;
+  final Value<int> assembled;
+  final Value<int> primed;
+  final Value<int> painted;
+  final Value<String?> notes;
+  final Value<DateTime?> purchaseDate;
+  final Value<double?> purchasePrice;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const OwnedMiniaturesCompanion({
+    this.id = const Value.absent(),
+    this.datasheetId = const Value.absent(),
+    this.quantity = const Value.absent(),
+    this.assembled = const Value.absent(),
+    this.primed = const Value.absent(),
+    this.painted = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.purchaseDate = const Value.absent(),
+    this.purchasePrice = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OwnedMiniaturesCompanion.insert({
+    required String id,
+    required String datasheetId,
+    required int quantity,
+    this.assembled = const Value.absent(),
+    this.primed = const Value.absent(),
+    this.painted = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.purchaseDate = const Value.absent(),
+    this.purchasePrice = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       datasheetId = Value(datasheetId),
+       quantity = Value(quantity);
+  static Insertable<OwnedMiniature> custom({
+    Expression<String>? id,
+    Expression<String>? datasheetId,
+    Expression<int>? quantity,
+    Expression<int>? assembled,
+    Expression<int>? primed,
+    Expression<int>? painted,
+    Expression<String>? notes,
+    Expression<DateTime>? purchaseDate,
+    Expression<double>? purchasePrice,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (datasheetId != null) 'datasheet_id': datasheetId,
+      if (quantity != null) 'quantity': quantity,
+      if (assembled != null) 'assembled': assembled,
+      if (primed != null) 'primed': primed,
+      if (painted != null) 'painted': painted,
+      if (notes != null) 'notes': notes,
+      if (purchaseDate != null) 'purchase_date': purchaseDate,
+      if (purchasePrice != null) 'purchase_price': purchasePrice,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OwnedMiniaturesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? datasheetId,
+    Value<int>? quantity,
+    Value<int>? assembled,
+    Value<int>? primed,
+    Value<int>? painted,
+    Value<String?>? notes,
+    Value<DateTime?>? purchaseDate,
+    Value<double?>? purchasePrice,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return OwnedMiniaturesCompanion(
+      id: id ?? this.id,
+      datasheetId: datasheetId ?? this.datasheetId,
+      quantity: quantity ?? this.quantity,
+      assembled: assembled ?? this.assembled,
+      primed: primed ?? this.primed,
+      painted: painted ?? this.painted,
+      notes: notes ?? this.notes,
+      purchaseDate: purchaseDate ?? this.purchaseDate,
+      purchasePrice: purchasePrice ?? this.purchasePrice,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (datasheetId.present) {
+      map['datasheet_id'] = Variable<String>(datasheetId.value);
+    }
+    if (quantity.present) {
+      map['quantity'] = Variable<int>(quantity.value);
+    }
+    if (assembled.present) {
+      map['assembled'] = Variable<int>(assembled.value);
+    }
+    if (primed.present) {
+      map['primed'] = Variable<int>(primed.value);
+    }
+    if (painted.present) {
+      map['painted'] = Variable<int>(painted.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (purchaseDate.present) {
+      map['purchase_date'] = Variable<DateTime>(purchaseDate.value);
+    }
+    if (purchasePrice.present) {
+      map['purchase_price'] = Variable<double>(purchasePrice.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OwnedMiniaturesCompanion(')
+          ..write('id: $id, ')
+          ..write('datasheetId: $datasheetId, ')
+          ..write('quantity: $quantity, ')
+          ..write('assembled: $assembled, ')
+          ..write('primed: $primed, ')
+          ..write('painted: $painted, ')
+          ..write('notes: $notes, ')
+          ..write('purchaseDate: $purchaseDate, ')
+          ..write('purchasePrice: $purchasePrice, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -13009,6 +13671,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $DatasheetAbilityLinksTable(this);
   late final $ArmiesTable armies = $ArmiesTable(this);
   late final $ArmyUnitsTable armyUnits = $ArmyUnitsTable(this);
+  late final $OwnedMiniaturesTable ownedMiniatures = $OwnedMiniaturesTable(
+    this,
+  );
   late final GameSystemDao gameSystemDao = GameSystemDao(this as AppDatabase);
   late final FactionDao factionDao = FactionDao(this as AppDatabase);
   late final AbilityDao abilityDao = AbilityDao(this as AppDatabase);
@@ -13016,6 +13681,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final WeaponDao weaponDao = WeaponDao(this as AppDatabase);
   late final DatasheetDao datasheetDao = DatasheetDao(this as AppDatabase);
   late final ArmyDao armyDao = ArmyDao(this as AppDatabase);
+  late final CollectionDao collectionDao = CollectionDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -13049,6 +13715,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     datasheetAbilityLinks,
     armies,
     armyUnits,
+    ownedMiniatures,
   ];
 }
 
@@ -19875,6 +20542,332 @@ typedef $$ArmyUnitsTableProcessedTableManager =
       ArmyUnit,
       PrefetchHooks Function()
     >;
+typedef $$OwnedMiniaturesTableCreateCompanionBuilder =
+    OwnedMiniaturesCompanion Function({
+      required String id,
+      required String datasheetId,
+      required int quantity,
+      Value<int> assembled,
+      Value<int> primed,
+      Value<int> painted,
+      Value<String?> notes,
+      Value<DateTime?> purchaseDate,
+      Value<double?> purchasePrice,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+typedef $$OwnedMiniaturesTableUpdateCompanionBuilder =
+    OwnedMiniaturesCompanion Function({
+      Value<String> id,
+      Value<String> datasheetId,
+      Value<int> quantity,
+      Value<int> assembled,
+      Value<int> primed,
+      Value<int> painted,
+      Value<String?> notes,
+      Value<DateTime?> purchaseDate,
+      Value<double?> purchasePrice,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$OwnedMiniaturesTableFilterComposer
+    extends Composer<_$AppDatabase, $OwnedMiniaturesTable> {
+  $$OwnedMiniaturesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get datasheetId => $composableBuilder(
+    column: $table.datasheetId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get assembled => $composableBuilder(
+    column: $table.assembled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get primed => $composableBuilder(
+    column: $table.primed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get painted => $composableBuilder(
+    column: $table.painted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get purchaseDate => $composableBuilder(
+    column: $table.purchaseDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get purchasePrice => $composableBuilder(
+    column: $table.purchasePrice,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$OwnedMiniaturesTableOrderingComposer
+    extends Composer<_$AppDatabase, $OwnedMiniaturesTable> {
+  $$OwnedMiniaturesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get datasheetId => $composableBuilder(
+    column: $table.datasheetId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get assembled => $composableBuilder(
+    column: $table.assembled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get primed => $composableBuilder(
+    column: $table.primed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get painted => $composableBuilder(
+    column: $table.painted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get purchaseDate => $composableBuilder(
+    column: $table.purchaseDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get purchasePrice => $composableBuilder(
+    column: $table.purchasePrice,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$OwnedMiniaturesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OwnedMiniaturesTable> {
+  $$OwnedMiniaturesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get datasheetId => $composableBuilder(
+    column: $table.datasheetId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get quantity =>
+      $composableBuilder(column: $table.quantity, builder: (column) => column);
+
+  GeneratedColumn<int> get assembled =>
+      $composableBuilder(column: $table.assembled, builder: (column) => column);
+
+  GeneratedColumn<int> get primed =>
+      $composableBuilder(column: $table.primed, builder: (column) => column);
+
+  GeneratedColumn<int> get painted =>
+      $composableBuilder(column: $table.painted, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get purchaseDate => $composableBuilder(
+    column: $table.purchaseDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get purchasePrice => $composableBuilder(
+    column: $table.purchasePrice,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$OwnedMiniaturesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OwnedMiniaturesTable,
+          OwnedMiniature,
+          $$OwnedMiniaturesTableFilterComposer,
+          $$OwnedMiniaturesTableOrderingComposer,
+          $$OwnedMiniaturesTableAnnotationComposer,
+          $$OwnedMiniaturesTableCreateCompanionBuilder,
+          $$OwnedMiniaturesTableUpdateCompanionBuilder,
+          (
+            OwnedMiniature,
+            BaseReferences<
+              _$AppDatabase,
+              $OwnedMiniaturesTable,
+              OwnedMiniature
+            >,
+          ),
+          OwnedMiniature,
+          PrefetchHooks Function()
+        > {
+  $$OwnedMiniaturesTableTableManager(
+    _$AppDatabase db,
+    $OwnedMiniaturesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OwnedMiniaturesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OwnedMiniaturesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OwnedMiniaturesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> datasheetId = const Value.absent(),
+                Value<int> quantity = const Value.absent(),
+                Value<int> assembled = const Value.absent(),
+                Value<int> primed = const Value.absent(),
+                Value<int> painted = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime?> purchaseDate = const Value.absent(),
+                Value<double?> purchasePrice = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OwnedMiniaturesCompanion(
+                id: id,
+                datasheetId: datasheetId,
+                quantity: quantity,
+                assembled: assembled,
+                primed: primed,
+                painted: painted,
+                notes: notes,
+                purchaseDate: purchaseDate,
+                purchasePrice: purchasePrice,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String datasheetId,
+                required int quantity,
+                Value<int> assembled = const Value.absent(),
+                Value<int> primed = const Value.absent(),
+                Value<int> painted = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime?> purchaseDate = const Value.absent(),
+                Value<double?> purchasePrice = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OwnedMiniaturesCompanion.insert(
+                id: id,
+                datasheetId: datasheetId,
+                quantity: quantity,
+                assembled: assembled,
+                primed: primed,
+                painted: painted,
+                notes: notes,
+                purchaseDate: purchaseDate,
+                purchasePrice: purchasePrice,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$OwnedMiniaturesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OwnedMiniaturesTable,
+      OwnedMiniature,
+      $$OwnedMiniaturesTableFilterComposer,
+      $$OwnedMiniaturesTableOrderingComposer,
+      $$OwnedMiniaturesTableAnnotationComposer,
+      $$OwnedMiniaturesTableCreateCompanionBuilder,
+      $$OwnedMiniaturesTableUpdateCompanionBuilder,
+      (
+        OwnedMiniature,
+        BaseReferences<_$AppDatabase, $OwnedMiniaturesTable, OwnedMiniature>,
+      ),
+      OwnedMiniature,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -19935,4 +20928,6 @@ class $AppDatabaseManager {
       $$ArmiesTableTableManager(_db, _db.armies);
   $$ArmyUnitsTableTableManager get armyUnits =>
       $$ArmyUnitsTableTableManager(_db, _db.armyUnits);
+  $$OwnedMiniaturesTableTableManager get ownedMiniatures =>
+      $$OwnedMiniaturesTableTableManager(_db, _db.ownedMiniatures);
 }

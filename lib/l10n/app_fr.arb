@@ -69,5 +69,26 @@
       "limit": { "type": "int" }
     }
   },
-  "armyBuilderOverLimit": "Limite de points dépassée"
+  "armyBuilderOverLimit": "Limite de points dépassée",
+
+  "collectionAddEntry": "Ajouter à la collection",
+  "collectionEmpty": "Ta collection est vide",
+  "collectionQuantityLabel": "{count} possédées",
+  "@collectionQuantityLabel": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "collectionAssembled": "Montées",
+  "collectionPrimed": "Apprêtées",
+  "collectionPainted": "Peintes",
+  "collectionQuantityDialogLabel": "Quantité",
+  "collectionSummaryLine": "{entries} unités · {models} figurines · {painted} peintes",
+  "@collectionSummaryLine": {
+    "placeholders": {
+      "entries": { "type": "int" },
+      "models": { "type": "int" },
+      "painted": { "type": "int" }
+    }
+  }
 }

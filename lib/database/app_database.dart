@@ -44,6 +44,8 @@ import 'tables/datasheet_ability_links_table.dart';
 import 'tables/armies_table.dart';
 import 'tables/army_units_table.dart';
 
+import 'tables/owned_miniatures_table.dart';
+
 // =========================
 // DAO
 // =========================
@@ -55,6 +57,7 @@ import 'daos/keyword_dao.dart';
 import 'daos/weapon_dao.dart';
 import 'daos/datasheet_dao.dart';
 import 'daos/army_dao.dart';
+import 'daos/collection_dao.dart';
 
 import 'seed/catalog_seed.dart';
 
@@ -107,6 +110,9 @@ part 'app_database.g.dart';
     // ===== ARMIES =====
     Armies,
     ArmyUnits,
+
+    // ===== COLLECTION =====
+    OwnedMiniatures,
   ],
   daos: [
     GameSystemDao,
@@ -116,6 +122,7 @@ part 'app_database.g.dart';
     WeaponDao,
     DatasheetDao,
     ArmyDao,
+    CollectionDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -141,12 +148,14 @@ class AppDatabase extends _$AppDatabase {
 
   late final ArmyDao armyDao = ArmyDao(this);
 
+  late final CollectionDao collectionDao = CollectionDao(this);
+
   // =========================
   // Database version
   // =========================
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   // =========================
   // Migrations
@@ -166,6 +175,9 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 3) {
             await m.addColumn(armies, armies.pointsLimit);
+          }
+          if (from < 4) {
+            await m.createTable(ownedMiniatures);
           }
         },
 

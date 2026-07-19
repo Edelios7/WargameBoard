@@ -69,5 +69,26 @@
       "limit": { "type": "int" }
     }
   },
-  "armyBuilderOverLimit": "Points limit exceeded"
+  "armyBuilderOverLimit": "Points limit exceeded",
+
+  "collectionAddEntry": "Add to collection",
+  "collectionEmpty": "Your collection is empty",
+  "collectionQuantityLabel": "{count} owned",
+  "@collectionQuantityLabel": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "collectionAssembled": "Assembled",
+  "collectionPrimed": "Primed",
+  "collectionPainted": "Painted",
+  "collectionQuantityDialogLabel": "Quantity",
+  "collectionSummaryLine": "{entries} units · {models} models · {painted} painted",
+  "@collectionSummaryLine": {
+    "placeholders": {
+      "entries": { "type": "int" },
+      "models": { "type": "int" },
+      "painted": { "type": "int" }
+    }
+  }
 }

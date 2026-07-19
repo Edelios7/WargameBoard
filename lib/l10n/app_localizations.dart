@@ -301,6 +301,54 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Limite de points dépassée'**
   String get armyBuilderOverLimit;
+
+  /// No description provided for @collectionAddEntry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter à la collection'**
+  String get collectionAddEntry;
+
+  /// No description provided for @collectionEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ta collection est vide'**
+  String get collectionEmpty;
+
+  /// No description provided for @collectionQuantityLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} possédées'**
+  String collectionQuantityLabel(int count);
+
+  /// No description provided for @collectionAssembled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montées'**
+  String get collectionAssembled;
+
+  /// No description provided for @collectionPrimed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Apprêtées'**
+  String get collectionPrimed;
+
+  /// No description provided for @collectionPainted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Peintes'**
+  String get collectionPainted;
+
+  /// No description provided for @collectionQuantityDialogLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantité'**
+  String get collectionQuantityDialogLabel;
+
+  /// No description provided for @collectionSummaryLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'{entries} unités · {models} figurines · {painted} peintes'**
+  String collectionSummaryLine(int entries, int models, int painted);
 }
 
 class _AppLocalizationsDelegate
