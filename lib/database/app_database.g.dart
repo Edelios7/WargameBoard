@@ -12129,6 +12129,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $DatasheetKeywordLinksTable(this);
   late final $DatasheetAbilityLinksTable datasheetAbilityLinks =
       $DatasheetAbilityLinksTable(this);
+  late final GameSystemDao gameSystemDao = GameSystemDao(this as AppDatabase);
+  late final FactionDao factionDao = FactionDao(this as AppDatabase);
+  late final AbilityDao abilityDao = AbilityDao(this as AppDatabase);
+  late final KeywordDao keywordDao = KeywordDao(this as AppDatabase);
+  late final WeaponDao weaponDao = WeaponDao(this as AppDatabase);
+  late final DatasheetDao datasheetDao = DatasheetDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
