@@ -125,37 +125,51 @@ class _CollectionCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.border),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(entry.datasheetName, style: AppTextStyles.body),
-          const SizedBox(height: 2),
-          Text(entry.factionName, style: AppTextStyles.caption),
-          const SizedBox(height: 8),
-          Text(
-            l10n.collectionQuantityLabel(entry.quantity),
-            style: AppTextStyles.caption.copyWith(color: AppColors.primary),
-          ),
-          const Spacer(),
-          _CountRow(
-            label: l10n.collectionAssembled,
-            value: entry.assembled,
-            max: entry.quantity,
-            onChanged: (v) => _updateCount(ref, 'assembled', v),
-          ),
-          _CountRow(
-            label: l10n.collectionPrimed,
-            value: entry.primed,
-            max: entry.quantity,
-            onChanged: (v) => _updateCount(ref, 'primed', v),
-          ),
-          _CountRow(
-            label: l10n.collectionPainted,
-            value: entry.painted,
-            max: entry.quantity,
-            onChanged: (v) => _updateCount(ref, 'painted', v),
-          ),
-        ],
+      child: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              entry.datasheetName,
+              style: AppTextStyles.body,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              entry.factionName,
+              style: AppTextStyles.caption,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.collectionQuantityLabel(entry.quantity),
+              style: AppTextStyles.caption.copyWith(color: AppColors.primary),
+            ),
+            const SizedBox(height: 12),
+            _CountRow(
+              label: l10n.collectionAssembled,
+              value: entry.assembled,
+              max: entry.quantity,
+              onChanged: (v) => _updateCount(ref, 'assembled', v),
+            ),
+            _CountRow(
+              label: l10n.collectionPrimed,
+              value: entry.primed,
+              max: entry.quantity,
+              onChanged: (v) => _updateCount(ref, 'primed', v),
+            ),
+            _CountRow(
+              label: l10n.collectionPainted,
+              value: entry.painted,
+              max: entry.quantity,
+              onChanged: (v) => _updateCount(ref, 'painted', v),
+            ),
+          ],
+        ),
       ),
     );
   }

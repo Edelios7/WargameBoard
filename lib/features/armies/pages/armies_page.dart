@@ -181,13 +181,20 @@ class _ArmyDetail extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(army.name, style: AppTextStyles.heading),
-                  const SizedBox(height: 6),
-                  Text(army.factionName, style: AppTextStyles.caption),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      army.name,
+                      style: AppTextStyles.heading,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(army.factionName, style: AppTextStyles.caption),
+                  ],
+                ),
               ),
               IconButton(
                 tooltip: l10n.armyBuilderDeleteArmy,
