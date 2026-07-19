@@ -52,6 +52,8 @@ import 'daos/keyword_dao.dart';
 import 'daos/weapon_dao.dart';
 import 'daos/datasheet_dao.dart';
 
+import 'seed/catalog_seed.dart';
+
 part 'app_database.g.dart';
 
 @DriftDatabase(
@@ -110,6 +112,8 @@ part 'app_database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(openConnection());
 
+  AppDatabase.forTesting(QueryExecutor executor) : super(executor);
+
   // =========================
   // DAO
   // =========================
@@ -141,6 +145,7 @@ class AppDatabase extends _$AppDatabase {
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) async {
           await m.createAll();
+          await seedCatalog(this);
         },
 
         onUpgrade: (Migrator m, int from, int to) async {
