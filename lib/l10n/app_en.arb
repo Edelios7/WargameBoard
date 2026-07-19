@@ -90,5 +90,14 @@
       "models": { "type": "int" },
       "painted": { "type": "int" }
     }
-  }
+  },
+
+  "statsArmiesCount": "Armies created",
+  "statsCollectionEntries": "Units in collection",
+  "statsCollectionModels": "Models in collection",
+  "statsCollectionPainted": "Models painted",
+  "statsPaintingProgress": "Painting progress",
+  "statsPointsByArmy": "Points by army",
+  "statsNoArmies": "No army created yet",
+  "statsNoCollection": "No models in your collection yet"
 }

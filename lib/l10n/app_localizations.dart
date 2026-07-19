@@ -349,6 +349,54 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'{entries} unités · {models} figurines · {painted} peintes'**
   String collectionSummaryLine(int entries, int models, int painted);
+
+  /// No description provided for @statsArmiesCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Armées créées'**
+  String get statsArmiesCount;
+
+  /// No description provided for @statsCollectionEntries.
+  ///
+  /// In fr, this message translates to:
+  /// **'Unités en collection'**
+  String get statsCollectionEntries;
+
+  /// No description provided for @statsCollectionModels.
+  ///
+  /// In fr, this message translates to:
+  /// **'Figurines en collection'**
+  String get statsCollectionModels;
+
+  /// No description provided for @statsCollectionPainted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Figurines peintes'**
+  String get statsCollectionPainted;
+
+  /// No description provided for @statsPaintingProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Progression peinture'**
+  String get statsPaintingProgress;
+
+  /// No description provided for @statsPointsByArmy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Points par armée'**
+  String get statsPointsByArmy;
+
+  /// No description provided for @statsNoArmies.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas encore d\'armée créée'**
+  String get statsNoArmies;
+
+  /// No description provided for @statsNoCollection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas encore de figurines en collection'**
+  String get statsNoCollection;
 }
 
 class _AppLocalizationsDelegate

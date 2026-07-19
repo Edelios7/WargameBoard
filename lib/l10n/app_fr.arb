@@ -90,5 +90,14 @@
       "models": { "type": "int" },
       "painted": { "type": "int" }
     }
-  }
+  },
+
+  "statsArmiesCount": "Armées créées",
+  "statsCollectionEntries": "Unités en collection",
+  "statsCollectionModels": "Figurines en collection",
+  "statsCollectionPainted": "Figurines peintes",
+  "statsPaintingProgress": "Progression peinture",
+  "statsPointsByArmy": "Points par armée",
+  "statsNoArmies": "Pas encore d'armée créée",
+  "statsNoCollection": "Pas encore de figurines en collection"
 }

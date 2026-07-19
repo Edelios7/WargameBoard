@@ -148,4 +148,28 @@ class AppLocalizationsFr extends AppLocalizations {
   String collectionSummaryLine(int entries, int models, int painted) {
     return '$entries unités · $models figurines · $painted peintes';
   }
+
+  @override
+  String get statsArmiesCount => 'Armées créées';
+
+  @override
+  String get statsCollectionEntries => 'Unités en collection';
+
+  @override
+  String get statsCollectionModels => 'Figurines en collection';
+
+  @override
+  String get statsCollectionPainted => 'Figurines peintes';
+
+  @override
+  String get statsPaintingProgress => 'Progression peinture';
+
+  @override
+  String get statsPointsByArmy => 'Points par armée';
+
+  @override
+  String get statsNoArmies => 'Pas encore d\'armée créée';
+
+  @override
+  String get statsNoCollection => 'Pas encore de figurines en collection';
 }
