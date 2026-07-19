@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_text_styles.dart';
+import '../../../shell/navigation.dart';
 import '../widgets/dashboard_card.dart';
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    void goTo(AppTab tab) =>
+        ref.read(selectedTabProvider.notifier).state = tab;
+
     return Scaffold(
       backgroundColor: const Color(0xFF111318),
       body: Padding(
@@ -43,7 +48,7 @@ class DashboardPage extends StatelessWidget {
                     title: "Armées",
                     subtitle:
                         "Crée, modifie et organise toutes tes armées.",
-                    onTap: () {},
+                    onTap: () => goTo(AppTab.armies),
                   ),
 
                   DashboardCard(
@@ -51,7 +56,7 @@ class DashboardPage extends StatelessWidget {
                     title: "Batailles",
                     subtitle:
                         "Prépare tes parties et consulte leur historique.",
-                    onTap: () {},
+                    onTap: () => goTo(AppTab.battles),
                   ),
 
                   DashboardCard(
@@ -59,7 +64,7 @@ class DashboardPage extends StatelessWidget {
                     title: "Collection",
                     subtitle:
                         "Gère tes figurines, peintures et boîtes.",
-                    onTap: () {},
+                    onTap: () => goTo(AppTab.collection),
                   ),
 
                   DashboardCard(
@@ -67,7 +72,7 @@ class DashboardPage extends StatelessWidget {
                     title: "Statistiques",
                     subtitle:
                         "Analyse tes performances et l'évolution de tes armées.",
-                    onTap: () {},
+                    onTap: () => goTo(AppTab.statistics),
                   ),
                 ],
               ),
