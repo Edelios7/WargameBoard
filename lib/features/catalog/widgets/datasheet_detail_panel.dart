@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -89,9 +89,9 @@ class DatasheetDetailPanel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(.18),
+        color: AppColors.primary.withValues(alpha: .18),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.primary.withOpacity(.4)),
+        border: Border.all(color: AppColors.primary.withValues(alpha: .4)),
       ),
       child: Text(
         l10n.pointsSuffix(points),

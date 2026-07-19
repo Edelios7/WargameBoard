@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class DashboardCard extends StatefulWidget {
   final String image;
@@ -52,14 +52,14 @@ class _DashboardCardState extends State<DashboardCard> {
               borderRadius: BorderRadius.circular(22),
               border: Border.all(
                 color: hovering
-                    ? Colors.deepPurpleAccent.withOpacity(.6)
+                    ? Colors.deepPurpleAccent.withValues(alpha: .6)
                     : Colors.white10,
                 width: hovering ? 1.6 : 1,
               ),
               boxShadow: [
                 BoxShadow(
                   color: hovering
-                      ? Colors.deepPurpleAccent.withOpacity(.40)
+                      ? Colors.deepPurpleAccent.withValues(alpha: .40)
                       : Colors.black26,
                   blurRadius: hovering ? 30 : 12,
                   spreadRadius: hovering ? 2 : 0,
@@ -124,7 +124,7 @@ class _DashboardCardState extends State<DashboardCard> {
                           child: AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 180),
                             style: TextStyle(
-                              color: Colors.white.withOpacity(.90),
+                              color: Colors.white.withValues(alpha: .90),
                               fontSize: hovering ? 18 : 17,
                             ),
                             child: Text(widget.subtitle),
@@ -143,7 +143,7 @@ class _DashboardCardState extends State<DashboardCard> {
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               color: hovering
-                                  ? Colors.deepPurpleAccent.withOpacity(.20)
+                                  ? Colors.deepPurpleAccent.withValues(alpha: .20)
                                   : Colors.transparent,
                               shape: BoxShape.circle,
                             ),

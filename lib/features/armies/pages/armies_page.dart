@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -131,7 +131,7 @@ class _ArmyListItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Material(
-        color: selected ? AppColors.primary.withOpacity(.16) : AppColors.surface,
+        color: selected ? AppColors.primary.withValues(alpha: .16) : AppColors.surface,
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
@@ -209,13 +209,13 @@ class _ArmyDetail extends ConsumerWidget {
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: (army.isOverLimit ? AppColors.error : AppColors.primary)
-                      .withOpacity(.18),
+                      .withValues(alpha: .18),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: (army.isOverLimit
                             ? AppColors.error
                             : AppColors.primary)
-                        .withOpacity(.4),
+                        .withValues(alpha: .4),
                   ),
                 ),
                 child: Text(

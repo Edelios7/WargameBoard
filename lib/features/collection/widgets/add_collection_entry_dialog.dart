@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -109,7 +109,7 @@ class _AddCollectionEntryDialogState
                           final selected = result.id == _selected?.id;
                           return ListTile(
                             selected: selected,
-                            selectedTileColor: AppColors.primary.withOpacity(.14),
+                            selectedTileColor: AppColors.primary.withValues(alpha: .14),
                             title: Text(result.name, style: AppTextStyles.body),
                             subtitle: result.subtitle != null
                                 ? Text(

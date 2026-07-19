@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -148,7 +148,7 @@ class _DatasheetListItem extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Material(
         color: selected
-            ? AppColors.primary.withOpacity(.16)
+            ? AppColors.primary.withValues(alpha: .16)
             : AppColors.surface,
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
