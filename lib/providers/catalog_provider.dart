@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../database/app_database.dart';
 import '../database/models/datasheet_details.dart';
 import '../database/models/search_result.dart';
 import '../repositories/catalog_repository.dart';
@@ -19,6 +20,11 @@ final catalogSearchResultsProvider =
   final query = ref.watch(catalogSearchQueryProvider);
 
   return repository.search(query);
+});
+
+final factionsListProvider = FutureProvider<List<Faction>>((ref) {
+  final database = ref.watch(databaseProvider);
+  return database.factionDao.getAll();
 });
 
 final selectedDatasheetIdProvider = StateProvider<String?>((ref) => null);

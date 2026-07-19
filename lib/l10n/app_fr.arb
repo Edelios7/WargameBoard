@@ -42,5 +42,22 @@
     "placeholders": {
       "points": { "type": "int" }
     }
+  },
+
+  "armyBuilderNewArmy": "Nouvelle armée",
+  "armyBuilderArmyName": "Nom de l'armée",
+  "armyBuilderFaction": "Faction",
+  "armyBuilderCreate": "Créer",
+  "armyBuilderCancel": "Annuler",
+  "armyBuilderEmptyList": "Aucune armée pour l'instant",
+  "armyBuilderSelectPrompt": "Sélectionnez une armée ou créez-en une nouvelle",
+  "armyBuilderAddUnit": "Ajouter une unité",
+  "armyBuilderEmptyUnits": "Aucune unité dans cette armée",
+  "armyBuilderDeleteArmy": "Supprimer l'armée",
+  "armyBuilderModelCount": "{count} figurines",
+  "@armyBuilderModelCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
   }
 }

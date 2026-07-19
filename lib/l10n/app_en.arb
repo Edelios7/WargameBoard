@@ -42,5 +42,22 @@
     "placeholders": {
       "points": { "type": "int" }
     }
+  },
+
+  "armyBuilderNewArmy": "New army",
+  "armyBuilderArmyName": "Army name",
+  "armyBuilderFaction": "Faction",
+  "armyBuilderCreate": "Create",
+  "armyBuilderCancel": "Cancel",
+  "armyBuilderEmptyList": "No armies yet",
+  "armyBuilderSelectPrompt": "Select an army or create a new one",
+  "armyBuilderAddUnit": "Add a unit",
+  "armyBuilderEmptyUnits": "No units in this army",
+  "armyBuilderDeleteArmy": "Delete army",
+  "armyBuilderModelCount": "{count} models",
+  "@armyBuilderModelCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
   }
 }

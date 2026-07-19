@@ -217,6 +217,72 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'{points} pts'**
   String pointsSuffix(int points);
+
+  /// No description provided for @armyBuilderNewArmy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle armée'**
+  String get armyBuilderNewArmy;
+
+  /// No description provided for @armyBuilderArmyName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom de l\'armée'**
+  String get armyBuilderArmyName;
+
+  /// No description provided for @armyBuilderFaction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Faction'**
+  String get armyBuilderFaction;
+
+  /// No description provided for @armyBuilderCreate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer'**
+  String get armyBuilderCreate;
+
+  /// No description provided for @armyBuilderCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler'**
+  String get armyBuilderCancel;
+
+  /// No description provided for @armyBuilderEmptyList.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune armée pour l\'instant'**
+  String get armyBuilderEmptyList;
+
+  /// No description provided for @armyBuilderSelectPrompt.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionnez une armée ou créez-en une nouvelle'**
+  String get armyBuilderSelectPrompt;
+
+  /// No description provided for @armyBuilderAddUnit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une unité'**
+  String get armyBuilderAddUnit;
+
+  /// No description provided for @armyBuilderEmptyUnits.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune unité dans cette armée'**
+  String get armyBuilderEmptyUnits;
+
+  /// No description provided for @armyBuilderDeleteArmy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer l\'armée'**
+  String get armyBuilderDeleteArmy;
+
+  /// No description provided for @armyBuilderModelCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} figurines'**
+  String armyBuilderModelCount(int count);
 }
 
 class _AppLocalizationsDelegate

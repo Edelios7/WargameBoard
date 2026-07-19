@@ -73,4 +73,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String pointsSuffix(int points) {
     return '$points pts';
   }
+
+  @override
+  String get armyBuilderNewArmy => 'New army';
+
+  @override
+  String get armyBuilderArmyName => 'Army name';
+
+  @override
+  String get armyBuilderFaction => 'Faction';
+
+  @override
+  String get armyBuilderCreate => 'Create';
+
+  @override
+  String get armyBuilderCancel => 'Cancel';
+
+  @override
+  String get armyBuilderEmptyList => 'No armies yet';
+
+  @override
+  String get armyBuilderSelectPrompt => 'Select an army or create a new one';
+
+  @override
+  String get armyBuilderAddUnit => 'Add a unit';
+
+  @override
+  String get armyBuilderEmptyUnits => 'No units in this army';
+
+  @override
+  String get armyBuilderDeleteArmy => 'Delete army';
+
+  @override
+  String armyBuilderModelCount(int count) {
+    return '$count models';
+  }
 }
