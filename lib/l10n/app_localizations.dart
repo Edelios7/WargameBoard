@@ -170,6 +170,18 @@ abstract class AppLocalizations {
   /// **'Erreur de chargement du catalogue : {error}'**
   String catalogLoadError(String error);
 
+  /// No description provided for @catalogFilterAllFactions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes les factions'**
+  String get catalogFilterAllFactions;
+
+  /// No description provided for @catalogFilterAllKeywords.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous les mots-clés'**
+  String get catalogFilterAllKeywords;
+
   /// No description provided for @sectionUnitSize.
   ///
   /// In fr, this message translates to:

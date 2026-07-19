@@ -52,13 +52,27 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     with _$DatasheetDaoMixin {
   DatasheetDao(AppDatabase db) : super(db);
 
-  Future<List<SearchResult>> search(String text) async {
+  Future<List<SearchResult>> search(
+    String text, {
+    String? factionId,
+    String? keywordId,
+  }) async {
     final pattern = '%$text%';
     final query = select(datasheets).join([
       innerJoin(factions, factions.id.equalsExp(datasheets.factionId)),
+      if (keywordId != null)
+        innerJoin(
+          datasheetKeywordLinks,
+          datasheetKeywordLinks.datasheetId.equalsExp(datasheets.id) &
+              datasheetKeywordLinks.keywordId.equals(keywordId),
+        ),
     ])
       ..where(datasheets.name.like(pattern))
       ..orderBy([OrderingTerm.asc(datasheets.name)]);
+
+    if (factionId != null) {
+      query.where(datasheets.factionId.equals(factionId));
+    }
 
     final rows = await query.get();
     return rows.map((row) {

@@ -20,6 +20,8 @@
       "error": { "type": "String" }
     }
   },
+  "catalogFilterAllFactions": "Toutes les factions",
+  "catalogFilterAllKeywords": "Tous les mots-clés",
 
   "sectionUnitSize": "Effectif",
   "sectionProfiles": "Profils",

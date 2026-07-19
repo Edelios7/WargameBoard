@@ -39,4 +39,25 @@ void main() {
     final details = await database.datasheetDao.getDatasheet('does-not-exist');
     expect(details, isNull);
   });
+
+  test('search filters by faction', () async {
+    final matching = await database.datasheetDao
+        .search('', factionId: 'fac-blood-angels');
+    expect(matching, hasLength(3));
+
+    final none =
+        await database.datasheetDao.search('', factionId: 'fac-unknown');
+    expect(none, isEmpty);
+  });
+
+  test('search filters by keyword', () async {
+    final flying =
+        await database.datasheetDao.search('', keywordId: 'kw-fly');
+    expect(flying, hasLength(1));
+    expect(flying.single.name, 'Sanguinary Guard');
+
+    final deathCompany = await database.datasheetDao
+        .search('', keywordId: 'kw-death-company');
+    expect(deathCompany.single.name, 'Death Company Marines');
+  });
 }

@@ -17,6 +17,10 @@ class CatalogPage extends ConsumerWidget {
     final resultsAsync = ref.watch(catalogSearchResultsProvider);
     final detailAsync = ref.watch(selectedDatasheetProvider);
     final selectedId = ref.watch(selectedDatasheetIdProvider);
+    final factionsAsync = ref.watch(factionsListProvider);
+    final keywordsAsync = ref.watch(keywordsListProvider);
+    final factionFilter = ref.watch(catalogFactionFilterProvider);
+    final keywordFilter = ref.watch(catalogKeywordFilterProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -38,6 +42,49 @@ class CatalogPage extends ConsumerWidget {
                     onChanged: (value) => ref
                         .read(catalogSearchQueryProvider.notifier)
                         .state = value,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: factionsAsync.when(
+                          loading: () => const SizedBox.shrink(),
+                          error: (_, __) => const SizedBox.shrink(),
+                          data: (factions) => _FilterDropdown(
+                            value: factionFilter,
+                            allLabel: l10n.catalogFilterAllFactions,
+                            items: {
+                              for (final faction in factions)
+                                faction.id: faction.name,
+                            },
+                            onChanged: (value) => ref
+                                .read(catalogFactionFilterProvider.notifier)
+                                .state = value,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: keywordsAsync.when(
+                          loading: () => const SizedBox.shrink(),
+                          error: (_, __) => const SizedBox.shrink(),
+                          data: (keywords) => _FilterDropdown(
+                            value: keywordFilter,
+                            allLabel: l10n.catalogFilterAllKeywords,
+                            items: {
+                              for (final keyword in keywords)
+                                keyword.id: keyword.name,
+                            },
+                            onChanged: (value) => ref
+                                .read(catalogKeywordFilterProvider.notifier)
+                                .state = value,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -125,6 +172,58 @@ class _SearchField extends StatelessWidget {
           ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 14),
+        ),
+      ),
+    );
+  }
+}
+
+class _FilterDropdown extends StatelessWidget {
+  final String? value;
+  final String allLabel;
+  final Map<String, String> items;
+  final ValueChanged<String?> onChanged;
+
+  const _FilterDropdown({
+    required this.value,
+    required this.allLabel,
+    required this.items,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.border),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String?>(
+          isExpanded: true,
+          value: value,
+          dropdownColor: AppColors.surface,
+          style: AppTextStyles.caption,
+          icon: const Icon(
+            Icons.expand_more_rounded,
+            color: AppColors.textSecondary,
+            size: 18,
+          ),
+          items: [
+            DropdownMenuItem<String?>(
+              value: null,
+              child: Text(allLabel, overflow: TextOverflow.ellipsis),
+            ),
+            ...items.entries.map(
+              (entry) => DropdownMenuItem<String?>(
+                value: entry.key,
+                child: Text(entry.value, overflow: TextOverflow.ellipsis),
+              ),
+            ),
+          ],
+          onChanged: onChanged,
         ),
       ),
     );

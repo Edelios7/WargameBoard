@@ -47,6 +47,12 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get catalogFilterAllFactions => 'Toutes les factions';
+
+  @override
+  String get catalogFilterAllKeywords => 'Tous les mots-clés';
+
+  @override
   String get sectionUnitSize => 'Effectif';
 
   @override

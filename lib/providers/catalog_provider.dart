@@ -14,17 +14,28 @@ final catalogRepositoryProvider = Provider<CatalogRepository>((ref) {
 
 final catalogSearchQueryProvider = StateProvider<String>((ref) => '');
 
+final catalogFactionFilterProvider = StateProvider<String?>((ref) => null);
+
+final catalogKeywordFilterProvider = StateProvider<String?>((ref) => null);
+
 final catalogSearchResultsProvider =
     FutureProvider<List<SearchResult>>((ref) {
   final repository = ref.watch(catalogRepositoryProvider);
   final query = ref.watch(catalogSearchQueryProvider);
+  final factionId = ref.watch(catalogFactionFilterProvider);
+  final keywordId = ref.watch(catalogKeywordFilterProvider);
 
-  return repository.search(query);
+  return repository.search(query, factionId: factionId, keywordId: keywordId);
 });
 
 final factionsListProvider = FutureProvider<List<Faction>>((ref) {
   final database = ref.watch(databaseProvider);
   return database.factionDao.getAll();
+});
+
+final keywordsListProvider = FutureProvider<List<Keyword>>((ref) {
+  final database = ref.watch(databaseProvider);
+  return database.keywordDao.getAll();
 });
 
 final selectedDatasheetIdProvider = StateProvider<String?>((ref) => null);

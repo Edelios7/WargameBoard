@@ -20,6 +20,8 @@
       "error": { "type": "String" }
     }
   },
+  "catalogFilterAllFactions": "All factions",
+  "catalogFilterAllKeywords": "All keywords",
 
   "sectionUnitSize": "Unit size",
   "sectionProfiles": "Profiles",

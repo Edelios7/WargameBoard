@@ -47,6 +47,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get catalogFilterAllFactions => 'All factions';
+
+  @override
+  String get catalogFilterAllKeywords => 'All keywords';
+
+  @override
   String get sectionUnitSize => 'Unit size';
 
   @override

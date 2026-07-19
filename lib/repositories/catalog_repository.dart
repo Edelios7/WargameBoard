@@ -7,8 +7,16 @@ class CatalogRepository {
 
   CatalogRepository(this.database);
 
-  Future<List<SearchResult>> search(String text) {
-    return database.datasheetDao.search(text);
+  Future<List<SearchResult>> search(
+    String text, {
+    String? factionId,
+    String? keywordId,
+  }) {
+    return database.datasheetDao.search(
+      text,
+      factionId: factionId,
+      keywordId: keywordId,
+    );
   }
 
   Future<DatasheetDetails?> getDatasheet(String id) {
