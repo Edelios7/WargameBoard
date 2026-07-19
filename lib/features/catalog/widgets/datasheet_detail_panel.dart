@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/local_datasheet_images.dart';
 import '../../../database/models/datasheet_details.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -35,11 +36,25 @@ class DatasheetDetailPanel extends StatelessWidget {
       );
     }
 
+    final imageFile = LocalDatasheetImages.find(sheet.id);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (imageFile != null) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.file(
+                imageFile,
+                height: 220,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
           Text(sheet.name, style: AppTextStyles.heading),
           const SizedBox(height: 6),
           Text(sheet.factionName, style: AppTextStyles.caption),
