@@ -44,6 +44,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Claude Code : préférences locales de l'outil, pas du code projet
+.claude/settings.local.json
+
 # Images de référence officielles (usage privé uniquement, jamais commitées)
 local_assets/**/*.png
 local_assets/**/*.jpg

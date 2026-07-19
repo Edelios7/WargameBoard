@@ -12080,6 +12080,824 @@ class DatasheetAbilityLinksCompanion
   }
 }
 
+class $ArmiesTable extends Armies with TableInfo<$ArmiesTable, Army> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ArmiesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _factionIdMeta = const VerificationMeta(
+    'factionId',
+  );
+  @override
+  late final GeneratedColumn<String> factionId = GeneratedColumn<String>(
+    'faction_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    factionId,
+    name,
+    notes,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'armies';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Army> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('faction_id')) {
+      context.handle(
+        _factionIdMeta,
+        factionId.isAcceptableOrUnknown(data['faction_id']!, _factionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_factionIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Army map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Army(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      factionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}faction_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ArmiesTable createAlias(String alias) {
+    return $ArmiesTable(attachedDatabase, alias);
+  }
+}
+
+class Army extends DataClass implements Insertable<Army> {
+  final String id;
+  final String factionId;
+  final String name;
+  final String? notes;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const Army({
+    required this.id,
+    required this.factionId,
+    required this.name,
+    this.notes,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['faction_id'] = Variable<String>(factionId);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  ArmiesCompanion toCompanion(bool nullToAbsent) {
+    return ArmiesCompanion(
+      id: Value(id),
+      factionId: Value(factionId),
+      name: Value(name),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory Army.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Army(
+      id: serializer.fromJson<String>(json['id']),
+      factionId: serializer.fromJson<String>(json['factionId']),
+      name: serializer.fromJson<String>(json['name']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'factionId': serializer.toJson<String>(factionId),
+      'name': serializer.toJson<String>(name),
+      'notes': serializer.toJson<String?>(notes),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  Army copyWith({
+    String? id,
+    String? factionId,
+    String? name,
+    Value<String?> notes = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => Army(
+    id: id ?? this.id,
+    factionId: factionId ?? this.factionId,
+    name: name ?? this.name,
+    notes: notes.present ? notes.value : this.notes,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  Army copyWithCompanion(ArmiesCompanion data) {
+    return Army(
+      id: data.id.present ? data.id.value : this.id,
+      factionId: data.factionId.present ? data.factionId.value : this.factionId,
+      name: data.name.present ? data.name.value : this.name,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Army(')
+          ..write('id: $id, ')
+          ..write('factionId: $factionId, ')
+          ..write('name: $name, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, factionId, name, notes, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Army &&
+          other.id == this.id &&
+          other.factionId == this.factionId &&
+          other.name == this.name &&
+          other.notes == this.notes &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ArmiesCompanion extends UpdateCompanion<Army> {
+  final Value<String> id;
+  final Value<String> factionId;
+  final Value<String> name;
+  final Value<String?> notes;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const ArmiesCompanion({
+    this.id = const Value.absent(),
+    this.factionId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ArmiesCompanion.insert({
+    required String id,
+    required String factionId,
+    required String name,
+    this.notes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       factionId = Value(factionId),
+       name = Value(name);
+  static Insertable<Army> custom({
+    Expression<String>? id,
+    Expression<String>? factionId,
+    Expression<String>? name,
+    Expression<String>? notes,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (factionId != null) 'faction_id': factionId,
+      if (name != null) 'name': name,
+      if (notes != null) 'notes': notes,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ArmiesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? factionId,
+    Value<String>? name,
+    Value<String?>? notes,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return ArmiesCompanion(
+      id: id ?? this.id,
+      factionId: factionId ?? this.factionId,
+      name: name ?? this.name,
+      notes: notes ?? this.notes,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (factionId.present) {
+      map['faction_id'] = Variable<String>(factionId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ArmiesCompanion(')
+          ..write('id: $id, ')
+          ..write('factionId: $factionId, ')
+          ..write('name: $name, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ArmyUnitsTable extends ArmyUnits
+    with TableInfo<$ArmyUnitsTable, ArmyUnit> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ArmyUnitsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _armyIdMeta = const VerificationMeta('armyId');
+  @override
+  late final GeneratedColumn<String> armyId = GeneratedColumn<String>(
+    'army_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _datasheetIdMeta = const VerificationMeta(
+    'datasheetId',
+  );
+  @override
+  late final GeneratedColumn<String> datasheetId = GeneratedColumn<String>(
+    'datasheet_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _modelCountMeta = const VerificationMeta(
+    'modelCount',
+  );
+  @override
+  late final GeneratedColumn<int> modelCount = GeneratedColumn<int>(
+    'model_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _displayOrderMeta = const VerificationMeta(
+    'displayOrder',
+  );
+  @override
+  late final GeneratedColumn<int> displayOrder = GeneratedColumn<int>(
+    'display_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    armyId,
+    datasheetId,
+    modelCount,
+    displayOrder,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'army_units';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ArmyUnit> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('army_id')) {
+      context.handle(
+        _armyIdMeta,
+        armyId.isAcceptableOrUnknown(data['army_id']!, _armyIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_armyIdMeta);
+    }
+    if (data.containsKey('datasheet_id')) {
+      context.handle(
+        _datasheetIdMeta,
+        datasheetId.isAcceptableOrUnknown(
+          data['datasheet_id']!,
+          _datasheetIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_datasheetIdMeta);
+    }
+    if (data.containsKey('model_count')) {
+      context.handle(
+        _modelCountMeta,
+        modelCount.isAcceptableOrUnknown(data['model_count']!, _modelCountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_modelCountMeta);
+    }
+    if (data.containsKey('display_order')) {
+      context.handle(
+        _displayOrderMeta,
+        displayOrder.isAcceptableOrUnknown(
+          data['display_order']!,
+          _displayOrderMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ArmyUnit map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ArmyUnit(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      armyId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}army_id'],
+      )!,
+      datasheetId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}datasheet_id'],
+      )!,
+      modelCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}model_count'],
+      )!,
+      displayOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}display_order'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ArmyUnitsTable createAlias(String alias) {
+    return $ArmyUnitsTable(attachedDatabase, alias);
+  }
+}
+
+class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
+  final String id;
+  final String armyId;
+  final String datasheetId;
+  final int modelCount;
+  final int displayOrder;
+  final DateTime createdAt;
+  const ArmyUnit({
+    required this.id,
+    required this.armyId,
+    required this.datasheetId,
+    required this.modelCount,
+    required this.displayOrder,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['army_id'] = Variable<String>(armyId);
+    map['datasheet_id'] = Variable<String>(datasheetId);
+    map['model_count'] = Variable<int>(modelCount);
+    map['display_order'] = Variable<int>(displayOrder);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  ArmyUnitsCompanion toCompanion(bool nullToAbsent) {
+    return ArmyUnitsCompanion(
+      id: Value(id),
+      armyId: Value(armyId),
+      datasheetId: Value(datasheetId),
+      modelCount: Value(modelCount),
+      displayOrder: Value(displayOrder),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory ArmyUnit.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ArmyUnit(
+      id: serializer.fromJson<String>(json['id']),
+      armyId: serializer.fromJson<String>(json['armyId']),
+      datasheetId: serializer.fromJson<String>(json['datasheetId']),
+      modelCount: serializer.fromJson<int>(json['modelCount']),
+      displayOrder: serializer.fromJson<int>(json['displayOrder']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'armyId': serializer.toJson<String>(armyId),
+      'datasheetId': serializer.toJson<String>(datasheetId),
+      'modelCount': serializer.toJson<int>(modelCount),
+      'displayOrder': serializer.toJson<int>(displayOrder),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  ArmyUnit copyWith({
+    String? id,
+    String? armyId,
+    String? datasheetId,
+    int? modelCount,
+    int? displayOrder,
+    DateTime? createdAt,
+  }) => ArmyUnit(
+    id: id ?? this.id,
+    armyId: armyId ?? this.armyId,
+    datasheetId: datasheetId ?? this.datasheetId,
+    modelCount: modelCount ?? this.modelCount,
+    displayOrder: displayOrder ?? this.displayOrder,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  ArmyUnit copyWithCompanion(ArmyUnitsCompanion data) {
+    return ArmyUnit(
+      id: data.id.present ? data.id.value : this.id,
+      armyId: data.armyId.present ? data.armyId.value : this.armyId,
+      datasheetId: data.datasheetId.present
+          ? data.datasheetId.value
+          : this.datasheetId,
+      modelCount: data.modelCount.present
+          ? data.modelCount.value
+          : this.modelCount,
+      displayOrder: data.displayOrder.present
+          ? data.displayOrder.value
+          : this.displayOrder,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ArmyUnit(')
+          ..write('id: $id, ')
+          ..write('armyId: $armyId, ')
+          ..write('datasheetId: $datasheetId, ')
+          ..write('modelCount: $modelCount, ')
+          ..write('displayOrder: $displayOrder, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, armyId, datasheetId, modelCount, displayOrder, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ArmyUnit &&
+          other.id == this.id &&
+          other.armyId == this.armyId &&
+          other.datasheetId == this.datasheetId &&
+          other.modelCount == this.modelCount &&
+          other.displayOrder == this.displayOrder &&
+          other.createdAt == this.createdAt);
+}
+
+class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
+  final Value<String> id;
+  final Value<String> armyId;
+  final Value<String> datasheetId;
+  final Value<int> modelCount;
+  final Value<int> displayOrder;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const ArmyUnitsCompanion({
+    this.id = const Value.absent(),
+    this.armyId = const Value.absent(),
+    this.datasheetId = const Value.absent(),
+    this.modelCount = const Value.absent(),
+    this.displayOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ArmyUnitsCompanion.insert({
+    required String id,
+    required String armyId,
+    required String datasheetId,
+    required int modelCount,
+    this.displayOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       armyId = Value(armyId),
+       datasheetId = Value(datasheetId),
+       modelCount = Value(modelCount);
+  static Insertable<ArmyUnit> custom({
+    Expression<String>? id,
+    Expression<String>? armyId,
+    Expression<String>? datasheetId,
+    Expression<int>? modelCount,
+    Expression<int>? displayOrder,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (armyId != null) 'army_id': armyId,
+      if (datasheetId != null) 'datasheet_id': datasheetId,
+      if (modelCount != null) 'model_count': modelCount,
+      if (displayOrder != null) 'display_order': displayOrder,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ArmyUnitsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? armyId,
+    Value<String>? datasheetId,
+    Value<int>? modelCount,
+    Value<int>? displayOrder,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return ArmyUnitsCompanion(
+      id: id ?? this.id,
+      armyId: armyId ?? this.armyId,
+      datasheetId: datasheetId ?? this.datasheetId,
+      modelCount: modelCount ?? this.modelCount,
+      displayOrder: displayOrder ?? this.displayOrder,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (armyId.present) {
+      map['army_id'] = Variable<String>(armyId.value);
+    }
+    if (datasheetId.present) {
+      map['datasheet_id'] = Variable<String>(datasheetId.value);
+    }
+    if (modelCount.present) {
+      map['model_count'] = Variable<int>(modelCount.value);
+    }
+    if (displayOrder.present) {
+      map['display_order'] = Variable<int>(displayOrder.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ArmyUnitsCompanion(')
+          ..write('id: $id, ')
+          ..write('armyId: $armyId, ')
+          ..write('datasheetId: $datasheetId, ')
+          ..write('modelCount: $modelCount, ')
+          ..write('displayOrder: $displayOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -12129,12 +12947,15 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $DatasheetKeywordLinksTable(this);
   late final $DatasheetAbilityLinksTable datasheetAbilityLinks =
       $DatasheetAbilityLinksTable(this);
+  late final $ArmiesTable armies = $ArmiesTable(this);
+  late final $ArmyUnitsTable armyUnits = $ArmyUnitsTable(this);
   late final GameSystemDao gameSystemDao = GameSystemDao(this as AppDatabase);
   late final FactionDao factionDao = FactionDao(this as AppDatabase);
   late final AbilityDao abilityDao = AbilityDao(this as AppDatabase);
   late final KeywordDao keywordDao = KeywordDao(this as AppDatabase);
   late final WeaponDao weaponDao = WeaponDao(this as AppDatabase);
   late final DatasheetDao datasheetDao = DatasheetDao(this as AppDatabase);
+  late final ArmyDao armyDao = ArmyDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -12166,6 +12987,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     weaponAbilityLinks,
     datasheetKeywordLinks,
     datasheetAbilityLinks,
+    armies,
+    armyUnits,
   ];
 }
 
@@ -18539,6 +19362,438 @@ typedef $$DatasheetAbilityLinksTableProcessedTableManager =
       DatasheetAbilityLink,
       PrefetchHooks Function()
     >;
+typedef $$ArmiesTableCreateCompanionBuilder =
+    ArmiesCompanion Function({
+      required String id,
+      required String factionId,
+      required String name,
+      Value<String?> notes,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+typedef $$ArmiesTableUpdateCompanionBuilder =
+    ArmiesCompanion Function({
+      Value<String> id,
+      Value<String> factionId,
+      Value<String> name,
+      Value<String?> notes,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$ArmiesTableFilterComposer
+    extends Composer<_$AppDatabase, $ArmiesTable> {
+  $$ArmiesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get factionId => $composableBuilder(
+    column: $table.factionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ArmiesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ArmiesTable> {
+  $$ArmiesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get factionId => $composableBuilder(
+    column: $table.factionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ArmiesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ArmiesTable> {
+  $$ArmiesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get factionId =>
+      $composableBuilder(column: $table.factionId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$ArmiesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ArmiesTable,
+          Army,
+          $$ArmiesTableFilterComposer,
+          $$ArmiesTableOrderingComposer,
+          $$ArmiesTableAnnotationComposer,
+          $$ArmiesTableCreateCompanionBuilder,
+          $$ArmiesTableUpdateCompanionBuilder,
+          (Army, BaseReferences<_$AppDatabase, $ArmiesTable, Army>),
+          Army,
+          PrefetchHooks Function()
+        > {
+  $$ArmiesTableTableManager(_$AppDatabase db, $ArmiesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ArmiesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ArmiesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ArmiesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> factionId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ArmiesCompanion(
+                id: id,
+                factionId: factionId,
+                name: name,
+                notes: notes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String factionId,
+                required String name,
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ArmiesCompanion.insert(
+                id: id,
+                factionId: factionId,
+                name: name,
+                notes: notes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ArmiesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ArmiesTable,
+      Army,
+      $$ArmiesTableFilterComposer,
+      $$ArmiesTableOrderingComposer,
+      $$ArmiesTableAnnotationComposer,
+      $$ArmiesTableCreateCompanionBuilder,
+      $$ArmiesTableUpdateCompanionBuilder,
+      (Army, BaseReferences<_$AppDatabase, $ArmiesTable, Army>),
+      Army,
+      PrefetchHooks Function()
+    >;
+typedef $$ArmyUnitsTableCreateCompanionBuilder =
+    ArmyUnitsCompanion Function({
+      required String id,
+      required String armyId,
+      required String datasheetId,
+      required int modelCount,
+      Value<int> displayOrder,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+typedef $$ArmyUnitsTableUpdateCompanionBuilder =
+    ArmyUnitsCompanion Function({
+      Value<String> id,
+      Value<String> armyId,
+      Value<String> datasheetId,
+      Value<int> modelCount,
+      Value<int> displayOrder,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$ArmyUnitsTableFilterComposer
+    extends Composer<_$AppDatabase, $ArmyUnitsTable> {
+  $$ArmyUnitsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get armyId => $composableBuilder(
+    column: $table.armyId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get datasheetId => $composableBuilder(
+    column: $table.datasheetId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get modelCount => $composableBuilder(
+    column: $table.modelCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get displayOrder => $composableBuilder(
+    column: $table.displayOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ArmyUnitsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ArmyUnitsTable> {
+  $$ArmyUnitsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get armyId => $composableBuilder(
+    column: $table.armyId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get datasheetId => $composableBuilder(
+    column: $table.datasheetId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get modelCount => $composableBuilder(
+    column: $table.modelCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get displayOrder => $composableBuilder(
+    column: $table.displayOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ArmyUnitsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ArmyUnitsTable> {
+  $$ArmyUnitsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get armyId =>
+      $composableBuilder(column: $table.armyId, builder: (column) => column);
+
+  GeneratedColumn<String> get datasheetId => $composableBuilder(
+    column: $table.datasheetId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get modelCount => $composableBuilder(
+    column: $table.modelCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get displayOrder => $composableBuilder(
+    column: $table.displayOrder,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$ArmyUnitsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ArmyUnitsTable,
+          ArmyUnit,
+          $$ArmyUnitsTableFilterComposer,
+          $$ArmyUnitsTableOrderingComposer,
+          $$ArmyUnitsTableAnnotationComposer,
+          $$ArmyUnitsTableCreateCompanionBuilder,
+          $$ArmyUnitsTableUpdateCompanionBuilder,
+          (ArmyUnit, BaseReferences<_$AppDatabase, $ArmyUnitsTable, ArmyUnit>),
+          ArmyUnit,
+          PrefetchHooks Function()
+        > {
+  $$ArmyUnitsTableTableManager(_$AppDatabase db, $ArmyUnitsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ArmyUnitsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ArmyUnitsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ArmyUnitsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> armyId = const Value.absent(),
+                Value<String> datasheetId = const Value.absent(),
+                Value<int> modelCount = const Value.absent(),
+                Value<int> displayOrder = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ArmyUnitsCompanion(
+                id: id,
+                armyId: armyId,
+                datasheetId: datasheetId,
+                modelCount: modelCount,
+                displayOrder: displayOrder,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String armyId,
+                required String datasheetId,
+                required int modelCount,
+                Value<int> displayOrder = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ArmyUnitsCompanion.insert(
+                id: id,
+                armyId: armyId,
+                datasheetId: datasheetId,
+                modelCount: modelCount,
+                displayOrder: displayOrder,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ArmyUnitsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ArmyUnitsTable,
+      ArmyUnit,
+      $$ArmyUnitsTableFilterComposer,
+      $$ArmyUnitsTableOrderingComposer,
+      $$ArmyUnitsTableAnnotationComposer,
+      $$ArmyUnitsTableCreateCompanionBuilder,
+      $$ArmyUnitsTableUpdateCompanionBuilder,
+      (ArmyUnit, BaseReferences<_$AppDatabase, $ArmyUnitsTable, ArmyUnit>),
+      ArmyUnit,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -18595,4 +19850,8 @@ class $AppDatabaseManager {
       $$DatasheetKeywordLinksTableTableManager(_db, _db.datasheetKeywordLinks);
   $$DatasheetAbilityLinksTableTableManager get datasheetAbilityLinks =>
       $$DatasheetAbilityLinksTableTableManager(_db, _db.datasheetAbilityLinks);
+  $$ArmiesTableTableManager get armies =>
+      $$ArmiesTableTableManager(_db, _db.armies);
+  $$ArmyUnitsTableTableManager get armyUnits =>
+      $$ArmyUnitsTableTableManager(_db, _db.armyUnits);
 }

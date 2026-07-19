@@ -41,6 +41,9 @@ import 'tables/weapon_ability_links_table.dart';
 import 'tables/datasheet_keyword_links_table.dart';
 import 'tables/datasheet_ability_links_table.dart';
 
+import 'tables/armies_table.dart';
+import 'tables/army_units_table.dart';
+
 // =========================
 // DAO
 // =========================
@@ -51,6 +54,7 @@ import 'daos/ability_dao.dart';
 import 'daos/keyword_dao.dart';
 import 'daos/weapon_dao.dart';
 import 'daos/datasheet_dao.dart';
+import 'daos/army_dao.dart';
 
 import 'seed/catalog_seed.dart';
 
@@ -99,6 +103,10 @@ part 'app_database.g.dart';
     WeaponAbilityLinks,
     DatasheetKeywordLinks,
     DatasheetAbilityLinks,
+
+    // ===== ARMIES =====
+    Armies,
+    ArmyUnits,
   ],
   daos: [
     GameSystemDao,
@@ -107,6 +115,7 @@ part 'app_database.g.dart';
     KeywordDao,
     WeaponDao,
     DatasheetDao,
+    ArmyDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -130,12 +139,14 @@ class AppDatabase extends _$AppDatabase {
 
   late final DatasheetDao datasheetDao = DatasheetDao(this);
 
+  late final ArmyDao armyDao = ArmyDao(this);
+
   // =========================
   // Database version
   // =========================
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   // =========================
   // Migrations
@@ -149,7 +160,10 @@ class AppDatabase extends _$AppDatabase {
         },
 
         onUpgrade: (Migrator m, int from, int to) async {
-          // Les futures migrations seront ajoutées ici.
+          if (from < 2) {
+            await m.createTable(armies);
+            await m.createTable(armyUnits);
+          }
         },
 
         beforeOpen: (details) async {
