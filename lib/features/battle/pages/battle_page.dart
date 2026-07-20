@@ -79,7 +79,7 @@ class BattlePage extends ConsumerWidget {
   }
 }
 
-class _BattleCard extends StatelessWidget {
+class _BattleCard extends ConsumerWidget {
   final BattleDetails battle;
 
   const _BattleCard({required this.battle});
@@ -109,7 +109,7 @@ class _BattleCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final dateFormat = DateFormat.yMMMd(Localizations.localeOf(context).toString());
 
@@ -159,6 +159,14 @@ class _BattleCard extends StatelessWidget {
               l10n.battleScoreLine(battle.myScore!, battle.opponentScore!),
               style: AppTextStyles.body,
             ),
+          IconButton(
+            icon: const Icon(Icons.close_rounded),
+            color: AppColors.textSecondary,
+            onPressed: () async {
+              await ref.read(battleRepositoryProvider).deleteBattle(battle.id);
+              ref.invalidate(battlesListProvider);
+            },
+          ),
         ],
       ),
     );

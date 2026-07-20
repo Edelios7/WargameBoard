@@ -48,4 +48,19 @@ void main() {
     expect(find.text('Marc'), findsOneWidget);
     expect(find.text('Victoire'), findsOneWidget);
   });
+
+  testWidgets('deleting a battle removes it from the history', (tester) async {
+    await database.battleDao.addBattle(opponentName: 'Julie');
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Julie'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.close_rounded));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Julie'), findsNothing);
+    expect(find.text('Aucune partie enregistrée'), findsOneWidget);
+  });
 }
