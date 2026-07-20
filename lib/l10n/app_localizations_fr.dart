@@ -127,6 +127,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get armyBuilderDeleteArmy => 'Supprimer l\'armée';
 
   @override
+  String get armyBuilderCopyList => 'Copier la liste';
+
+  @override
+  String get armyBuilderCopiedToClipboard =>
+      'Liste copiée dans le presse-papier';
+
+  @override
   String get armyBuilderDetachmentLabel => 'Détachement (optionnel)';
 
   @override

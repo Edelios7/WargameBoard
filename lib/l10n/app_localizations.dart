@@ -320,6 +320,18 @@ abstract class AppLocalizations {
   /// **'Supprimer l\'armée'**
   String get armyBuilderDeleteArmy;
 
+  /// No description provided for @armyBuilderCopyList.
+  ///
+  /// In fr, this message translates to:
+  /// **'Copier la liste'**
+  String get armyBuilderCopyList;
+
+  /// No description provided for @armyBuilderCopiedToClipboard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Liste copiée dans le presse-papier'**
+  String get armyBuilderCopiedToClipboard;
+
   /// No description provided for @armyBuilderDetachmentLabel.
   ///
   /// In fr, this message translates to:

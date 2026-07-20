@@ -1,8 +1,10 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/army_list_formatter.dart';
 import '../../../database/models/army_details.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/army_provider.dart';
@@ -260,6 +262,24 @@ class _ArmyDetail extends ConsumerWidget {
                     ),
                   ],
                 ),
+              ),
+              IconButton(
+                tooltip: l10n.armyBuilderCopyList,
+                icon: const Icon(Icons.copy_rounded),
+                color: AppColors.textSecondary,
+                onPressed: () async {
+                  await Clipboard.setData(
+                    ClipboardData(text: ArmyListFormatter.format(army)),
+                  );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.armyBuilderCopiedToClipboard),
+                        backgroundColor: AppColors.surface,
+                      ),
+                    );
+                  }
+                },
               ),
               if (army.detachmentId != null)
                 IconButton(

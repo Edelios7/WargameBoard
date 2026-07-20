@@ -62,6 +62,8 @@
   "armyBuilderAddUnit": "Ajouter une unité",
   "armyBuilderEmptyUnits": "Aucune unité dans cette armée",
   "armyBuilderDeleteArmy": "Supprimer l'armée",
+  "armyBuilderCopyList": "Copier la liste",
+  "armyBuilderCopiedToClipboard": "Liste copiée dans le presse-papier",
   "armyBuilderDetachmentLabel": "Détachement (optionnel)",
   "armyBuilderDetachmentNone": "Aucun",
   "armyBuilderEnhancementLabel": "Enhancement",
