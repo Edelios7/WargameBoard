@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/app_chip.dart';
 import '../../../database/models/search_result.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/catalog_provider.dart';
@@ -33,7 +34,28 @@ class CatalogPage extends ConsumerWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 28, 24, 16),
-                  child: Text(l10n.navCatalog, style: AppTextStyles.heading),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(l10n.navCatalog, style: AppTextStyles.heading),
+                      if (factionFilter != null || keywordFilter != null)
+                        TextButton(
+                          onPressed: () {
+                            ref
+                                .read(catalogFactionFilterProvider.notifier)
+                                .state = null;
+                            ref
+                                .read(catalogKeywordFilterProvider.notifier)
+                                .state = null;
+                          },
+                          child: Text(
+                            l10n.catalogResetFilters,
+                            style: AppTextStyles.caption
+                                .copyWith(color: AppColors.primary),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -113,19 +135,37 @@ class CatalogPage extends ConsumerWidget {
                           ),
                         );
                       }
-                      return ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: results.length,
-                        itemBuilder: (context, index) {
-                          final result = results[index];
-                          return _DatasheetListItem(
-                            result: result,
-                            selected: result.id == selectedId,
-                            onTap: () => ref
-                                .read(selectedDatasheetIdProvider.notifier)
-                                .state = result.id,
-                          );
-                        },
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 4),
+                            child: Text(
+                              l10n.catalogResultsCount(results.length),
+                              style: AppTextStyles.eyebrow,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Expanded(
+                            child: ListView.builder(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              itemCount: results.length,
+                              itemBuilder: (context, index) {
+                                final result = results[index];
+                                return _DatasheetListItem(
+                                  result: result,
+                                  selected: result.id == selectedId,
+                                  onTap: () => ref
+                                      .read(selectedDatasheetIdProvider
+                                          .notifier)
+                                      .state = result.id,
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       );
                     },
                   ),
@@ -247,28 +287,46 @@ class _DatasheetListItem extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Material(
         color: selected
-            ? AppColors.primary.withValues(alpha: .16)
-            : AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
+            ? AppColors.primary.withValues(alpha: .10)
+            : AppColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(10),
         child: InkWell(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(10),
           onTap: onTap,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: selected ? AppColors.primary : AppColors.border,
                 width: selected ? 1.4 : 1,
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Text(result.name, style: AppTextStyles.body),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        result.name,
+                        style: AppTextStyles.body,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (result.factionName != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          result.factionName!,
+                          style: AppTextStyles.caption,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
                 if (result.subtitle != null) ...[
-                  const SizedBox(height: 4),
-                  Text(result.subtitle!, style: AppTextStyles.caption),
+                  const SizedBox(width: 8),
+                  AppChip(label: result.subtitle!, accent: selected),
                 ],
               ],
             ),

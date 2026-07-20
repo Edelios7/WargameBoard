@@ -20,25 +20,47 @@ class Sidebar extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
-      width: 240,
+      width: 232,
       decoration: BoxDecoration(
         color: AppColors.surface,
         border: Border(
-          right: BorderSide(
-            color: Colors.white.withValues(alpha: .05),
-          ),
+          right: BorderSide(color: AppColors.border),
         ),
       ),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.appTitle,
-            style: AppTextStyles.title,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: Row(
+              children: [
+                Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.shield_moon_rounded,
+                    color: Colors.white,
+                    size: 17,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    l10n.appTitle,
+                    style: AppTextStyles.title.copyWith(fontSize: 16),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
 
-          const SizedBox(height: 40),
+          const SizedBox(height: 28),
 
           Expanded(
             child: SingleChildScrollView(

@@ -40,11 +40,25 @@
     }
   },
   "catalogFilterAllFactions": "Toutes les factions",
+  "catalogResetFilters": "Réinitialiser",
+  "catalogResultsCount": "{count} résultat(s)",
+  "@catalogResultsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "catalogFilterAllKeywords": "Tous les mots-clés",
 
   "sectionUnitSize": "Effectif",
   "sectionProfiles": "Profils",
   "sectionWeapons": "Armes",
+  "weaponColName": "Arme",
+  "weaponColRange": "Portée",
+  "weaponColAttacks": "A",
+  "weaponColStrength": "F",
+  "weaponColAp": "PA",
+  "weaponColDamage": "D",
+  "weaponMelee": "Mêlée",
   "sectionKeywords": "Mots-clés",
   "sectionAbilities": "Capacités",
   "sectionEquipment": "Équipement",
@@ -105,6 +119,15 @@
       "count": { "type": "int" }
     }
   },
+  "armyBuilderUnitCount": "{count} unités",
+  "@armyBuilderUnitCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "armyBuilderListValid": "Liste valide",
+  "armyBuilderListInvalid": "Liste invalide",
+  "armyBuilderRoleOther": "Autres",
 
   "armyBuilderPointsLimitLabel": "Limite de points (optionnel)",
   "armyBuilderPointsWithLimit": "{points} / {limit} pts",
@@ -203,6 +226,22 @@
   "dashboardBattlesSubtitle": "Prépare tes parties et consulte leur historique.",
   "dashboardCollectionSubtitle": "Gère tes figurines, peintures et boîtes.",
   "dashboardStatisticsSubtitle": "Analyse tes performances et l'évolution de tes armées.",
+  "dashboardStatArmies": "Armées",
+  "dashboardStatArmiesSub": "Listes créées",
+  "dashboardStatCollection": "Collection",
+  "dashboardStatCollectionSub": "Figurines possédées",
+  "dashboardStatPoints": "Points cumulés",
+  "dashboardStatPointsSub": "Sur toutes les armées",
+  "dashboardStatPainting": "Progression peinture",
+  "dashboardStatPaintingSub": "Figurines peintes",
+  "dashboardYourArmies": "Vos armées",
+  "dashboardSeeAll": "Voir tout",
+  "dashboardNoArmiesYet": "Aucune armée créée pour l'instant",
+  "dashboardPaintingBreakdown": "État de la collection",
+  "dashboardFactionBreakdown": "Répartition par faction",
+  "dashboardStatusPainted": "Peintes",
+  "dashboardStatusAssembled": "Montées",
+  "dashboardStatusUnbuilt": "Sur grappe",
 
   "explorerTabKeywords": "Mots-clés",
   "explorerTabAbilities": "Capacités",

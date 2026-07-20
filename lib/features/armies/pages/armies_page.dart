@@ -325,44 +325,8 @@ class _ArmyDetail extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: (army.isOverLimit ? AppColors.error : AppColors.primary)
-                      .withValues(alpha: .18),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: (army.isOverLimit
-                            ? AppColors.error
-                            : AppColors.primary)
-                        .withValues(alpha: .4),
-                  ),
-                ),
-                child: Text(
-                  army.pointsLimit != null
-                      ? l10n.armyBuilderPointsWithLimit(
-                          army.totalPoints, army.pointsLimit!)
-                      : l10n.pointsSuffix(army.totalPoints),
-                  style: AppTextStyles.body.copyWith(
-                    color:
-                        army.isOverLimit ? AppColors.error : AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              if (army.isOverLimit) ...[
-                const SizedBox(width: 10),
-                Text(
-                  l10n.armyBuilderOverLimit,
-                  style: AppTextStyles.caption.copyWith(color: AppColors.error),
-                ),
-              ],
-            ],
-          ),
+          const SizedBox(height: 16),
+          _ArmyStatsBar(army: army),
           Builder(
             builder: (context) {
               final validation = ref.watch(armyValidationProvider(army));
@@ -384,7 +348,7 @@ class _ArmyDetail extends ConsumerWidget {
               );
             },
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           FilledButton.icon(
             style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
             onPressed: () => showDialog(
@@ -403,127 +367,252 @@ class _ArmyDetail extends ConsumerWidget {
                       style: AppTextStyles.caption,
                     ),
                   )
-                : ListView.builder(
-                    itemCount: army.units.length,
-                    itemBuilder: (context, index) {
-                      final unit = army.units[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppColors.border),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      unit.datasheetName,
-                                      style: AppTextStyles.body,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      l10n.armyBuilderModelCount(
-                                        unit.modelCount,
-                                      ),
-                                      style: AppTextStyles.caption,
-                                    ),
-                                    if (army.detachmentId != null) ...[
-                                      const SizedBox(height: 4),
-                                      InkWell(
-                                        onTap: () => _pickEnhancement(
-                                          context,
-                                          ref,
-                                          army.detachmentId!,
-                                          unit,
-                                        ),
-                                        child: Text(
-                                          unit.enhancementName ??
-                                              l10n.armyBuilderChooseEnhancement,
-                                          style: AppTextStyles.caption.copyWith(
-                                            color: AppColors.primary,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                              if (unit.maximumModels > unit.minimumModels) ...[
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.remove_circle_outline_rounded,
-                                    size: 20,
-                                  ),
-                                  color: AppColors.textSecondary,
-                                  onPressed: unit.modelCount <=
-                                          unit.minimumModels
-                                      ? null
-                                      : () async {
-                                          await ref
-                                              .read(armyRepositoryProvider)
-                                              .updateModelCount(
-                                                unit.id,
-                                                unit.modelCount - 1,
-                                              );
-                                          ref.invalidate(selectedArmyProvider);
-                                          ref.invalidate(armiesListProvider);
-                                        },
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.add_circle_outline_rounded,
-                                    size: 20,
-                                  ),
-                                  color: AppColors.textSecondary,
-                                  onPressed: unit.modelCount >=
-                                          unit.maximumModels
-                                      ? null
-                                      : () async {
-                                          await ref
-                                              .read(armyRepositoryProvider)
-                                              .updateModelCount(
-                                                unit.id,
-                                                unit.modelCount + 1,
-                                              );
-                                          ref.invalidate(selectedArmyProvider);
-                                          ref.invalidate(armiesListProvider);
-                                        },
-                                ),
-                              ],
-                              Text(
-                                l10n.pointsSuffix(unit.points),
-                                style: AppTextStyles.body,
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.close_rounded),
-                                color: AppColors.textSecondary,
-                                onPressed: () async {
-                                  await ref
-                                      .read(armyRepositoryProvider)
-                                      .removeUnit(unit.id);
-                                  ref.invalidate(selectedArmyProvider);
-                                  ref.invalidate(armiesListProvider);
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                : _GroupedUnitsList(army: army),
           ),
           const SizedBox(height: 16),
           _ArmyNotesField(armyId: army.id, initialNotes: army.notes),
+        ],
+      ),
+    );
+  }
+}
+
+class _ArmyStatsBar extends ConsumerWidget {
+  final ArmyDetails army;
+
+  const _ArmyStatsBar({required this.army});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final validation = ref.watch(armyValidationProvider(army));
+    final isValid = validation?.isValid ?? true;
+    final barColor = army.isOverLimit ? AppColors.error : AppColors.primary;
+    final ratio = army.pointsLimit == null || army.pointsLimit == 0
+        ? null
+        : (army.totalPoints / army.pointsLimit!).clamp(0, 1.4).toDouble();
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            runSpacing: 8,
+            children: [
+              Text(
+                army.pointsLimit != null
+                    ? l10n.armyBuilderPointsWithLimit(
+                        army.totalPoints, army.pointsLimit!)
+                    : l10n.pointsSuffix(army.totalPoints),
+                style: AppTextStyles.title.copyWith(color: barColor),
+              ),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  _statBadge(l10n.armyBuilderUnitCount(army.units.length)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: (isValid ? AppColors.success : AppColors.error)
+                          .withValues(alpha: .14),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isValid
+                              ? Icons.check_circle_rounded
+                              : Icons.error_rounded,
+                          size: 13,
+                          color: isValid
+                              ? AppColors.success
+                              : AppColors.error,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          isValid
+                              ? l10n.armyBuilderListValid
+                              : l10n.armyBuilderListInvalid,
+                          style: AppTextStyles.eyebrow.copyWith(
+                            color: isValid
+                                ? AppColors.success
+                                : AppColors.error,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          if (ratio != null) ...[
+            const SizedBox(height: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: LinearProgressIndicator(
+                value: ratio.clamp(0, 1),
+                minHeight: 8,
+                backgroundColor: AppColors.border,
+                color: barColor,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _statBadge(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Text(label, style: AppTextStyles.eyebrow),
+    );
+  }
+}
+
+class _GroupedUnitsList extends StatelessWidget {
+  final ArmyDetails army;
+
+  const _GroupedUnitsList({required this.army});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final groups = <String, List<ArmyUnitDetails>>{};
+    for (final unit in army.units) {
+      final role = unit.battlefieldRole.isEmpty
+          ? l10n.armyBuilderRoleOther
+          : unit.battlefieldRole;
+      groups.putIfAbsent(role, () => []).add(unit);
+    }
+
+    return ListView(
+      children: [
+        for (final entry in groups.entries) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8, top: 4),
+            child: Text(
+              entry.key.toUpperCase(),
+              style: AppTextStyles.eyebrow.copyWith(color: AppColors.primary),
+            ),
+          ),
+          for (final unit in entry.value)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _ArmyUnitRow(army: army, unit: unit),
+            ),
+          const SizedBox(height: 8),
+        ],
+      ],
+    );
+  }
+}
+
+class _ArmyUnitRow extends ConsumerWidget {
+  final ArmyDetails army;
+  final ArmyUnitDetails unit;
+
+  const _ArmyUnitRow({required this.army, required this.unit});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(unit.datasheetName, style: AppTextStyles.body),
+                const SizedBox(height: 4),
+                Text(
+                  l10n.armyBuilderModelCount(unit.modelCount),
+                  style: AppTextStyles.caption,
+                ),
+                if (army.detachmentId != null) ...[
+                  const SizedBox(height: 4),
+                  InkWell(
+                    onTap: () => _pickEnhancement(
+                      context,
+                      ref,
+                      army.detachmentId!,
+                      unit,
+                    ),
+                    child: Text(
+                      unit.enhancementName ??
+                          l10n.armyBuilderChooseEnhancement,
+                      style: AppTextStyles.caption
+                          .copyWith(color: AppColors.primary),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          if (unit.maximumModels > unit.minimumModels) ...[
+            IconButton(
+              icon: const Icon(Icons.remove_circle_outline_rounded, size: 20),
+              color: AppColors.textSecondary,
+              onPressed: unit.modelCount <= unit.minimumModels
+                  ? null
+                  : () async {
+                      await ref
+                          .read(armyRepositoryProvider)
+                          .updateModelCount(unit.id, unit.modelCount - 1);
+                      ref.invalidate(selectedArmyProvider);
+                      ref.invalidate(armiesListProvider);
+                    },
+            ),
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline_rounded, size: 20),
+              color: AppColors.textSecondary,
+              onPressed: unit.modelCount >= unit.maximumModels
+                  ? null
+                  : () async {
+                      await ref
+                          .read(armyRepositoryProvider)
+                          .updateModelCount(unit.id, unit.modelCount + 1);
+                      ref.invalidate(selectedArmyProvider);
+                      ref.invalidate(armiesListProvider);
+                    },
+            ),
+          ],
+          Text(l10n.pointsSuffix(unit.points), style: AppTextStyles.body),
+          IconButton(
+            icon: const Icon(Icons.close_rounded),
+            color: AppColors.textSecondary,
+            onPressed: () async {
+              await ref.read(armyRepositoryProvider).removeUnit(unit.id);
+              ref.invalidate(selectedArmyProvider);
+              ref.invalidate(armiesListProvider);
+            },
+          ),
         ],
       ),
     );

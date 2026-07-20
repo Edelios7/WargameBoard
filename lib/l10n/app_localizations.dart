@@ -248,6 +248,18 @@ abstract class AppLocalizations {
   /// **'Toutes les factions'**
   String get catalogFilterAllFactions;
 
+  /// No description provided for @catalogResetFilters.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réinitialiser'**
+  String get catalogResetFilters;
+
+  /// No description provided for @catalogResultsCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} résultat(s)'**
+  String catalogResultsCount(int count);
+
   /// No description provided for @catalogFilterAllKeywords.
   ///
   /// In fr, this message translates to:
@@ -271,6 +283,48 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Armes'**
   String get sectionWeapons;
+
+  /// No description provided for @weaponColName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Arme'**
+  String get weaponColName;
+
+  /// No description provided for @weaponColRange.
+  ///
+  /// In fr, this message translates to:
+  /// **'Portée'**
+  String get weaponColRange;
+
+  /// No description provided for @weaponColAttacks.
+  ///
+  /// In fr, this message translates to:
+  /// **'A'**
+  String get weaponColAttacks;
+
+  /// No description provided for @weaponColStrength.
+  ///
+  /// In fr, this message translates to:
+  /// **'F'**
+  String get weaponColStrength;
+
+  /// No description provided for @weaponColAp.
+  ///
+  /// In fr, this message translates to:
+  /// **'PA'**
+  String get weaponColAp;
+
+  /// No description provided for @weaponColDamage.
+  ///
+  /// In fr, this message translates to:
+  /// **'D'**
+  String get weaponColDamage;
+
+  /// No description provided for @weaponMelee.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mêlée'**
+  String get weaponMelee;
 
   /// No description provided for @sectionKeywords.
   ///
@@ -451,6 +505,30 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'{count} figurines'**
   String armyBuilderModelCount(int count);
+
+  /// No description provided for @armyBuilderUnitCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} unités'**
+  String armyBuilderUnitCount(int count);
+
+  /// No description provided for @armyBuilderListValid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Liste valide'**
+  String get armyBuilderListValid;
+
+  /// No description provided for @armyBuilderListInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Liste invalide'**
+  String get armyBuilderListInvalid;
+
+  /// No description provided for @armyBuilderRoleOther.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autres'**
+  String get armyBuilderRoleOther;
 
   /// No description provided for @armyBuilderPointsLimitLabel.
   ///
@@ -787,6 +865,102 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Analyse tes performances et l\'évolution de tes armées.'**
   String get dashboardStatisticsSubtitle;
+
+  /// No description provided for @dashboardStatArmies.
+  ///
+  /// In fr, this message translates to:
+  /// **'Armées'**
+  String get dashboardStatArmies;
+
+  /// No description provided for @dashboardStatArmiesSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Listes créées'**
+  String get dashboardStatArmiesSub;
+
+  /// No description provided for @dashboardStatCollection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Collection'**
+  String get dashboardStatCollection;
+
+  /// No description provided for @dashboardStatCollectionSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Figurines possédées'**
+  String get dashboardStatCollectionSub;
+
+  /// No description provided for @dashboardStatPoints.
+  ///
+  /// In fr, this message translates to:
+  /// **'Points cumulés'**
+  String get dashboardStatPoints;
+
+  /// No description provided for @dashboardStatPointsSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sur toutes les armées'**
+  String get dashboardStatPointsSub;
+
+  /// No description provided for @dashboardStatPainting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Progression peinture'**
+  String get dashboardStatPainting;
+
+  /// No description provided for @dashboardStatPaintingSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Figurines peintes'**
+  String get dashboardStatPaintingSub;
+
+  /// No description provided for @dashboardYourArmies.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos armées'**
+  String get dashboardYourArmies;
+
+  /// No description provided for @dashboardSeeAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir tout'**
+  String get dashboardSeeAll;
+
+  /// No description provided for @dashboardNoArmiesYet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune armée créée pour l\'instant'**
+  String get dashboardNoArmiesYet;
+
+  /// No description provided for @dashboardPaintingBreakdown.
+  ///
+  /// In fr, this message translates to:
+  /// **'État de la collection'**
+  String get dashboardPaintingBreakdown;
+
+  /// No description provided for @dashboardFactionBreakdown.
+  ///
+  /// In fr, this message translates to:
+  /// **'Répartition par faction'**
+  String get dashboardFactionBreakdown;
+
+  /// No description provided for @dashboardStatusPainted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Peintes'**
+  String get dashboardStatusPainted;
+
+  /// No description provided for @dashboardStatusAssembled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montées'**
+  String get dashboardStatusAssembled;
+
+  /// No description provided for @dashboardStatusUnbuilt.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sur grappe'**
+  String get dashboardStatusUnbuilt;
 
   /// No description provided for @explorerTabKeywords.
   ///

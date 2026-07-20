@@ -22,6 +22,7 @@ class ArmyUnitDetails {
   final String id;
   final String datasheetId;
   final String datasheetName;
+  final String battlefieldRole;
   final int modelCount;
   final int minimumModels;
   final int maximumModels;
@@ -34,6 +35,7 @@ class ArmyUnitDetails {
     required this.id,
     required this.datasheetId,
     required this.datasheetName,
+    this.battlefieldRole = '',
     required this.modelCount,
     required this.minimumModels,
     required this.maximumModels,

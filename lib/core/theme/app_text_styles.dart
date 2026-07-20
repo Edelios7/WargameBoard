@@ -5,24 +5,32 @@ class AppTextStyles {
   AppTextStyles._();
 
   static const TextStyle heading = TextStyle(
-    fontSize: 28,
-    fontWeight: FontWeight.bold,
+    fontSize: 26,
+    fontWeight: FontWeight.w700,
+    letterSpacing: -0.3,
     color: AppColors.textPrimary,
   );
 
   static const TextStyle title = TextStyle(
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
   );
 
   static const TextStyle body = TextStyle(
-    fontSize: 16,
+    fontSize: 15,
     color: AppColors.textPrimary,
   );
 
   static const TextStyle caption = TextStyle(
-    fontSize: 14,
+    fontSize: 13,
+    color: AppColors.textSecondary,
+  );
+
+  static const TextStyle eyebrow = TextStyle(
+    fontSize: 11,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 1.1,
     color: AppColors.textSecondary,
   );
 }

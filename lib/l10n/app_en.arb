@@ -40,11 +40,25 @@
     }
   },
   "catalogFilterAllFactions": "All factions",
+  "catalogResetFilters": "Reset",
+  "catalogResultsCount": "{count} result(s)",
+  "@catalogResultsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "catalogFilterAllKeywords": "All keywords",
 
   "sectionUnitSize": "Unit size",
   "sectionProfiles": "Profiles",
   "sectionWeapons": "Weapons",
+  "weaponColName": "Weapon",
+  "weaponColRange": "Range",
+  "weaponColAttacks": "A",
+  "weaponColStrength": "S",
+  "weaponColAp": "AP",
+  "weaponColDamage": "D",
+  "weaponMelee": "Melee",
   "sectionKeywords": "Keywords",
   "sectionAbilities": "Abilities",
   "sectionEquipment": "Equipment",
@@ -105,6 +119,15 @@
       "count": { "type": "int" }
     }
   },
+  "armyBuilderUnitCount": "{count} units",
+  "@armyBuilderUnitCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "armyBuilderListValid": "Valid list",
+  "armyBuilderListInvalid": "Invalid list",
+  "armyBuilderRoleOther": "Other",
 
   "armyBuilderPointsLimitLabel": "Points limit (optional)",
   "armyBuilderPointsWithLimit": "{points} / {limit} pts",
@@ -203,6 +226,22 @@
   "dashboardBattlesSubtitle": "Prepare your games and check their history.",
   "dashboardCollectionSubtitle": "Manage your models, painting and boxes.",
   "dashboardStatisticsSubtitle": "Analyze your performance and army progress.",
+  "dashboardStatArmies": "Armies",
+  "dashboardStatArmiesSub": "Lists created",
+  "dashboardStatCollection": "Collection",
+  "dashboardStatCollectionSub": "Models owned",
+  "dashboardStatPoints": "Total points",
+  "dashboardStatPointsSub": "Across all armies",
+  "dashboardStatPainting": "Painting progress",
+  "dashboardStatPaintingSub": "Models painted",
+  "dashboardYourArmies": "Your armies",
+  "dashboardSeeAll": "See all",
+  "dashboardNoArmiesYet": "No army created yet",
+  "dashboardPaintingBreakdown": "Collection status",
+  "dashboardFactionBreakdown": "Breakdown by faction",
+  "dashboardStatusPainted": "Painted",
+  "dashboardStatusAssembled": "Assembled",
+  "dashboardStatusUnbuilt": "Unbuilt",
 
   "explorerTabKeywords": "Keywords",
   "explorerTabAbilities": "Abilities",

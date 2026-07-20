@@ -89,6 +89,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get catalogFilterAllFactions => 'All factions';
 
   @override
+  String get catalogResetFilters => 'Reset';
+
+  @override
+  String catalogResultsCount(int count) {
+    return '$count result(s)';
+  }
+
+  @override
   String get catalogFilterAllKeywords => 'All keywords';
 
   @override
@@ -99,6 +107,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sectionWeapons => 'Weapons';
+
+  @override
+  String get weaponColName => 'Weapon';
+
+  @override
+  String get weaponColRange => 'Range';
+
+  @override
+  String get weaponColAttacks => 'A';
+
+  @override
+  String get weaponColStrength => 'S';
+
+  @override
+  String get weaponColAp => 'AP';
+
+  @override
+  String get weaponColDamage => 'D';
+
+  @override
+  String get weaponMelee => 'Melee';
 
   @override
   String get sectionKeywords => 'Keywords';
@@ -199,6 +228,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String armyBuilderModelCount(int count) {
     return '$count models';
   }
+
+  @override
+  String armyBuilderUnitCount(int count) {
+    return '$count units';
+  }
+
+  @override
+  String get armyBuilderListValid => 'Valid list';
+
+  @override
+  String get armyBuilderListInvalid => 'Invalid list';
+
+  @override
+  String get armyBuilderRoleOther => 'Other';
 
   @override
   String get armyBuilderPointsLimitLabel => 'Points limit (optional)';
@@ -383,6 +426,54 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dashboardStatisticsSubtitle =>
       'Analyze your performance and army progress.';
+
+  @override
+  String get dashboardStatArmies => 'Armies';
+
+  @override
+  String get dashboardStatArmiesSub => 'Lists created';
+
+  @override
+  String get dashboardStatCollection => 'Collection';
+
+  @override
+  String get dashboardStatCollectionSub => 'Models owned';
+
+  @override
+  String get dashboardStatPoints => 'Total points';
+
+  @override
+  String get dashboardStatPointsSub => 'Across all armies';
+
+  @override
+  String get dashboardStatPainting => 'Painting progress';
+
+  @override
+  String get dashboardStatPaintingSub => 'Models painted';
+
+  @override
+  String get dashboardYourArmies => 'Your armies';
+
+  @override
+  String get dashboardSeeAll => 'See all';
+
+  @override
+  String get dashboardNoArmiesYet => 'No army created yet';
+
+  @override
+  String get dashboardPaintingBreakdown => 'Collection status';
+
+  @override
+  String get dashboardFactionBreakdown => 'Breakdown by faction';
+
+  @override
+  String get dashboardStatusPainted => 'Painted';
+
+  @override
+  String get dashboardStatusAssembled => 'Assembled';
+
+  @override
+  String get dashboardStatusUnbuilt => 'Unbuilt';
 
   @override
   String get explorerTabKeywords => 'Keywords';

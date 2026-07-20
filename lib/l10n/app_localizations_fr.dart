@@ -89,6 +89,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get catalogFilterAllFactions => 'Toutes les factions';
 
   @override
+  String get catalogResetFilters => 'Réinitialiser';
+
+  @override
+  String catalogResultsCount(int count) {
+    return '$count résultat(s)';
+  }
+
+  @override
   String get catalogFilterAllKeywords => 'Tous les mots-clés';
 
   @override
@@ -99,6 +107,27 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get sectionWeapons => 'Armes';
+
+  @override
+  String get weaponColName => 'Arme';
+
+  @override
+  String get weaponColRange => 'Portée';
+
+  @override
+  String get weaponColAttacks => 'A';
+
+  @override
+  String get weaponColStrength => 'F';
+
+  @override
+  String get weaponColAp => 'PA';
+
+  @override
+  String get weaponColDamage => 'D';
+
+  @override
+  String get weaponMelee => 'Mêlée';
 
   @override
   String get sectionKeywords => 'Mots-clés';
@@ -201,6 +230,20 @@ class AppLocalizationsFr extends AppLocalizations {
   String armyBuilderModelCount(int count) {
     return '$count figurines';
   }
+
+  @override
+  String armyBuilderUnitCount(int count) {
+    return '$count unités';
+  }
+
+  @override
+  String get armyBuilderListValid => 'Liste valide';
+
+  @override
+  String get armyBuilderListInvalid => 'Liste invalide';
+
+  @override
+  String get armyBuilderRoleOther => 'Autres';
 
   @override
   String get armyBuilderPointsLimitLabel => 'Limite de points (optionnel)';
@@ -386,6 +429,54 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get dashboardStatisticsSubtitle =>
       'Analyse tes performances et l\'évolution de tes armées.';
+
+  @override
+  String get dashboardStatArmies => 'Armées';
+
+  @override
+  String get dashboardStatArmiesSub => 'Listes créées';
+
+  @override
+  String get dashboardStatCollection => 'Collection';
+
+  @override
+  String get dashboardStatCollectionSub => 'Figurines possédées';
+
+  @override
+  String get dashboardStatPoints => 'Points cumulés';
+
+  @override
+  String get dashboardStatPointsSub => 'Sur toutes les armées';
+
+  @override
+  String get dashboardStatPainting => 'Progression peinture';
+
+  @override
+  String get dashboardStatPaintingSub => 'Figurines peintes';
+
+  @override
+  String get dashboardYourArmies => 'Vos armées';
+
+  @override
+  String get dashboardSeeAll => 'Voir tout';
+
+  @override
+  String get dashboardNoArmiesYet => 'Aucune armée créée pour l\'instant';
+
+  @override
+  String get dashboardPaintingBreakdown => 'État de la collection';
+
+  @override
+  String get dashboardFactionBreakdown => 'Répartition par faction';
+
+  @override
+  String get dashboardStatusPainted => 'Peintes';
+
+  @override
+  String get dashboardStatusAssembled => 'Montées';
+
+  @override
+  String get dashboardStatusUnbuilt => 'Sur grappe';
 
   @override
   String get explorerTabKeywords => 'Mots-clés';

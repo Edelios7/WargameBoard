@@ -252,6 +252,7 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         id: unit.id,
         datasheetId: datasheet.id,
         datasheetName: datasheet.name,
+        battlefieldRole: datasheet.battlefieldRole,
         modelCount: unit.modelCount,
         minimumModels: size?.minimumModels ?? unit.modelCount,
         maximumModels: size?.maximumModels ?? unit.modelCount,
