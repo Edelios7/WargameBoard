@@ -18,6 +18,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navCatalog => 'Catalogue';
 
   @override
+  String get navExplorer => 'Règles';
+
+  @override
   String get navArmies => 'Armées';
 
   @override
@@ -342,4 +345,19 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get dashboardStatisticsSubtitle =>
       'Analyse tes performances et l\'évolution de tes armées.';
+
+  @override
+  String get explorerTabKeywords => 'Mots-clés';
+
+  @override
+  String get explorerTabAbilities => 'Capacités';
+
+  @override
+  String get explorerSearchHint => 'Rechercher une règle...';
+
+  @override
+  String get explorerEmpty => 'Aucune règle trouvée';
+
+  @override
+  String get explorerViewInCatalog => 'Voir les unités';
 }

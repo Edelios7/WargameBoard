@@ -5,6 +5,7 @@
 
   "navDashboard": "Dashboard",
   "navCatalog": "Catalog",
+  "navExplorer": "Rules",
   "navArmies": "Armies",
   "navBattles": "Battles",
   "navCollection": "Collection",
@@ -179,5 +180,11 @@
   "dashboardArmiesSubtitle": "Create, edit and organize all your armies.",
   "dashboardBattlesSubtitle": "Prepare your games and check their history.",
   "dashboardCollectionSubtitle": "Manage your models, painting and boxes.",
-  "dashboardStatisticsSubtitle": "Analyze your performance and army progress."
+  "dashboardStatisticsSubtitle": "Analyze your performance and army progress.",
+
+  "explorerTabKeywords": "Keywords",
+  "explorerTabAbilities": "Abilities",
+  "explorerSearchHint": "Search for a rule...",
+  "explorerEmpty": "No rule found",
+  "explorerViewInCatalog": "View units"
 }

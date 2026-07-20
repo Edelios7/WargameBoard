@@ -48,6 +48,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // La locale par défaut du test runner est l'anglais.
+    await tester.ensureVisible(find.text('Settings'));
     await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
 

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -40,49 +40,27 @@ class Sidebar extends StatelessWidget {
 
           const SizedBox(height: 40),
 
-          _item(
-            0,
-            Icons.home_rounded,
-            l10n.navDashboard,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _item(0, Icons.home_rounded, l10n.navDashboard),
+                  _item(1, Icons.auto_stories_rounded, l10n.navCatalog),
+                  _item(2, Icons.menu_book_rounded, l10n.navExplorer),
+                  _item(3, Icons.groups_rounded, l10n.navArmies),
+                  _item(
+                    4,
+                    Icons.sports_martial_arts_rounded,
+                    l10n.navBattles,
+                  ),
+                  _item(5, Icons.inventory_2_rounded, l10n.navCollection),
+                  _item(6, Icons.bar_chart_rounded, l10n.navStatistics),
+                  _item(7, Icons.settings_rounded, l10n.navSettings),
+                ],
+              ),
+            ),
           ),
-
-          _item(
-            1,
-            Icons.auto_stories_rounded,
-            l10n.navCatalog,
-          ),
-
-          _item(
-            2,
-            Icons.groups_rounded,
-            l10n.navArmies,
-          ),
-
-          _item(
-            3,
-            Icons.sports_martial_arts_rounded,
-            l10n.navBattles,
-          ),
-
-          _item(
-            4,
-            Icons.inventory_2_rounded,
-            l10n.navCollection,
-          ),
-
-          _item(
-            5,
-            Icons.bar_chart_rounded,
-            l10n.navStatistics,
-          ),
-
-          _item(
-            6,
-            Icons.settings_rounded,
-            l10n.navSettings,
-          ),
-
-          const Spacer(),
 
           Opacity(
             opacity: .45,

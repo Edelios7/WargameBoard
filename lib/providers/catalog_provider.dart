@@ -38,6 +38,11 @@ final keywordsListProvider = FutureProvider<List<Keyword>>((ref) {
   return database.keywordDao.getAll();
 });
 
+final abilitiesListProvider = FutureProvider<List<Ability>>((ref) {
+  final database = ref.watch(databaseProvider);
+  return database.abilityDao.getAll();
+});
+
 final selectedDatasheetIdProvider = StateProvider<String?>((ref) => null);
 
 final selectedDatasheetProvider =

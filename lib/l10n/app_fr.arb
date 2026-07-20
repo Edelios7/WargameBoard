@@ -5,6 +5,7 @@
 
   "navDashboard": "Dashboard",
   "navCatalog": "Catalogue",
+  "navExplorer": "Règles",
   "navArmies": "Armées",
   "navBattles": "Batailles",
   "navCollection": "Collection",
@@ -179,5 +180,11 @@
   "dashboardArmiesSubtitle": "Crée, modifie et organise toutes tes armées.",
   "dashboardBattlesSubtitle": "Prépare tes parties et consulte leur historique.",
   "dashboardCollectionSubtitle": "Gère tes figurines, peintures et boîtes.",
-  "dashboardStatisticsSubtitle": "Analyse tes performances et l'évolution de tes armées."
+  "dashboardStatisticsSubtitle": "Analyse tes performances et l'évolution de tes armées.",
+
+  "explorerTabKeywords": "Mots-clés",
+  "explorerTabAbilities": "Capacités",
+  "explorerSearchHint": "Rechercher une règle...",
+  "explorerEmpty": "Aucune règle trouvée",
+  "explorerViewInCatalog": "Voir les unités"
 }

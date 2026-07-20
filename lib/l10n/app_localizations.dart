@@ -116,6 +116,12 @@ abstract class AppLocalizations {
   /// **'Catalogue'**
   String get navCatalog;
 
+  /// No description provided for @navExplorer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Règles'**
+  String get navExplorer;
+
   /// No description provided for @navArmies.
   ///
   /// In fr, this message translates to:
@@ -709,6 +715,36 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Analyse tes performances et l\'évolution de tes armées.'**
   String get dashboardStatisticsSubtitle;
+
+  /// No description provided for @explorerTabKeywords.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mots-clés'**
+  String get explorerTabKeywords;
+
+  /// No description provided for @explorerTabAbilities.
+  ///
+  /// In fr, this message translates to:
+  /// **'Capacités'**
+  String get explorerTabAbilities;
+
+  /// No description provided for @explorerSearchHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher une règle...'**
+  String get explorerSearchHint;
+
+  /// No description provided for @explorerEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune règle trouvée'**
+  String get explorerEmpty;
+
+  /// No description provided for @explorerViewInCatalog.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir les unités'**
+  String get explorerViewInCatalog;
 }
 
 class _AppLocalizationsDelegate
