@@ -24,6 +24,7 @@ class _AddCollectionEntryDialogState
   bool _loading = false;
   SearchResult? _selected;
   final _quantityController = TextEditingController(text: '1');
+  final _notesController = TextEditingController();
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _AddCollectionEntryDialogState
   @override
   void dispose() {
     _quantityController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
@@ -55,9 +57,11 @@ class _AddCollectionEntryDialogState
 
     final repository = ref.read(collectionRepositoryProvider);
     if (widget.wishlist) {
+      final notes = _notesController.text.trim();
       await repository.addWishlistItem(
         datasheetId: selected.id,
         quantity: quantity,
+        notes: notes.isEmpty ? null : notes,
       );
       ref.invalidate(wishlistItemsProvider);
     } else {
@@ -155,6 +159,26 @@ class _AddCollectionEntryDialogState
                       ),
                     ),
                   ),
+                  if (widget.wishlist) ...[
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: TextField(
+                        controller: _notesController,
+                        style: AppTextStyles.body,
+                        decoration: InputDecoration(
+                          labelText: l10n.wishlistNotesDialogLabel,
+                          labelStyle: AppTextStyles.caption,
+                          filled: true,
+                          fillColor: AppColors.background,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                   const SizedBox(width: 12),
                   FilledButton(
                     style:

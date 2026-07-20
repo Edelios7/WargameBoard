@@ -154,6 +154,7 @@
   "wishlistAddItem": "Add to wishlist",
   "wishlistEmpty": "Your wishlist is empty",
   "wishlistMoveToCollection": "Mark as acquired",
+  "wishlistNotesDialogLabel": "Notes (optional)",
 
   "statsArmiesCount": "Armies created",
   "statsCollectionEntries": "Units in collection",

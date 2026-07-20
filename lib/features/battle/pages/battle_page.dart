@@ -151,6 +151,15 @@ class _BattleCard extends ConsumerWidget {
                   ].join(' · '),
                   style: AppTextStyles.caption,
                 ),
+                if (battle.notes != null && battle.notes!.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    battle.notes!,
+                    style: AppTextStyles.caption,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ],
             ),
           ),

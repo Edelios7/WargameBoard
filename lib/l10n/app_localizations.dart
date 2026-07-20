@@ -590,6 +590,12 @@ abstract class AppLocalizations {
   /// **'Marquer comme acquis'**
   String get wishlistMoveToCollection;
 
+  /// No description provided for @wishlistNotesDialogLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notes (optionnel)'**
+  String get wishlistNotesDialogLabel;
+
   /// No description provided for @statsArmiesCount.
   ///
   /// In fr, this message translates to:

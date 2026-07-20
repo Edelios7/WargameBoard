@@ -278,6 +278,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wishlistMoveToCollection => 'Mark as acquired';
 
   @override
+  String get wishlistNotesDialogLabel => 'Notes (optional)';
+
+  @override
   String get statsArmiesCount => 'Armies created';
 
   @override

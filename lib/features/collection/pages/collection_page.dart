@@ -259,6 +259,15 @@ class _WishlistTab extends ConsumerWidget {
                               '${item.factionName} · ${l10n.collectionQuantityLabel(item.quantity)}',
                               style: AppTextStyles.caption,
                             ),
+                            if (item.notes != null && item.notes!.isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                item.notes!,
+                                style: AppTextStyles.caption,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ],
                         ),
                       ),

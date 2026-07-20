@@ -154,6 +154,7 @@
   "wishlistAddItem": "Ajouter à la liste d'envies",
   "wishlistEmpty": "Ta liste d'envies est vide",
   "wishlistMoveToCollection": "Marquer comme acquis",
+  "wishlistNotesDialogLabel": "Notes (optionnel)",
 
   "statsArmiesCount": "Armées créées",
   "statsCollectionEntries": "Unités en collection",
