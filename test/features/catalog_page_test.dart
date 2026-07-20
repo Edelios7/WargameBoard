@@ -36,6 +36,9 @@ void main() {
     expect(find.text('Sélectionnez une unité pour voir sa fiche'),
         findsOneWidget);
 
+    await tester.enterText(find.byType(TextField).first, 'Sanguinary');
+    await tester.pumpAndSettle();
+
     await tester.tap(find.text('Sanguinary Guard'));
     await tester.pumpAndSettle();
 

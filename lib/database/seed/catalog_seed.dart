@@ -4,6 +4,7 @@ import 'datasheet_seed.dart';
 import 'detachment_seed.dart';
 import 'faction_seed.dart';
 import 'keyword_seed.dart';
+import 'orks_seed.dart';
 
 Future<void> seedCatalog(AppDatabase db) async {
   await db.transaction(() async {
@@ -12,5 +13,6 @@ Future<void> seedCatalog(AppDatabase db) async {
     await seedAbilities(db);
     await seedDatasheets(db);
     await seedDetachments(db);
+    await seedOrks(db);
   });
 }

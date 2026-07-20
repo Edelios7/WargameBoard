@@ -60,4 +60,26 @@ void main() {
         .search('', keywordId: 'kw-death-company');
     expect(deathCompany.single.name, 'Death Company Marines');
   });
+
+  test('Orks are seeded as a distinct faction', () async {
+    final orks = await database.datasheetDao.search('', factionId: 'fac-orks');
+    expect(orks.map((d) => d.name), containsAll(['Warboss', 'Boyz', 'Nobz']));
+    expect(orks.every((d) => d.factionName == 'Orks'), isTrue);
+
+    final factions = await database.factionDao.getAll();
+    expect(factions.map((f) => f.name), containsAll(['Blood Angels', 'Orks']));
+  });
+
+  test('Ork Boyz datasheet resolves with mob keywords', () async {
+    final results = await database.datasheetDao.search('Boyz');
+    final details =
+        await database.datasheetDao.getDatasheet(results.single.id);
+
+    expect(details, isNotNull);
+    expect(details!.factionName, 'Orks');
+    expect(details.keywords, contains('Mob'));
+    expect(details.abilities, contains('Mob Rule'));
+    expect(details.unit.minimumSize, 10);
+    expect(details.unit.maximumSize, 20);
+  });
 }

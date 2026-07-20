@@ -9,6 +9,9 @@ const String abBlackRage = 'ab-black-rage';
 const String abAngelicVisage = 'ab-angelic-visage';
 const String abDeepStrike = 'ab-deep-strike';
 const String abLethalHits = 'ab-lethal-hits';
+const String abMobRule = 'ab-mob-rule';
+const String abEreWeGo = 'ab-ere-we-go';
+const String abWaaagh = 'ab-waaagh';
 
 Future<void> seedAbilities(AppDatabase db) async {
   final abilities = <String, ({String name, String description, String type})>{
@@ -46,6 +49,21 @@ Future<void> seedAbilities(AppDatabase db) async {
       name: 'Lethal Hits',
       description: 'Un résultat critique au jet Pour Toucher inflige automatiquement une blessure.',
       type: 'Weapon',
+    ),
+    abMobRule: (
+      name: 'Mob Rule',
+      description: 'Le moral d\'une unité Orks s\'appuie sur le nombre de figurines proches.',
+      type: 'Faction',
+    ),
+    abEreWeGo: (
+      name: '\'Ere We Go',
+      description: 'Relance des jets de charge ratés, portée par l\'excitation du combat.',
+      type: 'Faction',
+    ),
+    abWaaagh: (
+      name: 'Waaagh!',
+      description: 'La ferveur collective des Orks renforce l\'unité au corps à corps.',
+      type: 'Faction',
     ),
   };
 
