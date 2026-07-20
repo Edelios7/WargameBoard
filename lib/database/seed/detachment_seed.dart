@@ -51,4 +51,38 @@ Future<void> seedDetachments(AppDatabase db) async {
           ),
         );
   }
+
+  final stratagems = <String, ({String name, int cp, String phase, String description})>{
+    'strat-no-escape': (
+      name: 'No Escape',
+      cp: 1,
+      phase: 'Phase de combat',
+      description: 'Poursuis un ennemi qui tente de fuir le combat pour l\'achever.',
+    ),
+    'strat-honour-the-chapter': (
+      name: 'Honour the Chapter',
+      cp: 1,
+      phase: 'N\'importe quelle phase',
+      description: 'Relance des jets de blessure ratés pour une unité clé.',
+    ),
+    'strat-wings-of-fire': (
+      name: 'Wings of Fire',
+      cp: 2,
+      phase: 'Phase de mouvement',
+      description: 'Une unité dotée de Fly gagne une mobilité accrue ce tour-ci.',
+    ),
+  };
+
+  for (final entry in stratagems.entries) {
+    await db.into(db.stratagems).insert(
+          StratagemsCompanion.insert(
+            id: entry.key,
+            detachmentId: detAngelicHost,
+            name: entry.value.name,
+            commandPoints: entry.value.cp,
+            phase: Value(entry.value.phase),
+            description: Value(entry.value.description),
+          ),
+        );
+  }
 }

@@ -141,6 +141,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get armyBuilderChooseEnhancement => 'Choose an enhancement';
 
   @override
+  String get armyBuilderStratagems => 'Stratagems';
+
+  @override
+  String armyBuilderStratagemCp(int cp) {
+    return '$cp CP';
+  }
+
+  @override
+  String get armyBuilderNoStratagems => 'No stratagems for this detachment';
+
+  @override
   String armyBuilderModelCount(int count) {
     return '$count models';
   }

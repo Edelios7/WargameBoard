@@ -43,6 +43,7 @@ import 'tables/datasheet_ability_links_table.dart';
 
 import 'tables/detachments_table.dart';
 import 'tables/enhancements_table.dart';
+import 'tables/stratagems_table.dart';
 
 import 'tables/armies_table.dart';
 import 'tables/army_units_table.dart';
@@ -116,6 +117,7 @@ part 'app_database.g.dart';
     // ===== DETACHMENTS =====
     Detachments,
     Enhancements,
+    Stratagems,
 
     // ===== ARMIES =====
     Armies,
@@ -171,7 +173,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   // =========================
   // Migrations
@@ -203,6 +205,9 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(enhancements);
             await m.addColumn(armies, armies.detachmentId);
             await m.addColumn(armyUnits, armyUnits.enhancementId);
+          }
+          if (from < 7) {
+            await m.createTable(stratagems);
           }
         },
 

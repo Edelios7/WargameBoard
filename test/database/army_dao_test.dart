@@ -150,4 +150,19 @@ void main() {
         await database.armyDao.getEnhancementsForDetachment(detAngelicHost);
     expect(options, hasLength(3));
   });
+
+  test('stratagems are listed for a detachment, ordered by command points',
+      () async {
+    final stratagems =
+        await database.armyDao.getStratagemsForDetachment(detAngelicHost);
+
+    expect(stratagems, hasLength(3));
+    expect(stratagems.map((s) => s.name), contains('Wings of Fire'));
+    for (var i = 1; i < stratagems.length; i++) {
+      expect(
+        stratagems[i].commandPoints,
+        greaterThanOrEqualTo(stratagems[i - 1].commandPoints),
+      );
+    }
+  });
 }

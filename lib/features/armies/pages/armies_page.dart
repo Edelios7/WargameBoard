@@ -261,6 +261,17 @@ class _ArmyDetail extends ConsumerWidget {
                   ],
                 ),
               ),
+              if (army.detachmentId != null)
+                IconButton(
+                  tooltip: l10n.armyBuilderStratagems,
+                  icon: const Icon(Icons.auto_awesome_rounded),
+                  color: AppColors.primary,
+                  onPressed: () => showDialog(
+                    context: context,
+                    builder: (_) =>
+                        _StratagemsDialog(detachmentId: army.detachmentId!),
+                  ),
+                ),
               IconButton(
                 tooltip: l10n.armyBuilderDeleteArmy,
                 icon: const Icon(Icons.delete_outline_rounded),
@@ -450,6 +461,107 @@ class _ArmyDetail extends ConsumerWidget {
                   ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _StratagemsDialog extends ConsumerWidget {
+  final String detachmentId;
+
+  const _StratagemsDialog({required this.detachmentId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final stratagemsAsync =
+        ref.watch(stratagemsForDetachmentProvider(detachmentId));
+
+    return Dialog(
+      backgroundColor: AppColors.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: SizedBox(
+        width: 460,
+        height: 480,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.armyBuilderStratagems, style: AppTextStyles.title),
+              const SizedBox(height: 16),
+              Expanded(
+                child: stratagemsAsync.when(
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  error: (error, _) => Center(
+                    child: Text('$error', style: AppTextStyles.caption),
+                  ),
+                  data: (stratagems) {
+                    if (stratagems.isEmpty) {
+                      return Center(
+                        child: Text(
+                          l10n.armyBuilderNoStratagems,
+                          style: AppTextStyles.caption,
+                        ),
+                      );
+                    }
+                    return ListView.builder(
+                      itemCount: stratagems.length,
+                      itemBuilder: (context, index) {
+                        final stratagem = stratagems[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      stratagem.name,
+                                      style: AppTextStyles.body,
+                                    ),
+                                  ),
+                                  Text(
+                                    l10n.armyBuilderStratagemCp(
+                                      stratagem.commandPoints,
+                                    ),
+                                    style: AppTextStyles.body.copyWith(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (stratagem.phase != null)
+                                Text(
+                                  stratagem.phase!,
+                                  style: AppTextStyles.caption,
+                                ),
+                              if (stratagem.description != null) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  stratagem.description!,
+                                  style: AppTextStyles.caption,
+                                ),
+                              ],
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

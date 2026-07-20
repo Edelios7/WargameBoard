@@ -50,6 +50,12 @@ class ArmyRepository {
     return database.armyDao.getEnhancementsForDetachment(detachmentId);
   }
 
+  Future<List<StratagemOption>> getStratagemsForDetachment(
+    String detachmentId,
+  ) {
+    return database.armyDao.getStratagemsForDetachment(detachmentId);
+  }
+
   Future<String> addUnit({
     required String armyId,
     required String datasheetId,

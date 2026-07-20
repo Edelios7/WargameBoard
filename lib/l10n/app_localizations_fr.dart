@@ -142,6 +142,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get armyBuilderChooseEnhancement => 'Choisir un enhancement';
 
   @override
+  String get armyBuilderStratagems => 'Stratagèmes';
+
+  @override
+  String armyBuilderStratagemCp(int cp) {
+    return '$cp PC';
+  }
+
+  @override
+  String get armyBuilderNoStratagems => 'Aucun stratagème pour ce détachement';
+
+  @override
   String armyBuilderModelCount(int count) {
     return '$count figurines';
   }

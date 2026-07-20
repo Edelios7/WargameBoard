@@ -11,6 +11,7 @@ import '../tables/detachments_table.dart';
 import '../tables/editions_table.dart';
 import '../tables/enhancements_table.dart';
 import '../tables/factions_table.dart';
+import '../tables/stratagems_table.dart';
 import '../tables/unit_sizes_table.dart';
 
 part 'army_dao.g.dart';
@@ -26,6 +27,7 @@ part 'army_dao.g.dart';
     UnitSizes,
     Detachments,
     Enhancements,
+    Stratagems,
   ],
 )
 class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
@@ -140,6 +142,24 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
               name: e.name,
               points: e.points,
               description: e.description,
+            ))
+        .toList();
+  }
+
+  Future<List<StratagemOption>> getStratagemsForDetachment(
+    String detachmentId,
+  ) async {
+    final rows = await (select(stratagems)
+          ..where((t) => t.detachmentId.equals(detachmentId))
+          ..orderBy([(t) => OrderingTerm.asc(t.commandPoints)]))
+        .get();
+    return rows
+        .map((s) => StratagemOption(
+              id: s.id,
+              name: s.name,
+              commandPoints: s.commandPoints,
+              phase: s.phase,
+              description: s.description,
             ))
         .toList();
   }

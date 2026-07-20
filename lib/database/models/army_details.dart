@@ -99,3 +99,19 @@ class EnhancementOption {
     this.description,
   });
 }
+
+class StratagemOption {
+  final String id;
+  final String name;
+  final int commandPoints;
+  final String? phase;
+  final String? description;
+
+  const StratagemOption({
+    required this.id,
+    required this.name,
+    required this.commandPoints,
+    this.phase,
+    this.description,
+  });
+}

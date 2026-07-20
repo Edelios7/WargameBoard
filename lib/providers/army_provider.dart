@@ -37,3 +37,9 @@ final enhancementsForDetachmentProvider =
   final repository = ref.watch(armyRepositoryProvider);
   return repository.getEnhancementsForDetachment(detachmentId);
 });
+
+final stratagemsForDetachmentProvider =
+    FutureProvider.family<List<StratagemOption>, String>((ref, detachmentId) {
+  final repository = ref.watch(armyRepositoryProvider);
+  return repository.getStratagemsForDetachment(detachmentId);
+});

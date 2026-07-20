@@ -67,6 +67,14 @@
   "armyBuilderEnhancementLabel": "Enhancement",
   "armyBuilderEnhancementNone": "None",
   "armyBuilderChooseEnhancement": "Choose an enhancement",
+  "armyBuilderStratagems": "Stratagems",
+  "armyBuilderStratagemCp": "{cp} CP",
+  "@armyBuilderStratagemCp": {
+    "placeholders": {
+      "cp": { "type": "int" }
+    }
+  },
+  "armyBuilderNoStratagems": "No stratagems for this detachment",
   "armyBuilderModelCount": "{count} models",
   "@armyBuilderModelCount": {
     "placeholders": {

@@ -350,6 +350,24 @@ abstract class AppLocalizations {
   /// **'Choisir un enhancement'**
   String get armyBuilderChooseEnhancement;
 
+  /// No description provided for @armyBuilderStratagems.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stratagèmes'**
+  String get armyBuilderStratagems;
+
+  /// No description provided for @armyBuilderStratagemCp.
+  ///
+  /// In fr, this message translates to:
+  /// **'{cp} PC'**
+  String armyBuilderStratagemCp(int cp);
+
+  /// No description provided for @armyBuilderNoStratagems.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun stratagème pour ce détachement'**
+  String get armyBuilderNoStratagems;
+
   /// No description provided for @armyBuilderModelCount.
   ///
   /// In fr, this message translates to:

@@ -67,6 +67,14 @@
   "armyBuilderEnhancementLabel": "Enhancement",
   "armyBuilderEnhancementNone": "Aucun",
   "armyBuilderChooseEnhancement": "Choisir un enhancement",
+  "armyBuilderStratagems": "Stratagèmes",
+  "armyBuilderStratagemCp": "{cp} PC",
+  "@armyBuilderStratagemCp": {
+    "placeholders": {
+      "cp": { "type": "int" }
+    }
+  },
+  "armyBuilderNoStratagems": "Aucun stratagème pour ce détachement",
   "armyBuilderModelCount": "{count} figurines",
   "@armyBuilderModelCount": {
     "placeholders": {
