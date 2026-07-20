@@ -305,6 +305,15 @@ class _ArmyDetail extends ConsumerWidget {
                   ),
                 ),
               IconButton(
+                tooltip: l10n.armyBuilderDuplicate,
+                icon: const Icon(Icons.content_copy_rounded),
+                color: AppColors.textSecondary,
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (_) => _DuplicateArmyDialog(army: army),
+                ),
+              ),
+              IconButton(
                 tooltip: l10n.armyBuilderDeleteArmy,
                 icon: const Icon(Icons.delete_outline_rounded),
                 color: AppColors.textSecondary,
@@ -514,6 +523,111 @@ class _ArmyDetail extends ConsumerWidget {
                   ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _DuplicateArmyDialog extends ConsumerStatefulWidget {
+  final ArmyDetails army;
+
+  const _DuplicateArmyDialog({required this.army});
+
+  @override
+  ConsumerState<_DuplicateArmyDialog> createState() =>
+      _DuplicateArmyDialogState();
+}
+
+class _DuplicateArmyDialogState extends ConsumerState<_DuplicateArmyDialog> {
+  late final TextEditingController _nameController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _duplicate() async {
+    final l10n = AppLocalizations.of(context)!;
+    final name = _nameController.text.trim().isEmpty
+        ? l10n.armyBuilderDuplicateSuffix(widget.army.name)
+        : _nameController.text.trim();
+
+    final newId = await ref
+        .read(armyBuilderServiceProvider)
+        .duplicateArmy(widget.army.id, name);
+
+    ref.invalidate(armiesListProvider);
+    if (newId != null) {
+      ref.read(selectedArmyIdProvider.notifier).state = newId;
+    }
+    if (mounted) Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Dialog(
+      backgroundColor: AppColors.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: SizedBox(
+          width: 380,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.armyBuilderDuplicate, style: AppTextStyles.title),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _nameController,
+                autofocus: true,
+                style: AppTextStyles.body,
+                decoration: InputDecoration(
+                  labelText: l10n.armyBuilderDuplicateNameLabel,
+                  hintText: l10n.armyBuilderDuplicateSuffix(widget.army.name),
+                  hintStyle: AppTextStyles.caption,
+                  labelStyle: AppTextStyles.caption,
+                  filled: true,
+                  fillColor: AppColors.background,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text(
+                      l10n.armyBuilderCancel,
+                      style: AppTextStyles.body,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                    ),
+                    onPressed: _duplicate,
+                    child: Text(l10n.armyBuilderDuplicate),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

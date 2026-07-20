@@ -158,6 +158,17 @@ class AppLocalizationsFr extends AppLocalizations {
       'Liste copiée dans le presse-papier';
 
   @override
+  String get armyBuilderDuplicate => 'Dupliquer l\'armée';
+
+  @override
+  String get armyBuilderDuplicateNameLabel => 'Nom de la copie';
+
+  @override
+  String armyBuilderDuplicateSuffix(String name) {
+    return '$name (copie)';
+  }
+
+  @override
   String get armyBuilderDetachmentLabel => 'Détachement (optionnel)';
 
   @override

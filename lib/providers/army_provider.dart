@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../database/models/army_details.dart';
 import '../repositories/army_repository.dart';
+import '../services/army_builder_service.dart';
 import '../services/army_validation_service.dart';
 import 'database_provider.dart';
 
@@ -18,6 +19,11 @@ final armyRepositoryProvider = Provider<ArmyRepository>((ref) {
   final database = ref.watch(databaseProvider);
 
   return ArmyRepository(database);
+});
+
+final armyBuilderServiceProvider = Provider<ArmyBuilderService>((ref) {
+  final repository = ref.watch(armyRepositoryProvider);
+  return ArmyBuilderService(repository);
 });
 
 final armiesListProvider = FutureProvider<List<ArmyListItem>>((ref) {

@@ -374,6 +374,24 @@ abstract class AppLocalizations {
   /// **'Liste copiée dans le presse-papier'**
   String get armyBuilderCopiedToClipboard;
 
+  /// No description provided for @armyBuilderDuplicate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dupliquer l\'armée'**
+  String get armyBuilderDuplicate;
+
+  /// No description provided for @armyBuilderDuplicateNameLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom de la copie'**
+  String get armyBuilderDuplicateNameLabel;
+
+  /// No description provided for @armyBuilderDuplicateSuffix.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} (copie)'**
+  String armyBuilderDuplicateSuffix(String name);
+
   /// No description provided for @armyBuilderDetachmentLabel.
   ///
   /// In fr, this message translates to:

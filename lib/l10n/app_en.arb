@@ -77,6 +77,14 @@
   "armyBuilderDeleteArmy": "Delete army",
   "armyBuilderCopyList": "Copy list",
   "armyBuilderCopiedToClipboard": "List copied to clipboard",
+  "armyBuilderDuplicate": "Duplicate army",
+  "armyBuilderDuplicateNameLabel": "Copy name",
+  "armyBuilderDuplicateSuffix": "{name} (copy)",
+  "@armyBuilderDuplicateSuffix": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
   "armyBuilderDetachmentLabel": "Detachment (optional)",
   "armyBuilderDetachmentNone": "None",
   "armyBuilderEnhancementLabel": "Enhancement",

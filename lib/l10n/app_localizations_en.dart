@@ -156,6 +156,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get armyBuilderCopiedToClipboard => 'List copied to clipboard';
 
   @override
+  String get armyBuilderDuplicate => 'Duplicate army';
+
+  @override
+  String get armyBuilderDuplicateNameLabel => 'Copy name';
+
+  @override
+  String armyBuilderDuplicateSuffix(String name) {
+    return '$name (copy)';
+  }
+
+  @override
   String get armyBuilderDetachmentLabel => 'Detachment (optional)';
 
   @override
