@@ -9,7 +9,9 @@ import '../../../providers/catalog_provider.dart';
 import '../../../providers/collection_provider.dart';
 
 class AddCollectionEntryDialog extends ConsumerStatefulWidget {
-  const AddCollectionEntryDialog({super.key});
+  final bool wishlist;
+
+  const AddCollectionEntryDialog({super.key, this.wishlist = false});
 
   @override
   ConsumerState<AddCollectionEntryDialog> createState() =>
@@ -51,13 +53,21 @@ class _AddCollectionEntryDialogState
     final quantity = int.tryParse(_quantityController.text.trim()) ?? 1;
     if (selected == null || quantity < 1) return;
 
-    await ref.read(collectionRepositoryProvider).addEntry(
-          datasheetId: selected.id,
-          quantity: quantity,
-        );
-
-    ref.invalidate(collectionEntriesProvider);
-    ref.invalidate(collectionSummaryProvider);
+    final repository = ref.read(collectionRepositoryProvider);
+    if (widget.wishlist) {
+      await repository.addWishlistItem(
+        datasheetId: selected.id,
+        quantity: quantity,
+      );
+      ref.invalidate(wishlistItemsProvider);
+    } else {
+      await repository.addEntry(
+        datasheetId: selected.id,
+        quantity: quantity,
+      );
+      ref.invalidate(collectionEntriesProvider);
+      ref.invalidate(collectionSummaryProvider);
+    }
 
     if (mounted) Navigator.of(context).pop();
   }
@@ -77,7 +87,10 @@ class _AddCollectionEntryDialogState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n.collectionAddEntry, style: AppTextStyles.title),
+              Text(
+                widget.wishlist ? l10n.wishlistAddItem : l10n.collectionAddEntry,
+                style: AppTextStyles.title,
+              ),
               const SizedBox(height: 16),
               TextField(
                 autofocus: true,

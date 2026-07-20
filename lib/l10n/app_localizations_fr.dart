@@ -204,6 +204,21 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get collectionTabOwned => 'Collection';
+
+  @override
+  String get collectionTabWishlist => 'Liste d\'envies';
+
+  @override
+  String get wishlistAddItem => 'Ajouter à la liste d\'envies';
+
+  @override
+  String get wishlistEmpty => 'Ta liste d\'envies est vide';
+
+  @override
+  String get wishlistMoveToCollection => 'Marquer comme acquis';
+
+  @override
   String get statsArmiesCount => 'Armées créées';
 
   @override

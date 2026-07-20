@@ -202,6 +202,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get collectionTabOwned => 'Collection';
+
+  @override
+  String get collectionTabWishlist => 'Wishlist';
+
+  @override
+  String get wishlistAddItem => 'Add to wishlist';
+
+  @override
+  String get wishlistEmpty => 'Your wishlist is empty';
+
+  @override
+  String get wishlistMoveToCollection => 'Mark as acquired';
+
+  @override
   String get statsArmiesCount => 'Armies created';
 
   @override

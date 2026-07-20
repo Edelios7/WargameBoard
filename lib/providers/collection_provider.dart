@@ -20,3 +20,9 @@ final collectionSummaryProvider = FutureProvider<CollectionSummary>((ref) {
   final repository = ref.watch(collectionRepositoryProvider);
   return repository.getSummary();
 });
+
+final wishlistItemsProvider =
+    FutureProvider<List<WishlistItemDetails>>((ref) {
+  final repository = ref.watch(collectionRepositoryProvider);
+  return repository.listWishlistItems();
+});

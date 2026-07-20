@@ -43,4 +43,28 @@ class CollectionRepository {
       painted: painted,
     );
   }
+
+  Future<List<WishlistItemDetails>> listWishlistItems() {
+    return database.collectionDao.listWishlistItems();
+  }
+
+  Future<String> addWishlistItem({
+    required String datasheetId,
+    int quantity = 1,
+    String? notes,
+  }) {
+    return database.collectionDao.addWishlistItem(
+      datasheetId: datasheetId,
+      quantity: quantity,
+      notes: notes,
+    );
+  }
+
+  Future<void> deleteWishlistItem(String id) {
+    return database.collectionDao.deleteWishlistItem(id);
+  }
+
+  Future<void> moveWishlistItemToCollection(String id) {
+    return database.collectionDao.moveWishlistItemToCollection(id);
+  }
 }

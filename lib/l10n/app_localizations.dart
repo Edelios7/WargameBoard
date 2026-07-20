@@ -452,6 +452,36 @@ abstract class AppLocalizations {
   /// **'{entries} unités · {models} figurines · {painted} peintes'**
   String collectionSummaryLine(int entries, int models, int painted);
 
+  /// No description provided for @collectionTabOwned.
+  ///
+  /// In fr, this message translates to:
+  /// **'Collection'**
+  String get collectionTabOwned;
+
+  /// No description provided for @collectionTabWishlist.
+  ///
+  /// In fr, this message translates to:
+  /// **'Liste d\'envies'**
+  String get collectionTabWishlist;
+
+  /// No description provided for @wishlistAddItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter à la liste d\'envies'**
+  String get wishlistAddItem;
+
+  /// No description provided for @wishlistEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ta liste d\'envies est vide'**
+  String get wishlistEmpty;
+
+  /// No description provided for @wishlistMoveToCollection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Marquer comme acquis'**
+  String get wishlistMoveToCollection;
+
   /// No description provided for @statsArmiesCount.
   ///
   /// In fr, this message translates to:

@@ -6,6 +6,7 @@ import '../models/collection_item_details.dart';
 import '../tables/datasheets_table.dart';
 import '../tables/factions_table.dart';
 import '../tables/owned_miniatures_table.dart';
+import '../tables/wishlist_items_table.dart';
 
 part 'collection_dao.g.dart';
 
@@ -14,6 +15,7 @@ part 'collection_dao.g.dart';
     OwnedMiniatures,
     Datasheets,
     Factions,
+    WishlistItems,
   ],
 )
 class CollectionDao extends DatabaseAccessor<AppDatabase>
@@ -110,5 +112,63 @@ class CollectionDao extends DatabaseAccessor<AppDatabase>
       totalModels: totalModels,
       totalPainted: totalPainted,
     );
+  }
+
+  Future<String> addWishlistItem({
+    required String datasheetId,
+    int quantity = 1,
+    String? notes,
+  }) async {
+    final id = _uuid.v4();
+    await into(wishlistItems).insert(
+      WishlistItemsCompanion.insert(
+        id: id,
+        datasheetId: datasheetId,
+        quantity: Value(quantity),
+        notes: Value(notes),
+      ),
+    );
+    return id;
+  }
+
+  Future<void> deleteWishlistItem(String id) {
+    return (delete(wishlistItems)..where((t) => t.id.equals(id))).go();
+  }
+
+  Future<List<WishlistItemDetails>> listWishlistItems() async {
+    final query = select(wishlistItems).join([
+      innerJoin(
+        datasheets,
+        datasheets.id.equalsExp(wishlistItems.datasheetId),
+      ),
+      innerJoin(factions, factions.id.equalsExp(datasheets.factionId)),
+    ])
+      ..orderBy([OrderingTerm.asc(datasheets.name)]);
+
+    final rows = await query.get();
+    return rows.map((row) {
+      final item = row.readTable(wishlistItems);
+      final datasheet = row.readTable(datasheets);
+      final faction = row.readTable(factions);
+      return WishlistItemDetails(
+        id: item.id,
+        datasheetId: datasheet.id,
+        datasheetName: datasheet.name,
+        factionName: faction.name,
+        quantity: item.quantity,
+        notes: item.notes,
+      );
+    }).toList();
+  }
+
+  /// Déplace un élément de la wishlist vers la collection possédée
+  /// (l'ajoute comme entrée de collection puis le retire de la wishlist).
+  Future<void> moveWishlistItemToCollection(String wishlistItemId) async {
+    final item = await (select(wishlistItems)
+          ..where((t) => t.id.equals(wishlistItemId)))
+        .getSingle();
+
+    await addEntry(datasheetId: item.datasheetId, quantity: item.quantity);
+    await deleteWishlistItem(wishlistItemId);
   }
 }

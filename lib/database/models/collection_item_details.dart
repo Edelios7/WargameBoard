@@ -34,3 +34,21 @@ class CollectionSummary {
   double get paintedRatio =>
       totalModels == 0 ? 0 : totalPainted / totalModels;
 }
+
+class WishlistItemDetails {
+  final String id;
+  final String datasheetId;
+  final String datasheetName;
+  final String factionName;
+  final int quantity;
+  final String? notes;
+
+  const WishlistItemDetails({
+    required this.id,
+    required this.datasheetId,
+    required this.datasheetName,
+    required this.factionName,
+    required this.quantity,
+    this.notes,
+  });
+}

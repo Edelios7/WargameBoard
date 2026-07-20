@@ -8,14 +8,34 @@ import '../../../l10n/app_localizations.dart';
 import '../../../providers/collection_provider.dart';
 import '../widgets/add_collection_entry_dialog.dart';
 
-class CollectionPage extends ConsumerWidget {
+class CollectionPage extends ConsumerStatefulWidget {
   const CollectionPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CollectionPage> createState() => _CollectionPageState();
+}
+
+class _CollectionPageState extends ConsumerState<CollectionPage>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final entriesAsync = ref.watch(collectionEntriesProvider);
-    final summaryAsync = ref.watch(collectionSummaryProvider);
+    final isWishlistTab = _tabController.index == 1;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -33,62 +53,191 @@ class CollectionPage extends ConsumerWidget {
                       FilledButton.styleFrom(backgroundColor: AppColors.primary),
                   onPressed: () => showDialog(
                     context: context,
-                    builder: (_) => const AddCollectionEntryDialog(),
+                    builder: (_) =>
+                        AddCollectionEntryDialog(wishlist: isWishlistTab),
                   ),
                   icon: const Icon(Icons.add_rounded),
-                  label: Text(l10n.collectionAddEntry),
+                  label: Text(
+                    isWishlistTab
+                        ? l10n.wishlistAddItem
+                        : l10n.collectionAddEntry,
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            summaryAsync.when(
-              loading: () => const SizedBox.shrink(),
-              error: (_, __) => const SizedBox.shrink(),
-              data: (summary) => Text(
-                l10n.collectionSummaryLine(
-                  summary.totalEntries,
-                  summary.totalModels,
-                  summary.totalPainted,
-                ),
-                style: AppTextStyles.caption,
-              ),
+            const SizedBox(height: 16),
+            TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              labelColor: AppColors.primary,
+              unselectedLabelColor: AppColors.textSecondary,
+              indicatorColor: AppColors.primary,
+              tabs: [
+                Tab(text: l10n.collectionTabOwned),
+                Tab(text: l10n.collectionTabWishlist),
+              ],
             ),
-            const SizedBox(height: 24),
             Expanded(
-              child: entriesAsync.when(
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                ),
-                error: (error, _) => Center(
-                  child: Text('$error', style: AppTextStyles.caption),
-                ),
-                data: (entries) {
-                  if (entries.isEmpty) {
-                    return Center(
-                      child: Text(
-                        l10n.collectionEmpty,
-                        style: AppTextStyles.caption,
-                      ),
-                    );
-                  }
-                  return GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 340,
-                      mainAxisExtent: 220,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                    ),
-                    itemCount: entries.length,
-                    itemBuilder: (context, index) {
-                      return _CollectionCard(entry: entries[index]);
-                    },
-                  );
-                },
+              child: TabBarView(
+                controller: _tabController,
+                children: const [
+                  _CollectionTab(),
+                  _WishlistTab(),
+                ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _CollectionTab extends ConsumerWidget {
+  const _CollectionTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final entriesAsync = ref.watch(collectionEntriesProvider);
+    final summaryAsync = ref.watch(collectionSummaryProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 12),
+        summaryAsync.when(
+          loading: () => const SizedBox.shrink(),
+          error: (_, __) => const SizedBox.shrink(),
+          data: (summary) => Text(
+            l10n.collectionSummaryLine(
+              summary.totalEntries,
+              summary.totalModels,
+              summary.totalPainted,
+            ),
+            style: AppTextStyles.caption,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Expanded(
+          child: entriesAsync.when(
+            loading: () => const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            ),
+            error: (error, _) => Center(
+              child: Text('$error', style: AppTextStyles.caption),
+            ),
+            data: (entries) {
+              if (entries.isEmpty) {
+                return Center(
+                  child: Text(
+                    l10n.collectionEmpty,
+                    style: AppTextStyles.caption,
+                  ),
+                );
+              }
+              return GridView.builder(
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 340,
+                  mainAxisExtent: 220,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                ),
+                itemCount: entries.length,
+                itemBuilder: (context, index) {
+                  return _CollectionCard(entry: entries[index]);
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _WishlistTab extends ConsumerWidget {
+  const _WishlistTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final itemsAsync = ref.watch(wishlistItemsProvider);
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: itemsAsync.when(
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+        error: (error, _) => Center(
+          child: Text('$error', style: AppTextStyles.caption),
+        ),
+        data: (items) {
+          if (items.isEmpty) {
+            return Center(
+              child: Text(l10n.wishlistEmpty, style: AppTextStyles.caption),
+            );
+          }
+          return ListView.builder(
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              final item = items[index];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(item.datasheetName, style: AppTextStyles.body),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${item.factionName} · ${l10n.collectionQuantityLabel(item.quantity)}',
+                              style: AppTextStyles.caption,
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: l10n.wishlistMoveToCollection,
+                        icon: const Icon(Icons.inventory_2_outlined),
+                        color: AppColors.primary,
+                        onPressed: () async {
+                          await ref
+                              .read(collectionRepositoryProvider)
+                              .moveWishlistItemToCollection(item.id);
+                          ref.invalidate(wishlistItemsProvider);
+                          ref.invalidate(collectionEntriesProvider);
+                          ref.invalidate(collectionSummaryProvider);
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded),
+                        color: AppColors.textSecondary,
+                        onPressed: () async {
+                          await ref
+                              .read(collectionRepositoryProvider)
+                              .deleteWishlistItem(item.id);
+                          ref.invalidate(wishlistItemsProvider);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }

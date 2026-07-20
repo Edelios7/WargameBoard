@@ -115,6 +115,12 @@
     }
   },
 
+  "collectionTabOwned": "Collection",
+  "collectionTabWishlist": "Liste d'envies",
+  "wishlistAddItem": "Ajouter à la liste d'envies",
+  "wishlistEmpty": "Ta liste d'envies est vide",
+  "wishlistMoveToCollection": "Marquer comme acquis",
+
   "statsArmiesCount": "Armées créées",
   "statsCollectionEntries": "Unités en collection",
   "statsCollectionModels": "Figurines en collection",

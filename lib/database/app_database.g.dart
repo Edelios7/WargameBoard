@@ -15036,6 +15036,368 @@ class OwnedMiniaturesCompanion extends UpdateCompanion<OwnedMiniature> {
   }
 }
 
+class $WishlistItemsTable extends WishlistItems
+    with TableInfo<$WishlistItemsTable, WishlistItem> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WishlistItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _datasheetIdMeta = const VerificationMeta(
+    'datasheetId',
+  );
+  @override
+  late final GeneratedColumn<String> datasheetId = GeneratedColumn<String>(
+    'datasheet_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _quantityMeta = const VerificationMeta(
+    'quantity',
+  );
+  @override
+  late final GeneratedColumn<int> quantity = GeneratedColumn<int>(
+    'quantity',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    datasheetId,
+    quantity,
+    notes,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'wishlist_items';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WishlistItem> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('datasheet_id')) {
+      context.handle(
+        _datasheetIdMeta,
+        datasheetId.isAcceptableOrUnknown(
+          data['datasheet_id']!,
+          _datasheetIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_datasheetIdMeta);
+    }
+    if (data.containsKey('quantity')) {
+      context.handle(
+        _quantityMeta,
+        quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  WishlistItem map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WishlistItem(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      datasheetId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}datasheet_id'],
+      )!,
+      quantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}quantity'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $WishlistItemsTable createAlias(String alias) {
+    return $WishlistItemsTable(attachedDatabase, alias);
+  }
+}
+
+class WishlistItem extends DataClass implements Insertable<WishlistItem> {
+  final String id;
+  final String datasheetId;
+  final int quantity;
+  final String? notes;
+  final DateTime createdAt;
+  const WishlistItem({
+    required this.id,
+    required this.datasheetId,
+    required this.quantity,
+    this.notes,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['datasheet_id'] = Variable<String>(datasheetId);
+    map['quantity'] = Variable<int>(quantity);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  WishlistItemsCompanion toCompanion(bool nullToAbsent) {
+    return WishlistItemsCompanion(
+      id: Value(id),
+      datasheetId: Value(datasheetId),
+      quantity: Value(quantity),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory WishlistItem.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WishlistItem(
+      id: serializer.fromJson<String>(json['id']),
+      datasheetId: serializer.fromJson<String>(json['datasheetId']),
+      quantity: serializer.fromJson<int>(json['quantity']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'datasheetId': serializer.toJson<String>(datasheetId),
+      'quantity': serializer.toJson<int>(quantity),
+      'notes': serializer.toJson<String?>(notes),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  WishlistItem copyWith({
+    String? id,
+    String? datasheetId,
+    int? quantity,
+    Value<String?> notes = const Value.absent(),
+    DateTime? createdAt,
+  }) => WishlistItem(
+    id: id ?? this.id,
+    datasheetId: datasheetId ?? this.datasheetId,
+    quantity: quantity ?? this.quantity,
+    notes: notes.present ? notes.value : this.notes,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  WishlistItem copyWithCompanion(WishlistItemsCompanion data) {
+    return WishlistItem(
+      id: data.id.present ? data.id.value : this.id,
+      datasheetId: data.datasheetId.present
+          ? data.datasheetId.value
+          : this.datasheetId,
+      quantity: data.quantity.present ? data.quantity.value : this.quantity,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WishlistItem(')
+          ..write('id: $id, ')
+          ..write('datasheetId: $datasheetId, ')
+          ..write('quantity: $quantity, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, datasheetId, quantity, notes, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WishlistItem &&
+          other.id == this.id &&
+          other.datasheetId == this.datasheetId &&
+          other.quantity == this.quantity &&
+          other.notes == this.notes &&
+          other.createdAt == this.createdAt);
+}
+
+class WishlistItemsCompanion extends UpdateCompanion<WishlistItem> {
+  final Value<String> id;
+  final Value<String> datasheetId;
+  final Value<int> quantity;
+  final Value<String?> notes;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const WishlistItemsCompanion({
+    this.id = const Value.absent(),
+    this.datasheetId = const Value.absent(),
+    this.quantity = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WishlistItemsCompanion.insert({
+    required String id,
+    required String datasheetId,
+    this.quantity = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       datasheetId = Value(datasheetId);
+  static Insertable<WishlistItem> custom({
+    Expression<String>? id,
+    Expression<String>? datasheetId,
+    Expression<int>? quantity,
+    Expression<String>? notes,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (datasheetId != null) 'datasheet_id': datasheetId,
+      if (quantity != null) 'quantity': quantity,
+      if (notes != null) 'notes': notes,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WishlistItemsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? datasheetId,
+    Value<int>? quantity,
+    Value<String?>? notes,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return WishlistItemsCompanion(
+      id: id ?? this.id,
+      datasheetId: datasheetId ?? this.datasheetId,
+      quantity: quantity ?? this.quantity,
+      notes: notes ?? this.notes,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (datasheetId.present) {
+      map['datasheet_id'] = Variable<String>(datasheetId.value);
+    }
+    if (quantity.present) {
+      map['quantity'] = Variable<int>(quantity.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WishlistItemsCompanion(')
+          ..write('id: $id, ')
+          ..write('datasheetId: $datasheetId, ')
+          ..write('quantity: $quantity, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -15723,6 +16085,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $OwnedMiniaturesTable ownedMiniatures = $OwnedMiniaturesTable(
     this,
   );
+  late final $WishlistItemsTable wishlistItems = $WishlistItemsTable(this);
   late final $BattlesTable battles = $BattlesTable(this);
   late final GameSystemDao gameSystemDao = GameSystemDao(this as AppDatabase);
   late final FactionDao factionDao = FactionDao(this as AppDatabase);
@@ -15770,6 +16133,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     armies,
     armyUnits,
     ownedMiniatures,
+    wishlistItems,
     battles,
   ];
 }
@@ -23650,6 +24014,208 @@ typedef $$OwnedMiniaturesTableProcessedTableManager =
       OwnedMiniature,
       PrefetchHooks Function()
     >;
+typedef $$WishlistItemsTableCreateCompanionBuilder =
+    WishlistItemsCompanion Function({
+      required String id,
+      required String datasheetId,
+      Value<int> quantity,
+      Value<String?> notes,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+typedef $$WishlistItemsTableUpdateCompanionBuilder =
+    WishlistItemsCompanion Function({
+      Value<String> id,
+      Value<String> datasheetId,
+      Value<int> quantity,
+      Value<String?> notes,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$WishlistItemsTableFilterComposer
+    extends Composer<_$AppDatabase, $WishlistItemsTable> {
+  $$WishlistItemsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get datasheetId => $composableBuilder(
+    column: $table.datasheetId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$WishlistItemsTableOrderingComposer
+    extends Composer<_$AppDatabase, $WishlistItemsTable> {
+  $$WishlistItemsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get datasheetId => $composableBuilder(
+    column: $table.datasheetId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WishlistItemsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WishlistItemsTable> {
+  $$WishlistItemsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get datasheetId => $composableBuilder(
+    column: $table.datasheetId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get quantity =>
+      $composableBuilder(column: $table.quantity, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$WishlistItemsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $WishlistItemsTable,
+          WishlistItem,
+          $$WishlistItemsTableFilterComposer,
+          $$WishlistItemsTableOrderingComposer,
+          $$WishlistItemsTableAnnotationComposer,
+          $$WishlistItemsTableCreateCompanionBuilder,
+          $$WishlistItemsTableUpdateCompanionBuilder,
+          (
+            WishlistItem,
+            BaseReferences<_$AppDatabase, $WishlistItemsTable, WishlistItem>,
+          ),
+          WishlistItem,
+          PrefetchHooks Function()
+        > {
+  $$WishlistItemsTableTableManager(_$AppDatabase db, $WishlistItemsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WishlistItemsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WishlistItemsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WishlistItemsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> datasheetId = const Value.absent(),
+                Value<int> quantity = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WishlistItemsCompanion(
+                id: id,
+                datasheetId: datasheetId,
+                quantity: quantity,
+                notes: notes,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String datasheetId,
+                Value<int> quantity = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WishlistItemsCompanion.insert(
+                id: id,
+                datasheetId: datasheetId,
+                quantity: quantity,
+                notes: notes,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WishlistItemsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $WishlistItemsTable,
+      WishlistItem,
+      $$WishlistItemsTableFilterComposer,
+      $$WishlistItemsTableOrderingComposer,
+      $$WishlistItemsTableAnnotationComposer,
+      $$WishlistItemsTableCreateCompanionBuilder,
+      $$WishlistItemsTableUpdateCompanionBuilder,
+      (
+        WishlistItem,
+        BaseReferences<_$AppDatabase, $WishlistItemsTable, WishlistItem>,
+      ),
+      WishlistItem,
+      PrefetchHooks Function()
+    >;
 typedef $$BattlesTableCreateCompanionBuilder =
     BattlesCompanion Function({
       required String id,
@@ -24014,6 +24580,8 @@ class $AppDatabaseManager {
       $$ArmyUnitsTableTableManager(_db, _db.armyUnits);
   $$OwnedMiniaturesTableTableManager get ownedMiniatures =>
       $$OwnedMiniaturesTableTableManager(_db, _db.ownedMiniatures);
+  $$WishlistItemsTableTableManager get wishlistItems =>
+      $$WishlistItemsTableTableManager(_db, _db.wishlistItems);
   $$BattlesTableTableManager get battles =>
       $$BattlesTableTableManager(_db, _db.battles);
 }

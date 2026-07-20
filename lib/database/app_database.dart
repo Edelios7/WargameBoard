@@ -49,6 +49,7 @@ import 'tables/armies_table.dart';
 import 'tables/army_units_table.dart';
 
 import 'tables/owned_miniatures_table.dart';
+import 'tables/wishlist_items_table.dart';
 
 import 'tables/battles_table.dart';
 
@@ -125,6 +126,7 @@ part 'app_database.g.dart';
 
     // ===== COLLECTION =====
     OwnedMiniatures,
+    WishlistItems,
 
     // ===== BATTLES =====
     Battles,
@@ -173,7 +175,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   // =========================
   // Migrations
@@ -208,6 +210,9 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 7) {
             await m.createTable(stratagems);
+          }
+          if (from < 8) {
+            await m.createTable(wishlistItems);
           }
         },
 
