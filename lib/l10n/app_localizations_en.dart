@@ -48,6 +48,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLanguageEnglish => 'English';
 
   @override
+  String get settingsImportTitle => 'Data import';
+
+  @override
+  String get settingsImportDescription =>
+      'Import datasheets from JSON (existing ids get updated).';
+
+  @override
+  String get settingsImportButton => 'Import JSON';
+
+  @override
+  String get settingsImportPasteHint => 'Paste the JSON document here...';
+
+  @override
+  String get settingsImportRun => 'Import';
+
+  @override
+  String settingsImportSuccess(int count) {
+    return '$count items imported';
+  }
+
+  @override
   String get catalogSearchHint => 'Search for a unit...';
 
   @override

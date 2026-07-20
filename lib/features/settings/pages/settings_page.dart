@@ -7,6 +7,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/locale_provider.dart';
 import '../../../providers/shared_preferences_provider.dart';
+import '../widgets/import_json_dialog.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -58,6 +59,35 @@ class SettingsPage extends ConsumerWidget {
                       label: l10n.settingsLanguageEnglish,
                       selected: localeOverride == const Locale('en'),
                       onTap: () => _setLocale(ref, const Locale('en')),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: 420,
+              child: AppCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.settingsImportTitle, style: AppTextStyles.body),
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.settingsImportDescription,
+                      style: AppTextStyles.caption,
+                    ),
+                    const SizedBox(height: 12),
+                    FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                      ),
+                      onPressed: () => showDialog(
+                        context: context,
+                        builder: (_) => const ImportJsonDialog(),
+                      ),
+                      icon: const Icon(Icons.file_download_outlined),
+                      label: Text(l10n.settingsImportButton),
                     ),
                   ],
                 ),

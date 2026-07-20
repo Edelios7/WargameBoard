@@ -1,0 +1,138 @@
+import 'dart:convert';
+
+import 'package:drift/native.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:wargameboard/database/app_database.dart';
+import 'package:wargameboard/database/seed/faction_seed.dart';
+import 'package:wargameboard/services/catalog_import_service.dart';
+
+void main() {
+  late AppDatabase database;
+  late CatalogImportService service;
+
+  setUp(() {
+    database = AppDatabase.forTesting(NativeDatabase.memory());
+    service = CatalogImportService(database);
+  });
+
+  tearDown(() async {
+    await database.close();
+  });
+
+  test('imports a new datasheet with weapon, keyword and cost', () async {
+    final result = await service.importJson(jsonEncode({
+      'keywords': [
+        {'id': 'kw-test-jump', 'name': 'Jump Pack'},
+      ],
+      'abilities': [
+        {
+          'id': 'ab-test-fury',
+          'name': 'Fury',
+          'description': 'Relance les 1 en charge.',
+        },
+      ],
+      'weapons': [
+        {
+          'id': 'wp-test-sword',
+          'name': 'Test sword',
+          'isMelee': true,
+          'profiles': [
+            {
+              'range': 0,
+              'attacks': '5',
+              'weaponSkill': 2,
+              'strength': 5,
+              'armorPenetration': -2,
+              'damage': '2',
+            },
+          ],
+        },
+      ],
+      'datasheets': [
+        {
+          'id': 'ds-test-assault',
+          'name': 'Assault Intercessors',
+          'factionId': seedFactionId,
+          'battlefieldRole': 'Battleline',
+          'unitType': 'Infantry',
+          'points': 75,
+          'editionId': seedEditionId,
+          'minimumModels': 5,
+          'maximumModels': 10,
+          'defaultModels': 5,
+          'keywordIds': ['kw-test-jump'],
+          'abilityIds': ['ab-test-fury'],
+        },
+      ],
+    }));
+
+    expect(result.datasheets, 1);
+    expect(result.weapons, 1);
+    expect(result.total, 4);
+
+    final search = await database.datasheetDao.search('Assault');
+    final details =
+        await database.datasheetDao.getDatasheet(search.single.id);
+    expect(details!.points, 75);
+    expect(details.keywords, contains('Jump Pack'));
+    expect(details.abilities, contains('Fury'));
+    expect(details.unit.maximumSize, 10);
+  });
+
+  test('re-importing the same id updates points instead of duplicating',
+      () async {
+    Map<String, dynamic> doc(int points) => {
+          'datasheets': [
+            {
+              'id': 'ds-test-upsert',
+              'name': 'Upsert Squad',
+              'factionId': seedFactionId,
+              'battlefieldRole': 'Elites',
+              'unitType': 'Infantry',
+              'points': points,
+              'editionId': seedEditionId,
+            },
+          ],
+        };
+
+    await service.importJson(jsonEncode(doc(100)));
+    await service.importJson(jsonEncode(doc(85)));
+
+    final search = await database.datasheetDao.search('Upsert');
+    expect(search, hasLength(1));
+    final details =
+        await database.datasheetDao.getDatasheet(search.single.id);
+    expect(details!.points, 85);
+  });
+
+  test('rejects invalid JSON and unknown factions without partial writes',
+      () async {
+    expect(
+      () => service.importJson('pas du json'),
+      throwsA(isA<CatalogImportException>()),
+    );
+
+    await expectLater(
+      service.importJson(jsonEncode({
+        'keywords': [
+          {'id': 'kw-should-not-persist', 'name': 'Ghost'},
+        ],
+        'datasheets': [
+          {
+            'id': 'ds-orphan',
+            'name': 'Orphan',
+            'factionId': 'fac-does-not-exist',
+            'battlefieldRole': 'HQ',
+            'unitType': 'Infantry',
+          },
+        ],
+      })),
+      throwsA(isA<CatalogImportException>()),
+    );
+
+    // La transaction doit avoir tout annulé, y compris le keyword valide.
+    final keyword =
+        await database.keywordDao.getById('kw-should-not-persist');
+    expect(keyword, isNull);
+  });
+}

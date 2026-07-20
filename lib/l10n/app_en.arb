@@ -17,6 +17,18 @@
   "settingsLanguageFrench": "Français",
   "settingsLanguageEnglish": "English",
 
+  "settingsImportTitle": "Data import",
+  "settingsImportDescription": "Import datasheets from JSON (existing ids get updated).",
+  "settingsImportButton": "Import JSON",
+  "settingsImportPasteHint": "Paste the JSON document here...",
+  "settingsImportRun": "Import",
+  "settingsImportSuccess": "{count} items imported",
+  "@settingsImportSuccess": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
   "catalogSearchHint": "Search for a unit...",
   "catalogEmptyResults": "No unit found",
   "catalogSelectPrompt": "Select a unit to see its datasheet",

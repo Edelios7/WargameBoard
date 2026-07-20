@@ -48,6 +48,27 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsLanguageEnglish => 'English';
 
   @override
+  String get settingsImportTitle => 'Import de données';
+
+  @override
+  String get settingsImportDescription =>
+      'Importer des datasheets au format JSON (mise à jour si l\'id existe déjà).';
+
+  @override
+  String get settingsImportButton => 'Importer du JSON';
+
+  @override
+  String get settingsImportPasteHint => 'Colle ici le document JSON...';
+
+  @override
+  String get settingsImportRun => 'Importer';
+
+  @override
+  String settingsImportSuccess(int count) {
+    return '$count éléments importés';
+  }
+
+  @override
   String get catalogSearchHint => 'Rechercher une unité...';
 
   @override

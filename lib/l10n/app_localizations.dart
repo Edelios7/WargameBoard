@@ -176,6 +176,42 @@ abstract class AppLocalizations {
   /// **'English'**
   String get settingsLanguageEnglish;
 
+  /// No description provided for @settingsImportTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Import de données'**
+  String get settingsImportTitle;
+
+  /// No description provided for @settingsImportDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Importer des datasheets au format JSON (mise à jour si l\'id existe déjà).'**
+  String get settingsImportDescription;
+
+  /// No description provided for @settingsImportButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Importer du JSON'**
+  String get settingsImportButton;
+
+  /// No description provided for @settingsImportPasteHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Colle ici le document JSON...'**
+  String get settingsImportPasteHint;
+
+  /// No description provided for @settingsImportRun.
+  ///
+  /// In fr, this message translates to:
+  /// **'Importer'**
+  String get settingsImportRun;
+
+  /// No description provided for @settingsImportSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} éléments importés'**
+  String settingsImportSuccess(int count);
+
   /// No description provided for @catalogSearchHint.
   ///
   /// In fr, this message translates to:
