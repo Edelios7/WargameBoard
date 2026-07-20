@@ -129,6 +129,18 @@
   "statsPointsByArmy": "Points by army",
   "statsNoArmies": "No army created yet",
   "statsNoCollection": "No models in your collection yet",
+  "statsGamesPlayed": "Games played",
+  "statsVictories": "Victories",
+  "statsDefeats": "Defeats",
+  "statsWinRate": "Win rate",
+  "statsBattleRecord": "Record {victories}W / {defeats}L / {draws}D",
+  "@statsBattleRecord": {
+    "placeholders": {
+      "victories": { "type": "int" },
+      "defeats": { "type": "int" },
+      "draws": { "type": "int" }
+    }
+  },
 
   "battleNewBattle": "New battle",
   "battleOpponentLabel": "Opponent",

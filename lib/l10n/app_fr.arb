@@ -129,6 +129,18 @@
   "statsPointsByArmy": "Points par armée",
   "statsNoArmies": "Pas encore d'armée créée",
   "statsNoCollection": "Pas encore de figurines en collection",
+  "statsGamesPlayed": "Parties jouées",
+  "statsVictories": "Victoires",
+  "statsDefeats": "Défaites",
+  "statsWinRate": "Taux de victoire",
+  "statsBattleRecord": "Bilan {victories}V / {defeats}D / {draws}N",
+  "@statsBattleRecord": {
+    "placeholders": {
+      "victories": { "type": "int" },
+      "defeats": { "type": "int" },
+      "draws": { "type": "int" }
+    }
+  },
 
   "battleNewBattle": "Nouvelle partie",
   "battleOpponentLabel": "Adversaire",

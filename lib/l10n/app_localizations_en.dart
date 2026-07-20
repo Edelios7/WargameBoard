@@ -241,6 +241,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statsNoCollection => 'No models in your collection yet';
 
   @override
+  String get statsGamesPlayed => 'Games played';
+
+  @override
+  String get statsVictories => 'Victories';
+
+  @override
+  String get statsDefeats => 'Defeats';
+
+  @override
+  String get statsWinRate => 'Win rate';
+
+  @override
+  String statsBattleRecord(int victories, int defeats, int draws) {
+    return 'Record ${victories}W / ${defeats}L / ${draws}D';
+  }
+
+  @override
   String get battleNewBattle => 'New battle';
 
   @override

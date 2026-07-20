@@ -530,6 +530,36 @@ abstract class AppLocalizations {
   /// **'Pas encore de figurines en collection'**
   String get statsNoCollection;
 
+  /// No description provided for @statsGamesPlayed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Parties jouées'**
+  String get statsGamesPlayed;
+
+  /// No description provided for @statsVictories.
+  ///
+  /// In fr, this message translates to:
+  /// **'Victoires'**
+  String get statsVictories;
+
+  /// No description provided for @statsDefeats.
+  ///
+  /// In fr, this message translates to:
+  /// **'Défaites'**
+  String get statsDefeats;
+
+  /// No description provided for @statsWinRate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Taux de victoire'**
+  String get statsWinRate;
+
+  /// No description provided for @statsBattleRecord.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bilan {victories}V / {defeats}D / {draws}N'**
+  String statsBattleRecord(int victories, int defeats, int draws);
+
   /// No description provided for @battleNewBattle.
   ///
   /// In fr, this message translates to:

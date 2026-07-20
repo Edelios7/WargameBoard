@@ -243,6 +243,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String get statsNoCollection => 'Pas encore de figurines en collection';
 
   @override
+  String get statsGamesPlayed => 'Parties jouées';
+
+  @override
+  String get statsVictories => 'Victoires';
+
+  @override
+  String get statsDefeats => 'Défaites';
+
+  @override
+  String get statsWinRate => 'Taux de victoire';
+
+  @override
+  String statsBattleRecord(int victories, int defeats, int draws) {
+    return 'Bilan ${victories}V / ${defeats}D / ${draws}N';
+  }
+
+  @override
   String get battleNewBattle => 'Nouvelle partie';
 
   @override

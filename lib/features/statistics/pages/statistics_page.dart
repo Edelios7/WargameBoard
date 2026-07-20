@@ -7,6 +7,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../database/models/army_details.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/army_provider.dart';
+import '../../../providers/battle_provider.dart';
 import '../../../providers/collection_provider.dart';
 
 class StatisticsPage extends ConsumerWidget {
@@ -17,6 +18,8 @@ class StatisticsPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final armiesAsync = ref.watch(armiesListProvider);
     final summaryAsync = ref.watch(collectionSummaryProvider);
+    final battleStatsAsync = ref.watch(battleStatsProvider);
+    final battleStats = battleStatsAsync.value;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -52,6 +55,45 @@ class StatisticsPage extends ConsumerWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 16),
+            GridView.count(
+              shrinkWrap: true,
+              crossAxisCount: 4,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 1.4,
+              children: [
+                _StatTile(
+                  label: l10n.statsGamesPlayed,
+                  value: battleStats?.totalGames.toString() ?? '—',
+                ),
+                _StatTile(
+                  label: l10n.statsVictories,
+                  value: battleStats?.victories.toString() ?? '—',
+                ),
+                _StatTile(
+                  label: l10n.statsDefeats,
+                  value: battleStats?.defeats.toString() ?? '—',
+                ),
+                _StatTile(
+                  label: l10n.statsWinRate,
+                  value: battleStats == null
+                      ? '—'
+                      : '${(battleStats.winRate * 100).round()} %',
+                ),
+              ],
+            ),
+            if (battleStats != null && battleStats.totalGames > 0) ...[
+              const SizedBox(height: 8),
+              Text(
+                l10n.statsBattleRecord(
+                  battleStats.victories,
+                  battleStats.defeats,
+                  battleStats.draws,
+                ),
+                style: AppTextStyles.caption,
+              ),
+            ],
             const SizedBox(height: 28),
             summaryAsync.when(
               loading: () => const SizedBox.shrink(),
