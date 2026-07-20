@@ -2,7 +2,7 @@
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/utils/local_datasheet_images.dart';
+import '../../../core/utils/local_catalog_images.dart';
 import '../../../database/models/datasheet_details.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -36,7 +36,8 @@ class DatasheetDetailPanel extends StatelessWidget {
       );
     }
 
-    final imageFile = LocalDatasheetImages.find(sheet.id);
+    final imageFile = LocalCatalogImages.datasheet(sheet.id);
+    final factionIcon = LocalCatalogImages.faction(sheet.factionId);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(28),
@@ -57,7 +58,22 @@ class DatasheetDetailPanel extends StatelessWidget {
           ],
           Text(sheet.name, style: AppTextStyles.heading),
           const SizedBox(height: 6),
-          Text(sheet.factionName, style: AppTextStyles.caption),
+          Row(
+            children: [
+              if (factionIcon != null) ...[
+                ClipOval(
+                  child: Image.file(
+                    factionIcon,
+                    width: 20,
+                    height: 20,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+              Text(sheet.factionName, style: AppTextStyles.caption),
+            ],
+          ),
           const SizedBox(height: 20),
           _pointsBadge(l10n, sheet.points),
           const SizedBox(height: 28),

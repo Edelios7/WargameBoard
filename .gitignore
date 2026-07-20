@@ -52,3 +52,7 @@ local_assets/**/*.png
 local_assets/**/*.jpg
 local_assets/**/*.jpeg
 local_assets/**/*.webp
+
+# Dossier de compilation de données de jeu (stats, règles) - usage privé
+# uniquement, jamais commité (contenu dérivé de règles officielles GW)
+local_assets/wh40k_reference/
