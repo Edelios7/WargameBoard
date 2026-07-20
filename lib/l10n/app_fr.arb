@@ -106,6 +106,8 @@
     }
   },
   "armyBuilderOverLimit": "Limite de points dépassée",
+  "armyValidationEmptyArmy": "Armée vide — ajoute des unités",
+  "armyValidationNoDetachment": "Aucun détachement sélectionné",
 
   "collectionAddEntry": "Ajouter à la collection",
   "collectionExportCsv": "Copier en CSV",

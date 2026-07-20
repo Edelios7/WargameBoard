@@ -446,6 +446,18 @@ abstract class AppLocalizations {
   /// **'Limite de points dépassée'**
   String get armyBuilderOverLimit;
 
+  /// No description provided for @armyValidationEmptyArmy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Armée vide — ajoute des unités'**
+  String get armyValidationEmptyArmy;
+
+  /// No description provided for @armyValidationNoDetachment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun détachement sélectionné'**
+  String get armyValidationNoDetachment;
+
   /// No description provided for @collectionAddEntry.
   ///
   /// In fr, this message translates to:

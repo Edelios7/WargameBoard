@@ -200,6 +200,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get armyBuilderOverLimit => 'Limite de points dépassée';
 
   @override
+  String get armyValidationEmptyArmy => 'Armée vide — ajoute des unités';
+
+  @override
+  String get armyValidationNoDetachment => 'Aucun détachement sélectionné';
+
+  @override
   String get collectionAddEntry => 'Ajouter à la collection';
 
   @override

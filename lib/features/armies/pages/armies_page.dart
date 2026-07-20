@@ -8,8 +8,20 @@ import '../../../core/utils/army_list_formatter.dart';
 import '../../../database/models/army_details.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/army_provider.dart';
+import '../../../services/army_validation_service.dart';
 import '../widgets/add_unit_dialog.dart';
 import '../widgets/create_army_dialog.dart';
+
+String _warningLabel(AppLocalizations l10n, ArmyValidationIssue issue) {
+  switch (issue) {
+    case ArmyValidationIssue.emptyArmy:
+      return l10n.armyValidationEmptyArmy;
+    case ArmyValidationIssue.noDetachmentSelected:
+      return l10n.armyValidationNoDetachment;
+    case ArmyValidationIssue.overPointsLimit:
+      return l10n.armyBuilderOverLimit;
+  }
+}
 
 class ArmiesPage extends ConsumerWidget {
   const ArmiesPage({super.key});
@@ -341,6 +353,27 @@ class _ArmyDetail extends ConsumerWidget {
                 ),
               ],
             ],
+          ),
+          Builder(
+            builder: (context) {
+              final validation = ref.watch(armyValidationProvider(army));
+              if (validation == null || validation.warnings.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: validation.warnings
+                      .map((issue) => Text(
+                            _warningLabel(l10n, issue),
+                            style: AppTextStyles.caption
+                                .copyWith(color: AppColors.textSecondary),
+                          ))
+                      .toList(),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 24),
           FilledButton.icon(

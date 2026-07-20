@@ -198,6 +198,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get armyBuilderOverLimit => 'Points limit exceeded';
 
   @override
+  String get armyValidationEmptyArmy => 'Empty army — add some units';
+
+  @override
+  String get armyValidationNoDetachment => 'No detachment selected';
+
+  @override
   String get collectionAddEntry => 'Add to collection';
 
   @override

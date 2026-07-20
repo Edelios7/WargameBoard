@@ -2,7 +2,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../database/models/army_details.dart';
 import '../repositories/army_repository.dart';
+import '../services/army_validation_service.dart';
 import 'database_provider.dart';
+
+final armyValidationServiceProvider =
+    Provider<ArmyValidationService>((ref) => const ArmyValidationService());
+
+final armyValidationProvider =
+    Provider.family<ArmyValidationResult?, ArmyDetails?>((ref, army) {
+  if (army == null) return null;
+  return ref.watch(armyValidationServiceProvider).validate(army);
+});
 
 final armyRepositoryProvider = Provider<ArmyRepository>((ref) {
   final database = ref.watch(databaseProvider);
