@@ -122,13 +122,29 @@ class _CollectionTab extends ConsumerWidget {
               child: summaryAsync.when(
                 loading: () => const SizedBox.shrink(),
                 error: (_, __) => const SizedBox.shrink(),
-                data: (summary) => Text(
-                  l10n.collectionSummaryLine(
-                    summary.totalEntries,
-                    summary.totalModels,
-                    summary.totalPainted,
-                  ),
-                  style: AppTextStyles.caption,
+                data: (summary) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.collectionSummaryLine(
+                        summary.totalEntries,
+                        summary.totalModels,
+                        summary.totalPainted,
+                      ),
+                      style: AppTextStyles.caption,
+                    ),
+                    if (summary.totalValue > 0)
+                      Text(
+                        l10n.collectionTotalValue(
+                          ref.read(collectionServiceProvider).formatValue(
+                                summary.totalValue,
+                                Localizations.localeOf(context).languageCode,
+                              ),
+                        ),
+                        style: AppTextStyles.caption
+                            .copyWith(color: AppColors.primary),
+                      ),
+                  ],
                 ),
               ),
             ),

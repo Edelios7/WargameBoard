@@ -17,15 +17,21 @@ class CollectionRepository {
   Future<String> addEntry({
     required String datasheetId,
     required int quantity,
+    double? purchasePrice,
   }) {
     return database.collectionDao.addEntry(
       datasheetId: datasheetId,
       quantity: quantity,
+      purchasePrice: purchasePrice,
     );
   }
 
   Future<void> deleteEntry(String id) {
     return database.collectionDao.deleteEntry(id);
+  }
+
+  Future<void> setPurchasePrice(String id, double? purchasePrice) {
+    return database.collectionDao.setPurchasePrice(id, purchasePrice);
   }
 
   Future<void> updateCounts(

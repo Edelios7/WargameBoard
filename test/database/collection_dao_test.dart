@@ -73,4 +73,35 @@ void main() {
     expect(summary.totalModels, 4);
     expect(summary.totalPainted, 1);
   });
+
+  test('getSummary sums purchase prices, treating null as zero', () async {
+    final captain = await database.datasheetDao.search('Captain');
+    final guard = await database.datasheetDao.search('Sanguinary');
+
+    await database.collectionDao.addEntry(
+      datasheetId: captain.single.id,
+      quantity: 1,
+      purchasePrice: 45.5,
+    );
+    await database.collectionDao.addEntry(
+      datasheetId: guard.single.id,
+      quantity: 1,
+    );
+
+    final summary = await database.collectionDao.getSummary();
+    expect(summary.totalValue, 45.5);
+  });
+
+  test('setPurchasePrice updates the price on an existing entry', () async {
+    final captain = await database.datasheetDao.search('Captain');
+    final entryId = await database.collectionDao.addEntry(
+      datasheetId: captain.single.id,
+      quantity: 1,
+    );
+
+    await database.collectionDao.setPurchasePrice(entryId, 30.0);
+
+    final entries = await database.collectionDao.listEntries();
+    expect(entries.single.purchasePrice, 30.0);
+  });
 }

@@ -41,7 +41,8 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Death Company Marines'));
-    await tester.enterText(find.byType(TextField).last, '5');
+    // TextField 0 = recherche, 1 = quantité, 2 = prix (optionnel).
+    await tester.enterText(find.byType(TextField).at(1), '5');
     await tester.tap(find.text('Créer'));
     await tester.pumpAndSettle();
 

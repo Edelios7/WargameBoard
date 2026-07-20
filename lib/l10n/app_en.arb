@@ -124,12 +124,19 @@
   "collectionPrimed": "Primed",
   "collectionPainted": "Painted",
   "collectionQuantityDialogLabel": "Quantity",
+  "collectionPriceDialogLabel": "Price (optional)",
   "collectionSummaryLine": "{entries} units · {models} models · {painted} painted",
   "@collectionSummaryLine": {
     "placeholders": {
       "entries": { "type": "int" },
       "models": { "type": "int" },
       "painted": { "type": "int" }
+    }
+  },
+  "collectionTotalValue": "Value: {value}",
+  "@collectionTotalValue": {
+    "placeholders": {
+      "value": { "type": "String" }
     }
   },
 

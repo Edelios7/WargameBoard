@@ -236,8 +236,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get collectionQuantityDialogLabel => 'Quantity';
 
   @override
+  String get collectionPriceDialogLabel => 'Price (optional)';
+
+  @override
   String collectionSummaryLine(int entries, int models, int painted) {
     return '$entries units · $models models · $painted painted';
+  }
+
+  @override
+  String collectionTotalValue(String value) {
+    return 'Value: $value';
   }
 
   @override

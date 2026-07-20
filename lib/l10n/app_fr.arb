@@ -124,12 +124,19 @@
   "collectionPrimed": "Apprêtées",
   "collectionPainted": "Peintes",
   "collectionQuantityDialogLabel": "Quantité",
+  "collectionPriceDialogLabel": "Prix (optionnel)",
   "collectionSummaryLine": "{entries} unités · {models} figurines · {painted} peintes",
   "@collectionSummaryLine": {
     "placeholders": {
       "entries": { "type": "int" },
       "models": { "type": "int" },
       "painted": { "type": "int" }
+    }
+  },
+  "collectionTotalValue": "Valeur : {value}",
+  "@collectionTotalValue": {
+    "placeholders": {
+      "value": { "type": "String" }
     }
   },
 

@@ -518,11 +518,23 @@ abstract class AppLocalizations {
   /// **'Quantité'**
   String get collectionQuantityDialogLabel;
 
+  /// No description provided for @collectionPriceDialogLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix (optionnel)'**
+  String get collectionPriceDialogLabel;
+
   /// No description provided for @collectionSummaryLine.
   ///
   /// In fr, this message translates to:
   /// **'{entries} unités · {models} figurines · {painted} peintes'**
   String collectionSummaryLine(int entries, int models, int painted);
+
+  /// No description provided for @collectionTotalValue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valeur : {value}'**
+  String collectionTotalValue(String value);
 
   /// No description provided for @collectionTabOwned.
   ///

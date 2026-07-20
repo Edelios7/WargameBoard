@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../database/models/collection_item_details.dart';
 import '../repositories/collection_repository.dart';
+import '../services/collection_service.dart';
 import 'database_provider.dart';
 
 final collectionRepositoryProvider = Provider<CollectionRepository>((ref) {
@@ -9,6 +10,9 @@ final collectionRepositoryProvider = Provider<CollectionRepository>((ref) {
 
   return CollectionRepository(database);
 });
+
+final collectionServiceProvider =
+    Provider<CollectionService>((ref) => const CollectionService());
 
 final collectionEntriesProvider =
     FutureProvider<List<CollectionItemDetails>>((ref) {

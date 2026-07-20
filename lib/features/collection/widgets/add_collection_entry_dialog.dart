@@ -24,6 +24,7 @@ class _AddCollectionEntryDialogState
   bool _loading = false;
   SearchResult? _selected;
   final _quantityController = TextEditingController(text: '1');
+  final _priceController = TextEditingController();
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _AddCollectionEntryDialogState
   @override
   void dispose() {
     _quantityController.dispose();
+    _priceController.dispose();
     super.dispose();
   }
 
@@ -64,6 +66,9 @@ class _AddCollectionEntryDialogState
       await repository.addEntry(
         datasheetId: selected.id,
         quantity: quantity,
+        purchasePrice: double.tryParse(
+          _priceController.text.trim().replaceAll(',', '.'),
+        ),
       );
       ref.invalidate(collectionEntriesProvider);
       ref.invalidate(collectionSummaryProvider);
@@ -155,6 +160,27 @@ class _AddCollectionEntryDialogState
                       ),
                     ),
                   ),
+                  if (!widget.wishlist) ...[
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: _priceController,
+                        keyboardType:
+                            const TextInputType.numberWithOptions(decimal: true),
+                        style: AppTextStyles.body,
+                        decoration: InputDecoration(
+                          labelText: l10n.collectionPriceDialogLabel,
+                          labelStyle: AppTextStyles.caption,
+                          filled: true,
+                          fillColor: AppColors.background,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                   const SizedBox(width: 12),
                   FilledButton(
                     style:

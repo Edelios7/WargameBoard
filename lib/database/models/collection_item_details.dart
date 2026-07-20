@@ -7,6 +7,7 @@ class CollectionItemDetails {
   final int assembled;
   final int primed;
   final int painted;
+  final double? purchasePrice;
 
   const CollectionItemDetails({
     required this.id,
@@ -17,6 +18,7 @@ class CollectionItemDetails {
     required this.assembled,
     required this.primed,
     required this.painted,
+    this.purchasePrice,
   });
 }
 
@@ -24,11 +26,13 @@ class CollectionSummary {
   final int totalEntries;
   final int totalModels;
   final int totalPainted;
+  final double totalValue;
 
   const CollectionSummary({
     required this.totalEntries,
     required this.totalModels,
     required this.totalPainted,
+    this.totalValue = 0,
   });
 
   double get paintedRatio =>

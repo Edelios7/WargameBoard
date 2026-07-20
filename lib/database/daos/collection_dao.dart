@@ -27,6 +27,7 @@ class CollectionDao extends DatabaseAccessor<AppDatabase>
   Future<String> addEntry({
     required String datasheetId,
     required int quantity,
+    double? purchasePrice,
   }) async {
     final id = _uuid.v4();
     await into(ownedMiniatures).insert(
@@ -34,6 +35,9 @@ class CollectionDao extends DatabaseAccessor<AppDatabase>
         id: id,
         datasheetId: datasheetId,
         quantity: quantity,
+        purchasePrice: Value(purchasePrice),
+        purchaseDate:
+            purchasePrice == null ? const Value.absent() : Value(DateTime.now()),
       ),
     );
     return id;
@@ -95,22 +99,36 @@ class CollectionDao extends DatabaseAccessor<AppDatabase>
         assembled: entry.assembled,
         primed: entry.primed,
         painted: entry.painted,
+        purchasePrice: entry.purchasePrice,
       );
     }).toList();
+  }
+
+  Future<void> setPurchasePrice(String id, double? purchasePrice) {
+    return (update(ownedMiniatures)..where((t) => t.id.equals(id))).write(
+      OwnedMiniaturesCompanion(
+        purchasePrice: Value(purchasePrice),
+        purchaseDate:
+            purchasePrice == null ? const Value(null) : Value(DateTime.now()),
+      ),
+    );
   }
 
   Future<CollectionSummary> getSummary() async {
     final entries = await listEntries();
     var totalModels = 0;
     var totalPainted = 0;
+    var totalValue = 0.0;
     for (final entry in entries) {
       totalModels += entry.quantity;
       totalPainted += entry.painted;
+      totalValue += entry.purchasePrice ?? 0;
     }
     return CollectionSummary(
       totalEntries: entries.length,
       totalModels: totalModels,
       totalPainted: totalPainted,
+      totalValue: totalValue,
     );
   }
 
