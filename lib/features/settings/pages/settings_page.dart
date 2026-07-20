@@ -6,9 +6,21 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/locale_provider.dart';
+import '../../../providers/shared_preferences_provider.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
+
+  void _setLocale(WidgetRef ref, Locale? locale) {
+    ref.read(localeOverrideProvider.notifier).state = locale;
+
+    final prefs = ref.read(sharedPreferencesProvider);
+    if (locale == null) {
+      prefs.remove(localePreferenceKey);
+    } else {
+      prefs.setString(localePreferenceKey, locale.languageCode);
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -35,23 +47,17 @@ class SettingsPage extends ConsumerWidget {
                     _LanguageOption(
                       label: l10n.settingsLanguageSystem,
                       selected: localeOverride == null,
-                      onTap: () => ref
-                          .read(localeOverrideProvider.notifier)
-                          .state = null,
+                      onTap: () => _setLocale(ref, null),
                     ),
                     _LanguageOption(
                       label: l10n.settingsLanguageFrench,
                       selected: localeOverride == const Locale('fr'),
-                      onTap: () => ref
-                          .read(localeOverrideProvider.notifier)
-                          .state = const Locale('fr'),
+                      onTap: () => _setLocale(ref, const Locale('fr')),
                     ),
                     _LanguageOption(
                       label: l10n.settingsLanguageEnglish,
                       selected: localeOverride == const Locale('en'),
-                      onTap: () => ref
-                          .read(localeOverrideProvider.notifier)
-                          .state = const Locale('en'),
+                      onTap: () => _setLocale(ref, const Locale('en')),
                     ),
                   ],
                 ),
