@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 
 import '../app_database.dart';
 import '../models/collection_item_details.dart';
+import '../tables/army_units_table.dart';
 import '../tables/datasheets_table.dart';
 import '../tables/factions_table.dart';
 import '../tables/owned_miniatures_table.dart';
@@ -16,6 +17,7 @@ part 'collection_dao.g.dart';
     Datasheets,
     Factions,
     WishlistItems,
+    ArmyUnits,
   ],
 )
 class CollectionDao extends DatabaseAccessor<AppDatabase>
@@ -48,8 +50,10 @@ class CollectionDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Met à jour les compteurs d'une entrée, bornés entre 0 et la quantité
-  /// possédée.
-  Future<void> updateCounts(
+  /// possédée. Retourne l'entrée avant/après, pour permettre au repository
+  /// de calculer les deltas assembled/painted (gains d'XP notamment) sans
+  /// requête supplémentaire.
+  Future<({OwnedMiniature before, OwnedMiniature after})> updateCounts(
     String id, {
     int? quantity,
     int? assembled,
@@ -73,6 +77,11 @@ class CollectionDao extends DatabaseAccessor<AppDatabase>
         updatedAt: Value(DateTime.now()),
       ),
     );
+
+    final updated =
+        await (select(ownedMiniatures)..where((t) => t.id.equals(id)))
+            .getSingle();
+    return (before: entry, after: updated);
   }
 
   Future<List<CollectionItemDetails>> listEntries() async {
@@ -100,8 +109,69 @@ class CollectionDao extends DatabaseAccessor<AppDatabase>
         primed: entry.primed,
         painted: entry.painted,
         purchasePrice: entry.purchasePrice,
+        purchaseDate: entry.purchaseDate,
+        createdAt: entry.createdAt,
       );
     }).toList();
+  }
+
+  /// Dernières entrées ajoutées à la collection, du plus récent au plus
+  /// ancien.
+  Future<List<CollectionItemDetails>> listRecentlyAdded({
+    int limit = 5,
+  }) async {
+    final entries = await listEntries();
+    final sorted = [...entries]
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return sorted.take(limit).toList();
+  }
+
+  /// Achats récents (entrées avec un prix renseigné), du plus récent au
+  /// plus ancien.
+  Future<List<CollectionItemDetails>> listRecentPurchases({
+    int limit = 5,
+  }) async {
+    final entries = await listEntries();
+    final withPrice = entries.where((e) => e.purchaseDate != null).toList()
+      ..sort((a, b) => b.purchaseDate!.compareTo(a.purchaseDate!));
+    return withPrice.take(limit).toList();
+  }
+
+  /// Compare la quantité possédée par datasheet au total requis à travers
+  /// toutes les armées, pour repérer les manques ("il vous manque N X").
+  Future<List<CollectionGap>> getCollectionGaps({int limit = 5}) async {
+    final owned = <String, int>{};
+    for (final entry in await listEntries()) {
+      owned[entry.datasheetId] = (owned[entry.datasheetId] ?? 0) + entry.quantity;
+    }
+
+    final query = select(armyUnits).join([
+      innerJoin(datasheets, datasheets.id.equalsExp(armyUnits.datasheetId)),
+    ]);
+    final rows = await query.get();
+    final needed = <String, int>{};
+    final names = <String, String>{};
+    for (final row in rows) {
+      final unit = row.readTable(armyUnits);
+      final datasheet = row.readTable(datasheets);
+      needed[datasheet.id] = (needed[datasheet.id] ?? 0) + unit.modelCount;
+      names[datasheet.id] = datasheet.name;
+    }
+
+    final gaps = <CollectionGap>[];
+    for (final entry in needed.entries) {
+      final ownedCount = owned[entry.key] ?? 0;
+      if (entry.value > ownedCount) {
+        gaps.add(CollectionGap(
+          datasheetId: entry.key,
+          datasheetName: names[entry.key]!,
+          owned: ownedCount,
+          neededAcrossArmies: entry.value,
+        ));
+      }
+    }
+    gaps.sort((a, b) => b.missing.compareTo(a.missing));
+    return gaps.take(limit).toList();
   }
 
   Future<void> setPurchasePrice(String id, double? purchasePrice) {

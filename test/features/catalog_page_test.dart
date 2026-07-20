@@ -2,16 +2,21 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wargameboard/database/app_database.dart';
 import 'package:wargameboard/features/catalog/pages/catalog_page.dart';
 import 'package:wargameboard/l10n/app_localizations.dart';
 import 'package:wargameboard/providers/database_provider.dart';
+import 'package:wargameboard/providers/shared_preferences_provider.dart';
 
 void main() {
   late AppDatabase database;
+  late SharedPreferences prefs;
 
-  setUp(() {
+  setUp(() async {
     database = AppDatabase.forTesting(NativeDatabase.memory());
+    SharedPreferences.setMockInitialValues({});
+    prefs = await SharedPreferences.getInstance();
   });
 
   tearDown(() async {
@@ -22,7 +27,10 @@ void main() {
       (tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [databaseProvider.overrideWithValue(database)],
+        overrides: [
+          databaseProvider.overrideWithValue(database),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+        ],
         child: MaterialApp(
           locale: const Locale('fr'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,

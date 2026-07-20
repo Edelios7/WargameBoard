@@ -15432,6 +15432,29 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _opponentFactionIdMeta = const VerificationMeta(
+    'opponentFactionId',
+  );
+  @override
+  late final GeneratedColumn<String> opponentFactionId =
+      GeneratedColumn<String>(
+        'opponent_faction_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _locationMeta = const VerificationMeta(
+    'location',
+  );
+  @override
+  late final GeneratedColumn<String> location = GeneratedColumn<String>(
+    'location',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _missionNameMeta = const VerificationMeta(
     'missionName',
   );
@@ -15452,6 +15475,16 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
         type: DriftSqlType.string,
         requiredDuringInsert: false,
       ).withConverter<BattleResult?>($BattlesTable.$converterresultn);
+  @override
+  late final GeneratedColumnWithTypeConverter<BattleType, String> type =
+      GeneratedColumn<String>(
+        'type',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: Constant(BattleType.matched.name),
+      ).withConverter<BattleType>($BattlesTable.$convertertype);
   static const VerificationMeta _myScoreMeta = const VerificationMeta(
     'myScore',
   );
@@ -15512,8 +15545,11 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
     id,
     armyId,
     opponentName,
+    opponentFactionId,
+    location,
     missionName,
     result,
+    type,
     myScore,
     opponentScore,
     notes,
@@ -15550,6 +15586,21 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
           data['opponent_name']!,
           _opponentNameMeta,
         ),
+      );
+    }
+    if (data.containsKey('opponent_faction_id')) {
+      context.handle(
+        _opponentFactionIdMeta,
+        opponentFactionId.isAcceptableOrUnknown(
+          data['opponent_faction_id']!,
+          _opponentFactionIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('location')) {
+      context.handle(
+        _locationMeta,
+        location.isAcceptableOrUnknown(data['location']!, _locationMeta),
       );
     }
     if (data.containsKey('mission_name')) {
@@ -15615,6 +15666,14 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
         DriftSqlType.string,
         data['${effectivePrefix}opponent_name'],
       ),
+      opponentFactionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}opponent_faction_id'],
+      ),
+      location: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}location'],
+      ),
       missionName: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}mission_name'],
@@ -15624,6 +15683,12 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
           DriftSqlType.string,
           data['${effectivePrefix}result'],
         ),
+      ),
+      type: $BattlesTable.$convertertype.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}type'],
+        )!,
       ),
       myScore: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
@@ -15657,14 +15722,19 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
       const EnumNameConverter<BattleResult>(BattleResult.values);
   static JsonTypeConverter2<BattleResult?, String?, String?> $converterresultn =
       JsonTypeConverter2.asNullable($converterresult);
+  static JsonTypeConverter2<BattleType, String, String> $convertertype =
+      const EnumNameConverter<BattleType>(BattleType.values);
 }
 
 class Battle extends DataClass implements Insertable<Battle> {
   final String id;
   final String? armyId;
   final String? opponentName;
+  final String? opponentFactionId;
+  final String? location;
   final String? missionName;
   final BattleResult? result;
+  final BattleType type;
   final int? myScore;
   final int? opponentScore;
   final String? notes;
@@ -15674,8 +15744,11 @@ class Battle extends DataClass implements Insertable<Battle> {
     required this.id,
     this.armyId,
     this.opponentName,
+    this.opponentFactionId,
+    this.location,
     this.missionName,
     this.result,
+    required this.type,
     this.myScore,
     this.opponentScore,
     this.notes,
@@ -15692,6 +15765,12 @@ class Battle extends DataClass implements Insertable<Battle> {
     if (!nullToAbsent || opponentName != null) {
       map['opponent_name'] = Variable<String>(opponentName);
     }
+    if (!nullToAbsent || opponentFactionId != null) {
+      map['opponent_faction_id'] = Variable<String>(opponentFactionId);
+    }
+    if (!nullToAbsent || location != null) {
+      map['location'] = Variable<String>(location);
+    }
     if (!nullToAbsent || missionName != null) {
       map['mission_name'] = Variable<String>(missionName);
     }
@@ -15699,6 +15778,9 @@ class Battle extends DataClass implements Insertable<Battle> {
       map['result'] = Variable<String>(
         $BattlesTable.$converterresultn.toSql(result),
       );
+    }
+    {
+      map['type'] = Variable<String>($BattlesTable.$convertertype.toSql(type));
     }
     if (!nullToAbsent || myScore != null) {
       map['my_score'] = Variable<int>(myScore);
@@ -15723,12 +15805,19 @@ class Battle extends DataClass implements Insertable<Battle> {
       opponentName: opponentName == null && nullToAbsent
           ? const Value.absent()
           : Value(opponentName),
+      opponentFactionId: opponentFactionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(opponentFactionId),
+      location: location == null && nullToAbsent
+          ? const Value.absent()
+          : Value(location),
       missionName: missionName == null && nullToAbsent
           ? const Value.absent()
           : Value(missionName),
       result: result == null && nullToAbsent
           ? const Value.absent()
           : Value(result),
+      type: Value(type),
       myScore: myScore == null && nullToAbsent
           ? const Value.absent()
           : Value(myScore),
@@ -15752,9 +15841,16 @@ class Battle extends DataClass implements Insertable<Battle> {
       id: serializer.fromJson<String>(json['id']),
       armyId: serializer.fromJson<String?>(json['armyId']),
       opponentName: serializer.fromJson<String?>(json['opponentName']),
+      opponentFactionId: serializer.fromJson<String?>(
+        json['opponentFactionId'],
+      ),
+      location: serializer.fromJson<String?>(json['location']),
       missionName: serializer.fromJson<String?>(json['missionName']),
       result: $BattlesTable.$converterresultn.fromJson(
         serializer.fromJson<String?>(json['result']),
+      ),
+      type: $BattlesTable.$convertertype.fromJson(
+        serializer.fromJson<String>(json['type']),
       ),
       myScore: serializer.fromJson<int?>(json['myScore']),
       opponentScore: serializer.fromJson<int?>(json['opponentScore']),
@@ -15770,9 +15866,14 @@ class Battle extends DataClass implements Insertable<Battle> {
       'id': serializer.toJson<String>(id),
       'armyId': serializer.toJson<String?>(armyId),
       'opponentName': serializer.toJson<String?>(opponentName),
+      'opponentFactionId': serializer.toJson<String?>(opponentFactionId),
+      'location': serializer.toJson<String?>(location),
       'missionName': serializer.toJson<String?>(missionName),
       'result': serializer.toJson<String?>(
         $BattlesTable.$converterresultn.toJson(result),
+      ),
+      'type': serializer.toJson<String>(
+        $BattlesTable.$convertertype.toJson(type),
       ),
       'myScore': serializer.toJson<int?>(myScore),
       'opponentScore': serializer.toJson<int?>(opponentScore),
@@ -15786,8 +15887,11 @@ class Battle extends DataClass implements Insertable<Battle> {
     String? id,
     Value<String?> armyId = const Value.absent(),
     Value<String?> opponentName = const Value.absent(),
+    Value<String?> opponentFactionId = const Value.absent(),
+    Value<String?> location = const Value.absent(),
     Value<String?> missionName = const Value.absent(),
     Value<BattleResult?> result = const Value.absent(),
+    BattleType? type,
     Value<int?> myScore = const Value.absent(),
     Value<int?> opponentScore = const Value.absent(),
     Value<String?> notes = const Value.absent(),
@@ -15797,8 +15901,13 @@ class Battle extends DataClass implements Insertable<Battle> {
     id: id ?? this.id,
     armyId: armyId.present ? armyId.value : this.armyId,
     opponentName: opponentName.present ? opponentName.value : this.opponentName,
+    opponentFactionId: opponentFactionId.present
+        ? opponentFactionId.value
+        : this.opponentFactionId,
+    location: location.present ? location.value : this.location,
     missionName: missionName.present ? missionName.value : this.missionName,
     result: result.present ? result.value : this.result,
+    type: type ?? this.type,
     myScore: myScore.present ? myScore.value : this.myScore,
     opponentScore: opponentScore.present
         ? opponentScore.value
@@ -15814,10 +15923,15 @@ class Battle extends DataClass implements Insertable<Battle> {
       opponentName: data.opponentName.present
           ? data.opponentName.value
           : this.opponentName,
+      opponentFactionId: data.opponentFactionId.present
+          ? data.opponentFactionId.value
+          : this.opponentFactionId,
+      location: data.location.present ? data.location.value : this.location,
       missionName: data.missionName.present
           ? data.missionName.value
           : this.missionName,
       result: data.result.present ? data.result.value : this.result,
+      type: data.type.present ? data.type.value : this.type,
       myScore: data.myScore.present ? data.myScore.value : this.myScore,
       opponentScore: data.opponentScore.present
           ? data.opponentScore.value
@@ -15834,8 +15948,11 @@ class Battle extends DataClass implements Insertable<Battle> {
           ..write('id: $id, ')
           ..write('armyId: $armyId, ')
           ..write('opponentName: $opponentName, ')
+          ..write('opponentFactionId: $opponentFactionId, ')
+          ..write('location: $location, ')
           ..write('missionName: $missionName, ')
           ..write('result: $result, ')
+          ..write('type: $type, ')
           ..write('myScore: $myScore, ')
           ..write('opponentScore: $opponentScore, ')
           ..write('notes: $notes, ')
@@ -15850,8 +15967,11 @@ class Battle extends DataClass implements Insertable<Battle> {
     id,
     armyId,
     opponentName,
+    opponentFactionId,
+    location,
     missionName,
     result,
+    type,
     myScore,
     opponentScore,
     notes,
@@ -15865,8 +15985,11 @@ class Battle extends DataClass implements Insertable<Battle> {
           other.id == this.id &&
           other.armyId == this.armyId &&
           other.opponentName == this.opponentName &&
+          other.opponentFactionId == this.opponentFactionId &&
+          other.location == this.location &&
           other.missionName == this.missionName &&
           other.result == this.result &&
+          other.type == this.type &&
           other.myScore == this.myScore &&
           other.opponentScore == this.opponentScore &&
           other.notes == this.notes &&
@@ -15878,8 +16001,11 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
   final Value<String> id;
   final Value<String?> armyId;
   final Value<String?> opponentName;
+  final Value<String?> opponentFactionId;
+  final Value<String?> location;
   final Value<String?> missionName;
   final Value<BattleResult?> result;
+  final Value<BattleType> type;
   final Value<int?> myScore;
   final Value<int?> opponentScore;
   final Value<String?> notes;
@@ -15890,8 +16016,11 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     this.id = const Value.absent(),
     this.armyId = const Value.absent(),
     this.opponentName = const Value.absent(),
+    this.opponentFactionId = const Value.absent(),
+    this.location = const Value.absent(),
     this.missionName = const Value.absent(),
     this.result = const Value.absent(),
+    this.type = const Value.absent(),
     this.myScore = const Value.absent(),
     this.opponentScore = const Value.absent(),
     this.notes = const Value.absent(),
@@ -15903,8 +16032,11 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     required String id,
     this.armyId = const Value.absent(),
     this.opponentName = const Value.absent(),
+    this.opponentFactionId = const Value.absent(),
+    this.location = const Value.absent(),
     this.missionName = const Value.absent(),
     this.result = const Value.absent(),
+    this.type = const Value.absent(),
     this.myScore = const Value.absent(),
     this.opponentScore = const Value.absent(),
     this.notes = const Value.absent(),
@@ -15916,8 +16048,11 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     Expression<String>? id,
     Expression<String>? armyId,
     Expression<String>? opponentName,
+    Expression<String>? opponentFactionId,
+    Expression<String>? location,
     Expression<String>? missionName,
     Expression<String>? result,
+    Expression<String>? type,
     Expression<int>? myScore,
     Expression<int>? opponentScore,
     Expression<String>? notes,
@@ -15929,8 +16064,11 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
       if (id != null) 'id': id,
       if (armyId != null) 'army_id': armyId,
       if (opponentName != null) 'opponent_name': opponentName,
+      if (opponentFactionId != null) 'opponent_faction_id': opponentFactionId,
+      if (location != null) 'location': location,
       if (missionName != null) 'mission_name': missionName,
       if (result != null) 'result': result,
+      if (type != null) 'type': type,
       if (myScore != null) 'my_score': myScore,
       if (opponentScore != null) 'opponent_score': opponentScore,
       if (notes != null) 'notes': notes,
@@ -15944,8 +16082,11 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     Value<String>? id,
     Value<String?>? armyId,
     Value<String?>? opponentName,
+    Value<String?>? opponentFactionId,
+    Value<String?>? location,
     Value<String?>? missionName,
     Value<BattleResult?>? result,
+    Value<BattleType>? type,
     Value<int?>? myScore,
     Value<int?>? opponentScore,
     Value<String?>? notes,
@@ -15957,8 +16098,11 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
       id: id ?? this.id,
       armyId: armyId ?? this.armyId,
       opponentName: opponentName ?? this.opponentName,
+      opponentFactionId: opponentFactionId ?? this.opponentFactionId,
+      location: location ?? this.location,
       missionName: missionName ?? this.missionName,
       result: result ?? this.result,
+      type: type ?? this.type,
       myScore: myScore ?? this.myScore,
       opponentScore: opponentScore ?? this.opponentScore,
       notes: notes ?? this.notes,
@@ -15980,12 +16124,23 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     if (opponentName.present) {
       map['opponent_name'] = Variable<String>(opponentName.value);
     }
+    if (opponentFactionId.present) {
+      map['opponent_faction_id'] = Variable<String>(opponentFactionId.value);
+    }
+    if (location.present) {
+      map['location'] = Variable<String>(location.value);
+    }
     if (missionName.present) {
       map['mission_name'] = Variable<String>(missionName.value);
     }
     if (result.present) {
       map['result'] = Variable<String>(
         $BattlesTable.$converterresultn.toSql(result.value),
+      );
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(
+        $BattlesTable.$convertertype.toSql(type.value),
       );
     }
     if (myScore.present) {
@@ -16015,13 +16170,841 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
           ..write('id: $id, ')
           ..write('armyId: $armyId, ')
           ..write('opponentName: $opponentName, ')
+          ..write('opponentFactionId: $opponentFactionId, ')
+          ..write('location: $location, ')
           ..write('missionName: $missionName, ')
           ..write('result: $result, ')
+          ..write('type: $type, ')
           ..write('myScore: $myScore, ')
           ..write('opponentScore: $opponentScore, ')
           ..write('notes: $notes, ')
           ..write('playedAt: $playedAt, ')
           ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ProjectsTable extends Projects with TableInfo<$ProjectsTable, Project> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ProjectsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _doneMeta = const VerificationMeta('done');
+  @override
+  late final GeneratedColumn<bool> done = GeneratedColumn<bool>(
+    'done',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("done" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _progressPercentMeta = const VerificationMeta(
+    'progressPercent',
+  );
+  @override
+  late final GeneratedColumn<int> progressPercent = GeneratedColumn<int>(
+    'progress_percent',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _displayOrderMeta = const VerificationMeta(
+    'displayOrder',
+  );
+  @override
+  late final GeneratedColumn<int> displayOrder = GeneratedColumn<int>(
+    'display_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    title,
+    done,
+    progressPercent,
+    displayOrder,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'projects';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Project> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('done')) {
+      context.handle(
+        _doneMeta,
+        done.isAcceptableOrUnknown(data['done']!, _doneMeta),
+      );
+    }
+    if (data.containsKey('progress_percent')) {
+      context.handle(
+        _progressPercentMeta,
+        progressPercent.isAcceptableOrUnknown(
+          data['progress_percent']!,
+          _progressPercentMeta,
+        ),
+      );
+    }
+    if (data.containsKey('display_order')) {
+      context.handle(
+        _displayOrderMeta,
+        displayOrder.isAcceptableOrUnknown(
+          data['display_order']!,
+          _displayOrderMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Project map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Project(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      done: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}done'],
+      )!,
+      progressPercent: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}progress_percent'],
+      ),
+      displayOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}display_order'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ProjectsTable createAlias(String alias) {
+    return $ProjectsTable(attachedDatabase, alias);
+  }
+}
+
+class Project extends DataClass implements Insertable<Project> {
+  final String id;
+  final String title;
+  final bool done;
+  final int? progressPercent;
+  final int displayOrder;
+  final DateTime createdAt;
+  const Project({
+    required this.id,
+    required this.title,
+    required this.done,
+    this.progressPercent,
+    required this.displayOrder,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['title'] = Variable<String>(title);
+    map['done'] = Variable<bool>(done);
+    if (!nullToAbsent || progressPercent != null) {
+      map['progress_percent'] = Variable<int>(progressPercent);
+    }
+    map['display_order'] = Variable<int>(displayOrder);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  ProjectsCompanion toCompanion(bool nullToAbsent) {
+    return ProjectsCompanion(
+      id: Value(id),
+      title: Value(title),
+      done: Value(done),
+      progressPercent: progressPercent == null && nullToAbsent
+          ? const Value.absent()
+          : Value(progressPercent),
+      displayOrder: Value(displayOrder),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory Project.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Project(
+      id: serializer.fromJson<String>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      done: serializer.fromJson<bool>(json['done']),
+      progressPercent: serializer.fromJson<int?>(json['progressPercent']),
+      displayOrder: serializer.fromJson<int>(json['displayOrder']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'title': serializer.toJson<String>(title),
+      'done': serializer.toJson<bool>(done),
+      'progressPercent': serializer.toJson<int?>(progressPercent),
+      'displayOrder': serializer.toJson<int>(displayOrder),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  Project copyWith({
+    String? id,
+    String? title,
+    bool? done,
+    Value<int?> progressPercent = const Value.absent(),
+    int? displayOrder,
+    DateTime? createdAt,
+  }) => Project(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    done: done ?? this.done,
+    progressPercent: progressPercent.present
+        ? progressPercent.value
+        : this.progressPercent,
+    displayOrder: displayOrder ?? this.displayOrder,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  Project copyWithCompanion(ProjectsCompanion data) {
+    return Project(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      done: data.done.present ? data.done.value : this.done,
+      progressPercent: data.progressPercent.present
+          ? data.progressPercent.value
+          : this.progressPercent,
+      displayOrder: data.displayOrder.present
+          ? data.displayOrder.value
+          : this.displayOrder,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Project(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('done: $done, ')
+          ..write('progressPercent: $progressPercent, ')
+          ..write('displayOrder: $displayOrder, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, title, done, progressPercent, displayOrder, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Project &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.done == this.done &&
+          other.progressPercent == this.progressPercent &&
+          other.displayOrder == this.displayOrder &&
+          other.createdAt == this.createdAt);
+}
+
+class ProjectsCompanion extends UpdateCompanion<Project> {
+  final Value<String> id;
+  final Value<String> title;
+  final Value<bool> done;
+  final Value<int?> progressPercent;
+  final Value<int> displayOrder;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const ProjectsCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.done = const Value.absent(),
+    this.progressPercent = const Value.absent(),
+    this.displayOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ProjectsCompanion.insert({
+    required String id,
+    required String title,
+    this.done = const Value.absent(),
+    this.progressPercent = const Value.absent(),
+    this.displayOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       title = Value(title);
+  static Insertable<Project> custom({
+    Expression<String>? id,
+    Expression<String>? title,
+    Expression<bool>? done,
+    Expression<int>? progressPercent,
+    Expression<int>? displayOrder,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (done != null) 'done': done,
+      if (progressPercent != null) 'progress_percent': progressPercent,
+      if (displayOrder != null) 'display_order': displayOrder,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ProjectsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? title,
+    Value<bool>? done,
+    Value<int?>? progressPercent,
+    Value<int>? displayOrder,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return ProjectsCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      done: done ?? this.done,
+      progressPercent: progressPercent ?? this.progressPercent,
+      displayOrder: displayOrder ?? this.displayOrder,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (done.present) {
+      map['done'] = Variable<bool>(done.value);
+    }
+    if (progressPercent.present) {
+      map['progress_percent'] = Variable<int>(progressPercent.value);
+    }
+    if (displayOrder.present) {
+      map['display_order'] = Variable<int>(displayOrder.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProjectsCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('done: $done, ')
+          ..write('progressPercent: $progressPercent, ')
+          ..write('displayOrder: $displayOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $XpCategoryTotalsTable extends XpCategoryTotals
+    with TableInfo<$XpCategoryTotalsTable, XpCategoryTotal> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $XpCategoryTotalsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _xpMeta = const VerificationMeta('xp');
+  @override
+  late final GeneratedColumn<int> xp = GeneratedColumn<int>(
+    'xp',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [category, xp];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'xp_category_totals';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<XpCategoryTotal> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryMeta);
+    }
+    if (data.containsKey('xp')) {
+      context.handle(_xpMeta, xp.isAcceptableOrUnknown(data['xp']!, _xpMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {category};
+  @override
+  XpCategoryTotal map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return XpCategoryTotal(
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
+      xp: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}xp'],
+      )!,
+    );
+  }
+
+  @override
+  $XpCategoryTotalsTable createAlias(String alias) {
+    return $XpCategoryTotalsTable(attachedDatabase, alias);
+  }
+}
+
+class XpCategoryTotal extends DataClass implements Insertable<XpCategoryTotal> {
+  final String category;
+  final int xp;
+  const XpCategoryTotal({required this.category, required this.xp});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['category'] = Variable<String>(category);
+    map['xp'] = Variable<int>(xp);
+    return map;
+  }
+
+  XpCategoryTotalsCompanion toCompanion(bool nullToAbsent) {
+    return XpCategoryTotalsCompanion(category: Value(category), xp: Value(xp));
+  }
+
+  factory XpCategoryTotal.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return XpCategoryTotal(
+      category: serializer.fromJson<String>(json['category']),
+      xp: serializer.fromJson<int>(json['xp']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'category': serializer.toJson<String>(category),
+      'xp': serializer.toJson<int>(xp),
+    };
+  }
+
+  XpCategoryTotal copyWith({String? category, int? xp}) =>
+      XpCategoryTotal(category: category ?? this.category, xp: xp ?? this.xp);
+  XpCategoryTotal copyWithCompanion(XpCategoryTotalsCompanion data) {
+    return XpCategoryTotal(
+      category: data.category.present ? data.category.value : this.category,
+      xp: data.xp.present ? data.xp.value : this.xp,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('XpCategoryTotal(')
+          ..write('category: $category, ')
+          ..write('xp: $xp')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(category, xp);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is XpCategoryTotal &&
+          other.category == this.category &&
+          other.xp == this.xp);
+}
+
+class XpCategoryTotalsCompanion extends UpdateCompanion<XpCategoryTotal> {
+  final Value<String> category;
+  final Value<int> xp;
+  final Value<int> rowid;
+  const XpCategoryTotalsCompanion({
+    this.category = const Value.absent(),
+    this.xp = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  XpCategoryTotalsCompanion.insert({
+    required String category,
+    this.xp = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : category = Value(category);
+  static Insertable<XpCategoryTotal> custom({
+    Expression<String>? category,
+    Expression<int>? xp,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (category != null) 'category': category,
+      if (xp != null) 'xp': xp,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  XpCategoryTotalsCompanion copyWith({
+    Value<String>? category,
+    Value<int>? xp,
+    Value<int>? rowid,
+  }) {
+    return XpCategoryTotalsCompanion(
+      category: category ?? this.category,
+      xp: xp ?? this.xp,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (xp.present) {
+      map['xp'] = Variable<int>(xp.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('XpCategoryTotalsCompanion(')
+          ..write('category: $category, ')
+          ..write('xp: $xp, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $XpFactionTotalsTable extends XpFactionTotals
+    with TableInfo<$XpFactionTotalsTable, XpFactionTotal> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $XpFactionTotalsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _factionIdMeta = const VerificationMeta(
+    'factionId',
+  );
+  @override
+  late final GeneratedColumn<String> factionId = GeneratedColumn<String>(
+    'faction_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _xpMeta = const VerificationMeta('xp');
+  @override
+  late final GeneratedColumn<int> xp = GeneratedColumn<int>(
+    'xp',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [factionId, xp];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'xp_faction_totals';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<XpFactionTotal> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('faction_id')) {
+      context.handle(
+        _factionIdMeta,
+        factionId.isAcceptableOrUnknown(data['faction_id']!, _factionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_factionIdMeta);
+    }
+    if (data.containsKey('xp')) {
+      context.handle(_xpMeta, xp.isAcceptableOrUnknown(data['xp']!, _xpMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {factionId};
+  @override
+  XpFactionTotal map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return XpFactionTotal(
+      factionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}faction_id'],
+      )!,
+      xp: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}xp'],
+      )!,
+    );
+  }
+
+  @override
+  $XpFactionTotalsTable createAlias(String alias) {
+    return $XpFactionTotalsTable(attachedDatabase, alias);
+  }
+}
+
+class XpFactionTotal extends DataClass implements Insertable<XpFactionTotal> {
+  final String factionId;
+  final int xp;
+  const XpFactionTotal({required this.factionId, required this.xp});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['faction_id'] = Variable<String>(factionId);
+    map['xp'] = Variable<int>(xp);
+    return map;
+  }
+
+  XpFactionTotalsCompanion toCompanion(bool nullToAbsent) {
+    return XpFactionTotalsCompanion(factionId: Value(factionId), xp: Value(xp));
+  }
+
+  factory XpFactionTotal.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return XpFactionTotal(
+      factionId: serializer.fromJson<String>(json['factionId']),
+      xp: serializer.fromJson<int>(json['xp']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'factionId': serializer.toJson<String>(factionId),
+      'xp': serializer.toJson<int>(xp),
+    };
+  }
+
+  XpFactionTotal copyWith({String? factionId, int? xp}) =>
+      XpFactionTotal(factionId: factionId ?? this.factionId, xp: xp ?? this.xp);
+  XpFactionTotal copyWithCompanion(XpFactionTotalsCompanion data) {
+    return XpFactionTotal(
+      factionId: data.factionId.present ? data.factionId.value : this.factionId,
+      xp: data.xp.present ? data.xp.value : this.xp,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('XpFactionTotal(')
+          ..write('factionId: $factionId, ')
+          ..write('xp: $xp')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(factionId, xp);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is XpFactionTotal &&
+          other.factionId == this.factionId &&
+          other.xp == this.xp);
+}
+
+class XpFactionTotalsCompanion extends UpdateCompanion<XpFactionTotal> {
+  final Value<String> factionId;
+  final Value<int> xp;
+  final Value<int> rowid;
+  const XpFactionTotalsCompanion({
+    this.factionId = const Value.absent(),
+    this.xp = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  XpFactionTotalsCompanion.insert({
+    required String factionId,
+    this.xp = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : factionId = Value(factionId);
+  static Insertable<XpFactionTotal> custom({
+    Expression<String>? factionId,
+    Expression<int>? xp,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (factionId != null) 'faction_id': factionId,
+      if (xp != null) 'xp': xp,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  XpFactionTotalsCompanion copyWith({
+    Value<String>? factionId,
+    Value<int>? xp,
+    Value<int>? rowid,
+  }) {
+    return XpFactionTotalsCompanion(
+      factionId: factionId ?? this.factionId,
+      xp: xp ?? this.xp,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (factionId.present) {
+      map['faction_id'] = Variable<String>(factionId.value);
+    }
+    if (xp.present) {
+      map['xp'] = Variable<int>(xp.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('XpFactionTotalsCompanion(')
+          ..write('factionId: $factionId, ')
+          ..write('xp: $xp, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -16087,6 +17070,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $WishlistItemsTable wishlistItems = $WishlistItemsTable(this);
   late final $BattlesTable battles = $BattlesTable(this);
+  late final $ProjectsTable projects = $ProjectsTable(this);
+  late final $XpCategoryTotalsTable xpCategoryTotals = $XpCategoryTotalsTable(
+    this,
+  );
+  late final $XpFactionTotalsTable xpFactionTotals = $XpFactionTotalsTable(
+    this,
+  );
   late final GameSystemDao gameSystemDao = GameSystemDao(this as AppDatabase);
   late final FactionDao factionDao = FactionDao(this as AppDatabase);
   late final AbilityDao abilityDao = AbilityDao(this as AppDatabase);
@@ -16096,6 +17086,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final ArmyDao armyDao = ArmyDao(this as AppDatabase);
   late final CollectionDao collectionDao = CollectionDao(this as AppDatabase);
   late final BattleDao battleDao = BattleDao(this as AppDatabase);
+  late final ProjectDao projectDao = ProjectDao(this as AppDatabase);
+  late final XpDao xpDao = XpDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -16135,6 +17127,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     ownedMiniatures,
     wishlistItems,
     battles,
+    projects,
+    xpCategoryTotals,
+    xpFactionTotals,
   ];
 }
 
@@ -24221,8 +25216,11 @@ typedef $$BattlesTableCreateCompanionBuilder =
       required String id,
       Value<String?> armyId,
       Value<String?> opponentName,
+      Value<String?> opponentFactionId,
+      Value<String?> location,
       Value<String?> missionName,
       Value<BattleResult?> result,
+      Value<BattleType> type,
       Value<int?> myScore,
       Value<int?> opponentScore,
       Value<String?> notes,
@@ -24235,8 +25233,11 @@ typedef $$BattlesTableUpdateCompanionBuilder =
       Value<String> id,
       Value<String?> armyId,
       Value<String?> opponentName,
+      Value<String?> opponentFactionId,
+      Value<String?> location,
       Value<String?> missionName,
       Value<BattleResult?> result,
+      Value<BattleType> type,
       Value<int?> myScore,
       Value<int?> opponentScore,
       Value<String?> notes,
@@ -24269,6 +25270,16 @@ class $$BattlesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get opponentFactionId => $composableBuilder(
+    column: $table.opponentFactionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get location => $composableBuilder(
+    column: $table.location,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get missionName => $composableBuilder(
     column: $table.missionName,
     builder: (column) => ColumnFilters(column),
@@ -24279,6 +25290,12 @@ class $$BattlesTableFilterComposer
     column: $table.result,
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
+
+  ColumnWithTypeConverterFilters<BattleType, BattleType, String> get type =>
+      $composableBuilder(
+        column: $table.type,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
 
   ColumnFilters<int> get myScore => $composableBuilder(
     column: $table.myScore,
@@ -24330,6 +25347,16 @@ class $$BattlesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get opponentFactionId => $composableBuilder(
+    column: $table.opponentFactionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get location => $composableBuilder(
+    column: $table.location,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get missionName => $composableBuilder(
     column: $table.missionName,
     builder: (column) => ColumnOrderings(column),
@@ -24337,6 +25364,11 @@ class $$BattlesTableOrderingComposer
 
   ColumnOrderings<String> get result => $composableBuilder(
     column: $table.result,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -24386,6 +25418,14 @@ class $$BattlesTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get opponentFactionId => $composableBuilder(
+    column: $table.opponentFactionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get location =>
+      $composableBuilder(column: $table.location, builder: (column) => column);
+
   GeneratedColumn<String> get missionName => $composableBuilder(
     column: $table.missionName,
     builder: (column) => column,
@@ -24393,6 +25433,9 @@ class $$BattlesTableAnnotationComposer
 
   GeneratedColumnWithTypeConverter<BattleResult?, String> get result =>
       $composableBuilder(column: $table.result, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<BattleType, String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
 
   GeneratedColumn<int> get myScore =>
       $composableBuilder(column: $table.myScore, builder: (column) => column);
@@ -24443,8 +25486,11 @@ class $$BattlesTableTableManager
                 Value<String> id = const Value.absent(),
                 Value<String?> armyId = const Value.absent(),
                 Value<String?> opponentName = const Value.absent(),
+                Value<String?> opponentFactionId = const Value.absent(),
+                Value<String?> location = const Value.absent(),
                 Value<String?> missionName = const Value.absent(),
                 Value<BattleResult?> result = const Value.absent(),
+                Value<BattleType> type = const Value.absent(),
                 Value<int?> myScore = const Value.absent(),
                 Value<int?> opponentScore = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
@@ -24455,8 +25501,11 @@ class $$BattlesTableTableManager
                 id: id,
                 armyId: armyId,
                 opponentName: opponentName,
+                opponentFactionId: opponentFactionId,
+                location: location,
                 missionName: missionName,
                 result: result,
+                type: type,
                 myScore: myScore,
                 opponentScore: opponentScore,
                 notes: notes,
@@ -24469,8 +25518,11 @@ class $$BattlesTableTableManager
                 required String id,
                 Value<String?> armyId = const Value.absent(),
                 Value<String?> opponentName = const Value.absent(),
+                Value<String?> opponentFactionId = const Value.absent(),
+                Value<String?> location = const Value.absent(),
                 Value<String?> missionName = const Value.absent(),
                 Value<BattleResult?> result = const Value.absent(),
+                Value<BattleType> type = const Value.absent(),
                 Value<int?> myScore = const Value.absent(),
                 Value<int?> opponentScore = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
@@ -24481,8 +25533,11 @@ class $$BattlesTableTableManager
                 id: id,
                 armyId: armyId,
                 opponentName: opponentName,
+                opponentFactionId: opponentFactionId,
+                location: location,
                 missionName: missionName,
                 result: result,
+                type: type,
                 myScore: myScore,
                 opponentScore: opponentScore,
                 notes: notes,
@@ -24510,6 +25565,521 @@ typedef $$BattlesTableProcessedTableManager =
       $$BattlesTableUpdateCompanionBuilder,
       (Battle, BaseReferences<_$AppDatabase, $BattlesTable, Battle>),
       Battle,
+      PrefetchHooks Function()
+    >;
+typedef $$ProjectsTableCreateCompanionBuilder =
+    ProjectsCompanion Function({
+      required String id,
+      required String title,
+      Value<bool> done,
+      Value<int?> progressPercent,
+      Value<int> displayOrder,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+typedef $$ProjectsTableUpdateCompanionBuilder =
+    ProjectsCompanion Function({
+      Value<String> id,
+      Value<String> title,
+      Value<bool> done,
+      Value<int?> progressPercent,
+      Value<int> displayOrder,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$ProjectsTableFilterComposer
+    extends Composer<_$AppDatabase, $ProjectsTable> {
+  $$ProjectsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get done => $composableBuilder(
+    column: $table.done,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get progressPercent => $composableBuilder(
+    column: $table.progressPercent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get displayOrder => $composableBuilder(
+    column: $table.displayOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ProjectsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ProjectsTable> {
+  $$ProjectsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get done => $composableBuilder(
+    column: $table.done,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get progressPercent => $composableBuilder(
+    column: $table.progressPercent,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get displayOrder => $composableBuilder(
+    column: $table.displayOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ProjectsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ProjectsTable> {
+  $$ProjectsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<bool> get done =>
+      $composableBuilder(column: $table.done, builder: (column) => column);
+
+  GeneratedColumn<int> get progressPercent => $composableBuilder(
+    column: $table.progressPercent,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get displayOrder => $composableBuilder(
+    column: $table.displayOrder,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$ProjectsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ProjectsTable,
+          Project,
+          $$ProjectsTableFilterComposer,
+          $$ProjectsTableOrderingComposer,
+          $$ProjectsTableAnnotationComposer,
+          $$ProjectsTableCreateCompanionBuilder,
+          $$ProjectsTableUpdateCompanionBuilder,
+          (Project, BaseReferences<_$AppDatabase, $ProjectsTable, Project>),
+          Project,
+          PrefetchHooks Function()
+        > {
+  $$ProjectsTableTableManager(_$AppDatabase db, $ProjectsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ProjectsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ProjectsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ProjectsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<bool> done = const Value.absent(),
+                Value<int?> progressPercent = const Value.absent(),
+                Value<int> displayOrder = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ProjectsCompanion(
+                id: id,
+                title: title,
+                done: done,
+                progressPercent: progressPercent,
+                displayOrder: displayOrder,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String title,
+                Value<bool> done = const Value.absent(),
+                Value<int?> progressPercent = const Value.absent(),
+                Value<int> displayOrder = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ProjectsCompanion.insert(
+                id: id,
+                title: title,
+                done: done,
+                progressPercent: progressPercent,
+                displayOrder: displayOrder,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ProjectsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ProjectsTable,
+      Project,
+      $$ProjectsTableFilterComposer,
+      $$ProjectsTableOrderingComposer,
+      $$ProjectsTableAnnotationComposer,
+      $$ProjectsTableCreateCompanionBuilder,
+      $$ProjectsTableUpdateCompanionBuilder,
+      (Project, BaseReferences<_$AppDatabase, $ProjectsTable, Project>),
+      Project,
+      PrefetchHooks Function()
+    >;
+typedef $$XpCategoryTotalsTableCreateCompanionBuilder =
+    XpCategoryTotalsCompanion Function({
+      required String category,
+      Value<int> xp,
+      Value<int> rowid,
+    });
+typedef $$XpCategoryTotalsTableUpdateCompanionBuilder =
+    XpCategoryTotalsCompanion Function({
+      Value<String> category,
+      Value<int> xp,
+      Value<int> rowid,
+    });
+
+class $$XpCategoryTotalsTableFilterComposer
+    extends Composer<_$AppDatabase, $XpCategoryTotalsTable> {
+  $$XpCategoryTotalsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get xp => $composableBuilder(
+    column: $table.xp,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$XpCategoryTotalsTableOrderingComposer
+    extends Composer<_$AppDatabase, $XpCategoryTotalsTable> {
+  $$XpCategoryTotalsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get xp => $composableBuilder(
+    column: $table.xp,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$XpCategoryTotalsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $XpCategoryTotalsTable> {
+  $$XpCategoryTotalsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<int> get xp =>
+      $composableBuilder(column: $table.xp, builder: (column) => column);
+}
+
+class $$XpCategoryTotalsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $XpCategoryTotalsTable,
+          XpCategoryTotal,
+          $$XpCategoryTotalsTableFilterComposer,
+          $$XpCategoryTotalsTableOrderingComposer,
+          $$XpCategoryTotalsTableAnnotationComposer,
+          $$XpCategoryTotalsTableCreateCompanionBuilder,
+          $$XpCategoryTotalsTableUpdateCompanionBuilder,
+          (
+            XpCategoryTotal,
+            BaseReferences<
+              _$AppDatabase,
+              $XpCategoryTotalsTable,
+              XpCategoryTotal
+            >,
+          ),
+          XpCategoryTotal,
+          PrefetchHooks Function()
+        > {
+  $$XpCategoryTotalsTableTableManager(
+    _$AppDatabase db,
+    $XpCategoryTotalsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$XpCategoryTotalsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$XpCategoryTotalsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$XpCategoryTotalsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> category = const Value.absent(),
+                Value<int> xp = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => XpCategoryTotalsCompanion(
+                category: category,
+                xp: xp,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String category,
+                Value<int> xp = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => XpCategoryTotalsCompanion.insert(
+                category: category,
+                xp: xp,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$XpCategoryTotalsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $XpCategoryTotalsTable,
+      XpCategoryTotal,
+      $$XpCategoryTotalsTableFilterComposer,
+      $$XpCategoryTotalsTableOrderingComposer,
+      $$XpCategoryTotalsTableAnnotationComposer,
+      $$XpCategoryTotalsTableCreateCompanionBuilder,
+      $$XpCategoryTotalsTableUpdateCompanionBuilder,
+      (
+        XpCategoryTotal,
+        BaseReferences<_$AppDatabase, $XpCategoryTotalsTable, XpCategoryTotal>,
+      ),
+      XpCategoryTotal,
+      PrefetchHooks Function()
+    >;
+typedef $$XpFactionTotalsTableCreateCompanionBuilder =
+    XpFactionTotalsCompanion Function({
+      required String factionId,
+      Value<int> xp,
+      Value<int> rowid,
+    });
+typedef $$XpFactionTotalsTableUpdateCompanionBuilder =
+    XpFactionTotalsCompanion Function({
+      Value<String> factionId,
+      Value<int> xp,
+      Value<int> rowid,
+    });
+
+class $$XpFactionTotalsTableFilterComposer
+    extends Composer<_$AppDatabase, $XpFactionTotalsTable> {
+  $$XpFactionTotalsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get factionId => $composableBuilder(
+    column: $table.factionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get xp => $composableBuilder(
+    column: $table.xp,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$XpFactionTotalsTableOrderingComposer
+    extends Composer<_$AppDatabase, $XpFactionTotalsTable> {
+  $$XpFactionTotalsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get factionId => $composableBuilder(
+    column: $table.factionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get xp => $composableBuilder(
+    column: $table.xp,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$XpFactionTotalsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $XpFactionTotalsTable> {
+  $$XpFactionTotalsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get factionId =>
+      $composableBuilder(column: $table.factionId, builder: (column) => column);
+
+  GeneratedColumn<int> get xp =>
+      $composableBuilder(column: $table.xp, builder: (column) => column);
+}
+
+class $$XpFactionTotalsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $XpFactionTotalsTable,
+          XpFactionTotal,
+          $$XpFactionTotalsTableFilterComposer,
+          $$XpFactionTotalsTableOrderingComposer,
+          $$XpFactionTotalsTableAnnotationComposer,
+          $$XpFactionTotalsTableCreateCompanionBuilder,
+          $$XpFactionTotalsTableUpdateCompanionBuilder,
+          (
+            XpFactionTotal,
+            BaseReferences<
+              _$AppDatabase,
+              $XpFactionTotalsTable,
+              XpFactionTotal
+            >,
+          ),
+          XpFactionTotal,
+          PrefetchHooks Function()
+        > {
+  $$XpFactionTotalsTableTableManager(
+    _$AppDatabase db,
+    $XpFactionTotalsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$XpFactionTotalsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$XpFactionTotalsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$XpFactionTotalsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> factionId = const Value.absent(),
+                Value<int> xp = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => XpFactionTotalsCompanion(
+                factionId: factionId,
+                xp: xp,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String factionId,
+                Value<int> xp = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => XpFactionTotalsCompanion.insert(
+                factionId: factionId,
+                xp: xp,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$XpFactionTotalsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $XpFactionTotalsTable,
+      XpFactionTotal,
+      $$XpFactionTotalsTableFilterComposer,
+      $$XpFactionTotalsTableOrderingComposer,
+      $$XpFactionTotalsTableAnnotationComposer,
+      $$XpFactionTotalsTableCreateCompanionBuilder,
+      $$XpFactionTotalsTableUpdateCompanionBuilder,
+      (
+        XpFactionTotal,
+        BaseReferences<_$AppDatabase, $XpFactionTotalsTable, XpFactionTotal>,
+      ),
+      XpFactionTotal,
       PrefetchHooks Function()
     >;
 
@@ -24584,4 +26154,10 @@ class $AppDatabaseManager {
       $$WishlistItemsTableTableManager(_db, _db.wishlistItems);
   $$BattlesTableTableManager get battles =>
       $$BattlesTableTableManager(_db, _db.battles);
+  $$ProjectsTableTableManager get projects =>
+      $$ProjectsTableTableManager(_db, _db.projects);
+  $$XpCategoryTotalsTableTableManager get xpCategoryTotals =>
+      $$XpCategoryTotalsTableTableManager(_db, _db.xpCategoryTotals);
+  $$XpFactionTotalsTableTableManager get xpFactionTotals =>
+      $$XpFactionTotalsTableTableManager(_db, _db.xpFactionTotals);
 }

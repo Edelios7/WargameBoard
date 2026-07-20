@@ -13,6 +13,7 @@ enum AppTab {
   collection,
   statistics,
   settings,
+  profile,
 }
 
 final selectedTabProvider = StateProvider<AppTab>((ref) => AppTab.dashboard);

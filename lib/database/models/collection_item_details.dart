@@ -8,6 +8,8 @@ class CollectionItemDetails {
   final int primed;
   final int painted;
   final double? purchasePrice;
+  final DateTime? purchaseDate;
+  final DateTime createdAt;
 
   const CollectionItemDetails({
     required this.id,
@@ -19,6 +21,8 @@ class CollectionItemDetails {
     required this.primed,
     required this.painted,
     this.purchasePrice,
+    this.purchaseDate,
+    required this.createdAt,
   });
 }
 
@@ -55,4 +59,20 @@ class WishlistItemDetails {
     required this.quantity,
     this.notes,
   });
+}
+
+class CollectionGap {
+  final String datasheetId;
+  final String datasheetName;
+  final int owned;
+  final int neededAcrossArmies;
+
+  const CollectionGap({
+    required this.datasheetId,
+    required this.datasheetName,
+    required this.owned,
+    required this.neededAcrossArmies,
+  });
+
+  int get missing => neededAcrossArmies - owned;
 }

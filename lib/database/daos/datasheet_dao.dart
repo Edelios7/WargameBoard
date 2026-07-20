@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart';
 
+import '../../domain/xp/xp_awards.dart';
 import '../app_database.dart';
+import '../models/catalog_sort.dart';
 import '../models/datasheet_details.dart';
 import '../models/equipment_details.dart';
 import '../models/model_details.dart';
@@ -8,6 +10,7 @@ import '../models/search_result.dart';
 import '../models/unit_details.dart';
 import '../models/weapon_details.dart';
 import '../tables/abilities_table.dart';
+import '../tables/army_units_table.dart';
 import '../tables/datasheet_ability_links_table.dart';
 import '../tables/datasheet_costs_table.dart';
 import '../tables/datasheet_keyword_links_table.dart';
@@ -48,20 +51,112 @@ part 'datasheet_dao.g.dart';
     EquipmentGroups,
     EquipmentOptions,
     UnitSizes,
+    ArmyUnits,
   ],
 )
 class DatasheetDao extends DatabaseAccessor<AppDatabase>
     with _$DatasheetDaoMixin {
   DatasheetDao(AppDatabase db) : super(db);
 
+  Future<int> countDatasheets() async {
+    return (await select(datasheets).get()).length;
+  }
+
+  /// Classification légère d'une datasheet pour le barème d'XP peinture/
+  /// montage (voir lib/domain/xp/xp_awards.dart) : faction + gabarit
+  /// (personnage / véhicule / standard), déduits des colonnes existantes
+  /// (`isNamedCharacter`/`isEpicHero`, `unitType`, `battlefieldRole`) sans
+  /// dépendre d'un enum de rôle strict, la donnée source (import PDF) étant
+  /// encore en texte libre.
+  Future<DatasheetXpClass?> getXpClassification(String datasheetId) async {
+    final row = await (select(datasheets)
+          ..where((t) => t.id.equals(datasheetId)))
+        .getSingleOrNull();
+    if (row == null) return null;
+
+    final typeAndRole =
+        '${row.unitType} ${row.battlefieldRole}'.toLowerCase();
+    const vehicleKeywords = [
+      'vehicle',
+      'véhicule',
+      'monster',
+      'monstre',
+      'aircraft',
+      'aéronef',
+      'fortification',
+    ];
+
+    return DatasheetXpClass(
+      factionId: row.factionId,
+      isCharacterTier: row.isNamedCharacter || row.isEpicHero,
+      isVehicleTier: vehicleKeywords.any(typeAndRole.contains),
+    );
+  }
+
+  Future<int> countModelProfiles() async {
+    return (await select(modelProfiles).get()).length;
+  }
+
+  /// Datasheets les plus utilisées à travers toutes les armées (favoris).
+  Future<List<SearchResult>> mostUsedDatasheets({int limit = 5}) async {
+    final query = select(armyUnits).join([
+      innerJoin(
+        datasheets,
+        datasheets.id.equalsExp(armyUnits.datasheetId),
+      ),
+      innerJoin(factions, factions.id.equalsExp(datasheets.factionId)),
+    ]);
+
+    final rows = await query.get();
+    final counts = <String, int>{};
+    final byId = <String, SearchResult>{};
+    for (final row in rows) {
+      final datasheet = row.readTable(datasheets);
+      final faction = row.readTable(factions);
+      counts[datasheet.id] = (counts[datasheet.id] ?? 0) + 1;
+      byId[datasheet.id] = SearchResult(
+        id: datasheet.id,
+        name: datasheet.name,
+        type: 'datasheet',
+        subtitle: datasheet.battlefieldRole,
+        factionId: faction.id,
+        factionName: faction.name,
+        gameSystemId: faction.gameSystemId,
+        editionId: null,
+      );
+    }
+    final sortedIds = counts.keys.toList()
+      ..sort((a, b) => counts[b]!.compareTo(counts[a]!));
+    return sortedIds.take(limit).map((id) => byId[id]!).toList();
+  }
+
   Future<List<SearchResult>> search(
     String text, {
     String? factionId,
     String? keywordId,
+    String? role,
+    String? unitType,
+    String? editionId,
+    int? minPoints,
+    int? maxPoints,
+    CatalogSort sortBy = CatalogSort.nameAsc,
   }) async {
     final pattern = '%$text%';
+    final costPoints = datasheetCosts.points;
+
     final query = select(datasheets).join([
       innerJoin(factions, factions.id.equalsExp(datasheets.factionId)),
+      leftOuterJoin(
+        datasheetCosts,
+        datasheetCosts.datasheetId.equalsExp(datasheets.id),
+      ),
+      leftOuterJoin(
+        editions,
+        editions.id.equalsExp(datasheetCosts.editionId) &
+            (editionId != null
+                ? editions.id.equals(editionId)
+                : editions.isCurrent.equals(true)),
+      ),
       if (keywordId != null)
         innerJoin(
           datasheetKeywordLinks,
@@ -69,11 +164,40 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
               datasheetKeywordLinks.keywordId.equals(keywordId),
         ),
     ])
-      ..where(datasheets.name.like(pattern))
-      ..orderBy([OrderingTerm.asc(datasheets.name)]);
+      ..where(datasheets.name.like(pattern));
 
     if (factionId != null) {
       query.where(datasheets.factionId.equals(factionId));
+    }
+    if (role != null) {
+      query.where(datasheets.battlefieldRole.equals(role));
+    }
+    if (unitType != null) {
+      query.where(datasheets.unitType.equals(unitType));
+    }
+    if (minPoints != null) {
+      query.where(costPoints.isBiggerOrEqualValue(minPoints));
+    }
+    if (maxPoints != null) {
+      query.where(costPoints.isSmallerOrEqualValue(maxPoints));
+    }
+
+    switch (sortBy) {
+      case CatalogSort.nameAsc:
+        query.orderBy([OrderingTerm.asc(datasheets.name)]);
+        break;
+      case CatalogSort.pointsAsc:
+        query.orderBy([
+          OrderingTerm.asc(costPoints),
+          OrderingTerm.asc(datasheets.name),
+        ]);
+        break;
+      case CatalogSort.pointsDesc:
+        query.orderBy([
+          OrderingTerm.desc(costPoints),
+          OrderingTerm.asc(datasheets.name),
+        ]);
+        break;
     }
 
     final rows = await query.get();
@@ -89,8 +213,39 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
         factionName: faction.name,
         gameSystemId: faction.gameSystemId,
         editionId: null,
+        unitType: datasheet.unitType,
+        points: row.read(costPoints),
       );
     }).toList();
+  }
+
+  Future<List<String>> getDistinctRoles() async {
+    final query = selectOnly(datasheets, distinct: true)
+      ..addColumns([datasheets.battlefieldRole])
+      ..orderBy([OrderingTerm.asc(datasheets.battlefieldRole)]);
+    final rows = await query.get();
+    return rows.map((row) => row.read(datasheets.battlefieldRole)!).toList();
+  }
+
+  Future<List<String>> getDistinctUnitTypes() async {
+    final query = selectOnly(datasheets, distinct: true)
+      ..addColumns([datasheets.unitType])
+      ..orderBy([OrderingTerm.asc(datasheets.unitType)]);
+    final rows = await query.get();
+    return rows.map((row) => row.read(datasheets.unitType)!).toList();
+  }
+
+  Future<List<Edition>> getEditions() async {
+    final query = select(editions)
+      ..orderBy([(e) => OrderingTerm.desc(e.version)]);
+    return query.get();
+  }
+
+  Future<int> getMaxPoints() async {
+    final maxExp = datasheetCosts.points.max();
+    final query = selectOnly(datasheetCosts)..addColumns([maxExp]);
+    final row = await query.getSingleOrNull();
+    return row?.read(maxExp) ?? 0;
   }
 
   Future<DatasheetDetails?> getDatasheet(String id) async {

@@ -5,7 +5,7 @@ import 'package:wargameboard/core/utils/collection_export_formatter.dart';
 import 'package:wargameboard/database/models/collection_item_details.dart';
 
 void main() {
-  const entries = [
+  final entries = [
     CollectionItemDetails(
       id: 'c1',
       datasheetId: 'ds-1',
@@ -15,6 +15,7 @@ void main() {
       assembled: 3,
       primed: 2,
       painted: 1,
+      createdAt: DateTime(2026, 1, 1),
     ),
     CollectionItemDetails(
       id: 'c2',
@@ -25,6 +26,7 @@ void main() {
       assembled: 0,
       primed: 0,
       painted: 0,
+      createdAt: DateTime(2026, 1, 1),
     ),
   ];
 

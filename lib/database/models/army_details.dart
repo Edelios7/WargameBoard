@@ -5,6 +5,7 @@ class ArmyListItem {
   final String factionName;
   final int totalPoints;
   final int? pointsLimit;
+  final DateTime updatedAt;
 
   const ArmyListItem({
     required this.id,
@@ -13,6 +14,7 @@ class ArmyListItem {
     required this.factionName,
     required this.totalPoints,
     this.pointsLimit,
+    required this.updatedAt,
   });
 
   bool get isOverLimit => pointsLimit != null && totalPoints > pointsLimit!;

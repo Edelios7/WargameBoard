@@ -28,6 +28,7 @@ mixin _$DatasheetDaoMixin on DatabaseAccessor<AppDatabase> {
   $EquipmentOptionsTable get equipmentOptions =>
       attachedDatabase.equipmentOptions;
   $UnitSizesTable get unitSizes => attachedDatabase.unitSizes;
+  $ArmyUnitsTable get armyUnits => attachedDatabase.armyUnits;
   DatasheetDaoManager get managers => DatasheetDaoManager(this);
 }
 
@@ -100,4 +101,6 @@ class DatasheetDaoManager {
       );
   $$UnitSizesTableTableManager get unitSizes =>
       $$UnitSizesTableTableManager(_db.attachedDatabase, _db.unitSizes);
+  $$ArmyUnitsTableTableManager get armyUnits =>
+      $$ArmyUnitsTableTableManager(_db.attachedDatabase, _db.armyUnits);
 }

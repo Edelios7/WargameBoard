@@ -1,4 +1,5 @@
 import '../database/app_database.dart';
+import '../database/models/catalog_sort.dart';
 import '../database/models/datasheet_details.dart';
 import '../database/models/search_result.dart';
 
@@ -11,15 +12,36 @@ class CatalogRepository {
     String text, {
     String? factionId,
     String? keywordId,
+    String? role,
+    String? unitType,
+    String? editionId,
+    int? minPoints,
+    int? maxPoints,
+    CatalogSort sortBy = CatalogSort.nameAsc,
   }) {
     return database.datasheetDao.search(
       text,
       factionId: factionId,
       keywordId: keywordId,
+      role: role,
+      unitType: unitType,
+      editionId: editionId,
+      minPoints: minPoints,
+      maxPoints: maxPoints,
+      sortBy: sortBy,
     );
   }
 
   Future<DatasheetDetails?> getDatasheet(String id) {
     return database.datasheetDao.getDatasheet(id);
   }
+
+  Future<List<String>> getRoles() => database.datasheetDao.getDistinctRoles();
+
+  Future<List<String>> getUnitTypes() =>
+      database.datasheetDao.getDistinctUnitTypes();
+
+  Future<List<Edition>> getEditions() => database.datasheetDao.getEditions();
+
+  Future<int> getMaxPoints() => database.datasheetDao.getMaxPoints();
 }

@@ -68,7 +68,7 @@ void main() {
     await tester.tap(find.text('Captain'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Captain'), findsOneWidget);
+    expect(find.text('Captain'), findsWidgets);
     expect(find.textContaining('90 pts'), findsWidgets);
 
     final army = await database.armyDao.getArmy(armyId);

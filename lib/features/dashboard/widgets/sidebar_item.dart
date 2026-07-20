@@ -17,32 +17,44 @@ class SidebarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 2),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 11,
-      ),
+      margin: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
-        color: selected
-            ? AppColors.primary.withValues(alpha: 0.12)
-            : Colors.transparent,
+        gradient: selected
+            ? const LinearGradient(
+                colors: [AppColors.primary, Color(0xFF9A1830)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : null,
+        color: selected ? null : Colors.transparent,
         borderRadius: BorderRadius.circular(10),
-        border: Border(
-          left: BorderSide(
-            color: selected ? AppColors.primary : Colors.transparent,
-            width: 3,
-          ),
-        ),
+        boxShadow: selected
+            ? [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.35),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : null,
       ),
       child: Row(
         children: [
-          const SizedBox(width: 6),
-          Icon(
-            icon,
-            color: selected
-                ? AppColors.primary
-                : AppColors.textSecondary,
-            size: 19,
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: selected
+                  ? Colors.white.withValues(alpha: 0.16)
+                  : AppColors.surfaceElevated,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              color: selected ? Colors.white : AppColors.textSecondary,
+              size: 16,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -51,11 +63,8 @@ class SidebarItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
-                color: selected
-                    ? AppColors.textPrimary
-                    : AppColors.textSecondary,
-                fontWeight:
-                    selected ? FontWeight.w600 : FontWeight.w500,
+                color: selected ? Colors.white : AppColors.textSecondary,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
               ),
             ),
           ),

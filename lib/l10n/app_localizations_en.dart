@@ -39,6 +39,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get versionLabel => 'Version 0.1';
 
   @override
+  String get settingsProfileTitle => 'Profile';
+
+  @override
+  String get settingsDisplayNameLabel => 'Your name';
+
+  @override
   String get settingsLanguageTitle => 'Language';
 
   @override
@@ -98,6 +104,71 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get catalogFilterAllKeywords => 'All keywords';
+
+  @override
+  String get catalogFilterAllRoles => 'All roles';
+
+  @override
+  String get catalogFilterAllUnitTypes => 'All types';
+
+  @override
+  String get catalogFilterAllEditions => 'All editions';
+
+  @override
+  String get catalogFilterTitle => 'Filters';
+
+  @override
+  String get catalogFilterFaction => 'Faction';
+
+  @override
+  String get catalogFilterRole => 'Role';
+
+  @override
+  String get catalogFilterKeywords => 'Keywords';
+
+  @override
+  String get catalogFilterCost => 'Cost (pts)';
+
+  @override
+  String get catalogFilterEdition => 'Edition';
+
+  @override
+  String get catalogFilterUnitType => 'Unit type';
+
+  @override
+  String get catalogBreadcrumbAllUnits => 'All units';
+
+  @override
+  String get catalogSortLabel => 'Sort by:';
+
+  @override
+  String get catalogSortNameAsc => 'Name (A-Z)';
+
+  @override
+  String get catalogSortPointsAsc => 'Points (ascending)';
+
+  @override
+  String get catalogSortPointsDesc => 'Points (descending)';
+
+  @override
+  String catalogUnitsCount(int count) {
+    return '$count UNITS';
+  }
+
+  @override
+  String get catalogSeeMore => 'See more';
+
+  @override
+  String get catalogSeeLess => 'See less';
+
+  @override
+  String get catalogViewFullSheet => 'View full datasheet';
+
+  @override
+  String get catalogBackToCatalog => 'Catalog';
+
+  @override
+  String get sectionDescription => 'Description';
 
   @override
   String get sectionUnitSize => 'Unit size';
@@ -244,6 +315,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get armyBuilderRoleOther => 'Other';
 
   @override
+  String get armyBuilderNoUnitsYet => 'Add units to build your roster';
+
+  @override
   String get armyBuilderPointsLimitLabel => 'Points limit (optional)';
 
   @override
@@ -259,6 +333,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get armyValidationNoDetachment => 'No detachment selected';
+
+  @override
+  String get armyBuilderBack => 'Back';
+
+  @override
+  String get armyBuilderStatPoints => 'Points';
+
+  @override
+  String get armyBuilderStatUnits => 'Units';
+
+  @override
+  String get armyBuilderStatBattleline => 'Battleline';
+
+  @override
+  String get armyBuilderStatEnhancements => 'Enhancements';
+
+  @override
+  String get armyBuilderDetachmentSection => 'Detachment';
+
+  @override
+  String get armyBuilderNoDetachment => 'No detachment';
+
+  @override
+  String get armyBuilderRulesSection => 'Rules';
+
+  @override
+  String get armyBuilderViewAllRules => 'View all rules';
+
+  @override
+  String get armyBuilderUnitsSection => 'Units';
+
+  @override
+  String get armyBuilderUnitDetailsTitle => 'Unit details';
+
+  @override
+  String get armyBuilderSelectUnitPrompt => 'Select a unit to see its details';
+
+  @override
+  String get armyBuilderEditUnit => 'Edit unit';
+
+  @override
+  String get armyBuilderRemoveUnit => 'Remove unit';
+
+  @override
+  String get armyBuilderModelCountLabel => 'Model count';
 
   @override
   String get collectionAddEntry => 'Add to collection';
@@ -392,6 +511,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get battleResultDraw => 'Draw';
 
   @override
+  String get battleNotPlayedYet => 'Not played yet (scheduled)';
+
+  @override
   String get battleMyScoreLabel => 'My score';
 
   @override
@@ -476,6 +598,177 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardStatusUnbuilt => 'Unbuilt';
 
   @override
+  String dashboardGreetingNamed(String name) {
+    return 'Hello $name';
+  }
+
+  @override
+  String get dashboardGreetingAnon => 'Hello!';
+
+  @override
+  String dashboardEditionLine(String system, String edition) {
+    return '$system • $edition';
+  }
+
+  @override
+  String get dashboardStatModels => 'Models';
+
+  @override
+  String get dashboardStatModelsSub => 'Total owned';
+
+  @override
+  String get dashboardStatCollectionEntries => 'Collection';
+
+  @override
+  String get dashboardStatCollectionEntriesSub => 'Distinct units';
+
+  @override
+  String get dashboardStatValue => 'Estimated value';
+
+  @override
+  String get dashboardStatValueSub => 'Total purchase price';
+
+  @override
+  String get dashboardModifiedToday => 'Today';
+
+  @override
+  String get dashboardModifiedYesterday => 'Yesterday';
+
+  @override
+  String dashboardModifiedDaysAgo(int days) {
+    return '$days days ago';
+  }
+
+  @override
+  String dashboardModifiedLabel(String when) {
+    return 'Updated $when';
+  }
+
+  @override
+  String get dashboardRecentlyViewedTitle => 'Recently viewed';
+
+  @override
+  String get dashboardRecentlyViewedEmpty => 'No datasheet viewed yet';
+
+  @override
+  String get dashboardFavoritesTitle => 'Favorites';
+
+  @override
+  String get dashboardFavoritesEmpty =>
+      'Add units to your armies to see your favorites';
+
+  @override
+  String get dashboardFavoritesSubtitle => 'Most used across your armies';
+
+  @override
+  String get dashboardCollectionValueTitle => 'Collection value';
+
+  @override
+  String get dashboardPurchaseTotalLabel => 'Total purchase price';
+
+  @override
+  String get dashboardRecentPurchasesTitle => 'Recent additions';
+
+  @override
+  String get dashboardRecentPurchasesEmpty => 'No entries recorded yet';
+
+  @override
+  String get dashboardSuggestionsTitle => 'Suggestions';
+
+  @override
+  String get dashboardSuggestionsEmpty =>
+      'Nothing to flag, your collection covers your armies';
+
+  @override
+  String dashboardSuggestionMissing(int count, String name) {
+    return 'You\'re missing $count $name to complete your armies';
+  }
+
+  @override
+  String get dashboardHobbyScoreTitle => 'Hobby Score';
+
+  @override
+  String get dashboardHobbyScoreCollection => 'Collection';
+
+  @override
+  String get dashboardHobbyScorePainting => 'Painting';
+
+  @override
+  String get dashboardHobbyScoreGames => 'Games';
+
+  @override
+  String get dashboardHobbyScoreOrganization => 'Organization';
+
+  @override
+  String get dashboardQuickActionsTitle => 'Quick actions';
+
+  @override
+  String get dashboardQuickActionNewArmy => 'Create an army';
+
+  @override
+  String get dashboardQuickActionAddToCollection => 'Add to collection';
+
+  @override
+  String get dashboardQuickActionOpenCatalog => 'Open the catalog';
+
+  @override
+  String get dashboardQuickActionNewBattle => 'New battle';
+
+  @override
+  String get dashboardCatalogStatsTitle => 'Catalog stats';
+
+  @override
+  String get dashboardStatsUnits => 'Units';
+
+  @override
+  String get dashboardStatsProfiles => 'Profiles';
+
+  @override
+  String get dashboardStatsWeapons => 'Weapons';
+
+  @override
+  String get dashboardStatsAbilities => 'Abilities';
+
+  @override
+  String get dashboardStatsKeywords => 'Keywords';
+
+  @override
+  String get dashboardLastBattleTitle => 'Last battle played';
+
+  @override
+  String get dashboardLastBattleEmpty => 'No battle played yet';
+
+  @override
+  String get dashboardNextBattleTitle => 'Next battle';
+
+  @override
+  String get dashboardNextBattleEmpty => 'No battle scheduled';
+
+  @override
+  String get dashboardViewCalendar => 'View calendar';
+
+  @override
+  String get dashboardViewBattleDetails => 'View battle details';
+
+  @override
+  String get dashboardProjectsTitle => 'Ongoing projects';
+
+  @override
+  String get dashboardProjectsEmpty => 'No project yet';
+
+  @override
+  String get dashboardAddProjectHint => 'New project...';
+
+  @override
+  String get battleScheduleLabel => 'Battle date';
+
+  @override
+  String get battleLocationLabel => 'Location (optional)';
+
+  @override
+  String get battleOpponentFactionLabel => 'Opponent faction (optional)';
+
+  @override
   String get explorerTabKeywords => 'Keywords';
 
   @override
@@ -489,4 +782,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get explorerViewInCatalog => 'View units';
+
+  @override
+  String get profileCommandant => 'Commander';
+
+  @override
+  String profileLevelShort(int level) {
+    return 'Level $level';
+  }
+
+  @override
+  String get profilePageTitle => 'Commander profile';
+
+  @override
+  String get profilePageSubtitle =>
+      'Your hobby progression, across every specialization.';
+
+  @override
+  String get profileCategoriesTitle => 'Specializations';
+
+  @override
+  String get profileFactionsTitle => 'Factions';
+
+  @override
+  String get profileNoFactionXp =>
+      'No faction XP yet — paint, assemble, play or grow your collection to get started.';
+
+  @override
+  String profileXpProgress(int current, int total) {
+    return '$current / $total XP';
+  }
+
+  @override
+  String get xpCategoryPainting => 'Artist';
+
+  @override
+  String get xpCategoryAssembly => 'Hobbyist';
+
+  @override
+  String get xpCategoryBattle => 'Strategist';
+
+  @override
+  String get xpCategoryCollection => 'Collector';
+
+  @override
+  String get xpCategoryLore => 'Archivist';
+
+  @override
+  String get battleTypeLabel => 'Game type';
+
+  @override
+  String get battleTypeMatched => 'Matched play';
+
+  @override
+  String get battleTypeNarrative => 'Narrative';
+
+  @override
+  String get battleTypeTournament => 'Tournament';
 }

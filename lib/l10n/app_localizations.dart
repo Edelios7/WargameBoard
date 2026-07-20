@@ -158,6 +158,18 @@ abstract class AppLocalizations {
   /// **'Version 0.1'**
   String get versionLabel;
 
+  /// No description provided for @settingsProfileTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil'**
+  String get settingsProfileTitle;
+
+  /// No description provided for @settingsDisplayNameLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ton nom'**
+  String get settingsDisplayNameLabel;
+
   /// No description provided for @settingsLanguageTitle.
   ///
   /// In fr, this message translates to:
@@ -265,6 +277,132 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Tous les mots-clés'**
   String get catalogFilterAllKeywords;
+
+  /// No description provided for @catalogFilterAllRoles.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous les rôles'**
+  String get catalogFilterAllRoles;
+
+  /// No description provided for @catalogFilterAllUnitTypes.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous les types'**
+  String get catalogFilterAllUnitTypes;
+
+  /// No description provided for @catalogFilterAllEditions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes les éditions'**
+  String get catalogFilterAllEditions;
+
+  /// No description provided for @catalogFilterTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Filtres'**
+  String get catalogFilterTitle;
+
+  /// No description provided for @catalogFilterFaction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Faction'**
+  String get catalogFilterFaction;
+
+  /// No description provided for @catalogFilterRole.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rôle'**
+  String get catalogFilterRole;
+
+  /// No description provided for @catalogFilterKeywords.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mots-clés'**
+  String get catalogFilterKeywords;
+
+  /// No description provided for @catalogFilterCost.
+  ///
+  /// In fr, this message translates to:
+  /// **'Coût (pts)'**
+  String get catalogFilterCost;
+
+  /// No description provided for @catalogFilterEdition.
+  ///
+  /// In fr, this message translates to:
+  /// **'Édition'**
+  String get catalogFilterEdition;
+
+  /// No description provided for @catalogFilterUnitType.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type d\'unité'**
+  String get catalogFilterUnitType;
+
+  /// No description provided for @catalogBreadcrumbAllUnits.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes les unités'**
+  String get catalogBreadcrumbAllUnits;
+
+  /// No description provided for @catalogSortLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Trier par :'**
+  String get catalogSortLabel;
+
+  /// No description provided for @catalogSortNameAsc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom (A-Z)'**
+  String get catalogSortNameAsc;
+
+  /// No description provided for @catalogSortPointsAsc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Points (croissant)'**
+  String get catalogSortPointsAsc;
+
+  /// No description provided for @catalogSortPointsDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Points (décroissant)'**
+  String get catalogSortPointsDesc;
+
+  /// No description provided for @catalogUnitsCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} UNITÉS'**
+  String catalogUnitsCount(int count);
+
+  /// No description provided for @catalogSeeMore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir plus'**
+  String get catalogSeeMore;
+
+  /// No description provided for @catalogSeeLess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir moins'**
+  String get catalogSeeLess;
+
+  /// No description provided for @catalogViewFullSheet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir la fiche complète'**
+  String get catalogViewFullSheet;
+
+  /// No description provided for @catalogBackToCatalog.
+  ///
+  /// In fr, this message translates to:
+  /// **'Catalogue'**
+  String get catalogBackToCatalog;
+
+  /// No description provided for @sectionDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Description'**
+  String get sectionDescription;
 
   /// No description provided for @sectionUnitSize.
   ///
@@ -530,6 +668,12 @@ abstract class AppLocalizations {
   /// **'Autres'**
   String get armyBuilderRoleOther;
 
+  /// No description provided for @armyBuilderNoUnitsYet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoute des unités pour construire ta liste'**
+  String get armyBuilderNoUnitsYet;
+
   /// No description provided for @armyBuilderPointsLimitLabel.
   ///
   /// In fr, this message translates to:
@@ -559,6 +703,96 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Aucun détachement sélectionné'**
   String get armyValidationNoDetachment;
+
+  /// No description provided for @armyBuilderBack.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retour'**
+  String get armyBuilderBack;
+
+  /// No description provided for @armyBuilderStatPoints.
+  ///
+  /// In fr, this message translates to:
+  /// **'Points'**
+  String get armyBuilderStatPoints;
+
+  /// No description provided for @armyBuilderStatUnits.
+  ///
+  /// In fr, this message translates to:
+  /// **'Unités'**
+  String get armyBuilderStatUnits;
+
+  /// No description provided for @armyBuilderStatBattleline.
+  ///
+  /// In fr, this message translates to:
+  /// **'Battleline'**
+  String get armyBuilderStatBattleline;
+
+  /// No description provided for @armyBuilderStatEnhancements.
+  ///
+  /// In fr, this message translates to:
+  /// **'Améliorations'**
+  String get armyBuilderStatEnhancements;
+
+  /// No description provided for @armyBuilderDetachmentSection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détachement'**
+  String get armyBuilderDetachmentSection;
+
+  /// No description provided for @armyBuilderNoDetachment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun détachement'**
+  String get armyBuilderNoDetachment;
+
+  /// No description provided for @armyBuilderRulesSection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Règles'**
+  String get armyBuilderRulesSection;
+
+  /// No description provided for @armyBuilderViewAllRules.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir toutes les règles'**
+  String get armyBuilderViewAllRules;
+
+  /// No description provided for @armyBuilderUnitsSection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Unités'**
+  String get armyBuilderUnitsSection;
+
+  /// No description provided for @armyBuilderUnitDetailsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détails de l\'unité'**
+  String get armyBuilderUnitDetailsTitle;
+
+  /// No description provided for @armyBuilderSelectUnitPrompt.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionnez une unité pour voir ses détails'**
+  String get armyBuilderSelectUnitPrompt;
+
+  /// No description provided for @armyBuilderEditUnit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier l\'unité'**
+  String get armyBuilderEditUnit;
+
+  /// No description provided for @armyBuilderRemoveUnit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer l\'unité'**
+  String get armyBuilderRemoveUnit;
+
+  /// No description provided for @armyBuilderModelCountLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nombre de figurines'**
+  String get armyBuilderModelCountLabel;
 
   /// No description provided for @collectionAddEntry.
   ///
@@ -806,6 +1040,12 @@ abstract class AppLocalizations {
   /// **'Match nul'**
   String get battleResultDraw;
 
+  /// No description provided for @battleNotPlayedYet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas encore jouée (planifiée)'**
+  String get battleNotPlayedYet;
+
   /// No description provided for @battleMyScoreLabel.
   ///
   /// In fr, this message translates to:
@@ -962,6 +1202,324 @@ abstract class AppLocalizations {
   /// **'Sur grappe'**
   String get dashboardStatusUnbuilt;
 
+  /// No description provided for @dashboardGreetingNamed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bonjour {name}'**
+  String dashboardGreetingNamed(String name);
+
+  /// No description provided for @dashboardGreetingAnon.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bonjour !'**
+  String get dashboardGreetingAnon;
+
+  /// No description provided for @dashboardEditionLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'{system} • {edition}'**
+  String dashboardEditionLine(String system, String edition);
+
+  /// No description provided for @dashboardStatModels.
+  ///
+  /// In fr, this message translates to:
+  /// **'Figurines'**
+  String get dashboardStatModels;
+
+  /// No description provided for @dashboardStatModelsSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total possédé'**
+  String get dashboardStatModelsSub;
+
+  /// No description provided for @dashboardStatCollectionEntries.
+  ///
+  /// In fr, this message translates to:
+  /// **'Collection'**
+  String get dashboardStatCollectionEntries;
+
+  /// No description provided for @dashboardStatCollectionEntriesSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Unités distinctes'**
+  String get dashboardStatCollectionEntriesSub;
+
+  /// No description provided for @dashboardStatValue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valeur estimée'**
+  String get dashboardStatValue;
+
+  /// No description provided for @dashboardStatValueSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix d\'achat cumulé'**
+  String get dashboardStatValueSub;
+
+  /// No description provided for @dashboardModifiedToday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aujourd\'hui'**
+  String get dashboardModifiedToday;
+
+  /// No description provided for @dashboardModifiedYesterday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hier'**
+  String get dashboardModifiedYesterday;
+
+  /// No description provided for @dashboardModifiedDaysAgo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Il y a {days} jours'**
+  String dashboardModifiedDaysAgo(int days);
+
+  /// No description provided for @dashboardModifiedLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifié {when}'**
+  String dashboardModifiedLabel(String when);
+
+  /// No description provided for @dashboardRecentlyViewedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dernières fiches consultées'**
+  String get dashboardRecentlyViewedTitle;
+
+  /// No description provided for @dashboardRecentlyViewedEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune fiche consultée pour l\'instant'**
+  String get dashboardRecentlyViewedEmpty;
+
+  /// No description provided for @dashboardFavoritesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Favoris'**
+  String get dashboardFavoritesTitle;
+
+  /// No description provided for @dashboardFavoritesEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoute des unités à tes armées pour voir tes favoris'**
+  String get dashboardFavoritesEmpty;
+
+  /// No description provided for @dashboardFavoritesSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les plus utilisées dans vos armées'**
+  String get dashboardFavoritesSubtitle;
+
+  /// No description provided for @dashboardCollectionValueTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valeur de la collection'**
+  String get dashboardCollectionValueTitle;
+
+  /// No description provided for @dashboardPurchaseTotalLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix d\'achat total'**
+  String get dashboardPurchaseTotalLabel;
+
+  /// No description provided for @dashboardRecentPurchasesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Derniers achats'**
+  String get dashboardRecentPurchasesTitle;
+
+  /// No description provided for @dashboardRecentPurchasesEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun achat enregistré'**
+  String get dashboardRecentPurchasesEmpty;
+
+  /// No description provided for @dashboardSuggestionsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suggestions'**
+  String get dashboardSuggestionsTitle;
+
+  /// No description provided for @dashboardSuggestionsEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rien à signaler, ta collection couvre tes armées'**
+  String get dashboardSuggestionsEmpty;
+
+  /// No description provided for @dashboardSuggestionMissing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Il te manque {count} {name} pour compléter tes armées'**
+  String dashboardSuggestionMissing(int count, String name);
+
+  /// No description provided for @dashboardHobbyScoreTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hobby Score'**
+  String get dashboardHobbyScoreTitle;
+
+  /// No description provided for @dashboardHobbyScoreCollection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Collection'**
+  String get dashboardHobbyScoreCollection;
+
+  /// No description provided for @dashboardHobbyScorePainting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Peinture'**
+  String get dashboardHobbyScorePainting;
+
+  /// No description provided for @dashboardHobbyScoreGames.
+  ///
+  /// In fr, this message translates to:
+  /// **'Parties'**
+  String get dashboardHobbyScoreGames;
+
+  /// No description provided for @dashboardHobbyScoreOrganization.
+  ///
+  /// In fr, this message translates to:
+  /// **'Organisation'**
+  String get dashboardHobbyScoreOrganization;
+
+  /// No description provided for @dashboardQuickActionsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accès rapides'**
+  String get dashboardQuickActionsTitle;
+
+  /// No description provided for @dashboardQuickActionNewArmy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer une armée'**
+  String get dashboardQuickActionNewArmy;
+
+  /// No description provided for @dashboardQuickActionAddToCollection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter à la collection'**
+  String get dashboardQuickActionAddToCollection;
+
+  /// No description provided for @dashboardQuickActionOpenCatalog.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouvrir le catalogue'**
+  String get dashboardQuickActionOpenCatalog;
+
+  /// No description provided for @dashboardQuickActionNewBattle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle partie'**
+  String get dashboardQuickActionNewBattle;
+
+  /// No description provided for @dashboardCatalogStatsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Statistiques du catalogue'**
+  String get dashboardCatalogStatsTitle;
+
+  /// No description provided for @dashboardStatsUnits.
+  ///
+  /// In fr, this message translates to:
+  /// **'Unités'**
+  String get dashboardStatsUnits;
+
+  /// No description provided for @dashboardStatsProfiles.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profils'**
+  String get dashboardStatsProfiles;
+
+  /// No description provided for @dashboardStatsWeapons.
+  ///
+  /// In fr, this message translates to:
+  /// **'Armes'**
+  String get dashboardStatsWeapons;
+
+  /// No description provided for @dashboardStatsAbilities.
+  ///
+  /// In fr, this message translates to:
+  /// **'Capacités'**
+  String get dashboardStatsAbilities;
+
+  /// No description provided for @dashboardStatsKeywords.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mots-clés'**
+  String get dashboardStatsKeywords;
+
+  /// No description provided for @dashboardLastBattleTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dernière partie jouée'**
+  String get dashboardLastBattleTitle;
+
+  /// No description provided for @dashboardLastBattleEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune partie jouée pour l\'instant'**
+  String get dashboardLastBattleEmpty;
+
+  /// No description provided for @dashboardNextBattleTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prochaine partie'**
+  String get dashboardNextBattleTitle;
+
+  /// No description provided for @dashboardNextBattleEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune partie programmée'**
+  String get dashboardNextBattleEmpty;
+
+  /// No description provided for @dashboardViewCalendar.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir le calendrier'**
+  String get dashboardViewCalendar;
+
+  /// No description provided for @dashboardViewBattleDetails.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir les détails de la partie'**
+  String get dashboardViewBattleDetails;
+
+  /// No description provided for @dashboardProjectsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Projets en cours'**
+  String get dashboardProjectsTitle;
+
+  /// No description provided for @dashboardProjectsEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun projet pour l\'instant'**
+  String get dashboardProjectsEmpty;
+
+  /// No description provided for @dashboardAddProjectHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau projet...'**
+  String get dashboardAddProjectHint;
+
+  /// No description provided for @battleScheduleLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date de la partie'**
+  String get battleScheduleLabel;
+
+  /// No description provided for @battleLocationLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lieu (optionnel)'**
+  String get battleLocationLabel;
+
+  /// No description provided for @battleOpponentFactionLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Faction adverse (optionnel)'**
+  String get battleOpponentFactionLabel;
+
   /// No description provided for @explorerTabKeywords.
   ///
   /// In fr, this message translates to:
@@ -991,6 +1549,108 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Voir les unités'**
   String get explorerViewInCatalog;
+
+  /// No description provided for @profileCommandant.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commandant'**
+  String get profileCommandant;
+
+  /// No description provided for @profileLevelShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Niveau {level}'**
+  String profileLevelShort(int level);
+
+  /// No description provided for @profilePageTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil du Commandant'**
+  String get profilePageTitle;
+
+  /// No description provided for @profilePageSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ta progression dans le hobby, toutes spécialités confondues.'**
+  String get profilePageSubtitle;
+
+  /// No description provided for @profileCategoriesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Spécialités'**
+  String get profileCategoriesTitle;
+
+  /// No description provided for @profileFactionsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Factions'**
+  String get profileFactionsTitle;
+
+  /// No description provided for @profileNoFactionXp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune XP de faction pour l\'instant — peins, monte, joue ou agrandis ta collection pour commencer.'**
+  String get profileNoFactionXp;
+
+  /// No description provided for @profileXpProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'{current} / {total} XP'**
+  String profileXpProgress(int current, int total);
+
+  /// No description provided for @xpCategoryPainting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Artiste'**
+  String get xpCategoryPainting;
+
+  /// No description provided for @xpCategoryAssembly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hobbyiste'**
+  String get xpCategoryAssembly;
+
+  /// No description provided for @xpCategoryBattle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stratège'**
+  String get xpCategoryBattle;
+
+  /// No description provided for @xpCategoryCollection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Collectionneur'**
+  String get xpCategoryCollection;
+
+  /// No description provided for @xpCategoryLore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Archiviste'**
+  String get xpCategoryLore;
+
+  /// No description provided for @battleTypeLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type de partie'**
+  String get battleTypeLabel;
+
+  /// No description provided for @battleTypeMatched.
+  ///
+  /// In fr, this message translates to:
+  /// **'Partie normale'**
+  String get battleTypeMatched;
+
+  /// No description provided for @battleTypeNarrative.
+  ///
+  /// In fr, this message translates to:
+  /// **'Narrative'**
+  String get battleTypeNarrative;
+
+  /// No description provided for @battleTypeTournament.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tournoi'**
+  String get battleTypeTournament;
 }
 
 class _AppLocalizationsDelegate

@@ -15,6 +15,10 @@ class SearchResult {
 
   final String? editionId;
 
+  final String? unitType;
+
+  final int? points;
+
   const SearchResult({
     required this.id,
     required this.name,
@@ -24,5 +28,7 @@ class SearchResult {
     this.factionName,
     this.gameSystemId,
     this.editionId,
+    this.unitType,
+    this.points,
   });
 }

@@ -4,11 +4,13 @@ import '../database/models/collection_item_details.dart';
 import '../repositories/collection_repository.dart';
 import '../services/collection_service.dart';
 import 'database_provider.dart';
+import 'xp_provider.dart';
 
 final collectionRepositoryProvider = Provider<CollectionRepository>((ref) {
   final database = ref.watch(databaseProvider);
+  final xpService = ref.watch(xpServiceProvider);
 
-  return CollectionRepository(database);
+  return CollectionRepository(database, xpService);
 });
 
 final collectionServiceProvider =

@@ -5,6 +5,7 @@ import '../repositories/army_repository.dart';
 import '../services/army_builder_service.dart';
 import '../services/army_validation_service.dart';
 import 'database_provider.dart';
+import 'xp_provider.dart';
 
 final armyValidationServiceProvider =
     Provider<ArmyValidationService>((ref) => const ArmyValidationService());
@@ -17,8 +18,9 @@ final armyValidationProvider =
 
 final armyRepositoryProvider = Provider<ArmyRepository>((ref) {
   final database = ref.watch(databaseProvider);
+  final xpService = ref.watch(xpServiceProvider);
 
-  return ArmyRepository(database);
+  return ArmyRepository(database, xpService);
 });
 
 final armyBuilderServiceProvider = Provider<ArmyBuilderService>((ref) {
@@ -32,6 +34,8 @@ final armiesListProvider = FutureProvider<List<ArmyListItem>>((ref) {
 });
 
 final selectedArmyIdProvider = StateProvider<String?>((ref) => null);
+
+final selectedUnitIdProvider = StateProvider<String?>((ref) => null);
 
 final selectedArmyProvider = FutureProvider<ArmyDetails?>((ref) async {
   final armyId = ref.watch(selectedArmyIdProvider);

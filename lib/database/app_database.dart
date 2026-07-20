@@ -53,6 +53,11 @@ import 'tables/wishlist_items_table.dart';
 
 import 'tables/battles_table.dart';
 
+import 'tables/projects_table.dart';
+
+import 'tables/xp_category_totals_table.dart';
+import 'tables/xp_faction_totals_table.dart';
+
 // =========================
 // DAO
 // =========================
@@ -66,6 +71,8 @@ import 'daos/datasheet_dao.dart';
 import 'daos/army_dao.dart';
 import 'daos/collection_dao.dart';
 import 'daos/battle_dao.dart';
+import 'daos/project_dao.dart';
+import 'daos/xp_dao.dart';
 
 import 'seed/catalog_seed.dart';
 import 'seed/weapon_profile_seed.dart';
@@ -131,6 +138,13 @@ part 'app_database.g.dart';
 
     // ===== BATTLES =====
     Battles,
+
+    // ===== PROJECTS =====
+    Projects,
+
+    // ===== XP =====
+    XpCategoryTotals,
+    XpFactionTotals,
   ],
   daos: [
     GameSystemDao,
@@ -142,6 +156,8 @@ part 'app_database.g.dart';
     ArmyDao,
     CollectionDao,
     BattleDao,
+    ProjectDao,
+    XpDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -171,12 +187,16 @@ class AppDatabase extends _$AppDatabase {
 
   late final BattleDao battleDao = BattleDao(this);
 
+  late final ProjectDao projectDao = ProjectDao(this);
+
+  late final XpDao xpDao = XpDao(this);
+
   // =========================
   // Database version
   // =========================
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   // =========================
   // Migrations
@@ -187,6 +207,7 @@ class AppDatabase extends _$AppDatabase {
         onCreate: (Migrator m) async {
           await m.createAll();
           await seedCatalog(this);
+          await xpDao.seedCategories();
         },
 
         onUpgrade: (Migrator m, int from, int to) async {
@@ -219,6 +240,15 @@ class AppDatabase extends _$AppDatabase {
             // Backfill des profils d'armes sur les bases déjà créées
             // avant leur introduction dans le seed.
             await seedWeaponProfiles(this);
+          }
+          if (from < 10) {
+            await m.addColumn(battles, battles.opponentFactionId);
+            await m.addColumn(battles, battles.location);
+            await m.addColumn(battles, battles.type);
+            await m.createTable(projects);
+            await m.createTable(xpCategoryTotals);
+            await m.createTable(xpFactionTotals);
+            await xpDao.seedCategories();
           }
         },
 

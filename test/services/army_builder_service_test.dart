@@ -5,6 +5,7 @@ import 'package:wargameboard/database/seed/detachment_seed.dart';
 import 'package:wargameboard/database/seed/faction_seed.dart';
 import 'package:wargameboard/repositories/army_repository.dart';
 import 'package:wargameboard/services/army_builder_service.dart';
+import 'package:wargameboard/services/xp_service.dart';
 
 void main() {
   late AppDatabase database;
@@ -13,7 +14,7 @@ void main() {
 
   setUp(() {
     database = AppDatabase.forTesting(NativeDatabase.memory());
-    repository = ArmyRepository(database);
+    repository = ArmyRepository(database, XpService(database));
     service = ArmyBuilderService(repository);
   });
 

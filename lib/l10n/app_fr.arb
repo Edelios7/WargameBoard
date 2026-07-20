@@ -13,6 +13,8 @@
   "navSettings": "Paramètres",
   "versionLabel": "Version 0.1",
 
+  "settingsProfileTitle": "Profil",
+  "settingsDisplayNameLabel": "Ton nom",
   "settingsLanguageTitle": "Langue",
   "settingsLanguageSystem": "Système",
   "settingsLanguageFrench": "Français",
@@ -48,6 +50,32 @@
     }
   },
   "catalogFilterAllKeywords": "Tous les mots-clés",
+  "catalogFilterAllRoles": "Tous les rôles",
+  "catalogFilterAllUnitTypes": "Tous les types",
+  "catalogFilterAllEditions": "Toutes les éditions",
+  "catalogFilterTitle": "Filtres",
+  "catalogFilterFaction": "Faction",
+  "catalogFilterRole": "Rôle",
+  "catalogFilterKeywords": "Mots-clés",
+  "catalogFilterCost": "Coût (pts)",
+  "catalogFilterEdition": "Édition",
+  "catalogFilterUnitType": "Type d'unité",
+  "catalogBreadcrumbAllUnits": "Toutes les unités",
+  "catalogSortLabel": "Trier par :",
+  "catalogSortNameAsc": "Nom (A-Z)",
+  "catalogSortPointsAsc": "Points (croissant)",
+  "catalogSortPointsDesc": "Points (décroissant)",
+  "catalogUnitsCount": "{count} UNITÉS",
+  "@catalogUnitsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "catalogSeeMore": "Voir plus",
+  "catalogSeeLess": "Voir moins",
+  "catalogViewFullSheet": "Voir la fiche complète",
+  "catalogBackToCatalog": "Catalogue",
+  "sectionDescription": "Description",
 
   "sectionUnitSize": "Effectif",
   "sectionProfiles": "Profils",
@@ -128,6 +156,7 @@
   "armyBuilderListValid": "Liste valide",
   "armyBuilderListInvalid": "Liste invalide",
   "armyBuilderRoleOther": "Autres",
+  "armyBuilderNoUnitsYet": "Ajoute des unités pour construire ta liste",
 
   "armyBuilderPointsLimitLabel": "Limite de points (optionnel)",
   "armyBuilderPointsWithLimit": "{points} / {limit} pts",
@@ -140,6 +169,22 @@
   "armyBuilderOverLimit": "Limite de points dépassée",
   "armyValidationEmptyArmy": "Armée vide — ajoute des unités",
   "armyValidationNoDetachment": "Aucun détachement sélectionné",
+
+  "armyBuilderBack": "Retour",
+  "armyBuilderStatPoints": "Points",
+  "armyBuilderStatUnits": "Unités",
+  "armyBuilderStatBattleline": "Battleline",
+  "armyBuilderStatEnhancements": "Améliorations",
+  "armyBuilderDetachmentSection": "Détachement",
+  "armyBuilderNoDetachment": "Aucun détachement",
+  "armyBuilderRulesSection": "Règles",
+  "armyBuilderViewAllRules": "Voir toutes les règles",
+  "armyBuilderUnitsSection": "Unités",
+  "armyBuilderUnitDetailsTitle": "Détails de l'unité",
+  "armyBuilderSelectUnitPrompt": "Sélectionnez une unité pour voir ses détails",
+  "armyBuilderEditUnit": "Modifier l'unité",
+  "armyBuilderRemoveUnit": "Retirer l'unité",
+  "armyBuilderModelCountLabel": "Nombre de figurines",
 
   "collectionAddEntry": "Ajouter à la collection",
   "collectionExportCsv": "Copier en CSV",
@@ -209,6 +254,7 @@
   "battleResultVictory": "Victoire",
   "battleResultDefeat": "Défaite",
   "battleResultDraw": "Match nul",
+  "battleNotPlayedYet": "Pas encore jouée (planifiée)",
   "battleMyScoreLabel": "Mon score",
   "battleOpponentScoreLabel": "Score adverse",
   "battleNotesLabel": "Notes (optionnel)",
@@ -243,9 +289,114 @@
   "dashboardStatusAssembled": "Montées",
   "dashboardStatusUnbuilt": "Sur grappe",
 
+  "dashboardGreetingNamed": "Bonjour {name}",
+  "@dashboardGreetingNamed": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "dashboardGreetingAnon": "Bonjour !",
+  "dashboardEditionLine": "{system} • {edition}",
+  "@dashboardEditionLine": {
+    "placeholders": {
+      "system": { "type": "String" },
+      "edition": { "type": "String" }
+    }
+  },
+  "dashboardStatModels": "Figurines",
+  "dashboardStatModelsSub": "Total possédé",
+  "dashboardStatCollectionEntries": "Collection",
+  "dashboardStatCollectionEntriesSub": "Unités distinctes",
+  "dashboardStatValue": "Valeur estimée",
+  "dashboardStatValueSub": "Prix d'achat cumulé",
+  "dashboardModifiedToday": "Aujourd'hui",
+  "dashboardModifiedYesterday": "Hier",
+  "dashboardModifiedDaysAgo": "Il y a {days} jours",
+  "@dashboardModifiedDaysAgo": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "dashboardModifiedLabel": "Modifié {when}",
+  "@dashboardModifiedLabel": {
+    "placeholders": { "when": { "type": "String" } }
+  },
+  "dashboardRecentlyViewedTitle": "Dernières fiches consultées",
+  "dashboardRecentlyViewedEmpty": "Aucune fiche consultée pour l'instant",
+  "dashboardFavoritesTitle": "Favoris",
+  "dashboardFavoritesEmpty": "Ajoute des unités à tes armées pour voir tes favoris",
+  "dashboardFavoritesSubtitle": "Les plus utilisées dans vos armées",
+  "dashboardCollectionValueTitle": "Valeur de la collection",
+  "dashboardPurchaseTotalLabel": "Prix d'achat total",
+  "dashboardRecentPurchasesTitle": "Derniers achats",
+  "dashboardRecentPurchasesEmpty": "Aucun achat enregistré",
+  "dashboardSuggestionsTitle": "Suggestions",
+  "dashboardSuggestionsEmpty": "Rien à signaler, ta collection couvre tes armées",
+  "dashboardSuggestionMissing": "Il te manque {count} {name} pour compléter tes armées",
+  "@dashboardSuggestionMissing": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "name": { "type": "String" }
+    }
+  },
+  "dashboardHobbyScoreTitle": "Hobby Score",
+  "dashboardHobbyScoreCollection": "Collection",
+  "dashboardHobbyScorePainting": "Peinture",
+  "dashboardHobbyScoreGames": "Parties",
+  "dashboardHobbyScoreOrganization": "Organisation",
+  "dashboardQuickActionsTitle": "Accès rapides",
+  "dashboardQuickActionNewArmy": "Créer une armée",
+  "dashboardQuickActionAddToCollection": "Ajouter à la collection",
+  "dashboardQuickActionOpenCatalog": "Ouvrir le catalogue",
+  "dashboardQuickActionNewBattle": "Nouvelle partie",
+  "dashboardCatalogStatsTitle": "Statistiques du catalogue",
+  "dashboardStatsUnits": "Unités",
+  "dashboardStatsProfiles": "Profils",
+  "dashboardStatsWeapons": "Armes",
+  "dashboardStatsAbilities": "Capacités",
+  "dashboardStatsKeywords": "Mots-clés",
+  "dashboardLastBattleTitle": "Dernière partie jouée",
+  "dashboardLastBattleEmpty": "Aucune partie jouée pour l'instant",
+  "dashboardNextBattleTitle": "Prochaine partie",
+  "dashboardNextBattleEmpty": "Aucune partie programmée",
+  "dashboardViewCalendar": "Voir le calendrier",
+  "dashboardViewBattleDetails": "Voir les détails de la partie",
+  "dashboardProjectsTitle": "Projets en cours",
+  "dashboardProjectsEmpty": "Aucun projet pour l'instant",
+  "dashboardAddProjectHint": "Nouveau projet...",
+  "battleScheduleLabel": "Date de la partie",
+  "battleLocationLabel": "Lieu (optionnel)",
+  "battleOpponentFactionLabel": "Faction adverse (optionnel)",
+
   "explorerTabKeywords": "Mots-clés",
   "explorerTabAbilities": "Capacités",
   "explorerSearchHint": "Rechercher une règle...",
   "explorerEmpty": "Aucune règle trouvée",
-  "explorerViewInCatalog": "Voir les unités"
+  "explorerViewInCatalog": "Voir les unités",
+
+  "profileCommandant": "Commandant",
+  "profileLevelShort": "Niveau {level}",
+  "@profileLevelShort": {
+    "placeholders": {
+      "level": { "type": "int" }
+    }
+  },
+  "profilePageTitle": "Profil du Commandant",
+  "profilePageSubtitle": "Ta progression dans le hobby, toutes spécialités confondues.",
+  "profileCategoriesTitle": "Spécialités",
+  "profileFactionsTitle": "Factions",
+  "profileNoFactionXp": "Aucune XP de faction pour l'instant — peins, monte, joue ou agrandis ta collection pour commencer.",
+  "profileXpProgress": "{current} / {total} XP",
+  "@profileXpProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "xpCategoryPainting": "Artiste",
+  "xpCategoryAssembly": "Hobbyiste",
+  "xpCategoryBattle": "Stratège",
+  "xpCategoryCollection": "Collectionneur",
+  "xpCategoryLore": "Archiviste",
+
+  "battleTypeLabel": "Type de partie",
+  "battleTypeMatched": "Partie normale",
+  "battleTypeNarrative": "Narrative",
+  "battleTypeTournament": "Tournoi"
 }

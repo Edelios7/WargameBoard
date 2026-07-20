@@ -8,6 +8,7 @@ mixin _$CollectionDaoMixin on DatabaseAccessor<AppDatabase> {
   $DatasheetsTable get datasheets => attachedDatabase.datasheets;
   $FactionsTable get factions => attachedDatabase.factions;
   $WishlistItemsTable get wishlistItems => attachedDatabase.wishlistItems;
+  $ArmyUnitsTable get armyUnits => attachedDatabase.armyUnits;
   CollectionDaoManager get managers => CollectionDaoManager(this);
 }
 
@@ -25,4 +26,6 @@ class CollectionDaoManager {
       $$FactionsTableTableManager(_db.attachedDatabase, _db.factions);
   $$WishlistItemsTableTableManager get wishlistItems =>
       $$WishlistItemsTableTableManager(_db.attachedDatabase, _db.wishlistItems);
+  $$ArmyUnitsTableTableManager get armyUnits =>
+      $$ArmyUnitsTableTableManager(_db.attachedDatabase, _db.armyUnits);
 }

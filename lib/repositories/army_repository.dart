@@ -1,10 +1,12 @@
 import '../database/app_database.dart';
 import '../database/models/army_details.dart';
+import '../services/xp_service.dart';
 
 class ArmyRepository {
   final AppDatabase database;
+  final XpService xpService;
 
-  ArmyRepository(this.database);
+  ArmyRepository(this.database, this.xpService);
 
   Future<List<ArmyListItem>> listArmies() {
     return database.armyDao.listArmies();
@@ -19,13 +21,15 @@ class ArmyRepository {
     required String factionId,
     int? pointsLimit,
     String? detachmentId,
-  }) {
-    return database.armyDao.createArmy(
+  }) async {
+    final id = await database.armyDao.createArmy(
       name: name,
       factionId: factionId,
       pointsLimit: pointsLimit,
       detachmentId: detachmentId,
     );
+    await xpService.awardFirstArmyIfNeeded(factionId);
+    return id;
   }
 
   Future<void> deleteArmy(String armyId) {

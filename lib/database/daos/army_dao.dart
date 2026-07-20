@@ -35,6 +35,16 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
 
   static const _uuid = Uuid();
 
+  Future<int> countArmies() async {
+    return (await select(armies).get()).length;
+  }
+
+  Future<String?> getFactionId(String armyId) async {
+    final row = await (select(armies)..where((t) => t.id.equals(armyId)))
+        .getSingleOrNull();
+    return row?.factionId;
+  }
+
   Future<String> createArmy({
     required String name,
     required String factionId,
@@ -59,6 +69,11 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     await (delete(armies)..where((t) => t.id.equals(armyId))).go();
   }
 
+  Future<void> _touchArmy(String armyId) {
+    return (update(armies)..where((t) => t.id.equals(armyId)))
+        .write(ArmiesCompanion(updatedAt: Value(DateTime.now())));
+  }
+
   Future<String> addUnit({
     required String armyId,
     required String datasheetId,
@@ -73,11 +88,16 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         modelCount: modelCount,
       ),
     );
+    await _touchArmy(armyId);
     return id;
   }
 
-  Future<void> removeUnit(String armyUnitId) {
-    return (delete(armyUnits)..where((t) => t.id.equals(armyUnitId))).go();
+  Future<void> removeUnit(String armyUnitId) async {
+    final unit = await (select(armyUnits)
+          ..where((t) => t.id.equals(armyUnitId)))
+        .getSingleOrNull();
+    await (delete(armyUnits)..where((t) => t.id.equals(armyUnitId))).go();
+    if (unit != null) await _touchArmy(unit.armyId);
   }
 
   /// Met à jour le nombre de figurines d'une unité, borné par les
@@ -100,6 +120,7 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
 
     await (update(armyUnits)..where((t) => t.id.equals(armyUnitId)))
         .write(ArmyUnitsCompanion(modelCount: Value(clamped)));
+    await _touchArmy(unit.armyId);
 
     return clamped;
   }
@@ -109,10 +130,14 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
   Future<void> setUnitEnhancement(
     String armyUnitId,
     String? enhancementId,
-  ) {
-    return (update(armyUnits)..where((t) => t.id.equals(armyUnitId))).write(
+  ) async {
+    final unit = await (select(armyUnits)
+          ..where((t) => t.id.equals(armyUnitId)))
+        .getSingle();
+    await (update(armyUnits)..where((t) => t.id.equals(armyUnitId))).write(
       ArmyUnitsCompanion(enhancementId: Value(enhancementId)),
     );
+    await _touchArmy(unit.armyId);
   }
 
   Future<void> updateNotes(String armyId, String? notes) {
@@ -177,7 +202,7 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     final query = select(armies).join([
       innerJoin(factions, factions.id.equalsExp(armies.factionId)),
     ])
-      ..orderBy([OrderingTerm.asc(armies.name)]);
+      ..orderBy([OrderingTerm.desc(armies.updatedAt)]);
 
     final rows = await query.get();
     final result = <ArmyListItem>[];
@@ -191,6 +216,7 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         factionName: faction.name,
         totalPoints: await _totalPoints(army.id),
         pointsLimit: army.pointsLimit,
+        updatedAt: army.updatedAt,
       ));
     }
     return result;
