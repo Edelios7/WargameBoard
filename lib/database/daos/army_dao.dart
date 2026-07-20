@@ -115,6 +115,15 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     );
   }
 
+  Future<void> updateNotes(String armyId, String? notes) {
+    return (update(armies)..where((t) => t.id.equals(armyId))).write(
+      ArmiesCompanion(
+        notes: Value(notes),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
   Future<List<DetachmentOption>> getDetachmentsForFaction(
     String factionId,
   ) async {

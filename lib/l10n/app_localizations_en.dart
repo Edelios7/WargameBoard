@@ -159,6 +159,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get armyBuilderDuplicate => 'Duplicate army';
 
   @override
+  String get armyBuilderNotesLabel => 'Notes';
+
+  @override
   String get armyBuilderDuplicateNameLabel => 'Copy name';
 
   @override

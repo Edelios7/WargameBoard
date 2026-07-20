@@ -78,6 +78,7 @@
   "armyBuilderCopyList": "Copy list",
   "armyBuilderCopiedToClipboard": "List copied to clipboard",
   "armyBuilderDuplicate": "Duplicate army",
+  "armyBuilderNotesLabel": "Notes",
   "armyBuilderDuplicateNameLabel": "Copy name",
   "armyBuilderDuplicateSuffix": "{name} (copy)",
   "@armyBuilderDuplicateSuffix": {

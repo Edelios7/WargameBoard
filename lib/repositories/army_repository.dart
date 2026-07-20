@@ -32,6 +32,10 @@ class ArmyRepository {
     return database.armyDao.deleteArmy(armyId);
   }
 
+  Future<void> updateNotes(String armyId, String? notes) {
+    return database.armyDao.updateNotes(armyId, notes);
+  }
+
   Future<int> updateModelCount(String armyUnitId, int modelCount) {
     return database.armyDao.updateModelCount(armyUnitId, modelCount);
   }

@@ -380,6 +380,12 @@ abstract class AppLocalizations {
   /// **'Dupliquer l\'armée'**
   String get armyBuilderDuplicate;
 
+  /// No description provided for @armyBuilderNotesLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notes'**
+  String get armyBuilderNotesLabel;
+
   /// No description provided for @armyBuilderDuplicateNameLabel.
   ///
   /// In fr, this message translates to:

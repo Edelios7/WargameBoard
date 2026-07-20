@@ -165,4 +165,19 @@ void main() {
       );
     }
   });
+
+  test('updateNotes sets and clears the army notes', () async {
+    final armyId = await database.armyDao.createArmy(
+      name: 'Liste avec notes',
+      factionId: seedFactionId,
+    );
+
+    await database.armyDao.updateNotes(armyId, 'Prévoir un plan B contre les chars.');
+    var army = await database.armyDao.getArmy(armyId);
+    expect(army!.notes, 'Prévoir un plan B contre les chars.');
+
+    await database.armyDao.updateNotes(armyId, null);
+    army = await database.armyDao.getArmy(armyId);
+    expect(army!.notes, isNull);
+  });
 }

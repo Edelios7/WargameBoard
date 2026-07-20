@@ -78,6 +78,7 @@
   "armyBuilderCopyList": "Copier la liste",
   "armyBuilderCopiedToClipboard": "Liste copiée dans le presse-papier",
   "armyBuilderDuplicate": "Dupliquer l'armée",
+  "armyBuilderNotesLabel": "Notes",
   "armyBuilderDuplicateNameLabel": "Nom de la copie",
   "armyBuilderDuplicateSuffix": "{name} (copie)",
   "@armyBuilderDuplicateSuffix": {

@@ -522,8 +522,83 @@ class _ArmyDetail extends ConsumerWidget {
                     },
                   ),
           ),
+          const SizedBox(height: 16),
+          _ArmyNotesField(armyId: army.id, initialNotes: army.notes),
         ],
       ),
+    );
+  }
+}
+
+class _ArmyNotesField extends ConsumerStatefulWidget {
+  final String armyId;
+  final String? initialNotes;
+
+  const _ArmyNotesField({required this.armyId, required this.initialNotes});
+
+  @override
+  ConsumerState<_ArmyNotesField> createState() => _ArmyNotesFieldState();
+}
+
+class _ArmyNotesFieldState extends ConsumerState<_ArmyNotesField> {
+  late final TextEditingController _controller;
+  late final FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialNotes ?? '');
+    _focusNode = FocusNode();
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus) _save();
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant _ArmyNotesField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.armyId != widget.armyId) {
+      _controller.text = widget.initialNotes ?? '';
+    }
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final text = _controller.text.trim();
+    if (text == (widget.initialNotes ?? '')) return;
+    await ref
+        .read(armyRepositoryProvider)
+        .updateNotes(widget.armyId, text.isEmpty ? null : text);
+    ref.invalidate(selectedArmyProvider);
+    ref.invalidate(armiesListProvider);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return TextField(
+      controller: _controller,
+      focusNode: _focusNode,
+      maxLines: 3,
+      style: AppTextStyles.body,
+      decoration: InputDecoration(
+        labelText: l10n.armyBuilderNotesLabel,
+        labelStyle: AppTextStyles.caption,
+        filled: true,
+        fillColor: AppColors.surface,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: AppColors.border),
+        ),
+      ),
+      onSubmitted: (_) => _save(),
     );
   }
 }
