@@ -203,6 +203,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get collectionAddEntry => 'Ajouter à la collection';
 
   @override
+  String get collectionExportCsv => 'Copier en CSV';
+
+  @override
+  String get collectionExportJson => 'Copier en JSON';
+
+  @override
+  String get collectionExportedToClipboard =>
+      'Collection copiée dans le presse-papier';
+
+  @override
   String get collectionEmpty => 'Ta collection est vide';
 
   @override

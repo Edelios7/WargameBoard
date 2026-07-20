@@ -452,6 +452,24 @@ abstract class AppLocalizations {
   /// **'Ajouter à la collection'**
   String get collectionAddEntry;
 
+  /// No description provided for @collectionExportCsv.
+  ///
+  /// In fr, this message translates to:
+  /// **'Copier en CSV'**
+  String get collectionExportCsv;
+
+  /// No description provided for @collectionExportJson.
+  ///
+  /// In fr, this message translates to:
+  /// **'Copier en JSON'**
+  String get collectionExportJson;
+
+  /// No description provided for @collectionExportedToClipboard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Collection copiée dans le presse-papier'**
+  String get collectionExportedToClipboard;
+
   /// No description provided for @collectionEmpty.
   ///
   /// In fr, this message translates to:

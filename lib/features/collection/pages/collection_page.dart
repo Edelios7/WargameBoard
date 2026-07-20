@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/collection_export_formatter.dart';
 import '../../../database/models/collection_item_details.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/collection_provider.dart';
@@ -93,6 +95,13 @@ class _CollectionPageState extends ConsumerState<CollectionPage>
   }
 }
 
+void _copyExport(BuildContext context, AppLocalizations l10n, String text) {
+  Clipboard.setData(ClipboardData(text: text));
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(l10n.collectionExportedToClipboard)),
+  );
+}
+
 class _CollectionTab extends ConsumerWidget {
   const _CollectionTab();
 
@@ -106,17 +115,62 @@ class _CollectionTab extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 12),
-        summaryAsync.when(
-          loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
-          data: (summary) => Text(
-            l10n.collectionSummaryLine(
-              summary.totalEntries,
-              summary.totalModels,
-              summary.totalPainted,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: summaryAsync.when(
+                loading: () => const SizedBox.shrink(),
+                error: (_, __) => const SizedBox.shrink(),
+                data: (summary) => Text(
+                  l10n.collectionSummaryLine(
+                    summary.totalEntries,
+                    summary.totalModels,
+                    summary.totalPainted,
+                  ),
+                  style: AppTextStyles.caption,
+                ),
+              ),
             ),
-            style: AppTextStyles.caption,
-          ),
+            entriesAsync.maybeWhen(
+              data: (entries) => entries.isEmpty
+                  ? const SizedBox.shrink()
+                  : PopupMenuButton<void>(
+                      tooltip: '',
+                      icon: const Icon(
+                        Icons.ios_share_rounded,
+                        color: AppColors.textSecondary,
+                        size: 20,
+                      ),
+                      color: AppColors.surface,
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          onTap: () => _copyExport(
+                            context,
+                            l10n,
+                            CollectionExportFormatter.toCsv(entries),
+                          ),
+                          child: Text(
+                            l10n.collectionExportCsv,
+                            style: AppTextStyles.body,
+                          ),
+                        ),
+                        PopupMenuItem(
+                          onTap: () => _copyExport(
+                            context,
+                            l10n,
+                            CollectionExportFormatter.toJson(entries),
+                          ),
+                          child: Text(
+                            l10n.collectionExportJson,
+                            style: AppTextStyles.body,
+                          ),
+                        ),
+                      ],
+                    ),
+              orElse: () => const SizedBox.shrink(),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
         Expanded(

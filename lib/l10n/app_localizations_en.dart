@@ -201,6 +201,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get collectionAddEntry => 'Add to collection';
 
   @override
+  String get collectionExportCsv => 'Copy as CSV';
+
+  @override
+  String get collectionExportJson => 'Copy as JSON';
+
+  @override
+  String get collectionExportedToClipboard => 'Collection copied to clipboard';
+
+  @override
   String get collectionEmpty => 'Your collection is empty';
 
   @override

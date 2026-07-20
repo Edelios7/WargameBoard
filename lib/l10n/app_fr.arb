@@ -108,6 +108,9 @@
   "armyBuilderOverLimit": "Limite de points dépassée",
 
   "collectionAddEntry": "Ajouter à la collection",
+  "collectionExportCsv": "Copier en CSV",
+  "collectionExportJson": "Copier en JSON",
+  "collectionExportedToClipboard": "Collection copiée dans le presse-papier",
   "collectionEmpty": "Ta collection est vide",
   "collectionQuantityLabel": "{count} possédées",
   "@collectionQuantityLabel": {
