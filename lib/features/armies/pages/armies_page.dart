@@ -310,7 +310,7 @@ class _ArmyBuilderPage extends ConsumerWidget {
                 child: army.units.isEmpty
                     ? Center(
                         child: Text(
-                          AppLocalizations.of(context)!.armyBuilderNoUnitsYet,
+                          AppLocalizations.of(context)!.armyBuilderEmptyUnits,
                           style: AppTextStyles.caption,
                         ),
                       )
@@ -549,49 +549,6 @@ class _BuilderSidebar extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _BuilderSidebarContent(army: army, l10n: l10n),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          FilledButton.icon(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              minimumSize: const Size.fromHeight(44),
-            ),
-            onPressed: () => showDialog(
-              context: context,
-              builder: (_) => AddUnitDialog(armyId: army.id),
-            ),
-            icon: const Icon(Icons.add_rounded),
-            label: Text(l10n.armyBuilderAddUnit),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _BuilderSidebarContent extends StatelessWidget {
-  final ArmyDetails army;
-  final AppLocalizations l10n;
-
-  const _BuilderSidebarContent({required this.army, required this.l10n});
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, _) {
-        final selectedUnitId = ref.watch(selectedUnitIdProvider);
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
           Text(
             l10n.armyBuilderDetachmentSection.toUpperCase(),
             style: AppTextStyles.eyebrow,
@@ -635,12 +592,12 @@ class _BuilderSidebarContent extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           Text(
             l10n.armyBuilderRulesSection.toUpperCase(),
             style: AppTextStyles.eyebrow,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           InkWell(
             onTap: army.detachmentId == null
                 ? null
@@ -659,25 +616,17 @@ class _BuilderSidebarContent extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           Text(
             l10n.armyBuilderUnitsSection.toUpperCase(),
             style: AppTextStyles.eyebrow,
           ),
-          const SizedBox(height: 8),
-          army.units.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Text(
-                      l10n.armyBuilderEmptyUnits,
-                      style: AppTextStyles.caption,
-                      textAlign: TextAlign.center,
-                    ),
-                  )
+          const SizedBox(height: 6),
+          Expanded(
+            child: army.units.isEmpty
+                ? const SizedBox.shrink()
                 : ListView.builder(
                     padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: army.units.length,
                     itemBuilder: (context, index) {
                       final unit = army.units[index];
@@ -690,9 +639,22 @@ class _BuilderSidebarContent extends StatelessWidget {
                       );
                     },
                   ),
-          ],
-        );
-      },
+          ),
+          const SizedBox(height: 10),
+          FilledButton.icon(
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              minimumSize: const Size.fromHeight(40),
+            ),
+            onPressed: () => showDialog(
+              context: context,
+              builder: (_) => AddUnitDialog(armyId: army.id),
+            ),
+            icon: const Icon(Icons.add_rounded),
+            label: Text(l10n.armyBuilderAddUnit),
+          ),
+        ],
+      ),
     );
   }
 }

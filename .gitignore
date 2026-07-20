@@ -56,3 +56,6 @@ local_assets/**/*.webp
 # Dossier de compilation de données de jeu (stats, règles) - usage privé
 # uniquement, jamais commité (contenu dérivé de règles officielles GW)
 local_assets/wh40k_reference/
+
+# Sortie de l'outil manuel test/features/catalog_screenshot_test.dart
+catalog_screenshot.png

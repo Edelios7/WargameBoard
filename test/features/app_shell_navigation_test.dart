@@ -34,7 +34,7 @@ void main() {
     await tester.pumpWidget(_wrap(database));
     await tester.pumpAndSettle();
 
-    expect(find.text('Bienvenue sur Wargame Board'), findsOneWidget);
+    expect(find.text('Bonjour !'), findsOneWidget);
     expect(find.text('Armées'), findsWidgets);
   });
 
@@ -49,13 +49,13 @@ void main() {
     expect(find.text('Rechercher une unité...'), findsOneWidget);
   });
 
-  testWidgets('tapping the Armées stat tile navigates to Army Builder',
+  testWidgets('tapping the points stat tile navigates to Army Builder',
       (tester) async {
     await tester.pumpWidget(_wrap(database));
     await tester.pumpAndSettle();
 
-    // La tuile "ARMÉES" du dashboard (pas l'item de la sidebar).
-    await tester.tap(find.text('ARMÉES'));
+    // La tuile "POINTS CUMULÉS" du dashboard (pas l'item de la sidebar).
+    await tester.tap(find.text('POINTS CUMULÉS'));
     await tester.pumpAndSettle();
 
     expect(find.text('Aucune armée pour l\'instant'), findsOneWidget);

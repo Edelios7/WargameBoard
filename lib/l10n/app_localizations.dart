@@ -1502,6 +1502,48 @@ abstract class AppLocalizations {
   /// **'Nouveau projet...'**
   String get dashboardAddProjectHint;
 
+  /// No description provided for @dashboardSearchHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher (Ctrl+K)'**
+  String get dashboardSearchHint;
+
+  /// No description provided for @dashboardArmyStatusOk.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valide'**
+  String get dashboardArmyStatusOk;
+
+  /// No description provided for @dashboardArmyStatusWarning.
+  ///
+  /// In fr, this message translates to:
+  /// **'Attention'**
+  String get dashboardArmyStatusWarning;
+
+  /// No description provided for @dashboardCreateArmyShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer une nouvelle armée'**
+  String get dashboardCreateArmyShort;
+
+  /// No description provided for @dashboardVersus.
+  ///
+  /// In fr, this message translates to:
+  /// **'vs'**
+  String get dashboardVersus;
+
+  /// No description provided for @dashboardRecentAdditionsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Derniers ajouts'**
+  String get dashboardRecentAdditionsTitle;
+
+  /// No description provided for @dashboardRecentAdditionsEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun ajout récent'**
+  String get dashboardRecentAdditionsEmpty;
+
   /// No description provided for @battleScheduleLabel.
   ///
   /// In fr, this message translates to:

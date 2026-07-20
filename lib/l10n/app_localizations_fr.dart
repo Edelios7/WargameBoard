@@ -766,6 +766,27 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dashboardAddProjectHint => 'Nouveau projet...';
 
   @override
+  String get dashboardSearchHint => 'Rechercher (Ctrl+K)';
+
+  @override
+  String get dashboardArmyStatusOk => 'Valide';
+
+  @override
+  String get dashboardArmyStatusWarning => 'Attention';
+
+  @override
+  String get dashboardCreateArmyShort => 'Créer une nouvelle armée';
+
+  @override
+  String get dashboardVersus => 'vs';
+
+  @override
+  String get dashboardRecentAdditionsTitle => 'Derniers ajouts';
+
+  @override
+  String get dashboardRecentAdditionsEmpty => 'Aucun ajout récent';
+
+  @override
   String get battleScheduleLabel => 'Date de la partie';
 
   @override

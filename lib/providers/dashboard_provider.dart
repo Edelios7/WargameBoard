@@ -82,6 +82,12 @@ final recentPurchasesProvider =
   return repository.listRecentPurchases();
 });
 
+final recentlyAddedProvider =
+    FutureProvider<List<CollectionItemDetails>>((ref) {
+  final repository = ref.watch(collectionRepositoryProvider);
+  return repository.listRecentlyAdded();
+});
+
 class CatalogStats {
   final int datasheets;
   final int modelProfiles;
