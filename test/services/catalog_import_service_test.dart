@@ -105,6 +105,86 @@ void main() {
     expect(details!.points, 85);
   });
 
+  test('imports a new faction with a datasheet, models and weapons',
+      () async {
+    await service.importJson(jsonEncode({
+      'factions': [
+        {
+          'id': 'fac-test-tyranids',
+          'gameSystemId': seedGameSystemId,
+          'name': 'Tyranids',
+        },
+      ],
+      'weapons': [
+        {'id': 'wp-test-talons', 'name': 'Monstrous talons', 'isMelee': true},
+      ],
+      'datasheets': [
+        {
+          'id': 'ds-test-tervigon',
+          'name': 'Tervigon',
+          'factionId': 'fac-test-tyranids',
+          'battlefieldRole': 'Monstre',
+          'unitType': 'Monster',
+          'weaponIds': ['wp-test-talons'],
+          'models': [
+            {
+              'name': 'Tervigon',
+              'movement': 8,
+              'toughness': 11,
+              'save': 2,
+              'wounds': 16,
+              'leadership': 8,
+              'objectiveControl': 4,
+            },
+          ],
+        },
+      ],
+    }));
+
+    final search = await database.datasheetDao.search('Tervigon');
+    final details =
+        await database.datasheetDao.getDatasheet(search.single.id);
+    expect(details!.factionName, 'Tyranids');
+    expect(details.models, hasLength(1));
+    expect(details.models.single.toughness, 11);
+    expect(details.weapons.single.name, 'Monstrous talons');
+  });
+
+  test('re-importing models replaces them instead of accumulating',
+      () async {
+    Map<String, dynamic> doc(int wounds) => {
+          'datasheets': [
+            {
+              'id': 'ds-test-models',
+              'name': 'Model Squad',
+              'factionId': seedFactionId,
+              'battlefieldRole': 'Elites',
+              'unitType': 'Infantry',
+              'models': [
+                {
+                  'name': 'Fighter',
+                  'movement': 6,
+                  'toughness': 4,
+                  'save': 3,
+                  'wounds': wounds,
+                  'leadership': 6,
+                  'objectiveControl': 1,
+                },
+              ],
+            },
+          ],
+        };
+
+    await service.importJson(jsonEncode(doc(2)));
+    await service.importJson(jsonEncode(doc(3)));
+
+    final search = await database.datasheetDao.search('Model Squad');
+    final details =
+        await database.datasheetDao.getDatasheet(search.single.id);
+    expect(details!.models, hasLength(1));
+    expect(details.models.single.wounds, 3);
+  });
+
   test('rejects invalid JSON and unknown factions without partial writes',
       () async {
     expect(

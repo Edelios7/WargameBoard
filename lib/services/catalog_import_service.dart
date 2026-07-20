@@ -36,6 +36,7 @@ class CatalogImportException implements Exception {
 /// Format attendu (toutes les sections sont optionnelles) :
 /// ```json
 /// {
+///   "factions":  [{"id": "...", "gameSystemId": "...", "name": "..."}],
 ///   "keywords":  [{"id": "...", "name": "..."}],
 ///   "abilities": [{"id": "...", "name": "...", "description": "..."}],
 ///   "weapons": [{
@@ -48,7 +49,11 @@ class CatalogImportException implements Exception {
 ///     "battlefieldRole": "...", "unitType": "...",
 ///     "points": 90, "editionId": "...",
 ///     "minimumModels": 1, "maximumModels": 1, "defaultModels": 1,
-///     "keywordIds": ["..."], "abilityIds": ["..."]
+///     "keywordIds": ["..."], "abilityIds": ["..."],
+///     "weaponIds": ["..."],
+///     "models": [{"name": "...", "movement": 6, "toughness": 4,
+///                 "save": 3, "wounds": 5, "leadership": 6,
+///                 "objectiveControl": 1}]
 ///   }]
 /// }
 /// ```
@@ -76,6 +81,7 @@ class CatalogImportService {
     }
 
     return database.transaction(() async {
+      await _importFactions(decoded);
       final keywords = await _importKeywords(decoded);
       final abilities = await _importAbilities(decoded);
       final weapons = await _importWeapons(decoded);
@@ -87,6 +93,29 @@ class CatalogImportService {
         datasheets: datasheets,
       );
     });
+  }
+
+  Future<void> _importFactions(Map<String, dynamic> root) async {
+    final items = _section(root, 'factions');
+    for (final item in items) {
+      final gameSystemId =
+          _require<String>(item, 'gameSystemId', 'factions');
+      final systemExists = await (database.select(database.gameSystems)
+            ..where((t) => t.id.equals(gameSystemId)))
+          .getSingleOrNull();
+      if (systemExists == null) {
+        throw CatalogImportException(
+          'Système de jeu inconnu "$gameSystemId" dans "factions".',
+        );
+      }
+      await database.into(database.factions).insertOnConflictUpdate(
+            FactionsCompanion.insert(
+              id: _require<String>(item, 'id', 'factions'),
+              gameSystemId: gameSystemId,
+              name: _require<String>(item, 'name', 'factions'),
+            ),
+          );
+    }
   }
 
   List<Map<String, dynamic>> _section(Map<String, dynamic> root, String key) {
@@ -244,6 +273,73 @@ class CatalogImportService {
                 defaultModels: item['defaultModels'] as int? ?? minModels,
               ),
             );
+      }
+
+      final models = item['models'];
+      if (models is List) {
+        // Le document importé fait foi : remplace les modèles existants.
+        final oldModels = await (database.select(database.datasheetModels)
+              ..where((t) => t.datasheetId.equals(datasheetId)))
+            .get();
+        for (final oldModel in oldModels) {
+          await (database.delete(database.modelProfiles)
+                ..where((t) => t.datasheetModelId.equals(oldModel.id)))
+              .go();
+        }
+        await (database.delete(database.datasheetModels)
+              ..where((t) => t.datasheetId.equals(datasheetId)))
+            .go();
+
+        for (var i = 0; i < models.length; i++) {
+          final model = models[i];
+          if (model is! Map<String, dynamic>) {
+            throw CatalogImportException(
+              'Modèle invalide pour la datasheet $datasheetId.',
+            );
+          }
+          final modelId = 'dm-$datasheetId-$i';
+          final modelName = _require<String>(model, 'name', 'models');
+          await database.into(database.datasheetModels).insert(
+                DatasheetModelsCompanion.insert(
+                  id: modelId,
+                  datasheetId: datasheetId,
+                  name: modelName,
+                  displayOrder: Value(i),
+                ),
+              );
+          await database.into(database.modelProfiles).insert(
+                ModelProfilesCompanion.insert(
+                  id: 'mp-$datasheetId-$i',
+                  datasheetModelId: modelId,
+                  name: modelName,
+                  movement: _require<int>(model, 'movement', 'models'),
+                  toughness: _require<int>(model, 'toughness', 'models'),
+                  save: _require<int>(model, 'save', 'models'),
+                  wounds: _require<int>(model, 'wounds', 'models'),
+                  leadership: _require<int>(model, 'leadership', 'models'),
+                  objectiveControl:
+                      _require<int>(model, 'objectiveControl', 'models'),
+                ),
+              );
+        }
+      }
+
+      final weaponIds = item['weaponIds'];
+      if (weaponIds is List && models is List && models.isNotEmpty) {
+        // Rattache les armes au premier modèle de la datasheet.
+        const modelIndex = 0;
+        for (final weaponId in weaponIds.cast<String>()) {
+          await database
+              .into(database.datasheetWeapons)
+              .insertOnConflictUpdate(
+                DatasheetWeaponsCompanion.insert(
+                  id: 'dw-$datasheetId-$weaponId',
+                  datasheetModelId: 'dm-$datasheetId-$modelIndex',
+                  weaponId: weaponId,
+                  isDefault: const Value(true),
+                ),
+              );
+        }
       }
 
       final keywordIds = item['keywordIds'];
