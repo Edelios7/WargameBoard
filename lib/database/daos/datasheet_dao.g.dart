@@ -23,6 +23,7 @@ mixin _$DatasheetDaoMixin on DatabaseAccessor<AppDatabase> {
       attachedDatabase.weaponKeywordLinks;
   $WeaponAbilityLinksTable get weaponAbilityLinks =>
       attachedDatabase.weaponAbilityLinks;
+  $WeaponProfilesTable get weaponProfiles => attachedDatabase.weaponProfiles;
   $EquipmentGroupsTable get equipmentGroups => attachedDatabase.equipmentGroups;
   $EquipmentOptionsTable get equipmentOptions =>
       attachedDatabase.equipmentOptions;
@@ -81,6 +82,11 @@ class DatasheetDaoManager {
       $$WeaponAbilityLinksTableTableManager(
         _db.attachedDatabase,
         _db.weaponAbilityLinks,
+      );
+  $$WeaponProfilesTableTableManager get weaponProfiles =>
+      $$WeaponProfilesTableTableManager(
+        _db.attachedDatabase,
+        _db.weaponProfiles,
       );
   $$EquipmentGroupsTableTableManager get equipmentGroups =>
       $$EquipmentGroupsTableTableManager(

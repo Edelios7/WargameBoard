@@ -23,6 +23,7 @@ import '../tables/model_profiles_table.dart';
 import '../tables/unit_sizes_table.dart';
 import '../tables/weapon_ability_links_table.dart';
 import '../tables/weapon_keyword_links_table.dart';
+import '../tables/weapon_profiles_table.dart';
 import '../tables/weapons_table.dart';
 
 part 'datasheet_dao.g.dart';
@@ -43,6 +44,7 @@ part 'datasheet_dao.g.dart';
     Weapons,
     WeaponKeywordLinks,
     WeaponAbilityLinks,
+    WeaponProfiles,
     EquipmentGroups,
     EquipmentOptions,
     UnitSizes,
@@ -213,9 +215,29 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
         type: weapon.isMelee ? 'Melee' : 'Ranged',
         keywords: await _weaponKeywordNames(weapon.id),
         abilities: await _weaponAbilityNames(weapon.id),
+        profiles: await _weaponProfiles(weapon.id),
       ));
     }
     return result;
+  }
+
+  Future<List<WeaponProfileDetails>> _weaponProfiles(String weaponId) async {
+    final rows = await (select(weaponProfiles)
+          ..where((t) => t.weaponId.equals(weaponId))
+          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+        .get();
+    return rows
+        .map((p) => WeaponProfileDetails(
+              name: p.name,
+              range: p.range,
+              attacks: p.attacks,
+              ballisticSkill: p.ballisticSkill,
+              weaponSkill: p.weaponSkill,
+              strength: p.strength,
+              armorPenetration: p.armorPenetration,
+              damage: p.damage,
+            ))
+        .toList();
   }
 
   Future<List<String>> _weaponKeywordNames(String weaponId) async {

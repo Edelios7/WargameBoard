@@ -68,6 +68,7 @@ import 'daos/collection_dao.dart';
 import 'daos/battle_dao.dart';
 
 import 'seed/catalog_seed.dart';
+import 'seed/weapon_profile_seed.dart';
 
 part 'app_database.g.dart';
 
@@ -175,7 +176,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   // =========================
   // Migrations
@@ -213,6 +214,11 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 8) {
             await m.createTable(wishlistItems);
+          }
+          if (from < 9) {
+            // Backfill des profils d'armes sur les bases déjà créées
+            // avant leur introduction dans le seed.
+            await seedWeaponProfiles(this);
           }
         },
 

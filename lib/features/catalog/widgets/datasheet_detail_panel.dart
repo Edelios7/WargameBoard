@@ -158,10 +158,22 @@ class DatasheetDetailPanel extends StatelessWidget {
       children: sheet.weapons
           .map(
             (weapon) => Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Text(
-                '${weapon.name} (${weapon.type})',
-                style: AppTextStyles.body,
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(weapon.name, style: AppTextStyles.body),
+                  for (final profile in weapon.profiles)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(
+                        profile.summary,
+                        style: AppTextStyles.caption,
+                      ),
+                    ),
+                  if (weapon.profiles.isEmpty)
+                    Text(weapon.type, style: AppTextStyles.caption),
+                ],
               ),
             ),
           )

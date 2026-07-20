@@ -50,6 +50,26 @@ void main() {
     expect(none, isEmpty);
   });
 
+  test('weapons expose their seeded profiles', () async {
+    final results = await database.datasheetDao.search('Captain');
+    final details =
+        await database.datasheetDao.getDatasheet(results.single.id);
+
+    final plasmaPistol = details!.weapons
+        .firstWhere((weapon) => weapon.name == 'Plasma pistol');
+    expect(plasmaPistol.profiles, hasLength(1));
+    final profile = plasmaPistol.profiles.single;
+    expect(profile.range, 12);
+    expect(profile.isMelee, isFalse);
+    expect(profile.summary, contains('CT2+'));
+    expect(profile.summary, contains('PA-2'));
+
+    final powerWeapon = details.weapons.firstWhere(
+        (weapon) => weapon.name == 'Master-crafted power weapon');
+    expect(powerWeapon.profiles.single.isMelee, isTrue);
+    expect(powerWeapon.profiles.single.summary, startsWith('Mêlée'));
+  });
+
   test('search filters by keyword', () async {
     final flying =
         await database.datasheetDao.search('', keywordId: 'kw-fly');

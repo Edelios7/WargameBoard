@@ -5,6 +5,7 @@ import 'detachment_seed.dart';
 import 'faction_seed.dart';
 import 'keyword_seed.dart';
 import 'orks_seed.dart';
+import 'weapon_profile_seed.dart';
 
 Future<void> seedCatalog(AppDatabase db) async {
   await db.transaction(() async {
@@ -14,5 +15,6 @@ Future<void> seedCatalog(AppDatabase db) async {
     await seedDatasheets(db);
     await seedDetachments(db);
     await seedOrks(db);
+    await seedWeaponProfiles(db);
   });
 }
