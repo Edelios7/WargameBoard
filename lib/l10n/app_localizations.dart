@@ -848,6 +848,12 @@ abstract class AppLocalizations {
   /// **'Peintes'**
   String get collectionPainted;
 
+  /// No description provided for @collectionIncrementQuantity.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter 1 à la quantité'**
+  String get collectionIncrementQuantity;
+
   /// No description provided for @collectionQuantityDialogLabel.
   ///
   /// In fr, this message translates to:

@@ -1017,6 +1017,15 @@ class _CollectionCard extends ConsumerWidget {
     ref.invalidate(collectionSummaryProvider);
   }
 
+  Future<void> _incrementQuantity(WidgetRef ref) async {
+    await ref.read(collectionRepositoryProvider).updateCounts(
+          entry.id,
+          quantity: entry.quantity + 1,
+        );
+    ref.invalidate(collectionEntriesProvider);
+    ref.invalidate(collectionSummaryProvider);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
@@ -1048,9 +1057,31 @@ class _CollectionCard extends ConsumerWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 8),
-            Text(
-              l10n.collectionQuantityLabel(entry.quantity),
-              style: AppTextStyles.caption.copyWith(color: AppColors.primary),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.collectionQuantityLabel(entry.quantity),
+                    style: AppTextStyles.caption
+                        .copyWith(color: AppColors.primary),
+                  ),
+                ),
+                Tooltip(
+                  message: l10n.collectionIncrementQuantity,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(6),
+                    onTap: () => _incrementQuantity(ref),
+                    child: Padding(
+                      padding: const EdgeInsets.all(2),
+                      child: Icon(
+                        Icons.exposure_plus_1_rounded,
+                        size: 16,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             _CountRow(

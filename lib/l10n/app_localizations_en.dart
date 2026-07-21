@@ -409,6 +409,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get collectionPainted => 'Painted';
 
   @override
+  String get collectionIncrementQuantity => 'Add 1 to quantity';
+
+  @override
   String get collectionQuantityDialogLabel => 'Quantity';
 
   @override

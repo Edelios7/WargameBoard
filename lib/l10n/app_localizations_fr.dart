@@ -414,6 +414,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get collectionPainted => 'Peintes';
 
   @override
+  String get collectionIncrementQuantity => 'Ajouter 1 à la quantité';
+
+  @override
   String get collectionQuantityDialogLabel => 'Quantité';
 
   @override

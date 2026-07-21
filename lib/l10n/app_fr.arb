@@ -200,6 +200,7 @@
   "collectionAssembled": "Montées",
   "collectionPrimed": "Apprêtées",
   "collectionPainted": "Peintes",
+  "collectionIncrementQuantity": "Ajouter 1 à la quantité",
   "collectionQuantityDialogLabel": "Quantité",
   "collectionPriceDialogLabel": "Prix (optionnel)",
   "collectionSummaryLine": "{entries} unités · {models} figurines · {painted} peintes",

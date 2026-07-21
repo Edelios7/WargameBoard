@@ -200,6 +200,7 @@
   "collectionAssembled": "Assembled",
   "collectionPrimed": "Primed",
   "collectionPainted": "Painted",
+  "collectionIncrementQuantity": "Add 1 to quantity",
   "collectionQuantityDialogLabel": "Quantity",
   "collectionPriceDialogLabel": "Price (optional)",
   "collectionSummaryLine": "{entries} units · {models} models · {painted} painted",
