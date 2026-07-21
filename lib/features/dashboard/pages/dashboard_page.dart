@@ -841,7 +841,11 @@ class _ArmyRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-          FactionBadgeIcon(factionName: army.factionName, size: 36),
+          FactionBadgeIcon(
+            factionName: army.factionName,
+            factionId: army.factionId,
+            size: 36,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -1199,6 +1203,9 @@ class _NextBattleCard extends StatelessWidget {
                 final myFactionName = myArmy.isEmpty
                     ? null
                     : myArmy.first.factionName;
+                final myFactionId = myArmy.isEmpty
+                    ? null
+                    : myArmy.first.factionId;
                 final opponentFactionName = battle!.opponentFactionName;
 
                 return Row(
@@ -1209,6 +1216,7 @@ class _NextBattleCard extends StatelessWidget {
                           FactionBadgeIcon(
                             factionName:
                                 myFactionName ?? battle!.armyName ?? '?',
+                            factionId: myFactionId,
                             size: 32,
                           ),
                           const SizedBox(height: 4),

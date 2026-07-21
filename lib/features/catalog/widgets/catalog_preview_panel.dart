@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
+import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../database/models/cost_bracket.dart';
 import '../../../database/models/datasheet_details.dart';
 import '../../../database/models/model_details.dart';
@@ -56,8 +57,9 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
 
     final imageFile = LocalCatalogImages.datasheet(sheet.id);
     final model = sheet.models.isNotEmpty ? sheet.models.first : null;
-    final visibleKeywords =
-        _expandKeywords ? sheet.keywords : sheet.keywords.take(4).toList();
+    final visibleKeywords = _expandKeywords
+        ? sheet.keywords
+        : sheet.keywords.take(4).toList();
 
     return Container(
       color: AppColors.surface,
@@ -79,7 +81,18 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
                     children: [
                       Text(sheet.name, style: AppTextStyles.title),
                       const SizedBox(height: 4),
-                      Text(sheet.factionName, style: AppTextStyles.caption),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          FactionBadgeIcon(
+                            factionName: sheet.factionName,
+                            factionId: sheet.factionId,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(sheet.factionName, style: AppTextStyles.caption),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -117,17 +130,20 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
               _statBoxRow(l10n, model),
               const SizedBox(height: 24),
             ],
-            if (sheet.description != null &&
-                sheet.description!.isNotEmpty) ...[
-              Text(l10n.sectionDescription.toUpperCase(),
-                  style: AppTextStyles.eyebrow),
+            if (sheet.description != null && sheet.description!.isNotEmpty) ...[
+              Text(
+                l10n.sectionDescription.toUpperCase(),
+                style: AppTextStyles.eyebrow,
+              ),
               const SizedBox(height: 8),
               Text(sheet.description!, style: AppTextStyles.body),
               const SizedBox(height: 24),
             ],
             if (sheet.keywords.isNotEmpty) ...[
-              Text(l10n.sectionKeywords.toUpperCase(),
-                  style: AppTextStyles.eyebrow),
+              Text(
+                l10n.sectionKeywords.toUpperCase(),
+                style: AppTextStyles.eyebrow,
+              ),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -143,8 +159,9 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
                         _expandKeywords
                             ? l10n.catalogSeeLess
                             : l10n.catalogSeeMore,
-                        style: AppTextStyles.caption
-                            .copyWith(color: AppColors.primary),
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
                 ],
@@ -292,8 +309,10 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 3),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.surfaceElevated,
                     borderRadius: BorderRadius.circular(10),
