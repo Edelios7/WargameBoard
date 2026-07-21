@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../core/widgets/donut_chart.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/battle_details.dart';
@@ -84,6 +85,7 @@ class DashboardPage extends ConsumerWidget {
                   children: [
                     _StatTile(
                       icon: Icons.military_tech_rounded,
+                      accentColor: AppColors.primary,
                       label: l10n.dashboardStatPoints,
                       value: totalArmyPoints.toString(),
                       sublabel: l10n.dashboardStatPointsSub,
@@ -91,6 +93,7 @@ class DashboardPage extends ConsumerWidget {
                     ),
                     _StatTile(
                       icon: Icons.inventory_2_rounded,
+                      accentColor: AppColors.info,
                       label: l10n.dashboardStatModels,
                       value: (summary?.totalModels ?? 0).toString(),
                       sublabel: l10n.dashboardStatModelsSub,
@@ -98,6 +101,7 @@ class DashboardPage extends ConsumerWidget {
                     ),
                     _StatTile(
                       icon: Icons.brush_rounded,
+                      accentColor: AppColors.success,
                       label: l10n.dashboardStatPainting,
                       value: summary == null
                           ? '—'
@@ -168,6 +172,7 @@ class DashboardPage extends ConsumerWidget {
                   ),
                   _NextBattleCard(
                     battle: nextBattleAsync.value,
+                    armies: armies,
                     onTap: () => goTo(AppTab.battles),
                   ),
                 ];
@@ -478,6 +483,7 @@ class _BadgeIconButton extends StatelessWidget {
 
 class _StatTile extends StatelessWidget {
   final IconData icon;
+  final Color accentColor;
   final String label;
   final String value;
   final String sublabel;
@@ -485,6 +491,7 @@ class _StatTile extends StatelessWidget {
 
   const _StatTile({
     required this.icon,
+    required this.accentColor,
     required this.label,
     required this.value,
     required this.sublabel,
@@ -496,37 +503,46 @@ class _StatTile extends StatelessWidget {
     return AppCard(
       onTap: onTap,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(icon, size: 16, color: AppColors.primary),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
                   label.toUpperCase(),
                   style: AppTextStyles.eyebrow,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
+                const SizedBox(height: 6),
+                Text(
+                  value,
+                  style: AppTextStyles.heading,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  sublabel,
+                  style: AppTextStyles.caption,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: AppTextStyles.heading,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 2),
-          Text(
-            sublabel,
-            style: AppTextStyles.caption,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          const SizedBox(width: 12),
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: accentColor.withValues(alpha: .16),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, size: 22, color: accentColor),
           ),
         ],
       ),
@@ -747,18 +763,14 @@ class _YourArmiesCard extends StatelessWidget {
   }
 }
 
-class _ArmyRow extends ConsumerWidget {
+class _ArmyRow extends StatelessWidget {
   final ArmyListItem army;
 
   const _ArmyRow({required this.army});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final heroImageId =
-        ref.watch(factionHeroImageIdProvider(army.factionId)).value;
-    final heroFile =
-        heroImageId == null ? null : LocalCatalogImages.datasheet(heroImageId);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -769,21 +781,7 @@ class _ArmyRow extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: heroFile != null
-                ? Image.file(heroFile, width: 36, height: 36, fit: BoxFit.cover)
-                : Container(
-                    width: 36,
-                    height: 36,
-                    color: AppColors.surfaceElevated,
-                    child: const Icon(
-                      Icons.shield_outlined,
-                      size: 18,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-          ),
+          FactionBadgeIcon(factionName: army.factionName, size: 36),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -1089,9 +1087,14 @@ class _RecentlyViewedCard extends StatelessWidget {
 
 class _NextBattleCard extends StatelessWidget {
   final BattleDetails? battle;
+  final List<ArmyListItem> armies;
   final VoidCallback onTap;
 
-  const _NextBattleCard({required this.battle, required this.onTap});
+  const _NextBattleCard({
+    required this.battle,
+    required this.armies,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1119,34 +1122,61 @@ class _NextBattleCard extends StatelessWidget {
                   .formatMediumDate(battle!.playedAt),
               style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    battle!.armyName ?? '—',
-                    style: AppTextStyles.caption,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+            const SizedBox(height: 10),
+            Builder(builder: (context) {
+              final myArmy = armies.where((a) => a.id == battle!.armyId);
+              final myFactionName =
+                  myArmy.isEmpty ? null : myArmy.first.factionName;
+              final opponentFactionName = battle!.opponentFactionName;
+
+              return Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        FactionBadgeIcon(
+                          factionName: myFactionName ?? battle!.armyName ?? '?',
+                          size: 32,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          myFactionName ?? battle!.armyName ?? '—',
+                          style: AppTextStyles.caption,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(l10n.dashboardVersus, style: AppTextStyles.caption),
-                ),
-                Expanded(
-                  child: Text(
-                    battle!.opponentFactionName ??
-                        battle!.opponentName ??
-                        '—',
-                    style: AppTextStyles.caption,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.end,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child:
+                        Text(l10n.dashboardVersus, style: AppTextStyles.caption),
                   ),
-                ),
-              ],
-            ),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        FactionBadgeIcon(
+                          factionName: opponentFactionName ??
+                              battle!.opponentName ??
+                              '?',
+                          size: 32,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          opponentFactionName ?? battle!.opponentName ?? '—',
+                          style: AppTextStyles.caption,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }),
             if (battle!.location != null) ...[
               const SizedBox(height: 8),
               Row(
