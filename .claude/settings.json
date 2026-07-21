@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter analyze)",
+      "Bash(flutter analyze *)",
+      "Bash(flutter test)",
+      "Bash(flutter test *)",
+      "Bash(tasklist)",
+      "mcp__Claude_Browser__preview_logs",
+      "mcp__Claude_Browser__read_console_messages"
+    ]
+  }
+}
