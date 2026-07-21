@@ -105,7 +105,7 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
               const SizedBox(height: 20),
             ],
             if (model != null) ...[
-              _statBoxRow(model),
+              _statBoxRow(l10n, model),
               const SizedBox(height: 24),
             ],
             if (sheet.description != null &&
@@ -212,14 +212,14 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
     );
   }
 
-  Widget _statBoxRow(ModelDetails model) {
+  Widget _statBoxRow(AppLocalizations l10n, ModelDetails model) {
     final stats = <(String, String)>[
-      ('M', '${model.movement}"'),
-      ('T', '${model.toughness}'),
-      ('SV', '${model.save}+'),
-      ('W', '${model.wounds}'),
-      ('LD', '${model.leadership}+'),
-      ('OC', '${model.objectiveControl}'),
+      (l10n.statMovement, '${model.movement}"'),
+      (l10n.statToughness, '${model.toughness}'),
+      (l10n.statSave, '${model.save}+'),
+      (l10n.statWounds, '${model.wounds}'),
+      (l10n.statLeadership, '${model.leadership}+'),
+      (l10n.statObjectiveControl, '${model.objectiveControl}'),
     ];
     return Row(
       children: stats
@@ -228,7 +228,8 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 3),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
                   decoration: BoxDecoration(
                     color: AppColors.surfaceElevated,
                     borderRadius: BorderRadius.circular(10),
@@ -238,7 +239,13 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
                     children: [
                       Text(stat.$2, style: AppTextStyles.title),
                       const SizedBox(height: 2),
-                      Text(stat.$1, style: AppTextStyles.eyebrow),
+                      Text(
+                        stat.$1,
+                        style: AppTextStyles.eyebrow,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ],
                   ),
                 ),

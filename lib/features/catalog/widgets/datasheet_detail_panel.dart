@@ -6,6 +6,7 @@ import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
 import '../../../database/models/ability_details.dart';
 import '../../../database/models/datasheet_details.dart';
+import '../../../domain/catalog/core_ability_glossary.dart';
 import '../../../l10n/app_localizations.dart';
 
 class DatasheetDetailPanel extends StatelessWidget {
@@ -59,12 +60,15 @@ class DatasheetDetailPanel extends StatelessWidget {
               style: AppTextStyles.body,
             ),
           ),
-          _section(l10n.sectionProfiles, _modelsStatBlocks(sheet)),
+          _section(l10n.sectionProfiles, _modelsStatBlocks(sheet, l10n)),
           _section(l10n.sectionWeapons, _weaponsList(l10n, sheet)),
           if (sheet.keywords.isNotEmpty)
             _section(l10n.sectionKeywords, _chips(sheet.keywords)),
           if (sheet.abilities.isNotEmpty)
-            _section(l10n.sectionAbilities, _abilityCards(sheet.abilities)),
+            _section(
+              l10n.sectionAbilities,
+              _abilityCards(sheet.abilities, l10n),
+            ),
           if (sheet.equipment.isNotEmpty)
             _section(l10n.sectionEquipment, _equipmentList(sheet)),
         ],
@@ -185,7 +189,7 @@ class DatasheetDetailPanel extends StatelessWidget {
     );
   }
 
-  Widget _modelsStatBlocks(DatasheetDetails sheet) {
+  Widget _modelsStatBlocks(DatasheetDetails sheet, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: sheet.models
@@ -203,12 +207,15 @@ class DatasheetDetailPanel extends StatelessWidget {
                   ],
                   Row(
                     children: [
-                      _statBox('M', '${model.movement}"'),
-                      _statBox('T', '${model.toughness}'),
-                      _statBox('Sv', '${model.save}+'),
-                      _statBox('W', '${model.wounds}'),
-                      _statBox('Ld', '${model.leadership}+'),
-                      _statBox('OC', '${model.objectiveControl}'),
+                      _statBox(l10n.statMovement, '${model.movement}"'),
+                      _statBox(l10n.statToughness, '${model.toughness}'),
+                      _statBox(l10n.statSave, '${model.save}+'),
+                      _statBox(l10n.statWounds, '${model.wounds}'),
+                      _statBox(l10n.statLeadership, '${model.leadership}+'),
+                      _statBox(
+                        l10n.statObjectiveControl,
+                        '${model.objectiveControl}',
+                      ),
                     ],
                   ),
                 ],
@@ -223,7 +230,7 @@ class DatasheetDetailPanel extends StatelessWidget {
     return Expanded(
       child: Container(
         margin: const EdgeInsets.only(right: 8),
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
         decoration: BoxDecoration(
           color: AppColors.surfaceElevated,
           borderRadius: BorderRadius.circular(10),
@@ -236,7 +243,13 @@ class DatasheetDetailPanel extends StatelessWidget {
               style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 2),
-            Text(label, style: AppTextStyles.eyebrow),
+            Text(
+              label,
+              style: AppTextStyles.eyebrow,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           ],
         ),
       ),
@@ -351,7 +364,7 @@ class DatasheetDetailPanel extends StatelessWidget {
     );
   }
 
-  Widget _abilityCards(List<AbilityDetails> items) {
+  Widget _abilityCards(List<AbilityDetails> items, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: items
@@ -389,6 +402,28 @@ class DatasheetDetailPanel extends StatelessWidget {
                   if (ability.description.isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Text(ability.description, style: AppTextStyles.caption),
+                  ] else ...[
+                    const SizedBox(height: 6),
+                    Builder(builder: (context) {
+                      final generic =
+                          lookupCoreAbilityDescription(ability.name);
+                      if (generic != null) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AppChip(label: l10n.abilityGenericRuleTag),
+                            const SizedBox(height: 6),
+                            Text(generic, style: AppTextStyles.caption),
+                          ],
+                        );
+                      }
+                      return Text(
+                        l10n.abilityNoTextAvailable,
+                        style: AppTextStyles.caption.copyWith(
+                          fontStyle: FontStyle.italic,
+                        ),
+                      );
+                    }),
                   ],
                 ],
               ),

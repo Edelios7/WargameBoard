@@ -302,6 +302,12 @@ abstract class AppLocalizations {
   /// **'Filtres'**
   String get catalogFilterTitle;
 
+  /// No description provided for @catalogQuickAccessFactions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accès rapide aux factions'**
+  String get catalogQuickAccessFactions;
+
   /// No description provided for @catalogFilterFaction.
   ///
   /// In fr, this message translates to:
@@ -476,6 +482,42 @@ abstract class AppLocalizations {
   /// **'Effectif'**
   String get sectionUnitSize;
 
+  /// No description provided for @statMovement.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mouvement'**
+  String get statMovement;
+
+  /// No description provided for @statToughness.
+  ///
+  /// In fr, this message translates to:
+  /// **'Endurance'**
+  String get statToughness;
+
+  /// No description provided for @statSave.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sauvegarde'**
+  String get statSave;
+
+  /// No description provided for @statWounds.
+  ///
+  /// In fr, this message translates to:
+  /// **'Points de vie'**
+  String get statWounds;
+
+  /// No description provided for @statLeadership.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commandement'**
+  String get statLeadership;
+
+  /// No description provided for @statObjectiveControl.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contrôle d\'objectif'**
+  String get statObjectiveControl;
+
   /// No description provided for @sectionProfiles.
   ///
   /// In fr, this message translates to:
@@ -541,6 +583,18 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Capacités'**
   String get sectionAbilities;
+
+  /// No description provided for @abilityGenericRuleTag.
+  ///
+  /// In fr, this message translates to:
+  /// **'Règle générique'**
+  String get abilityGenericRuleTag;
+
+  /// No description provided for @abilityNoTextAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Règle propre à la faction — texte non disponible dans cette fiche, voir le livre de règles.'**
+  String get abilityNoTextAvailable;
 
   /// No description provided for @sectionEquipment.
   ///
@@ -925,6 +979,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Ajouter 1 à la quantité'**
   String get collectionIncrementQuantity;
+
+  /// No description provided for @collectionDecrementQuantity.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer 1 à la quantité'**
+  String get collectionDecrementQuantity;
 
   /// No description provided for @collectionQuantityDialogLabel.
   ///

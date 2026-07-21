@@ -118,6 +118,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get catalogFilterTitle => 'Filtres';
 
   @override
+  String get catalogQuickAccessFactions => 'Accès rapide aux factions';
+
+  @override
   String get catalogFilterFaction => 'Faction';
 
   @override
@@ -211,6 +214,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get sectionUnitSize => 'Effectif';
 
   @override
+  String get statMovement => 'Mouvement';
+
+  @override
+  String get statToughness => 'Endurance';
+
+  @override
+  String get statSave => 'Sauvegarde';
+
+  @override
+  String get statWounds => 'Points de vie';
+
+  @override
+  String get statLeadership => 'Commandement';
+
+  @override
+  String get statObjectiveControl => 'Contrôle d\'objectif';
+
+  @override
   String get sectionProfiles => 'Profils';
 
   @override
@@ -242,6 +263,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get sectionAbilities => 'Capacités';
+
+  @override
+  String get abilityGenericRuleTag => 'Règle générique';
+
+  @override
+  String get abilityNoTextAvailable =>
+      'Règle propre à la faction — texte non disponible dans cette fiche, voir le livre de règles.';
 
   @override
   String get sectionEquipment => 'Équipement';
@@ -456,6 +484,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get collectionIncrementQuantity => 'Ajouter 1 à la quantité';
+
+  @override
+  String get collectionDecrementQuantity => 'Retirer 1 à la quantité';
 
   @override
   String get collectionQuantityDialogLabel => 'Quantité';

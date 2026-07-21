@@ -31,7 +31,8 @@ String _warningLabel(AppLocalizations l10n, ArmyValidationIssue issue) {
 
 bool _isBattleline(String role) {
   final normalized = role.toLowerCase();
-  return normalized.contains('battleline') || normalized.contains('troops') ||
+  return normalized.contains('battleline') ||
+      normalized.contains('troops') ||
       normalized.contains('troupes');
 }
 
@@ -56,9 +57,8 @@ class ArmiesPage extends ConsumerWidget {
         loading: () => const Center(
           child: CircularProgressIndicator(color: AppColors.primary),
         ),
-        error: (error, _) => Center(
-          child: Text('$error', style: AppTextStyles.caption),
-        ),
+        error: (error, _) =>
+            Center(child: Text('$error', style: AppTextStyles.caption)),
         data: (army) {
           if (army == null) return const _ArmyListPage();
           return _ArmyBuilderPage(army: army);
@@ -76,111 +76,146 @@ class _ArmyListPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final armiesAsync = ref.watch(armiesListProvider);
 
+    final ambianceFile = LocalCatalogImages.branding('hero-battle-siege');
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(l10n.navArmies, style: AppTextStyles.heading),
-                IconButton(
-                  style: IconButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                  ),
-                  icon: const Icon(Icons.add_rounded),
-                  onPressed: () => showDialog(
-                    context: context,
-                    builder: (_) => const CreateArmyDialog(),
-                  ),
-                ),
-              ],
+      body: Stack(
+        children: [
+          if (ambianceFile != null)
+            Positioned.fill(
+              child: Image.file(
+                ambianceFile,
+                fit: BoxFit.cover,
+                alignment: Alignment.topCenter,
+              ),
             ),
-            const SizedBox(height: 24),
-            Expanded(
-              child: armiesAsync.when(
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
+          if (ambianceFile != null)
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      AppColors.background.withValues(alpha: .55),
+                      AppColors.background.withValues(alpha: .93),
+                      AppColors.background,
+                    ],
+                    stops: const [0, 0.45, 0.75],
+                  ),
                 ),
-                error: (error, _) => Center(
-                  child: Text('$error', style: AppTextStyles.caption),
-                ),
-                data: (armies) {
-                  if (armies.isEmpty) {
-                    return Center(
-                      child: Text(
-                        l10n.armyBuilderEmptyList,
-                        style: AppTextStyles.caption,
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(l10n.navArmies, style: AppTextStyles.heading),
+                    IconButton(
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
                       ),
-                    );
-                  }
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      final columns = (constraints.maxWidth / 260)
-                          .floor()
-                          .clamp(1, 5);
-                      return GridView.builder(
-                        gridDelegate:
-                            SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: columns,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 1.9,
-                        ),
-                        itemCount: armies.length,
-                        itemBuilder: (context, index) {
-                          final army = armies[index];
-                          return AppCard(
-                            onTap: () => ref
-                                .read(selectedArmyIdProvider.notifier)
-                                .state = army.id,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  army.name,
-                                  style: AppTextStyles.title,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                      icon: const Icon(Icons.add_rounded),
+                      onPressed: () => showDialog(
+                        context: context,
+                        builder: (_) => const CreateArmyDialog(),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Expanded(
+                  child: armiesAsync.when(
+                    loading: () => const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    error: (error, _) => Center(
+                      child: Text('$error', style: AppTextStyles.caption),
+                    ),
+                    data: (armies) {
+                      if (armies.isEmpty) {
+                        return Center(
+                          child: Text(
+                            l10n.armyBuilderEmptyList,
+                            style: AppTextStyles.caption,
+                          ),
+                        );
+                      }
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+                          final columns = (constraints.maxWidth / 260)
+                              .floor()
+                              .clamp(1, 5);
+                          return GridView.builder(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: columns,
+                                  crossAxisSpacing: 16,
+                                  mainAxisSpacing: 16,
+                                  childAspectRatio: 1.9,
                                 ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  army.factionName,
-                                  style: AppTextStyles.caption,
+                            itemCount: armies.length,
+                            itemBuilder: (context, index) {
+                              final army = armies[index];
+                              return AppCard(
+                                onTap: () =>
+                                    ref
+                                        .read(selectedArmyIdProvider.notifier)
+                                        .state = army
+                                        .id,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      army.name,
+                                      style: AppTextStyles.title,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      army.factionName,
+                                      style: AppTextStyles.caption,
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      army.pointsLimit != null
+                                          ? l10n.armyBuilderPointsWithLimit(
+                                              army.totalPoints,
+                                              army.pointsLimit!,
+                                            )
+                                          : l10n.pointsSuffix(army.totalPoints),
+                                      style: AppTextStyles.body.copyWith(
+                                        color: army.isOverLimit
+                                            ? AppColors.error
+                                            : AppColors.primary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  army.pointsLimit != null
-                                      ? l10n.armyBuilderPointsWithLimit(
-                                          army.totalPoints,
-                                          army.pointsLimit!,
-                                        )
-                                      : l10n.pointsSuffix(army.totalPoints),
-                                  style: AppTextStyles.body.copyWith(
-                                    color: army.isOverLimit
-                                        ? AppColors.error
-                                        : AppColors.primary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
+                              );
+                            },
                           );
                         },
                       );
                     },
-                  );
-                },
-              ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -193,10 +228,9 @@ Future<void> _pickEnhancement(
   ArmyUnitDetails unit,
 ) async {
   final l10n = AppLocalizations.of(context)!;
-  final options =
-      await ref.read(armyRepositoryProvider).getEnhancementsForDetachment(
-            detachmentId,
-          );
+  final options = await ref
+      .read(armyRepositoryProvider)
+      .getEnhancementsForDetachment(detachmentId);
 
   if (!context.mounted) return;
 
@@ -238,10 +272,9 @@ Future<void> _pickEnhancement(
 
   if (selected == null) return; // dialog dismissed, no change
 
-  await ref.read(armyRepositoryProvider).setUnitEnhancement(
-        unit.id,
-        selected.isEmpty ? null : selected,
-      );
+  await ref
+      .read(armyRepositoryProvider)
+      .setUnitEnhancement(unit.id, selected.isEmpty ? null : selected);
   ref.invalidate(selectedArmyProvider);
   ref.invalidate(armiesListProvider);
 }
@@ -289,15 +322,17 @@ class _ArmyBuilderPage extends ConsumerWidget {
                   ...validation.errors.map(
                     (issue) => Text(
                       _warningLabel(l10n, issue),
-                      style: AppTextStyles.caption
-                          .copyWith(color: AppColors.error),
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.error,
+                      ),
                     ),
                   ),
                   ...validation.warnings.map(
                     (issue) => Text(
                       _warningLabel(l10n, issue),
-                      style: AppTextStyles.caption
-                          .copyWith(color: AppColors.warning),
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.warning,
+                      ),
                     ),
                   ),
                 ],
@@ -310,10 +345,7 @@ class _ArmyBuilderPage extends ConsumerWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(
-                width: 300,
-                child: _BuilderSidebar(army: army),
-              ),
+              SizedBox(width: 300, child: _BuilderSidebar(army: army)),
               Container(width: 1, color: AppColors.border),
               Expanded(
                 flex: 2,
@@ -349,10 +381,12 @@ class _BuilderTopBar extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final validation = ref.watch(armyValidationProvider(army));
     final isValid = validation?.isValid ?? true;
-    final battlelineCount =
-        army.units.where((u) => _isBattleline(u.battlefieldRole)).length;
-    final enhancementsCount =
-        army.units.where((u) => u.enhancementId != null).length;
+    final battlelineCount = army.units
+        .where((u) => _isBattleline(u.battlefieldRole))
+        .length;
+    final enhancementsCount = army.units
+        .where((u) => u.enhancementId != null)
+        .length;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -399,7 +433,9 @@ class _BuilderTopBar extends ConsumerWidget {
                 label: l10n.armyBuilderStatPoints,
                 value: army.pointsLimit != null
                     ? l10n.armyBuilderPointsWithLimit(
-                        army.totalPoints, army.pointsLimit!)
+                        army.totalPoints,
+                        army.pointsLimit!,
+                      )
                     : l10n.pointsSuffix(army.totalPoints),
                 color: army.isOverLimit ? AppColors.error : AppColors.primary,
               ),
@@ -416,8 +452,10 @@ class _BuilderTopBar extends ConsumerWidget {
                 value: '$enhancementsCount/$_maxEnhancements',
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: (isValid ? AppColors.success : AppColors.error)
                       .withValues(alpha: .14),
@@ -450,8 +488,10 @@ class _BuilderTopBar extends ConsumerWidget {
         ),
         const SizedBox(width: 8),
         PopupMenuButton<String>(
-          icon: const Icon(Icons.more_vert_rounded,
-              color: AppColors.textSecondary),
+          icon: const Icon(
+            Icons.more_vert_rounded,
+            color: AppColors.textSecondary,
+          ),
           color: AppColors.surface,
           onSelected: (value) async {
             switch (value) {
@@ -471,10 +511,8 @@ class _BuilderTopBar extends ConsumerWidget {
               case 'notes':
                 showDialog(
                   context: context,
-                  builder: (_) => _NotesDialog(
-                    armyId: army.id,
-                    initialNotes: army.notes,
-                  ),
+                  builder: (_) =>
+                      _NotesDialog(armyId: army.id, initialNotes: army.notes),
                 );
                 break;
               case 'duplicate':
@@ -497,7 +535,10 @@ class _BuilderTopBar extends ConsumerWidget {
             ),
             PopupMenuItem(
               value: 'notes',
-              child: Text(l10n.armyBuilderNotesLabel, style: AppTextStyles.body),
+              child: Text(
+                l10n.armyBuilderNotesLabel,
+                style: AppTextStyles.body,
+              ),
             ),
             PopupMenuItem(
               value: 'duplicate',
@@ -580,8 +621,11 @@ class _BuilderSidebar extends ConsumerWidget {
                     color: AppColors.primary.withValues(alpha: .16),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.shield_rounded,
-                      size: 18, color: AppColors.primary),
+                  child: const Icon(
+                    Icons.shield_rounded,
+                    size: 18,
+                    color: AppColors.primary,
+                  ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -612,10 +656,10 @@ class _BuilderSidebar extends ConsumerWidget {
             onTap: army.detachmentId == null
                 ? null
                 : () => showDialog(
-                      context: context,
-                      builder: (_) =>
-                          _StratagemsDialog(detachmentId: army.detachmentId!),
-                    ),
+                    context: context,
+                    builder: (_) =>
+                        _StratagemsDialog(detachmentId: army.detachmentId!),
+                  ),
             child: Text(
               l10n.armyBuilderViewAllRules,
               style: AppTextStyles.body.copyWith(
@@ -643,9 +687,9 @@ class _BuilderSidebar extends ConsumerWidget {
                       return _UnitRosterRow(
                         unit: unit,
                         selected: unit.id == selectedUnitId,
-                        onTap: () => ref
-                            .read(selectedUnitIdProvider.notifier)
-                            .state = unit.id,
+                        onTap: () =>
+                            ref.read(selectedUnitIdProvider.notifier).state =
+                                unit.id,
                       );
                     },
                   ),
@@ -725,8 +769,9 @@ class _UnitRosterRow extends StatelessWidget {
                       Text(
                         unit.datasheetName,
                         style: AppTextStyles.body.copyWith(
-                          fontWeight:
-                              selected ? FontWeight.w600 : FontWeight.w400,
+                          fontWeight: selected
+                              ? FontWeight.w600
+                              : FontWeight.w400,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -739,7 +784,10 @@ class _UnitRosterRow extends StatelessWidget {
                     ],
                   ),
                 ),
-                Text(l10n.pointsSuffix(unit.points), style: AppTextStyles.caption),
+                Text(
+                  l10n.pointsSuffix(unit.points),
+                  style: AppTextStyles.caption,
+                ),
               ],
             ),
           ),
@@ -779,8 +827,10 @@ class _GroupedUnitGrid extends StatelessWidget {
             const SizedBox(height: 10),
             LayoutBuilder(
               builder: (context, constraints) {
-                final columns =
-                    (constraints.maxWidth / 220).floor().clamp(1, 4);
+                final columns = (constraints.maxWidth / 220).floor().clamp(
+                  1,
+                  4,
+                );
                 return GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -822,8 +872,7 @@ class _UnitCard extends ConsumerWidget {
       borderRadius: BorderRadius.circular(14),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () =>
-            ref.read(selectedUnitIdProvider.notifier).state = unit.id,
+        onTap: () => ref.read(selectedUnitIdProvider.notifier).state = unit.id,
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(
@@ -843,10 +892,7 @@ class _UnitCard extends ConsumerWidget {
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.surface,
-                        AppColors.surfaceElevated,
-                      ],
+                      colors: [AppColors.surface, AppColors.surfaceElevated],
                     ),
                   ),
                   child: const Center(
@@ -861,8 +907,10 @@ class _UnitCard extends ConsumerWidget {
                 top: 6,
                 right: 6,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: .55),
                     borderRadius: BorderRadius.circular(20),
@@ -934,16 +982,16 @@ class _UnitDetailsPanel extends ConsumerWidget {
       );
     }
 
-    final datasheetAsync =
-        ref.watch(datasheetByIdProvider(currentUnit.datasheetId));
+    final datasheetAsync = ref.watch(
+      datasheetByIdProvider(currentUnit.datasheetId),
+    );
 
     return datasheetAsync.when(
       loading: () => const Center(
         child: CircularProgressIndicator(color: AppColors.primary),
       ),
-      error: (error, _) => Center(
-        child: Text('$error', style: AppTextStyles.caption),
-      ),
+      error: (error, _) =>
+          Center(child: Text('$error', style: AppTextStyles.caption)),
       data: (sheet) {
         if (sheet == null) return const SizedBox.shrink();
         final imageFile = LocalCatalogImages.datasheet(sheet.id);
@@ -982,9 +1030,7 @@ class _UnitDetailsPanel extends ConsumerWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Text(sheet.name, style: AppTextStyles.title),
-                  ),
+                  Expanded(child: Text(sheet.name, style: AppTextStyles.title)),
                   Text(
                     l10n.pointsSuffix(currentUnit.points),
                     style: AppTextStyles.body.copyWith(
@@ -995,25 +1041,36 @@ class _UnitDetailsPanel extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 18),
-              if (sheet.models.isNotEmpty) _StatBlock(model: sheet.models.first),
+              if (sheet.models.isNotEmpty)
+                _StatBlock(model: sheet.models.first),
               if (sheet.equipment.isNotEmpty) ...[
                 const SizedBox(height: 24),
-                Text(l10n.sectionEquipment.toUpperCase(),
-                    style: AppTextStyles.eyebrow),
+                Text(
+                  l10n.sectionEquipment.toUpperCase(),
+                  style: AppTextStyles.eyebrow,
+                ),
                 const SizedBox(height: 10),
-                ...sheet.equipment.expand((group) => group.options).map(
+                ...sheet.equipment
+                    .expand((group) => group.options)
+                    .map(
                       (option) => Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: Row(
                           children: [
-                            const Icon(Icons.circle,
-                                size: 6, color: AppColors.primary),
+                            const Icon(
+                              Icons.circle,
+                              size: 6,
+                              color: AppColors.primary,
+                            ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(option, style: AppTextStyles.body),
                             ),
-                            const Icon(Icons.chevron_right_rounded,
-                                size: 18, color: AppColors.textSecondary),
+                            const Icon(
+                              Icons.chevron_right_rounded,
+                              size: 18,
+                              color: AppColors.textSecondary,
+                            ),
                           ],
                         ),
                       ),
@@ -1021,8 +1078,10 @@ class _UnitDetailsPanel extends ConsumerWidget {
               ],
               if (sheet.abilities.isNotEmpty) ...[
                 const SizedBox(height: 24),
-                Text(l10n.sectionAbilities.toUpperCase(),
-                    style: AppTextStyles.eyebrow),
+                Text(
+                  l10n.sectionAbilities.toUpperCase(),
+                  style: AppTextStyles.eyebrow,
+                ),
                 const SizedBox(height: 10),
                 ...sheet.abilities.map(
                   (ability) => Padding(
@@ -1032,8 +1091,11 @@ class _UnitDetailsPanel extends ConsumerWidget {
                       children: [
                         const Padding(
                           padding: EdgeInsets.only(top: 2),
-                          child: Icon(Icons.auto_awesome_rounded,
-                              size: 15, color: AppColors.primary),
+                          child: Icon(
+                            Icons.auto_awesome_rounded,
+                            size: 15,
+                            color: AppColors.primary,
+                          ),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
@@ -1068,8 +1130,9 @@ class _UnitDetailsPanel extends ConsumerWidget {
                   child: Text(
                     currentUnit.enhancementName ??
                         l10n.armyBuilderChooseEnhancement,
-                    style:
-                        AppTextStyles.body.copyWith(color: AppColors.primary),
+                    style: AppTextStyles.body.copyWith(
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
               ],
@@ -1102,13 +1165,14 @@ class _StatBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final stats = <String, String>{
-      'M': '${model.movement}"',
-      'T': '${model.toughness}',
-      'SV': '${model.save}+',
-      'W': '${model.wounds}',
-      'LD': '${model.leadership}+',
-      'OC': '${model.objectiveControl}',
+      l10n.statMovement: '${model.movement}"',
+      l10n.statToughness: '${model.toughness}',
+      l10n.statSave: '${model.save}+',
+      l10n.statWounds: '${model.wounds}',
+      l10n.statLeadership: '${model.leadership}+',
+      l10n.statObjectiveControl: '${model.objectiveControl}',
     };
 
     return Container(
@@ -1122,16 +1186,26 @@ class _StatBlock extends StatelessWidget {
         children: stats.entries
             .map(
               (entry) => Expanded(
-                child: Column(
-                  children: [
-                    Text(entry.key, style: AppTextStyles.eyebrow),
-                    const SizedBox(height: 4),
-                    Text(
-                      entry.value,
-                      style: AppTextStyles.body
-                          .copyWith(fontWeight: FontWeight.w700),
-                    ),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Column(
+                    children: [
+                      Text(
+                        entry.key,
+                        style: AppTextStyles.eyebrow,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        entry.value,
+                        style: AppTextStyles.body.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             )
@@ -1156,7 +1230,8 @@ class _EditUnitDialog extends ConsumerWidget {
     // à jour depuis le provider plutôt que de garder l'instantané passé au
     // constructeur, sinon le dialogue affiche un compteur figé.
     final freshArmy = ref.watch(selectedArmyProvider).value;
-    final currentUnit = freshArmy?.units.firstWhere(
+    final currentUnit =
+        freshArmy?.units.firstWhere(
           (u) => u.id == unit.id,
           orElse: () => unit,
         ) ??
@@ -1176,40 +1251,47 @@ class _EditUnitDialog extends ConsumerWidget {
               Text(currentUnit.datasheetName, style: AppTextStyles.title),
               const SizedBox(height: 20),
               if (currentUnit.maximumModels > currentUnit.minimumModels) ...[
-                Text(l10n.armyBuilderModelCountLabel, style: AppTextStyles.caption),
+                Text(
+                  l10n.armyBuilderModelCountLabel,
+                  style: AppTextStyles.caption,
+                ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     IconButton(
                       icon: const Icon(Icons.remove_circle_outline_rounded),
                       color: AppColors.textSecondary,
-                      onPressed: currentUnit.modelCount <=
-                              currentUnit.minimumModels
+                      onPressed:
+                          currentUnit.modelCount <= currentUnit.minimumModels
                           ? null
                           : () async {
                               await ref
                                   .read(armyRepositoryProvider)
                                   .updateModelCount(
-                                      currentUnit.id,
-                                      currentUnit.modelCount - 1);
+                                    currentUnit.id,
+                                    currentUnit.modelCount - 1,
+                                  );
                               ref.invalidate(selectedArmyProvider);
                               ref.invalidate(armiesListProvider);
                             },
                     ),
-                    Text('${currentUnit.modelCount}',
-                        style: AppTextStyles.title),
+                    Text(
+                      '${currentUnit.modelCount}',
+                      style: AppTextStyles.title,
+                    ),
                     IconButton(
                       icon: const Icon(Icons.add_circle_outline_rounded),
                       color: AppColors.textSecondary,
-                      onPressed: currentUnit.modelCount >=
-                              currentUnit.maximumModels
+                      onPressed:
+                          currentUnit.modelCount >= currentUnit.maximumModels
                           ? null
                           : () async {
                               await ref
                                   .read(armyRepositoryProvider)
                                   .updateModelCount(
-                                      currentUnit.id,
-                                      currentUnit.modelCount + 1);
+                                    currentUnit.id,
+                                    currentUnit.modelCount + 1,
+                                  );
                               ref.invalidate(selectedArmyProvider);
                               ref.invalidate(armiesListProvider);
                             },
@@ -1219,8 +1301,10 @@ class _EditUnitDialog extends ConsumerWidget {
                 const SizedBox(height: 12),
               ],
               if (army.detachmentId != null) ...[
-                Text(l10n.armyBuilderEnhancementLabel,
-                    style: AppTextStyles.caption),
+                Text(
+                  l10n.armyBuilderEnhancementLabel,
+                  style: AppTextStyles.caption,
+                ),
                 const SizedBox(height: 8),
                 InkWell(
                   onTap: () => _pickEnhancement(
@@ -1232,8 +1316,9 @@ class _EditUnitDialog extends ConsumerWidget {
                   child: Text(
                     currentUnit.enhancementName ??
                         l10n.armyBuilderChooseEnhancement,
-                    style:
-                        AppTextStyles.body.copyWith(color: AppColors.primary),
+                    style: AppTextStyles.body.copyWith(
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -1303,7 +1388,10 @@ class _NotesDialog extends ConsumerWidget {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text(l10n.armyBuilderCancel, style: AppTextStyles.body),
+                  child: Text(
+                    l10n.armyBuilderCancel,
+                    style: AppTextStyles.body,
+                  ),
                 ),
               ),
             ],
@@ -1500,8 +1588,9 @@ class _StratagemsDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final stratagemsAsync =
-        ref.watch(stratagemsForDetachmentProvider(detachmentId));
+    final stratagemsAsync = ref.watch(
+      stratagemsForDetachmentProvider(detachmentId),
+    );
 
     return Dialog(
       backgroundColor: AppColors.surface,
@@ -1519,9 +1608,7 @@ class _StratagemsDialog extends ConsumerWidget {
               Expanded(
                 child: stratagemsAsync.when(
                   loading: () => const Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.primary,
-                    ),
+                    child: CircularProgressIndicator(color: AppColors.primary),
                   ),
                   error: (error, _) => Center(
                     child: Text('$error', style: AppTextStyles.caption),
