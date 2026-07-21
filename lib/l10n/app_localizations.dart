@@ -977,14 +977,20 @@ abstract class AppLocalizations {
   /// No description provided for @collectionIncrementQuantity.
   ///
   /// In fr, this message translates to:
-  /// **'Ajouter 1 à la quantité'**
+  /// **'Ajouter le nombre saisi à la quantité'**
   String get collectionIncrementQuantity;
 
   /// No description provided for @collectionDecrementQuantity.
   ///
   /// In fr, this message translates to:
-  /// **'Retirer 1 à la quantité'**
+  /// **'Retirer le nombre saisi à la quantité'**
   String get collectionDecrementQuantity;
+
+  /// No description provided for @collectionQuickAccessFactions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accès rapide aux factions'**
+  String get collectionQuickAccessFactions;
 
   /// No description provided for @collectionQuantityDialogLabel.
   ///

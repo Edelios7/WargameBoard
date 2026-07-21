@@ -478,10 +478,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get collectionPainted => 'Painted';
 
   @override
-  String get collectionIncrementQuantity => 'Add 1 to quantity';
+  String get collectionIncrementQuantity => 'Add the amount to quantity';
 
   @override
-  String get collectionDecrementQuantity => 'Remove 1 from quantity';
+  String get collectionDecrementQuantity => 'Remove the amount from quantity';
+
+  @override
+  String get collectionQuickAccessFactions => 'Quick access to factions';
 
   @override
   String get collectionQuantityDialogLabel => 'Quantity';

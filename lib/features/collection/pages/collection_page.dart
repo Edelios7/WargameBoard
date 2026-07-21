@@ -5,8 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/collection_export_formatter.dart';
+import '../../../core/utils/faction_iconography.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/battle_details.dart';
 import '../../../database/models/collection_item_details.dart';
@@ -33,6 +35,27 @@ int _stateCount(CollectionItemDetails entry, _PaintState state) {
       return entry.painted;
   }
 }
+
+/// Clé sentinelle utilisée par le filtre de faction pour désigner le
+/// groupe "Space Marines" (qui regroupe les chapitres/sous-factions
+/// ci-dessous), plutôt qu'une faction unique portant ce nom exact.
+const _spaceMarinesGroupKey = '__space_marines_group__';
+
+/// Noms de faction considérés comme des chapitres/déclinaisons de Space
+/// Marines dans les données importées (chaque chapitre est sa propre
+/// faction en base, il n'y a pas de hiérarchie explicite en DB).
+const _spaceMarineChapterFactionNames = <String>{
+  'Space Marines',
+  'Blood Angels',
+  'Dark Angels',
+  'Space Wolves',
+  'Imperial Fists',
+  'Black Templars',
+  'Deathwatch',
+  'Salamanders',
+  'Raven Guard',
+  'Ultramarines',
+};
 
 class CollectionPage extends ConsumerStatefulWidget {
   const CollectionPage({super.key});
@@ -218,7 +241,17 @@ class _CollectionTab extends ConsumerStatefulWidget {
 
 class _CollectionTabState extends ConsumerState<_CollectionTab> {
   String? _factionFilter;
+  String? _chapterFilter;
   final Set<_PaintState> _stateFilter = {};
+
+  void _setFactionFilter(String? value) {
+    setState(() {
+      _factionFilter = value;
+      if (value != _spaceMarinesGroupKey) {
+        _chapterFilter = null;
+      }
+    });
+  }
 
   bool _matches(CollectionItemDetails entry) {
     if (widget.searchQuery.isNotEmpty &&
@@ -227,7 +260,16 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
             .contains(widget.searchQuery.toLowerCase())) {
       return false;
     }
-    if (_factionFilter != null && entry.factionName != _factionFilter) {
+    if (_factionFilter != null) {
+      if (_factionFilter == _spaceMarinesGroupKey) {
+        if (!_spaceMarineChapterFactionNames.contains(entry.factionName)) {
+          return false;
+        }
+      } else if (entry.factionName != _factionFilter) {
+        return false;
+      }
+    }
+    if (_chapterFilter != null && entry.factionName != _chapterFilter) {
       return false;
     }
     if (_stateFilter.isNotEmpty &&
@@ -280,6 +322,14 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
             lastBattle: lastBattleAsync.value,
           ),
           const SizedBox(height: 20),
+          _FactionQuickAccessRow(
+            entries: entries,
+            factionFilter: _factionFilter,
+            chapterFilter: _chapterFilter,
+            onFactionChanged: _setFactionFilter,
+            onChapterChanged: (value) =>
+                setState(() => _chapterFilter = value),
+          ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -290,8 +340,7 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
                       entries: entries,
                       factionFilter: _factionFilter,
                       stateFilter: _stateFilter,
-                      onFactionChanged: (value) =>
-                          setState(() => _factionFilter = value),
+                      onFactionChanged: _setFactionFilter,
                       onStateToggled: (state, value) => setState(() {
                         if (value) {
                           _stateFilter.add(state);
@@ -301,6 +350,7 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
                       }),
                       onReset: () => setState(() {
                         _factionFilter = null;
+                        _chapterFilter = null;
                         _stateFilter.clear();
                       }),
                     ),
@@ -551,6 +601,173 @@ class _StatTile extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _FactionQuickAccessRow extends StatelessWidget {
+  final List<CollectionItemDetails> entries;
+  final String? factionFilter;
+  final String? chapterFilter;
+  final ValueChanged<String?> onFactionChanged;
+  final ValueChanged<String?> onChapterChanged;
+
+  const _FactionQuickAccessRow({
+    required this.entries,
+    required this.factionFilter,
+    required this.chapterFilter,
+    required this.onFactionChanged,
+    required this.onChapterChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final presentFactions = entries.map((e) => e.factionName).toSet();
+    final hasSpaceMarines = presentFactions.any(
+      _spaceMarineChapterFactionNames.contains,
+    );
+    final otherFactions =
+        presentFactions
+            .where((f) => !_spaceMarineChapterFactionNames.contains(f))
+            .toList()
+          ..sort();
+
+    if (!hasSpaceMarines && otherFactions.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final chapters = factionFilter == _spaceMarinesGroupKey
+        ? (presentFactions.where(_spaceMarineChapterFactionNames.contains).toList()
+            ..sort())
+        : const <String>[];
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.collectionQuickAccessFactions.toUpperCase(),
+            style: AppTextStyles.eyebrow,
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 40,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                if (hasSpaceMarines)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: _FactionChip(
+                      label: 'Space Marines',
+                      selected: factionFilter == _spaceMarinesGroupKey,
+                      onTap: () => onFactionChanged(
+                        factionFilter == _spaceMarinesGroupKey
+                            ? null
+                            : _spaceMarinesGroupKey,
+                      ),
+                    ),
+                  ),
+                for (final faction in otherFactions)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: _FactionChip(
+                      label: faction,
+                      selected: factionFilter == faction,
+                      onTap: () =>
+                          onFactionChanged(factionFilter == faction ? null : faction),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          if (chapters.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              height: 34,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  for (final chapter in chapters)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: _FactionChip(
+                        label: chapter,
+                        selected: chapterFilter == chapter,
+                        compact: true,
+                        onTap: () => onChapterChanged(
+                          chapterFilter == chapter ? null : chapter,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _FactionChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final bool compact;
+  final VoidCallback onTap;
+
+  const _FactionChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.compact = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = FactionIconography.forFaction(label).color;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: compact ? 10 : 12,
+            vertical: compact ? 6 : 8,
+          ),
+          decoration: BoxDecoration(
+            color: selected
+                ? color.withValues(alpha: .18)
+                : AppColors.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: selected ? color : AppColors.border,
+              width: selected ? 1.4 : 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!compact) ...[
+                FactionBadgeIcon(factionName: label, size: 20),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                label,
+                style: AppTextStyles.caption.copyWith(
+                  color: selected
+                      ? AppColors.textPrimary
+                      : AppColors.textSecondary,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1020,13 +1237,22 @@ class _CollectionCard extends ConsumerWidget {
     ref.invalidate(xpSummaryProvider);
   }
 
-  Future<void> _incrementQuantity(WidgetRef ref) async {
-    await ref.read(collectionRepositoryProvider).updateCounts(
-          entry.id,
-          quantity: entry.quantity + 1,
-        );
+  /// Ajuste la quantité possédée de [delta] (positif ou négatif). Si la
+  /// nouvelle quantité tombe à 0 ou moins, l'entrée est entièrement
+  /// supprimée de la collection plutôt que laissée à 0.
+  Future<void> _adjustQuantity(WidgetRef ref, int delta) async {
+    final newQuantity = entry.quantity + delta;
+    if (newQuantity <= 0) {
+      await ref.read(collectionRepositoryProvider).deleteEntry(entry.id);
+    } else {
+      await ref
+          .read(collectionRepositoryProvider)
+          .updateCounts(entry.id, quantity: newQuantity);
+    }
     ref.invalidate(collectionEntriesProvider);
     ref.invalidate(collectionSummaryProvider);
+    ref.invalidate(recentlyAddedProvider);
+    ref.invalidate(xpSummaryProvider);
   }
 
   @override
@@ -1060,31 +1286,9 @@ class _CollectionCard extends ConsumerWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    l10n.collectionQuantityLabel(entry.quantity),
-                    style: AppTextStyles.caption
-                        .copyWith(color: AppColors.primary),
-                  ),
-                ),
-                Tooltip(
-                  message: l10n.collectionIncrementQuantity,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(6),
-                    onTap: () => _incrementQuantity(ref),
-                    child: Padding(
-                      padding: const EdgeInsets.all(2),
-                      child: Icon(
-                        Icons.exposure_plus_1_rounded,
-                        size: 16,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            _QuantityAdjustRow(
+              quantity: entry.quantity,
+              onAdjust: (delta) => _adjustQuantity(ref, delta),
             ),
             const SizedBox(height: 12),
             _CountRow(
@@ -1112,7 +1316,111 @@ class _CollectionCard extends ConsumerWidget {
   }
 }
 
-class _CountRow extends StatelessWidget {
+/// Lit un pas d'ajustement depuis un contrôleur de texte : le contenu doit
+/// être un entier strictement positif, sinon on retombe sur 1 (comportement
+/// équivalent aux boutons +/- simples d'avant).
+int _readStep(TextEditingController controller) {
+  final parsed = int.tryParse(controller.text.trim());
+  if (parsed == null || parsed <= 0) return 1;
+  return parsed;
+}
+
+/// Champ compact permettant de saisir le pas (le nombre à ajouter ou
+/// retirer) utilisé par les boutons +/- environnants.
+class _StepField extends StatelessWidget {
+  final TextEditingController controller;
+  final Key? fieldKey;
+
+  const _StepField({required this.controller, this.fieldKey});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 32,
+      height: 26,
+      child: TextField(
+        key: fieldKey,
+        controller: controller,
+        keyboardType: TextInputType.number,
+        textAlign: TextAlign.center,
+        style: AppTextStyles.caption,
+        decoration: const InputDecoration(
+          isDense: true,
+          contentPadding: EdgeInsets.symmetric(vertical: 2),
+          border: OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+}
+
+class _QuantityAdjustRow extends StatefulWidget {
+  final int quantity;
+
+  /// Reçoit le delta à appliquer (positif pour ajouter, négatif pour
+  /// retirer) — laisser l'appelant décider quoi faire si le résultat
+  /// tombe à 0 ou moins (typiquement : supprimer l'entrée).
+  final ValueChanged<int> onAdjust;
+
+  const _QuantityAdjustRow({required this.quantity, required this.onAdjust});
+
+  @override
+  State<_QuantityAdjustRow> createState() => _QuantityAdjustRowState();
+}
+
+class _QuantityAdjustRowState extends State<_QuantityAdjustRow> {
+  final _stepController = TextEditingController(text: '1');
+
+  @override
+  void dispose() {
+    _stepController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            l10n.collectionQuantityLabel(widget.quantity),
+            style: AppTextStyles.caption.copyWith(color: AppColors.primary),
+          ),
+        ),
+        Tooltip(
+          message: l10n.collectionDecrementQuantity,
+          child: IconButton(
+            key: const Key('quantity-decrement-button'),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            icon: const Icon(Icons.remove_rounded, size: 18),
+            color: AppColors.primary,
+            onPressed: () =>
+                widget.onAdjust(-_readStep(_stepController)),
+          ),
+        ),
+        _StepField(
+          controller: _stepController,
+          fieldKey: const Key('quantity-step-field'),
+        ),
+        Tooltip(
+          message: l10n.collectionIncrementQuantity,
+          child: IconButton(
+            key: const Key('quantity-increment-button'),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            icon: const Icon(Icons.add_rounded, size: 18),
+            color: AppColors.primary,
+            onPressed: () => widget.onAdjust(_readStep(_stepController)),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CountRow extends StatefulWidget {
   final String label;
   final int value;
   final int max;
@@ -1126,33 +1434,47 @@ class _CountRow extends StatelessWidget {
   });
 
   @override
+  State<_CountRow> createState() => _CountRowState();
+}
+
+class _CountRowState extends State<_CountRow> {
+  final _stepController = TextEditingController(text: '1');
+
+  @override
+  void dispose() {
+    _stepController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final step = _readStep(_stepController);
     return Row(
       children: [
         Expanded(
-          child: Text(label, style: AppTextStyles.caption),
+          child: Text(
+            '${widget.label} · ${widget.value}/${widget.max}',
+            style: AppTextStyles.caption,
+          ),
         ),
         IconButton(
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
           icon: const Icon(Icons.remove_circle_outline_rounded, size: 18),
           color: AppColors.textSecondary,
-          onPressed: value <= 0 ? null : () => onChanged(value - 1),
+          onPressed: widget.value <= 0
+              ? null
+              : () => widget.onChanged((widget.value - step).clamp(0, widget.max)),
         ),
-        SizedBox(
-          width: 20,
-          child: Text(
-            '$value',
-            textAlign: TextAlign.center,
-            style: AppTextStyles.body,
-          ),
-        ),
+        _StepField(controller: _stepController),
         IconButton(
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
           icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
           color: AppColors.textSecondary,
-          onPressed: value >= max ? null : () => onChanged(value + 1),
+          onPressed: widget.value >= widget.max
+              ? null
+              : () => widget.onChanged((widget.value + step).clamp(0, widget.max)),
         ),
       ],
     );

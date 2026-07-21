@@ -483,10 +483,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get collectionPainted => 'Peintes';
 
   @override
-  String get collectionIncrementQuantity => 'Ajouter 1 à la quantité';
+  String get collectionIncrementQuantity =>
+      'Ajouter le nombre saisi à la quantité';
 
   @override
-  String get collectionDecrementQuantity => 'Retirer 1 à la quantité';
+  String get collectionDecrementQuantity =>
+      'Retirer le nombre saisi à la quantité';
+
+  @override
+  String get collectionQuickAccessFactions => 'Accès rapide aux factions';
 
   @override
   String get collectionQuantityDialogLabel => 'Quantité';

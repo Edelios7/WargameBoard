@@ -77,4 +77,51 @@ void main() {
     final entries = await database.collectionDao.listEntries();
     expect(entries.single.assembled, 1);
   });
+
+  testWidgets(
+      'decrementing quantity to zero removes the entry from the collection',
+      (tester) async {
+    await database.collectionDao.addEntry(
+      datasheetId: 'ds-captain',
+      quantity: 1,
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    final removeQty = find.byKey(const Key('quantity-decrement-button'));
+    await tester.ensureVisible(removeQty);
+    await tester.pumpAndSettle();
+    await tester.tap(removeQty);
+    await tester.pumpAndSettle();
+
+    final entries = await database.collectionDao.listEntries();
+    expect(entries, isEmpty);
+    expect(find.text('Ta collection est vide'), findsOneWidget);
+  });
+
+  testWidgets('typing a custom step adds that amount to the quantity',
+      (tester) async {
+    await database.collectionDao.addEntry(
+      datasheetId: 'ds-captain',
+      quantity: 1,
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    final addQty = find.byKey(const Key('quantity-increment-button'));
+    final stepField = find.byKey(const Key('quantity-step-field'));
+
+    await tester.ensureVisible(stepField);
+    await tester.enterText(stepField, '3');
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(addQty);
+    await tester.tap(addQty);
+    await tester.pumpAndSettle();
+
+    final entries = await database.collectionDao.listEntries();
+    expect(entries.single.quantity, 4);
+  });
 }
