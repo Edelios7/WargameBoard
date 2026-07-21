@@ -18,15 +18,19 @@ class FactionBadgeIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final badge = FactionIconography.forFaction(factionName);
+    final glyphSize = size * 0.6;
 
     return Container(
       width: size,
       height: size,
+      alignment: Alignment.center,
       decoration: BoxDecoration(
         color: badge.color.withValues(alpha: .16),
         shape: BoxShape.circle,
       ),
-      child: Icon(badge.icon, size: size * 0.55, color: badge.color),
+      child: badge.glyphBuilder != null
+          ? badge.glyphBuilder!(glyphSize, badge.color)
+          : Icon(badge.icon, size: size * 0.55, color: badge.color),
     );
   }
 }

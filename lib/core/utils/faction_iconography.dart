@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/ork_head_icon.dart';
 
 /// Icône + couleur d'accent associées à une faction, pour habiller les
 /// listes d'armées / parties du Dashboard sans dépendre d'images.
 ///
-/// Ce sont des pictogrammes génériques (Material Icons) choisis pour
-/// évoquer chaque faction, pas les logos officiels Games Workshop : on
-/// reste dans l'esprit de la charte sans reproduire leurs marques.
+/// Ce sont des pictogrammes génériques (Material Icons, ou un glyphe
+/// dessiné à la main pour les archétypes qui le justifient, comme les
+/// Orks) choisis pour évoquer chaque faction, pas les logos officiels
+/// Games Workshop : on reste dans l'esprit de la charte sans reproduire
+/// leurs marques.
 class FactionBadge {
   final IconData icon;
   final Color color;
 
-  const FactionBadge(this.icon, this.color);
+  /// Glyphe dessiné à la main à utiliser à la place de [icon] quand fourni.
+  final Widget Function(double size, Color color)? glyphBuilder;
+
+  const FactionBadge(this.icon, this.color, {this.glyphBuilder});
 }
 
 class FactionIconography {
@@ -37,7 +43,14 @@ class FactionIconography {
     MapEntry('grey knights', FactionBadge(Icons.security_rounded, Color(0xFFB8C4CE))),
     MapEntry('imperial knights', FactionBadge(Icons.castle_rounded, Color(0xFF6D6F86))),
     MapEntry('chaos knights', FactionBadge(Icons.castle_rounded, AppColors.error)),
-    MapEntry('orks', FactionBadge(Icons.forest_rounded, AppColors.success)),
+    MapEntry(
+      'orks',
+      FactionBadge(
+        Icons.forest_rounded,
+        AppColors.success,
+        glyphBuilder: (size, color) => OrkHeadIcon(size: size, color: color),
+      ),
+    ),
     MapEntry('tyranids', FactionBadge(Icons.bug_report_rounded, Color(0xFF8E4FBF))),
     MapEntry('necrons', FactionBadge(Icons.settings_suggest_rounded, Color(0xFF3FBFA6))),
     MapEntry('aeldari', FactionBadge(Icons.auto_awesome_rounded, Color(0xFF3FBFA6))),
