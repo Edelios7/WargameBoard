@@ -85,6 +85,15 @@ void main() {
 
       await tester.tap(find.text('Sanguinary Guard'));
       await tester.pumpAndSettle();
+      // Image.file décode son codec de façon asynchrone (Skia) : laisse
+      // le temps aux images locales (fiche + icônes de faction) de finir
+      // de charger avant la capture, sinon la première capture les
+      // manque (juste pour cet outil de capture manuelle, sans impact
+      // sur le rendu réel de l'appli).
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 300)),
+      );
+      await tester.pumpAndSettle();
 
       final boundary =
           boundaryKey.currentContext!.findRenderObject()
