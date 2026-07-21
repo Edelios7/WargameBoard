@@ -204,13 +204,35 @@ def convert(ref_path: Path, out_path: Path, warnings: list) -> dict:
             }
         )
 
+    # CatalogImportService remplace TOUS les profils existants d'une arme
+    # par ceux du document importé (voir _importWeapons). Une même arme
+    # (même nom -> même id) apparaît souvent dans plusieurs fichiers de
+    # faction ; si sur UNE fiche son extraction a échoué (profil vide) et
+    # que ce fichier est importé après un autre où elle avait un profil
+    # valide, l'import écraserait le bon profil avec rien. On omet donc du
+    # document les armes qui n'ont ici aucun profil valide : le lien
+    # datasheet -> arme reste (weaponIds la référence toujours), seule
+    # l'écriture destructive de la table weapons/profils est évitée. Si
+    # aucune fiche, dans aucune faction, ne fournit jamais de profil valide
+    # pour cette arme, elle n'existera simplement pas en base — préférable
+    # à un profil vide qui s'afficherait comme cassé dans le catalogue.
+    complete_weapons = [w for w in weapons.values() if w["profiles"]]
+    skipped_weapons = len(weapons) - len(complete_weapons)
+    if skipped_weapons:
+        warnings.append(
+            f"{skipped_weapons} arme(s) omise(s) du document (aucun profil "
+            "valide dans cette faction) pour ne pas écraser un profil "
+            "valide importé par une autre faction : "
+            f"{', '.join(sorted(w['name'] for w in weapons.values() if not w['profiles']))}"
+        )
+
     document = {
         "factions": [
             {"id": faction_id, "gameSystemId": GAME_SYSTEM_ID, "name": faction_name}
         ],
         "keywords": sorted(keywords.values(), key=lambda k: k["id"]),
         "abilities": sorted(abilities.values(), key=lambda a: a["id"]),
-        "weapons": sorted(weapons.values(), key=lambda w: w["id"]),
+        "weapons": sorted(complete_weapons, key=lambda w: w["id"]),
         "datasheets": datasheets,
     }
 

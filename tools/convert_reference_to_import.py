@@ -1,7 +1,20 @@
 # -*- coding: utf-8 -*-
-"""Convertit un JSON de référence (local_assets/wh40k_reference/units_md/*.json,
-produit par parse_datasheets.py) vers le format d'import JSON de l'application
-(voir lib/services/catalog_import_service.dart).
+"""DÉPRÉCIÉ — ne pas utiliser. Remplacé par convert_reference_v2_to_import.py.
+
+Le parseur source (parse_datasheets.py, v1) n'a aucun garde-fou pour
+détecter la fin d'un tableau d'armes : une fois dans la section "armes", il
+traite toute ligne de texte suivante comme un nom d'arme jusqu'à tomber sur
+un en-tête connu. Quand du texte de règle apparaît avant l'en-tête
+"APTITUDES" (mise en page à colonnes, extraction pypdf non linéaire), ce
+texte est importé comme si c'était une arme (ex: une phrase entière de
+règle spéciale devient un "nom d'arme" sans profil).
+
+parse_datasheets_v2.py corrige ça (garde-fou RANGE_TOKEN : la ligne qui
+suit un nom candidat doit ressembler à une vraie valeur de portée/Mêlée
+avant d'être acceptée) et capture en plus les profils d'armes complets
+(v1 ne gardait que les noms). Toute donnée déjà importée depuis ce
+pipeline v1 doit être remplacée par un import v2 (voir
+tools/bulk_import_v2_test.dart) — ne pas relancer ce script.
 
 Usage :
   python tools/convert_reference_to_import.py <ref.json> [<sortie.json>]
