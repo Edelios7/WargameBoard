@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../../domain/xp/xp_awards.dart';
 import '../app_database.dart';
+import '../models/ability_details.dart';
 import '../models/catalog_sort.dart';
 import '../models/datasheet_details.dart';
 import '../models/equipment_details.dart';
@@ -262,7 +263,7 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
 
     final cost = await _getCurrentCost(id);
     final keywordNames = await _getKeywordNames(id);
-    final abilityNames = await _getAbilityNames(id);
+    final abilityDetails = await _getAbilityDetails(id);
     final models = await _getModels(id);
     final weaponDetails = await _getWeapons(id);
     final equipment = await _getEquipment(id);
@@ -277,7 +278,7 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
       gameSystemId: faction.gameSystemId,
       editionId: cost.editionId,
       keywords: keywordNames,
-      abilities: abilityNames,
+      abilities: abilityDetails,
       models: models,
       weapons: weaponDetails,
       equipment: equipment,
@@ -317,14 +318,24 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     return rows.map((r) => r.readTable(keywords).name).toList();
   }
 
-  Future<List<String>> _getAbilityNames(String datasheetId) async {
+  Future<List<AbilityDetails>> _getAbilityDetails(String datasheetId) async {
     final query = select(datasheetAbilityLinks).join([
       innerJoin(
           abilities, abilities.id.equalsExp(datasheetAbilityLinks.abilityId)),
     ])
-      ..where(datasheetAbilityLinks.datasheetId.equals(datasheetId));
+      ..where(datasheetAbilityLinks.datasheetId.equals(datasheetId))
+      ..orderBy([OrderingTerm.asc(abilities.name)]);
     final rows = await query.get();
-    return rows.map((r) => r.readTable(abilities).name).toList();
+    return rows.map((r) {
+      final ability = r.readTable(abilities);
+      return AbilityDetails(
+        id: ability.id,
+        name: ability.name,
+        description: ability.description,
+        type: ability.type,
+        isCore: ability.isCore,
+      );
+    }).toList();
   }
 
   Future<List<ModelDetails>> _getModels(String datasheetId) async {

@@ -29,7 +29,7 @@ void main() {
     expect(details!.factionName, 'Blood Angels');
     expect(details.points, greaterThan(0));
     expect(details.keywords, contains('Death Company'));
-    expect(details.abilities, contains('Feel No Pain 5+'));
+    expect(details.abilities.map((a) => a.name), contains('Feel No Pain 5+'));
     expect(details.weapons, isNotEmpty);
     expect(details.unit.minimumSize, 5);
     expect(details.unit.maximumSize, 10);
@@ -98,7 +98,7 @@ void main() {
     expect(details, isNotNull);
     expect(details!.factionName, 'Orks');
     expect(details.keywords, contains('Mob'));
-    expect(details.abilities, contains('Mob Rule'));
+    expect(details.abilities.map((a) => a.name), contains('Mob Rule'));
     expect(details.unit.minimumSize, 10);
     expect(details.unit.maximumSize, 20);
   });

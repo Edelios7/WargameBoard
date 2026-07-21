@@ -1027,7 +1027,19 @@ class _UnitDetailsPanel extends ConsumerWidget {
                         ),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: Text(ability, style: AppTextStyles.body),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(ability.name, style: AppTextStyles.body),
+                              if (ability.description.isNotEmpty) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  ability.description,
+                                  style: AppTextStyles.caption,
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
                       ],
                     ),

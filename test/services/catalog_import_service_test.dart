@@ -75,7 +75,7 @@ void main() {
         await database.datasheetDao.getDatasheet(search.single.id);
     expect(details!.points, 75);
     expect(details.keywords, contains('Jump Pack'));
-    expect(details.abilities, contains('Fury'));
+    expect(details.abilities.map((a) => a.name), contains('Fury'));
     expect(details.unit.maximumSize, 10);
   });
 

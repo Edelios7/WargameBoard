@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
+import '../../../database/models/ability_details.dart';
 import '../../../database/models/datasheet_details.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -45,38 +46,7 @@ class DatasheetDetailPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (imageFile != null) ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.file(
-                imageFile,
-                height: 220,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(height: 20),
-          ],
-          Text(sheet.name, style: AppTextStyles.heading),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              if (factionIcon != null) ...[
-                ClipOval(
-                  child: Image.file(
-                    factionIcon,
-                    width: 20,
-                    height: 20,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 8),
-              ],
-              Text(sheet.factionName, style: AppTextStyles.caption),
-            ],
-          ),
-          const SizedBox(height: 20),
-          _pointsBadge(l10n, sheet.points),
+          _hero(sheet, imageFile, factionIcon, l10n),
           const SizedBox(height: 28),
           _section(
             l10n.sectionUnitSize,
@@ -89,14 +59,95 @@ class DatasheetDetailPanel extends StatelessWidget {
               style: AppTextStyles.body,
             ),
           ),
-          _section(l10n.sectionProfiles, _modelsTable(sheet)),
+          _section(l10n.sectionProfiles, _modelsStatBlocks(sheet)),
           _section(l10n.sectionWeapons, _weaponsList(l10n, sheet)),
           if (sheet.keywords.isNotEmpty)
             _section(l10n.sectionKeywords, _chips(sheet.keywords)),
           if (sheet.abilities.isNotEmpty)
-            _section(l10n.sectionAbilities, _bulletList(sheet.abilities)),
+            _section(l10n.sectionAbilities, _abilityCards(sheet.abilities)),
           if (sheet.equipment.isNotEmpty)
             _section(l10n.sectionEquipment, _equipmentList(sheet)),
+        ],
+      ),
+    );
+  }
+
+  Widget _hero(
+    DatasheetDetails sheet,
+    dynamic imageFile,
+    dynamic factionIcon,
+    AppLocalizations l10n,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (imageFile != null)
+            Stack(
+              children: [
+                Image.file(
+                  imageFile,
+                  height: 240,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          AppColors.surfaceElevated.withValues(alpha: .95),
+                        ],
+                        stops: const [0.4, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(sheet.name, style: AppTextStyles.heading),
+                    ),
+                    _pointsBadge(l10n, sheet.points),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    if (factionIcon != null) ...[
+                      ClipOval(
+                        child: Image.file(
+                          factionIcon,
+                          width: 20,
+                          height: 20,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    Text(sheet.factionName, style: AppTextStyles.caption),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -134,22 +185,61 @@ class DatasheetDetailPanel extends StatelessWidget {
     );
   }
 
-  Widget _modelsTable(DatasheetDetails sheet) {
+  Widget _modelsStatBlocks(DatasheetDetails sheet) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: sheet.models
           .map(
             (model) => Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Text(
-                '${model.name} — M${model.movement}" T${model.toughness} '
-                'Sv${model.save}+ W${model.wounds} LD${model.leadership}+ '
-                'OC${model.objectiveControl}',
-                style: AppTextStyles.body,
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (sheet.models.length > 1) ...[
+                    Text(model.name, style: AppTextStyles.body.copyWith(
+                      fontWeight: FontWeight.w600,
+                    )),
+                    const SizedBox(height: 6),
+                  ],
+                  Row(
+                    children: [
+                      _statBox('M', '${model.movement}"'),
+                      _statBox('T', '${model.toughness}'),
+                      _statBox('Sv', '${model.save}+'),
+                      _statBox('W', '${model.wounds}'),
+                      _statBox('Ld', '${model.leadership}+'),
+                      _statBox('OC', '${model.objectiveControl}'),
+                    ],
+                  ),
+                ],
               ),
             ),
           )
           .toList(),
+    );
+  }
+
+  Widget _statBox(String label, String value) {
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceElevated,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 2),
+            Text(label, style: AppTextStyles.eyebrow),
+          ],
+        ),
+      ),
     );
   }
 
@@ -261,14 +351,47 @@ class DatasheetDetailPanel extends StatelessWidget {
     );
   }
 
-  Widget _bulletList(List<String> items) {
+  Widget _abilityCards(List<AbilityDetails> items) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: items
           .map(
-            (item) => Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Text('• $item', style: AppTextStyles.body),
+            (ability) => Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceElevated,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          ability.name,
+                          style: AppTextStyles.body.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      if (ability.isCore) ...[
+                        const SizedBox(width: 8),
+                        AppChip(label: 'CORE', accent: true),
+                      ] else if (ability.type != null) ...[
+                        const SizedBox(width: 8),
+                        AppChip(label: ability.type!.toUpperCase()),
+                      ],
+                    ],
+                  ),
+                  if (ability.description.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(ability.description, style: AppTextStyles.caption),
+                  ],
+                ],
+              ),
             ),
           )
           .toList(),

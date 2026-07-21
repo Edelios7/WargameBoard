@@ -89,19 +89,33 @@ void main() {
       final boundary =
           boundaryKey.currentContext!.findRenderObject()
               as RenderRepaintBoundary;
-      await tester.runAsync(() async {
-        final image = await boundary.toImage(pixelRatio: 1.0);
-        final byteData =
-            await image.toByteData(format: ui.ImageByteFormat.png);
-        final bytes = byteData!.buffer.asUint8List();
+      Future<void> capture(String suffix) async {
+        await tester.runAsync(() async {
+          final image = await boundary.toImage(pixelRatio: 1.0);
+          final byteData =
+              await image.toByteData(format: ui.ImageByteFormat.png);
+          final bytes = byteData!.buffer.asUint8List();
 
-        final outPath =
-            Platform.environment['CATALOG_SCREENSHOT_PATH'] ??
-            'catalog_screenshot.png';
-        final file = File(outPath);
-        file.parent.createSync(recursive: true);
-        file.writeAsBytesSync(bytes);
-      });
+          final basePath =
+              Platform.environment['CATALOG_SCREENSHOT_PATH'] ??
+              'catalog_screenshot.png';
+          final outPath = suffix.isEmpty
+              ? basePath
+              : basePath.replaceFirst('.png', '_$suffix.png');
+          final file = File(outPath);
+          file.parent.createSync(recursive: true);
+          file.writeAsBytesSync(bytes);
+        });
+      }
+
+      await capture('');
+
+      final ctaFinder = find.text('VOIR LA FICHE COMPLÈTE');
+      if (ctaFinder.evaluate().isNotEmpty) {
+        await tester.tap(ctaFinder);
+        await tester.pumpAndSettle();
+        await capture('full');
+      }
 
       await database.close();
     },

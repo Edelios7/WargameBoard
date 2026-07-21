@@ -1,3 +1,4 @@
+import 'ability_details.dart';
 import 'equipment_details.dart';
 import 'model_details.dart';
 import 'unit_details.dart';
@@ -20,7 +21,7 @@ class DatasheetDetails {
 
   final List<String> keywords;
 
-  final List<String> abilities;
+  final List<AbilityDetails> abilities;
 
   final List<ModelDetails> models;
 
