@@ -137,7 +137,7 @@ class _CollectionPageState extends ConsumerState<CollectionPage>
                       ),
                     if (wide) const SizedBox(width: 10),
                     IconButton(
-                      tooltip: null,
+                      tooltip: l10n.catalogFilterTitle,
                       style: IconButton.styleFrom(
                         backgroundColor: _filtersVisible
                             ? AppColors.primary.withValues(alpha: .16)
@@ -304,7 +304,23 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
     }
     if (entries.isEmpty) {
       return Center(
-        child: Text(l10n.collectionEmpty, style: AppTextStyles.caption),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.inventory_2_outlined,
+              size: 48,
+              color: AppColors.textSecondary,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              l10n.collectionEmpty,
+              style: AppTextStyles.body.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
       );
     }
 
@@ -381,7 +397,7 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
                           Text(l10n.collectionAllItemsTitle,
                               style: AppTextStyles.title),
                           PopupMenuButton<void>(
-                            tooltip: '',
+                            tooltip: l10n.collectionExportTooltip,
                             icon: const Icon(
                               Icons.ios_share_rounded,
                               color: AppColors.textSecondary,
@@ -418,10 +434,23 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
                       const SizedBox(height: 12),
                       if (filtered.isEmpty)
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          child: Text(
-                            l10n.collectionNoResultsForFilters,
-                            style: AppTextStyles.caption,
+                          padding: const EdgeInsets.symmetric(vertical: 32),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.search_off_rounded,
+                                  size: 36,
+                                  color: AppColors.textSecondary,
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  l10n.collectionNoResultsForFilters,
+                                  style: AppTextStyles.caption,
+                                ),
+                              ],
+                            ),
                           ),
                         )
                       else
@@ -431,7 +460,7 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
                           gridDelegate:
                               const SliverGridDelegateWithMaxCrossAxisExtent(
                             maxCrossAxisExtent: 340,
-                            mainAxisExtent: 220,
+                            mainAxisExtent: 260,
                             crossAxisSpacing: 16,
                             mainAxisSpacing: 16,
                           ),
@@ -1216,6 +1245,39 @@ class _WishlistTab extends ConsumerWidget {
   }
 }
 
+/// Demande confirmation avant une suppression définitive d'entrée, pour
+/// éviter qu'un clic répété sur "-" ou un pas mal calibré ne fasse
+/// disparaître une entrée sans que l'utilisateur l'ait vraiment voulu.
+Future<bool> _confirmRemoveEntry(
+  BuildContext context,
+  AppLocalizations l10n,
+  String datasheetName,
+) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      backgroundColor: AppColors.surface,
+      title: Text(l10n.collectionDeleteConfirmTitle, style: AppTextStyles.title),
+      content: Text(
+        l10n.collectionDeleteConfirmMessage(datasheetName),
+        style: AppTextStyles.body,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(false),
+          child: Text(l10n.armyBuilderCancel),
+        ),
+        FilledButton(
+          style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+          onPressed: () => Navigator.of(dialogContext).pop(true),
+          child: Text(l10n.collectionDeleteConfirmAction),
+        ),
+      ],
+    ),
+  );
+  return confirmed ?? false;
+}
+
 class _CollectionCard extends ConsumerWidget {
   final CollectionItemDetails entry;
 
@@ -1237,27 +1299,44 @@ class _CollectionCard extends ConsumerWidget {
     ref.invalidate(xpSummaryProvider);
   }
 
-  /// Ajuste la quantité possédée de [delta] (positif ou négatif). Si la
-  /// nouvelle quantité tombe à 0 ou moins, l'entrée est entièrement
-  /// supprimée de la collection plutôt que laissée à 0.
-  Future<void> _adjustQuantity(WidgetRef ref, int delta) async {
-    final newQuantity = entry.quantity + delta;
-    if (newQuantity <= 0) {
-      await ref.read(collectionRepositoryProvider).deleteEntry(entry.id);
-    } else {
-      await ref
-          .read(collectionRepositoryProvider)
-          .updateCounts(entry.id, quantity: newQuantity);
-    }
+  Future<void> _removeEntry(WidgetRef ref) async {
+    await ref.read(collectionRepositoryProvider).deleteEntry(entry.id);
     ref.invalidate(collectionEntriesProvider);
     ref.invalidate(collectionSummaryProvider);
     ref.invalidate(recentlyAddedProvider);
     ref.invalidate(xpSummaryProvider);
   }
 
+  /// Ajuste la quantité possédée de [delta] (positif ou négatif). Si la
+  /// nouvelle quantité tomberait à 0 ou moins, on demande confirmation
+  /// avant de supprimer l'entrée plutôt que de la laisser à 0.
+  Future<void> _adjustQuantity(
+    BuildContext context,
+    WidgetRef ref,
+    int delta,
+  ) async {
+    final newQuantity = entry.quantity + delta;
+    if (newQuantity <= 0) {
+      final l10n = AppLocalizations.of(context)!;
+      final confirmed =
+          await _confirmRemoveEntry(context, l10n, entry.datasheetName);
+      if (!confirmed) return;
+      await _removeEntry(ref);
+      return;
+    }
+    await ref
+        .read(collectionRepositoryProvider)
+        .updateCounts(entry.id, quantity: newQuantity);
+    ref.invalidate(collectionEntriesProvider);
+    ref.invalidate(collectionSummaryProvider);
+    ref.invalidate(xpSummaryProvider);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final paintedRatio =
+        entry.quantity == 0 ? 0.0 : (entry.painted / entry.quantity).clamp(0, 1);
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -1272,25 +1351,70 @@ class _CollectionCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              entry.datasheetName,
-              style: AppTextStyles.body,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              entry.factionName,
-              style: AppTextStyles.caption,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        entry.datasheetName,
+                        style: AppTextStyles.body,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        entry.factionName,
+                        style: AppTextStyles.caption,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                Tooltip(
+                  message: l10n.collectionDeleteEntryTooltip,
+                  child: InkWell(
+                    key: const Key('delete-entry-button'),
+                    borderRadius: BorderRadius.circular(6),
+                    onTap: () async {
+                      final confirmed = await _confirmRemoveEntry(
+                        context,
+                        l10n,
+                        entry.datasheetName,
+                      );
+                      if (confirmed) await _removeEntry(ref);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(2),
+                      child: Icon(
+                        Icons.delete_outline_rounded,
+                        size: 18,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
             _QuantityAdjustRow(
               quantity: entry.quantity,
-              onAdjust: (delta) => _adjustQuantity(ref, delta),
+              onAdjust: (delta) => _adjustQuantity(context, ref, delta),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: paintedRatio.toDouble(),
+                minHeight: 5,
+                backgroundColor: AppColors.background,
+                valueColor: const AlwaysStoppedAnimation(AppColors.success),
+              ),
+            ),
+            const SizedBox(height: 10),
             _CountRow(
               label: l10n.collectionAssembled,
               value: entry.assembled,
@@ -1335,19 +1459,23 @@ class _StepField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 32,
-      height: 26,
-      child: TextField(
-        key: fieldKey,
-        controller: controller,
-        keyboardType: TextInputType.number,
-        textAlign: TextAlign.center,
-        style: AppTextStyles.caption,
-        decoration: const InputDecoration(
-          isDense: true,
-          contentPadding: EdgeInsets.symmetric(vertical: 2),
-          border: OutlineInputBorder(),
+    final l10n = AppLocalizations.of(context)!;
+    return Tooltip(
+      message: l10n.collectionStepFieldTooltip,
+      child: SizedBox(
+        width: 32,
+        height: 26,
+        child: TextField(
+          key: fieldKey,
+          controller: controller,
+          keyboardType: TextInputType.number,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.caption,
+          decoration: const InputDecoration(
+            isDense: true,
+            contentPadding: EdgeInsets.symmetric(vertical: 2),
+            border: OutlineInputBorder(),
+          ),
         ),
       ),
     );

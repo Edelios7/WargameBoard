@@ -218,6 +218,7 @@
   "armyBuilderModelCountLabel": "Model count",
 
   "collectionAddEntry": "Add to collection",
+  "collectionExportTooltip": "Export",
   "collectionExportCsv": "Copy as CSV",
   "collectionExportJson": "Copy as JSON",
   "collectionExportedToClipboard": "Collection copied to clipboard",
@@ -233,7 +234,17 @@
   "collectionPainted": "Painted",
   "collectionIncrementQuantity": "Add the amount to quantity",
   "collectionDecrementQuantity": "Remove the amount from quantity",
+  "collectionStepFieldTooltip": "Amount to add or remove",
   "collectionQuickAccessFactions": "Quick access to factions",
+  "collectionDeleteEntryTooltip": "Remove from collection",
+  "collectionDeleteConfirmTitle": "Remove this entry?",
+  "collectionDeleteConfirmMessage": "This will remove {name} and its assembly/painting progress from your collection.",
+  "@collectionDeleteConfirmMessage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "collectionDeleteConfirmAction": "Remove",
   "collectionQuantityDialogLabel": "Quantity",
   "collectionPriceDialogLabel": "Price (optional)",
   "collectionSummaryLine": "{entries} units · {models} models · {painted} painted",

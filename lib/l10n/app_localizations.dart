@@ -926,6 +926,12 @@ abstract class AppLocalizations {
   /// **'Ajouter à la collection'**
   String get collectionAddEntry;
 
+  /// No description provided for @collectionExportTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Exporter'**
+  String get collectionExportTooltip;
+
   /// No description provided for @collectionExportCsv.
   ///
   /// In fr, this message translates to:
@@ -986,11 +992,41 @@ abstract class AppLocalizations {
   /// **'Retirer le nombre saisi à la quantité'**
   String get collectionDecrementQuantity;
 
+  /// No description provided for @collectionStepFieldTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nombre à ajouter ou retirer'**
+  String get collectionStepFieldTooltip;
+
   /// No description provided for @collectionQuickAccessFactions.
   ///
   /// In fr, this message translates to:
   /// **'Accès rapide aux factions'**
   String get collectionQuickAccessFactions;
+
+  /// No description provided for @collectionDeleteEntryTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer de la collection'**
+  String get collectionDeleteEntryTooltip;
+
+  /// No description provided for @collectionDeleteConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer cette entrée ?'**
+  String get collectionDeleteConfirmTitle;
+
+  /// No description provided for @collectionDeleteConfirmMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cela retirera {name} et sa progression de montage/peinture de votre collection.'**
+  String collectionDeleteConfirmMessage(String name);
+
+  /// No description provided for @collectionDeleteConfirmAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer'**
+  String get collectionDeleteConfirmAction;
 
   /// No description provided for @collectionQuantityDialogLabel.
   ///

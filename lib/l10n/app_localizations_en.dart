@@ -452,6 +452,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get collectionAddEntry => 'Add to collection';
 
   @override
+  String get collectionExportTooltip => 'Export';
+
+  @override
   String get collectionExportCsv => 'Copy as CSV';
 
   @override
@@ -484,7 +487,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get collectionDecrementQuantity => 'Remove the amount from quantity';
 
   @override
+  String get collectionStepFieldTooltip => 'Amount to add or remove';
+
+  @override
   String get collectionQuickAccessFactions => 'Quick access to factions';
+
+  @override
+  String get collectionDeleteEntryTooltip => 'Remove from collection';
+
+  @override
+  String get collectionDeleteConfirmTitle => 'Remove this entry?';
+
+  @override
+  String collectionDeleteConfirmMessage(String name) {
+    return 'This will remove $name and its assembly/painting progress from your collection.';
+  }
+
+  @override
+  String get collectionDeleteConfirmAction => 'Remove';
 
   @override
   String get collectionQuantityDialogLabel => 'Quantity';

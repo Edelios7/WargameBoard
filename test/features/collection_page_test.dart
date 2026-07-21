@@ -102,6 +102,11 @@ void main() {
     await tester.tap(removeQty);
     await tester.pumpAndSettle();
 
+    // Une confirmation est demandée avant la suppression définitive.
+    expect(find.text('Retirer cette entrée ?'), findsOneWidget);
+    await tester.tap(find.text('Retirer'));
+    await tester.pumpAndSettle();
+
     final entries = await database.collectionDao.listEntries();
     expect(entries, isEmpty);
     expect(find.text('Ta collection est vide'), findsOneWidget);
@@ -130,5 +135,37 @@ void main() {
 
     final entries = await database.collectionDao.listEntries();
     expect(entries.single.quantity, 4);
+  });
+
+  testWidgets(
+      'the explicit delete button asks for confirmation and can be cancelled',
+      (tester) async {
+    await database.collectionDao.addEntry(
+      datasheetId: 'ds-captain',
+      quantity: 3,
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    final deleteButton = find.byKey(const Key('delete-entry-button'));
+    await tester.ensureVisible(deleteButton);
+    await tester.tap(deleteButton);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Retirer cette entrée ?'), findsOneWidget);
+
+    // Annuler ne doit rien supprimer.
+    await tester.tap(find.text('Annuler'));
+    await tester.pumpAndSettle();
+    expect(await database.collectionDao.listEntries(), hasLength(1));
+
+    // Confirmer supprime bien l'entrée.
+    await tester.tap(deleteButton);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Retirer'));
+    await tester.pumpAndSettle();
+
+    expect(await database.collectionDao.listEntries(), isEmpty);
   });
 }
