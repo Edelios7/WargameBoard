@@ -198,11 +198,31 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   // =========================
   // Migrations
   // =========================
+
+  /// Vérifie qu'une colonne existe déjà avant de l'ajouter. Nécessaire
+  /// car le compteur de version de schéma (PRAGMA user_version) peut se
+  /// désynchroniser du schéma réellement appliqué (vu en usage réel :
+  /// une base dont les colonnes/tables d'une migration existaient déjà
+  /// alors que user_version indiquait une version antérieure) — sans ce
+  /// garde-fou, `m.addColumn` plante avec "duplicate column name" et
+  /// l'appli ne démarre plus du tout.
+  Future<bool> _hasColumn(String table, String column) async {
+    final rows = await customSelect('PRAGMA table_info($table)').get();
+    return rows.any((row) => row.data['name'] == column);
+  }
+
+  Future<bool> _hasTable(String name) async {
+    final rows = await customSelect(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name = ?",
+      variables: [Variable.withString(name)],
+    ).get();
+    return rows.isNotEmpty;
+  }
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -214,29 +234,45 @@ class AppDatabase extends _$AppDatabase {
 
         onUpgrade: (Migrator m, int from, int to) async {
           if (from < 2) {
-            await m.createTable(armies);
-            await m.createTable(armyUnits);
+            if (!await _hasTable('armies')) await m.createTable(armies);
+            if (!await _hasTable('army_units')) await m.createTable(armyUnits);
           }
           if (from < 3) {
-            await m.addColumn(armies, armies.pointsLimit);
+            if (!await _hasColumn('armies', 'points_limit')) {
+              await m.addColumn(armies, armies.pointsLimit);
+            }
           }
           if (from < 4) {
-            await m.createTable(ownedMiniatures);
+            if (!await _hasTable('owned_miniatures')) {
+              await m.createTable(ownedMiniatures);
+            }
           }
           if (from < 5) {
-            await m.createTable(battles);
+            if (!await _hasTable('battles')) await m.createTable(battles);
           }
           if (from < 6) {
-            await m.createTable(detachments);
-            await m.createTable(enhancements);
-            await m.addColumn(armies, armies.detachmentId);
-            await m.addColumn(armyUnits, armyUnits.enhancementId);
+            if (!await _hasTable('detachments')) {
+              await m.createTable(detachments);
+            }
+            if (!await _hasTable('enhancements')) {
+              await m.createTable(enhancements);
+            }
+            if (!await _hasColumn('armies', 'detachment_id')) {
+              await m.addColumn(armies, armies.detachmentId);
+            }
+            if (!await _hasColumn('army_units', 'enhancement_id')) {
+              await m.addColumn(armyUnits, armyUnits.enhancementId);
+            }
           }
           if (from < 7) {
-            await m.createTable(stratagems);
+            if (!await _hasTable('stratagems')) {
+              await m.createTable(stratagems);
+            }
           }
           if (from < 8) {
-            await m.createTable(wishlistItems);
+            if (!await _hasTable('wishlist_items')) {
+              await m.createTable(wishlistItems);
+            }
           }
           if (from < 9) {
             // Backfill des profils d'armes sur les bases déjà créées
@@ -244,19 +280,38 @@ class AppDatabase extends _$AppDatabase {
             await seedWeaponProfiles(this);
           }
           if (from < 10) {
-            await m.addColumn(battles, battles.opponentFactionId);
-            await m.addColumn(battles, battles.location);
-            await m.addColumn(battles, battles.type);
-            await m.createTable(projects);
-            await m.createTable(xpCategoryTotals);
-            await m.createTable(xpFactionTotals);
+            if (!await _hasColumn('battles', 'opponent_faction_id')) {
+              await m.addColumn(battles, battles.opponentFactionId);
+            }
+            if (!await _hasColumn('battles', 'location')) {
+              await m.addColumn(battles, battles.location);
+            }
+            if (!await _hasColumn('battles', 'type')) {
+              await m.addColumn(battles, battles.type);
+            }
+            if (!await _hasTable('projects')) await m.createTable(projects);
+            if (!await _hasTable('xp_category_totals')) {
+              await m.createTable(xpCategoryTotals);
+            }
+            if (!await _hasTable('xp_faction_totals')) {
+              await m.createTable(xpFactionTotals);
+            }
             await xpDao.seedCategories();
           }
           if (from < 11) {
-            await m.createTable(armyUnitEquipmentSelections);
+            if (!await _hasTable('army_unit_equipment_selections')) {
+              await m.createTable(armyUnitEquipmentSelections);
+            }
           }
           if (from < 12) {
-            await m.addColumn(datasheetCosts, datasheetCosts.modelCount);
+            if (!await _hasColumn('datasheet_costs', 'model_count')) {
+              await m.addColumn(datasheetCosts, datasheetCosts.modelCount);
+            }
+          }
+          if (from < 13) {
+            if (!await _hasColumn('army_units', 'is_warlord')) {
+              await m.addColumn(armyUnits, armyUnits.isWarlord);
+            }
           }
         },
 
