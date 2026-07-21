@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../database/models/xp_summary.dart';
 import '../../../domain/xp/xp_category.dart';
@@ -235,14 +236,21 @@ class _FactionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final bannerFile = LocalCatalogImages.factionBanner(faction.factionId);
 
-    return Row(
+    final row = Row(
       children: [
         Expanded(
           flex: 2,
           child: Text(
             faction.factionName,
-            style: AppTextStyles.body,
+            style: AppTextStyles.body.copyWith(
+              fontWeight:
+                  bannerFile != null ? FontWeight.w700 : FontWeight.w400,
+              shadows: bannerFile != null
+                  ? const [Shadow(blurRadius: 4, color: Colors.black)]
+                  : null,
+            ),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -253,7 +261,10 @@ class _FactionRow extends StatelessWidget {
             l10n.profileLevelShort(faction.level.level),
             style: AppTextStyles.body.copyWith(
               fontWeight: FontWeight.w700,
-              color: AppColors.primary,
+              color: AppColors.primaryLight,
+              shadows: bannerFile != null
+                  ? const [Shadow(blurRadius: 4, color: Colors.black)]
+                  : null,
             ),
             textAlign: TextAlign.right,
           ),
@@ -266,12 +277,45 @@ class _FactionRow extends StatelessWidget {
             child: LinearProgressIndicator(
               value: faction.level.progress,
               minHeight: 6,
-              backgroundColor: AppColors.background,
+              backgroundColor: bannerFile != null
+                  ? Colors.white.withValues(alpha: .2)
+                  : AppColors.background,
               valueColor: const AlwaysStoppedAnimation(AppColors.primaryLight),
             ),
           ),
         ),
       ],
+    );
+
+    if (bannerFile == null) return row;
+
+    // Bannière de faction en arrière-plan (voir local_assets/banners/),
+    // assombrie par un dégradé pour garder le texte lisible.
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: Stack(
+        children: [
+          Positioned.fill(child: Image.file(bannerFile, fit: BoxFit.cover)),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    AppColors.surface.withValues(alpha: .55),
+                    AppColors.surface.withValues(alpha: .9),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: row,
+          ),
+        ],
+      ),
     );
   }
 }

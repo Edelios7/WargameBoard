@@ -36,6 +36,11 @@ class LocalCatalogImages {
 
   static File? faction(String factionId) => _find('factions', factionId);
 
+  /// Bannière large illustrant une faction (voir local_assets/banners/),
+  /// pensée pour habiller l'arrière-plan d'une ligne/section plutôt que
+  /// comme icône — contrairement à [faction] qui est un portrait carré.
+  static File? factionBanner(String factionId) => _find('banners', factionId);
+
   /// Visuels d'habillage fixes (fond de page, bannières...), voir
   /// local_assets/branding/. Jamais commités (contenu généré, esthétique
   /// proche de l'imagerie GW).
