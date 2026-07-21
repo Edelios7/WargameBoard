@@ -4,8 +4,9 @@ class AppColors {
   AppColors._();
 
   // Couleur d'accent unique
-  static const Color primary = Color(0xFFC81E3A);
-  static const Color primaryLight = Color(0xFFE8455F);
+  static const Color primary = Color(0xFF7F31E6);
+  static const Color primaryLight = Color(0xFFB668F6);
+  static const Color primaryDark = Color(0xFF551FA0);
 
   // Arrière-plans
   static const Color background = Color(0xFF0A0C10);

@@ -80,7 +80,7 @@ class _RulesPageState extends State<RulesPage> {
               l10n: l10n,
               onOpenBook: () => _openBook(context, l10n, hero),
               onViewErrata: () => ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.rulesViewErrata(24))),
+                SnackBar(content: Text(l10n.rulesViewErrata(hero.errataCount))),
               ),
             ),
             const SizedBox(height: 24),
@@ -403,9 +403,7 @@ class _HeroCard extends StatelessWidget {
                     ),
                     onPressed: onViewErrata,
                     child: Text(
-                      l10n.rulesViewErrata(document.errataCount == 0
-                          ? 24
-                          : document.errataCount),
+                      l10n.rulesViewErrata(document.errataCount),
                       style: AppTextStyles.body,
                     ),
                   ),

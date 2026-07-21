@@ -40,210 +40,258 @@ class DashboardPage extends ConsumerWidget {
     final projectsAsync = ref.watch(projectsListProvider);
     final displayName = ref.watch(displayNameProvider);
 
-    void goTo(AppTab tab) =>
-        ref.read(selectedTabProvider.notifier).state = tab;
+    void goTo(AppTab tab) => ref.read(selectedTabProvider.notifier).state = tab;
 
     final armies = armiesAsync.value ?? const <ArmyListItem>[];
-    final totalArmyPoints =
-        armies.fold<int>(0, (sum, a) => sum + a.totalPoints);
+    final totalArmyPoints = armies.fold<int>(
+      0,
+      (sum, a) => sum + a.totalPoints,
+    );
     final summary = summaryAsync.value;
     final entries = entriesAsync.value ?? const <CollectionItemDetails>[];
     final heroFactionId = armies.isEmpty
         ? null
         : armies
-            .reduce((a, b) => a.totalPoints >= b.totalPoints ? a : b)
-            .factionId;
+              .reduce((a, b) => a.totalPoints >= b.totalPoints ? a : b)
+              .factionId;
+
+    final ambianceFile = LocalCatalogImages.branding('hero-dashboard');
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _DashboardHeader(
-              displayName: displayName,
-              heroFactionId: heroFactionId,
-              onOpenSettings: () => goTo(AppTab.settings),
-              onOpenProfile: () => goTo(AppTab.profile),
-              onSearch: (query) {
-                ref.read(catalogSearchQueryProvider.notifier).state = query;
-                goTo(AppTab.catalog);
-              },
+      body: Stack(
+        children: [
+          // L'illustration d'ambiance n'est qu'un fond décoratif : on ne
+          // montre qu'une bande réduite en haut de page (pas toute la
+          // hauteur défilable) pour limiter le morceau d'image visible, et
+          // le dégradé monte vite à une opacité quasi totale pour ne
+          // jamais laisser de détails de l'image se lire derrière le texte
+          // réel du Dashboard.
+          if (ambianceFile != null)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 260,
+              child: Image.file(
+                ambianceFile,
+                fit: BoxFit.cover,
+                alignment: Alignment.topCenter,
+              ),
             ),
-            const SizedBox(height: 24),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final columns = constraints.maxWidth > 900 ? 4 : 2;
-                return GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: columns,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 2.0,
-                  children: [
-                    _StatTile(
-                      icon: Icons.military_tech_rounded,
-                      accentColor: AppColors.primary,
-                      label: l10n.dashboardStatPoints,
-                      value: totalArmyPoints.toString(),
-                      sublabel: l10n.dashboardStatPointsSub,
-                      onTap: () => goTo(AppTab.armies),
-                    ),
-                    _StatTile(
-                      icon: Icons.inventory_2_rounded,
-                      accentColor: AppColors.info,
-                      label: l10n.dashboardStatModels,
-                      value: (summary?.totalModels ?? 0).toString(),
-                      sublabel: l10n.dashboardStatModelsSub,
-                      onTap: () => goTo(AppTab.collection),
-                    ),
-                    _StatTile(
-                      icon: Icons.brush_rounded,
-                      accentColor: AppColors.success,
-                      label: l10n.dashboardStatPainting,
-                      value: summary == null
-                          ? '—'
-                          : '${(summary.paintedRatio * 100).round()}%',
-                      sublabel: l10n.dashboardStatPaintingSub,
-                      onTap: () => goTo(AppTab.statistics),
-                    ),
-                    _LastBattleTile(
-                      battle: lastBattleAsync.value,
-                      onTap: () => goTo(AppTab.battles),
-                    ),
-                  ],
-                );
-              },
-            ),
-            const SizedBox(height: 28),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final wide = constraints.maxWidth > 980;
-                final cards = [
-                  _YourArmiesCard(
-                    armies: armies,
-                    onSeeAll: () => goTo(AppTab.armies),
+          if (ambianceFile != null)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 260,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      AppColors.background.withValues(alpha: .82),
+                      AppColors.background.withValues(alpha: .96),
+                      AppColors.background,
+                    ],
+                    stops: const [0, 0.3, 0.55],
                   ),
-                  _PaintingDonutCard(entries: entries),
-                  _FactionBreakdownCard(entries: entries),
-                ];
-                if (!wide) {
-                  return Column(
-                    children: [
-                      for (final card in cards) ...[
-                        card,
-                        const SizedBox(height: 16),
+                ),
+              ),
+            ),
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _DashboardHeader(
+                  displayName: displayName,
+                  heroFactionId: heroFactionId,
+                  onOpenSettings: () => goTo(AppTab.settings),
+                  onOpenProfile: () => goTo(AppTab.profile),
+                  onSearch: (query) {
+                    ref.read(catalogSearchQueryProvider.notifier).state = query;
+                    goTo(AppTab.catalog);
+                  },
+                ),
+                const SizedBox(height: 24),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final columns = constraints.maxWidth > 900 ? 4 : 2;
+                    return GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: columns,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 2.0,
+                      children: [
+                        _StatTile(
+                          icon: Icons.military_tech_rounded,
+                          accentColor: AppColors.primary,
+                          label: l10n.dashboardStatPoints,
+                          value: totalArmyPoints.toString(),
+                          sublabel: l10n.dashboardStatPointsSub,
+                          onTap: () => goTo(AppTab.armies),
+                        ),
+                        _StatTile(
+                          icon: Icons.inventory_2_rounded,
+                          accentColor: AppColors.info,
+                          label: l10n.dashboardStatModels,
+                          value: (summary?.totalModels ?? 0).toString(),
+                          sublabel: l10n.dashboardStatModelsSub,
+                          onTap: () => goTo(AppTab.collection),
+                        ),
+                        _StatTile(
+                          icon: Icons.brush_rounded,
+                          accentColor: AppColors.success,
+                          label: l10n.dashboardStatPainting,
+                          value: summary == null
+                              ? '—'
+                              : '${(summary.paintedRatio * 100).round()}%',
+                          sublabel: l10n.dashboardStatPaintingSub,
+                          onTap: () => goTo(AppTab.statistics),
+                        ),
+                        _LastBattleTile(
+                          battle: lastBattleAsync.value,
+                          onTap: () => goTo(AppTab.battles),
+                        ),
                       ],
-                    ],
-                  );
-                }
-                return IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(flex: 3, child: cards[0]),
-                      const SizedBox(width: 16),
-                      Expanded(flex: 3, child: cards[1]),
-                      const SizedBox(width: 16),
-                      Expanded(flex: 3, child: cards[2]),
-                    ],
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final wide = constraints.maxWidth > 980;
-                final cards = [
-                  _RecentAdditionsCard(
-                    entriesAsync: recentlyAddedAsync,
-                    onSeeAll: () => goTo(AppTab.collection),
-                  ),
-                  _RecentlyViewedCard(
-                    resultsAsync: recentlyViewedAsync,
-                    onSelect: (id) {
-                      ref.read(selectedDatasheetIdProvider.notifier).state =
-                          id;
-                      goTo(AppTab.catalog);
-                    },
-                  ),
-                  _NextBattleCard(
-                    battle: nextBattleAsync.value,
-                    armies: armies,
-                    onTap: () => goTo(AppTab.battles),
-                  ),
-                ];
-                if (!wide) {
-                  return Column(
-                    children: [
-                      for (final card in cards) ...[
-                        card,
-                        const SizedBox(height: 16),
-                      ],
-                    ],
-                  );
-                }
-                return IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(flex: 3, child: cards[0]),
-                      const SizedBox(width: 16),
-                      Expanded(flex: 3, child: cards[1]),
-                      const SizedBox(width: 16),
-                      Expanded(flex: 3, child: cards[2]),
-                    ],
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final wide = constraints.maxWidth > 900;
-                final quickActions = _QuickActionsCard(
-                  onNewArmy: () => showDialog(
-                    context: context,
-                    builder: (_) => const CreateArmyDialog(),
-                  ),
-                  onAddToCollection: () => showDialog(
-                    context: context,
-                    builder: (_) => const AddCollectionEntryDialog(),
-                  ),
-                  onOpenCatalog: () => goTo(AppTab.catalog),
-                  onNewBattle: () => showDialog(
-                    context: context,
-                    builder: (_) => const LogBattleDialog(),
-                  ),
-                );
-                final projects = _ProjectsCard(projectsAsync: projectsAsync);
+                    );
+                  },
+                ),
+                const SizedBox(height: 28),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final wide = constraints.maxWidth > 980;
+                    final cards = [
+                      _YourArmiesCard(
+                        armies: armies,
+                        onSeeAll: () => goTo(AppTab.armies),
+                      ),
+                      _PaintingDonutCard(entries: entries),
+                      _FactionBreakdownCard(entries: entries),
+                    ];
+                    if (!wide) {
+                      return Column(
+                        children: [
+                          for (final card in cards) ...[
+                            card,
+                            const SizedBox(height: 16),
+                          ],
+                        ],
+                      );
+                    }
+                    return IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(flex: 3, child: cards[0]),
+                          const SizedBox(width: 16),
+                          Expanded(flex: 3, child: cards[1]),
+                          const SizedBox(width: 16),
+                          Expanded(flex: 3, child: cards[2]),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final wide = constraints.maxWidth > 980;
+                    final cards = [
+                      _RecentAdditionsCard(
+                        entriesAsync: recentlyAddedAsync,
+                        onSeeAll: () => goTo(AppTab.collection),
+                      ),
+                      _RecentlyViewedCard(
+                        resultsAsync: recentlyViewedAsync,
+                        onSelect: (id) {
+                          ref.read(selectedDatasheetIdProvider.notifier).state =
+                              id;
+                          goTo(AppTab.catalog);
+                        },
+                      ),
+                      _NextBattleCard(
+                        battle: nextBattleAsync.value,
+                        armies: armies,
+                        onTap: () => goTo(AppTab.battles),
+                      ),
+                    ];
+                    if (!wide) {
+                      return Column(
+                        children: [
+                          for (final card in cards) ...[
+                            card,
+                            const SizedBox(height: 16),
+                          ],
+                        ],
+                      );
+                    }
+                    return IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(flex: 3, child: cards[0]),
+                          const SizedBox(width: 16),
+                          Expanded(flex: 3, child: cards[1]),
+                          const SizedBox(width: 16),
+                          Expanded(flex: 3, child: cards[2]),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final wide = constraints.maxWidth > 900;
+                    final quickActions = _QuickActionsCard(
+                      onNewArmy: () => showDialog(
+                        context: context,
+                        builder: (_) => const CreateArmyDialog(),
+                      ),
+                      onAddToCollection: () => showDialog(
+                        context: context,
+                        builder: (_) => const AddCollectionEntryDialog(),
+                      ),
+                      onOpenCatalog: () => goTo(AppTab.catalog),
+                      onNewBattle: () => showDialog(
+                        context: context,
+                        builder: (_) => const LogBattleDialog(),
+                      ),
+                    );
+                    final projects = _ProjectsCard(
+                      projectsAsync: projectsAsync,
+                    );
 
-                if (!wide) {
-                  return Column(
-                    children: [
-                      quickActions,
-                      const SizedBox(height: 16),
-                      projects,
-                    ],
-                  );
-                }
-                return IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(flex: 2, child: quickActions),
-                      const SizedBox(width: 16),
-                      Expanded(flex: 3, child: projects),
-                    ],
-                  ),
-                );
-              },
+                    if (!wide) {
+                      return Column(
+                        children: [
+                          quickActions,
+                          const SizedBox(height: 16),
+                          projects,
+                        ],
+                      );
+                    }
+                    return IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(flex: 2, child: quickActions),
+                          const SizedBox(width: 16),
+                          Expanded(flex: 3, child: projects),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -286,8 +334,9 @@ class _DashboardHeaderState extends ConsumerState<_DashboardHeader> {
     final heroImageId = widget.heroFactionId == null
         ? null
         : ref.watch(factionHeroImageIdProvider(widget.heroFactionId!)).value;
-    final heroFile =
-        heroImageId == null ? null : LocalCatalogImages.datasheet(heroImageId);
+    final heroFile = heroImageId == null
+        ? null
+        : LocalCatalogImages.datasheet(heroImageId);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -447,17 +496,17 @@ class _BadgeIconButton extends StatelessWidget {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            Center(
-              child: Icon(icon, size: 18, color: AppColors.textSecondary),
-            ),
+            Center(child: Icon(icon, size: 18, color: AppColors.textSecondary)),
             if (badgeCount > 0)
               Positioned(
                 top: -2,
                 right: -2,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
-                  constraints:
-                      const BoxConstraints(minWidth: 16, minHeight: 16),
+                  constraints: const BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
                   decoration: const BoxDecoration(
                     color: AppColors.primary,
                     shape: BoxShape.circle,
@@ -571,8 +620,11 @@ class _LastBattleTile extends ConsumerWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.sports_martial_arts_rounded,
-                    size: 16, color: AppColors.primary),
+                const Icon(
+                  Icons.sports_martial_arts_rounded,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -607,8 +659,9 @@ class _LastBattleTile extends ConsumerWidget {
     final heroImageId = opponentFactionId == null
         ? null
         : ref.watch(factionHeroImageIdProvider(opponentFactionId)).value;
-    final heroFile =
-        heroImageId == null ? null : LocalCatalogImages.datasheet(heroImageId);
+    final heroFile = heroImageId == null
+        ? null
+        : LocalCatalogImages.datasheet(heroImageId);
 
     return Material(
       color: AppColors.surfaceElevated,
@@ -649,8 +702,11 @@ class _LastBattleTile extends ConsumerWidget {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.sports_martial_arts_rounded,
-                      size: 16, color: AppColors.primary),
+                  const Icon(
+                    Icons.sports_martial_arts_rounded,
+                    size: 16,
+                    color: AppColors.primary,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -671,8 +727,10 @@ class _LastBattleTile extends ConsumerWidget {
               if (resultLabel != null) ...[
                 const SizedBox(height: 4),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: (isVictory ? AppColors.success : AppColors.error)
                         .withValues(alpha: .16),
@@ -719,8 +777,9 @@ class _YourArmiesCard extends StatelessWidget {
                   onPressed: onSeeAll,
                   child: Text(
                     l10n.dashboardSeeAll,
-                    style: AppTextStyles.caption
-                        .copyWith(color: AppColors.primary),
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
             ],
@@ -794,10 +853,7 @@ class _ArmyRow extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  army.factionName,
-                  style: AppTextStyles.caption,
-                ),
+                Text(army.factionName, style: AppTextStyles.caption),
               ],
             ),
           ),
@@ -837,8 +893,10 @@ class _PaintingDonutCard extends StatelessWidget {
     var unbuilt = 0;
     for (final entry in entries) {
       painted += entry.painted;
-      assembledOnly +=
-          (entry.assembled - entry.painted).clamp(0, entry.quantity);
+      assembledOnly += (entry.assembled - entry.painted).clamp(
+        0,
+        entry.quantity,
+      );
       unbuilt += (entry.quantity - entry.assembled).clamp(0, entry.quantity);
     }
 
@@ -898,11 +956,13 @@ class _FactionBreakdownCard extends StatelessWidget {
     final factionSegments = <DonutSegment>[];
     var colorIndex = 0;
     for (final e in factionTotals.entries) {
-      factionSegments.add(DonutSegment(
-        label: e.key,
-        value: e.value,
-        color: factionColors[colorIndex % factionColors.length],
-      ));
+      factionSegments.add(
+        DonutSegment(
+          label: e.key,
+          value: e.value,
+          color: factionColors[colorIndex % factionColors.length],
+        ),
+      );
       colorIndex++;
     }
 
@@ -951,15 +1011,18 @@ class _RecentAdditionsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(l10n.dashboardRecentAdditionsTitle,
-                  style: AppTextStyles.title),
+              Text(
+                l10n.dashboardRecentAdditionsTitle,
+                style: AppTextStyles.title,
+              ),
               if (entries.isNotEmpty)
                 TextButton(
                   onPressed: onSeeAll,
                   child: Text(
                     l10n.dashboardSeeAll,
-                    style: AppTextStyles.caption
-                        .copyWith(color: AppColors.primary),
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
             ],
@@ -974,7 +1037,9 @@ class _RecentAdditionsCard extends StatelessWidget {
               ),
             )
           else
-            ...entries.take(4).map(
+            ...entries
+                .take(4)
+                .map(
                   (entry) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: Row(
@@ -1118,71 +1183,82 @@ class _NextBattleCard extends StatelessWidget {
             )
           else ...[
             Text(
-              MaterialLocalizations.of(context)
-                  .formatMediumDate(battle!.playedAt),
+              MaterialLocalizations.of(
+                context,
+              ).formatMediumDate(battle!.playedAt),
               style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 10),
-            Builder(builder: (context) {
-              final myArmy = armies.where((a) => a.id == battle!.armyId);
-              final myFactionName =
-                  myArmy.isEmpty ? null : myArmy.first.factionName;
-              final opponentFactionName = battle!.opponentFactionName;
+            Builder(
+              builder: (context) {
+                final myArmy = armies.where((a) => a.id == battle!.armyId);
+                final myFactionName = myArmy.isEmpty
+                    ? null
+                    : myArmy.first.factionName;
+                final opponentFactionName = battle!.opponentFactionName;
 
-              return Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        FactionBadgeIcon(
-                          factionName: myFactionName ?? battle!.armyName ?? '?',
-                          size: 32,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          myFactionName ?? battle!.armyName ?? '—',
-                          style: AppTextStyles.caption,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                return Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          FactionBadgeIcon(
+                            factionName:
+                                myFactionName ?? battle!.armyName ?? '?',
+                            size: 32,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            myFactionName ?? battle!.armyName ?? '—',
+                            style: AppTextStyles.caption,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child:
-                        Text(l10n.dashboardVersus, style: AppTextStyles.caption),
-                  ),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        FactionBadgeIcon(
-                          factionName: opponentFactionName ??
-                              battle!.opponentName ??
-                              '?',
-                          size: 32,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          opponentFactionName ?? battle!.opponentName ?? '—',
-                          style: AppTextStyles.caption,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        l10n.dashboardVersus,
+                        style: AppTextStyles.caption,
+                      ),
                     ),
-                  ),
-                ],
-              );
-            }),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          FactionBadgeIcon(
+                            factionName:
+                                opponentFactionName ??
+                                battle!.opponentName ??
+                                '?',
+                            size: 32,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            opponentFactionName ?? battle!.opponentName ?? '—',
+                            style: AppTextStyles.caption,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
             if (battle!.location != null) ...[
               const SizedBox(height: 8),
               Row(
                 children: [
-                  const Icon(Icons.place_outlined,
-                      size: 14, color: AppColors.textSecondary),
+                  const Icon(
+                    Icons.place_outlined,
+                    size: 14,
+                    color: AppColors.textSecondary,
+                  ),
                   const SizedBox(width: 4),
                   Text(battle!.location!, style: AppTextStyles.caption),
                 ],
@@ -1276,8 +1352,11 @@ class _QuickActionsCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded,
-                  size: 18, color: AppColors.textSecondary),
+              const Icon(
+                Icons.chevron_right_rounded,
+                size: 18,
+                color: AppColors.textSecondary,
+              ),
             ],
           ),
         ),
@@ -1333,10 +1412,12 @@ class _ProjectsCardState extends ConsumerState<_ProjectsCard> {
               ),
             )
           else
-            ...projects.map((project) => Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: _ProjectRow(project: project),
-                )),
+            ...projects.map(
+              (project) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _ProjectRow(project: project),
+              ),
+            ),
           const SizedBox(height: 4),
           Row(
             children: [
@@ -1351,7 +1432,9 @@ class _ProjectsCardState extends ConsumerState<_ProjectsCard> {
                     filled: true,
                     fillColor: AppColors.surface,
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 10),
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide: BorderSide(color: AppColors.border),
@@ -1420,8 +1503,9 @@ class _ProjectRow extends ConsumerWidget {
                 child: Text(
                   title,
                   style: AppTextStyles.body.copyWith(
-                    decoration:
-                        done ? TextDecoration.lineThrough : TextDecoration.none,
+                    decoration: done
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none,
                     color: done
                         ? AppColors.textSecondary
                         : AppColors.textPrimary,
@@ -1453,12 +1537,7 @@ class _ProjectRow extends ConsumerWidget {
 Widget _thumbnail(String datasheetId, double size) {
   final imageFile = LocalCatalogImages.datasheet(datasheetId);
   if (imageFile != null) {
-    return Image.file(
-      imageFile,
-      width: size,
-      height: size,
-      fit: BoxFit.cover,
-    );
+    return Image.file(imageFile, width: size, height: size, fit: BoxFit.cover);
   }
   return Container(
     width: size,

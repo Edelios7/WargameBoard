@@ -22,7 +22,7 @@ class SidebarItem extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: selected
             ? const LinearGradient(
-                colors: [AppColors.primary, Color(0xFF9A1830)],
+                colors: [AppColors.primary, AppColors.primaryDark],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               )

@@ -80,17 +80,9 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
                     ],
                   ),
                 ),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    _iconButton(Icons.info_outline_rounded),
-                    _iconButton(Icons.ios_share_rounded),
-                    _iconButton(
-                      Icons.open_in_full_rounded,
-                      onTap: () => _openFullSheet(context, sheet.id),
-                    ),
-                  ],
+                _iconButton(
+                  Icons.open_in_full_rounded,
+                  onTap: () => _openFullSheet(context, sheet.id),
                 ),
               ],
             ),
