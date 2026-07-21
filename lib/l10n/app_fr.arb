@@ -169,6 +169,7 @@
   "armyBuilderOverLimit": "Limite de points dépassée",
   "armyValidationEmptyArmy": "Armée vide — ajoute des unités",
   "armyValidationNoDetachment": "Aucun détachement sélectionné",
+  "armyValidationTooManyEnhancements": "Trop d'enhancements (max 3)",
 
   "armyBuilderBack": "Retour",
   "armyBuilderStatPoints": "Points",

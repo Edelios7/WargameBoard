@@ -8,6 +8,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../providers/army_provider.dart';
 import '../../../providers/battle_provider.dart';
 import '../../../providers/catalog_provider.dart';
+import '../../../providers/xp_provider.dart';
 
 class LogBattleDialog extends ConsumerStatefulWidget {
   const LogBattleDialog({super.key});
@@ -92,6 +93,7 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
     ref.invalidate(battlesListProvider);
     ref.invalidate(nextBattleProvider);
     ref.invalidate(lastBattleProvider);
+    ref.invalidate(xpSummaryProvider);
     if (mounted) Navigator.of(context).pop();
   }
 

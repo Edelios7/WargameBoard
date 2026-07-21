@@ -4,6 +4,7 @@ enum ArmyValidationIssue {
   overPointsLimit,
   emptyArmy,
   noDetachmentSelected,
+  tooManyEnhancements,
 }
 
 class ArmyValidationResult {
@@ -28,6 +29,10 @@ class ArmyValidationResult {
 class ArmyValidationService {
   const ArmyValidationService();
 
+  /// Une liste ne peut pas comporter plus de 3 enhancements par
+  /// détachement (règle commune aux éditions 10 et 11).
+  static const maxEnhancements = 3;
+
   ArmyValidationResult validate(ArmyDetails army) {
     final errors = <ArmyValidationIssue>[];
     final warnings = <ArmyValidationIssue>[];
@@ -40,6 +45,11 @@ class ArmyValidationService {
     }
     if (army.pointsLimit != null && army.detachmentId == null) {
       warnings.add(ArmyValidationIssue.noDetachmentSelected);
+    }
+    final enhancementsCount =
+        army.units.where((u) => u.enhancementId != null).length;
+    if (enhancementsCount > maxEnhancements) {
+      errors.add(ArmyValidationIssue.tooManyEnhancements);
     }
 
     return ArmyValidationResult(

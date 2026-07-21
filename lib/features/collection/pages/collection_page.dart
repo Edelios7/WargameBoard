@@ -16,6 +16,7 @@ import '../../../providers/army_provider.dart';
 import '../../../providers/battle_provider.dart';
 import '../../../providers/collection_provider.dart';
 import '../../../providers/dashboard_provider.dart';
+import '../../../providers/xp_provider.dart';
 import '../widgets/add_collection_entry_dialog.dart';
 
 enum _PaintState { unbuilt, assembled, primed, painted }
@@ -973,6 +974,7 @@ class _WishlistTab extends ConsumerWidget {
                           ref.invalidate(wishlistItemsProvider);
                           ref.invalidate(collectionEntriesProvider);
                           ref.invalidate(collectionSummaryProvider);
+                          ref.invalidate(recentlyAddedProvider);
                         },
                       ),
                       IconButton(
@@ -1015,6 +1017,7 @@ class _CollectionCard extends ConsumerWidget {
         );
     ref.invalidate(collectionEntriesProvider);
     ref.invalidate(collectionSummaryProvider);
+    ref.invalidate(xpSummaryProvider);
   }
 
   Future<void> _incrementQuantity(WidgetRef ref) async {

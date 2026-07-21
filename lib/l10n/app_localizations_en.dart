@@ -335,6 +335,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get armyValidationNoDetachment => 'No detachment selected';
 
   @override
+  String get armyValidationTooManyEnhancements =>
+      'Too many enhancements (max 3)';
+
+  @override
   String get armyBuilderBack => 'Back';
 
   @override

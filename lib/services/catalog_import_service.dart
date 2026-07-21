@@ -326,8 +326,15 @@ class CatalogImportService {
 
       final weaponIds = item['weaponIds'];
       if (weaponIds is List && models is List && models.isNotEmpty) {
-        // Rattache les armes au premier modèle de la datasheet.
+        // Rattache les armes au premier modèle de la datasheet. On
+        // supprime d'abord les liens existants : le document importé fait
+        // foi, y compris pour retirer une arme qui ne devrait plus y
+        // figurer.
         const modelIndex = 0;
+        await (database.delete(database.datasheetWeapons)
+              ..where((t) =>
+                  t.datasheetModelId.equals('dm-$datasheetId-$modelIndex')))
+            .go();
         for (final weaponId in weaponIds.cast<String>()) {
           await database
               .into(database.datasheetWeapons)
@@ -344,6 +351,12 @@ class CatalogImportService {
 
       final keywordIds = item['keywordIds'];
       if (keywordIds is List) {
+        // Le document importé fait foi : on retire d'abord les liens
+        // existants pour que les mots-clés qui en ont disparu le soient
+        // aussi côté base (sinon ils restent affichés indéfiniment).
+        await (database.delete(database.datasheetKeywordLinks)
+              ..where((t) => t.datasheetId.equals(datasheetId)))
+            .go();
         for (final keywordId in keywordIds.cast<String>()) {
           await database
               .into(database.datasheetKeywordLinks)
@@ -359,6 +372,11 @@ class CatalogImportService {
 
       final abilityIds = item['abilityIds'];
       if (abilityIds is List) {
+        // Même logique que pour les mots-clés ci-dessus : purge avant
+        // réinsertion pour refléter les suppressions du document importé.
+        await (database.delete(database.datasheetAbilityLinks)
+              ..where((t) => t.datasheetId.equals(datasheetId)))
+            .go();
         for (final abilityId in abilityIds.cast<String>()) {
           await database
               .into(database.datasheetAbilityLinks)

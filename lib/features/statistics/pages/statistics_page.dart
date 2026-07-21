@@ -212,7 +212,15 @@ class _ArmyPointsBar extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(army.name, style: AppTextStyles.body),
+              Expanded(
+                child: Text(
+                  army.name,
+                  style: AppTextStyles.body,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
               Text('${army.totalPoints} pts', style: AppTextStyles.caption),
             ],
           ),

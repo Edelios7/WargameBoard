@@ -26,6 +26,7 @@ class BattleRepository {
     String? notes,
     DateTime? playedAt,
   }) async {
+    final effectivePlayedAt = playedAt ?? DateTime.now();
     final id = await database.battleDao.addBattle(
       armyId: armyId,
       opponentName: opponentName,
@@ -40,7 +41,12 @@ class BattleRepository {
       playedAt: playedAt,
     );
 
-    await xpService.awardBattle(armyId: armyId, result: result, type: type);
+    await xpService.awardBattle(
+      armyId: armyId,
+      result: result,
+      type: type,
+      playedAt: effectivePlayedAt,
+    );
 
     return id;
   }

@@ -704,6 +704,12 @@ abstract class AppLocalizations {
   /// **'Aucun détachement sélectionné'**
   String get armyValidationNoDetachment;
 
+  /// No description provided for @armyValidationTooManyEnhancements.
+  ///
+  /// In fr, this message translates to:
+  /// **'Trop d\'enhancements (max 3)'**
+  String get armyValidationTooManyEnhancements;
+
   /// No description provided for @armyBuilderBack.
   ///
   /// In fr, this message translates to:

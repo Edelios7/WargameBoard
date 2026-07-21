@@ -174,6 +174,8 @@ class _BattleCard extends ConsumerWidget {
             onPressed: () async {
               await ref.read(battleRepositoryProvider).deleteBattle(battle.id);
               ref.invalidate(battlesListProvider);
+              ref.invalidate(nextBattleProvider);
+              ref.invalidate(lastBattleProvider);
             },
           ),
         ],

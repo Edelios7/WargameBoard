@@ -7,6 +7,8 @@ import '../../../database/models/search_result.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/catalog_provider.dart';
 import '../../../providers/collection_provider.dart';
+import '../../../providers/dashboard_provider.dart';
+import '../../../providers/xp_provider.dart';
 
 class AddCollectionEntryDialog extends ConsumerStatefulWidget {
   final bool wishlist;
@@ -76,6 +78,8 @@ class _AddCollectionEntryDialogState
       );
       ref.invalidate(collectionEntriesProvider);
       ref.invalidate(collectionSummaryProvider);
+      ref.invalidate(recentlyAddedProvider);
+      ref.invalidate(xpSummaryProvider);
     }
 
     if (mounted) Navigator.of(context).pop();

@@ -46,7 +46,8 @@ void main() {
     await tester.tap(find.text('Créer'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Death Company Marines'), findsOneWidget);
+    // Apparaît à la fois dans "Ajouts récents" et dans la grille complète.
+    expect(find.text('Death Company Marines'), findsWidgets);
     expect(find.text('5 possédées'), findsOneWidget);
   });
 

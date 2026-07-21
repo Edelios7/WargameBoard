@@ -24,6 +24,8 @@ String _warningLabel(AppLocalizations l10n, ArmyValidationIssue issue) {
       return l10n.armyValidationNoDetachment;
     case ArmyValidationIssue.overPointsLimit:
       return l10n.armyBuilderOverLimit;
+    case ArmyValidationIssue.tooManyEnhancements:
+      return l10n.armyValidationTooManyEnhancements;
   }
 }
 
@@ -33,7 +35,7 @@ bool _isBattleline(String role) {
       normalized.contains('troupes');
 }
 
-const _maxEnhancements = 3;
+const _maxEnhancements = ArmyValidationService.maxEnhancements;
 
 class ArmiesPage extends ConsumerWidget {
   const ArmiesPage({super.key});
@@ -274,7 +276,8 @@ class _ArmyBuilderPage extends ConsumerWidget {
           builder: (context, ref, _) {
             final l10n = AppLocalizations.of(context)!;
             final validation = ref.watch(armyValidationProvider(army));
-            if (validation == null || validation.warnings.isEmpty) {
+            if (validation == null ||
+                (validation.errors.isEmpty && validation.warnings.isEmpty)) {
               return const SizedBox.shrink();
             }
             return Padding(
@@ -282,15 +285,22 @@ class _ArmyBuilderPage extends ConsumerWidget {
               child: Wrap(
                 spacing: 12,
                 runSpacing: 4,
-                children: validation.warnings
-                    .map(
-                      (issue) => Text(
-                        _warningLabel(l10n, issue),
-                        style: AppTextStyles.caption
-                            .copyWith(color: AppColors.warning),
-                      ),
-                    )
-                    .toList(),
+                children: [
+                  ...validation.errors.map(
+                    (issue) => Text(
+                      _warningLabel(l10n, issue),
+                      style: AppTextStyles.caption
+                          .copyWith(color: AppColors.error),
+                    ),
+                  ),
+                  ...validation.warnings.map(
+                    (issue) => Text(
+                      _warningLabel(l10n, issue),
+                      style: AppTextStyles.caption
+                          .copyWith(color: AppColors.warning),
+                    ),
+                  ),
+                ],
               ),
             );
           },
@@ -1141,6 +1151,17 @@ class _EditUnitDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
 
+    // L'armée peut changer pendant que ce dialogue reste ouvert (compteur de
+    // figurines modifié via les boutons +/- ci-dessous) : on relit l'unité
+    // à jour depuis le provider plutôt que de garder l'instantané passé au
+    // constructeur, sinon le dialogue affiche un compteur figé.
+    final freshArmy = ref.watch(selectedArmyProvider).value;
+    final currentUnit = freshArmy?.units.firstWhere(
+          (u) => u.id == unit.id,
+          orElse: () => unit,
+        ) ??
+        unit;
+
     return Dialog(
       backgroundColor: AppColors.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -1152,9 +1173,9 @@ class _EditUnitDialog extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(unit.datasheetName, style: AppTextStyles.title),
+              Text(currentUnit.datasheetName, style: AppTextStyles.title),
               const SizedBox(height: 20),
-              if (unit.maximumModels > unit.minimumModels) ...[
+              if (currentUnit.maximumModels > currentUnit.minimumModels) ...[
                 Text(l10n.armyBuilderModelCountLabel, style: AppTextStyles.caption),
                 const SizedBox(height: 8),
                 Row(
@@ -1162,28 +1183,33 @@ class _EditUnitDialog extends ConsumerWidget {
                     IconButton(
                       icon: const Icon(Icons.remove_circle_outline_rounded),
                       color: AppColors.textSecondary,
-                      onPressed: unit.modelCount <= unit.minimumModels
+                      onPressed: currentUnit.modelCount <=
+                              currentUnit.minimumModels
                           ? null
                           : () async {
                               await ref
                                   .read(armyRepositoryProvider)
                                   .updateModelCount(
-                                      unit.id, unit.modelCount - 1);
+                                      currentUnit.id,
+                                      currentUnit.modelCount - 1);
                               ref.invalidate(selectedArmyProvider);
                               ref.invalidate(armiesListProvider);
                             },
                     ),
-                    Text('${unit.modelCount}', style: AppTextStyles.title),
+                    Text('${currentUnit.modelCount}',
+                        style: AppTextStyles.title),
                     IconButton(
                       icon: const Icon(Icons.add_circle_outline_rounded),
                       color: AppColors.textSecondary,
-                      onPressed: unit.modelCount >= unit.maximumModels
+                      onPressed: currentUnit.modelCount >=
+                              currentUnit.maximumModels
                           ? null
                           : () async {
                               await ref
                                   .read(armyRepositoryProvider)
                                   .updateModelCount(
-                                      unit.id, unit.modelCount + 1);
+                                      currentUnit.id,
+                                      currentUnit.modelCount + 1);
                               ref.invalidate(selectedArmyProvider);
                               ref.invalidate(armiesListProvider);
                             },
@@ -1201,10 +1227,11 @@ class _EditUnitDialog extends ConsumerWidget {
                     context,
                     ref,
                     army.detachmentId!,
-                    unit,
+                    currentUnit,
                   ),
                   child: Text(
-                    unit.enhancementName ?? l10n.armyBuilderChooseEnhancement,
+                    currentUnit.enhancementName ??
+                        l10n.armyBuilderChooseEnhancement,
                     style:
                         AppTextStyles.body.copyWith(color: AppColors.primary),
                   ),
@@ -1218,7 +1245,7 @@ class _EditUnitDialog extends ConsumerWidget {
                     onPressed: () async {
                       await ref
                           .read(armyRepositoryProvider)
-                          .removeUnit(unit.id);
+                          .removeUnit(currentUnit.id);
                       ref.invalidate(selectedArmyProvider);
                       ref.invalidate(armiesListProvider);
                       ref.read(selectedUnitIdProvider.notifier).state = null;

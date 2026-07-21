@@ -71,7 +71,13 @@ class XpService {
     String? armyId,
     BattleResult? result,
     BattleType type = BattleType.matched,
+    required DateTime playedAt,
   }) async {
+    // Une partie planifiée dans le futur (pas encore jouée, pas de
+    // résultat) ne doit pas créditer l'XP "partie jouée" tant qu'elle n'a
+    // pas réellement eu lieu.
+    if (result == null && playedAt.isAfter(DateTime.now())) return;
+
     var amount = battleXpPlayed;
     if (result != null) amount += battleXpResult;
     if (type == BattleType.narrative) amount += battleXpNarrativeBonus;

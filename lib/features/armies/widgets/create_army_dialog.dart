@@ -6,6 +6,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/army_provider.dart';
 import '../../../providers/catalog_provider.dart';
+import '../../../providers/xp_provider.dart';
 
 class CreateArmyDialog extends ConsumerStatefulWidget {
   const CreateArmyDialog({super.key});
@@ -39,6 +40,7 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
         );
 
     ref.invalidate(armiesListProvider);
+    ref.invalidate(xpSummaryProvider);
     ref.read(selectedArmyIdProvider.notifier).state = armyId;
 
     if (mounted) Navigator.of(context).pop();
