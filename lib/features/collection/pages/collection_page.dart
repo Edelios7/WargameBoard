@@ -1380,12 +1380,47 @@ class _QuantityAdjustRowState extends State<_QuantityAdjustRow> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final label = l10n.collectionQuantityLabel(widget.quantity);
+    final firstSpace = label.indexOf(' ');
+    final numberPart = firstSpace == -1 ? label : label.substring(0, firstSpace);
+    final unitPart = firstSpace == -1 ? '' : label.substring(firstSpace + 1);
     return Row(
       children: [
         Expanded(
-          child: Text(
-            l10n.collectionQuantityLabel(widget.quantity),
-            style: AppTextStyles.caption.copyWith(color: AppColors.primary),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: .18),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  numberPart,
+                  key: const Key('quantity-badge-number'),
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 18,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+              if (unitPart.isNotEmpty) ...[
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    unitPart,
+                    style: AppTextStyles.caption,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
         Tooltip(

@@ -48,7 +48,14 @@ void main() {
 
     // Apparaît à la fois dans "Ajouts récents" et dans la grille complète.
     expect(find.text('Death Company Marines'), findsWidgets);
-    expect(find.text('5 possédées'), findsOneWidget);
+    // La quantité est affichée en deux morceaux (badge nombre + libellé).
+    expect(
+      tester
+          .widget<Text>(find.byKey(const Key('quantity-badge-number')))
+          .data,
+      '5',
+    );
+    expect(find.text('possédées'), findsOneWidget);
   });
 
   testWidgets('incrementing assembled count is clamped to quantity',
