@@ -53,4 +53,70 @@ void main() {
     expect(find.text('Blood Angels'), findsWidgets);
     expect(find.textContaining('pts'), findsWidgets);
   });
+
+  testWidgets('a unit already in the collection shows an owned badge',
+      (tester) async {
+    final results = await database.datasheetDao.search('Sanguinary Guard');
+    await database.collectionDao.addEntry(
+      datasheetId: results.single.id,
+      quantity: 3,
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(database),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+        ],
+        child: MaterialApp(
+          locale: const Locale('fr'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const CatalogPage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).first, 'Sanguinary');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Possédé ×3'), findsOneWidget);
+  });
+
+  testWidgets(
+      'picking a faction from quick access shows an active filter chip that clears it',
+      (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(database),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+        ],
+        child: MaterialApp(
+          locale: const Locale('fr'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const CatalogPage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Blood Angels').first);
+    await tester.pumpAndSettle();
+
+    // Le chip de filtre actif apparaît avec le nom de la faction, et une
+    // croix permet de le retirer sans rouvrir le menu déroulant.
+    final chipFinder = find.ancestor(
+      of: find.text('Blood Angels').last,
+      matching: find.byType(Container),
+    );
+    expect(chipFinder, findsWidgets);
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.close_rounded), findsNothing);
+  });
 }

@@ -137,7 +137,7 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
   Future<List<SearchResult>> search(
     String text, {
     String? factionId,
-    String? keywordId,
+    Set<String> keywordIds = const {},
     String? role,
     String? unitType,
     String? editionId,
@@ -161,12 +161,6 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
                 ? editions.id.equals(editionId)
                 : editions.isCurrent.equals(true)),
       ),
-      if (keywordId != null)
-        innerJoin(
-          datasheetKeywordLinks,
-          datasheetKeywordLinks.datasheetId.equalsExp(datasheets.id) &
-              datasheetKeywordLinks.keywordId.equals(keywordId),
-        ),
     ])
       ..where(datasheets.name.like(pattern));
 
@@ -215,6 +209,32 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     }
 
     var results = byDatasheetId.values.toList();
+
+    if (keywordIds.isNotEmpty) {
+      // Filtre "ET" : une fiche doit porter TOUS les mots-clés
+      // sélectionnés, pas juste un seul. Fait en Dart après dédup plutôt
+      // qu'un join (un join par mot-clé sélectionné ferait fanner-out
+      // les lignes, comme pour les paliers de coût ci-dessus).
+      final candidateIds = results.map((r) => r.id).toList();
+      if (candidateIds.isEmpty) return const [];
+      final linkRows = await (select(datasheetKeywordLinks)
+            ..where((t) =>
+                t.datasheetId.isIn(candidateIds) &
+                t.keywordId.isIn(keywordIds.toList())))
+          .get();
+      final matchedKeywordsByDatasheet = <String, Set<String>>{};
+      for (final link in linkRows) {
+        matchedKeywordsByDatasheet
+            .putIfAbsent(link.datasheetId, () => {})
+            .add(link.keywordId);
+      }
+      results = results
+          .where((r) =>
+              (matchedKeywordsByDatasheet[r.id]?.length ?? 0) ==
+              keywordIds.length)
+          .toList();
+    }
+
     if (minPoints != null) {
       results = results.where((r) => (r.points ?? 0) >= minPoints).toList();
     }
@@ -492,6 +512,16 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
       ));
     }
     return result;
+  }
+
+  /// Groupes d'équipement optionnel d'une datasheet (voir
+  /// [EquipmentGroupDetails]) — utilisé par l'army builder pour piloter
+  /// les choix d'armes par unité sans repasser par [getDatasheet] (qui
+  /// recharge aussi modèles/armes/aptitudes, inutiles ici).
+  Future<List<EquipmentGroupDetails>> getEquipmentGroups(
+    String datasheetId,
+  ) {
+    return _getEquipmentGroups(datasheetId);
   }
 
   Future<List<EquipmentGroupDetails>> _getEquipmentGroups(

@@ -326,6 +326,42 @@ abstract class AppLocalizations {
   /// **'Mots-clés'**
   String get catalogFilterKeywords;
 
+  /// No description provided for @catalogAddKeywordFilter.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un mot-clé'**
+  String get catalogAddKeywordFilter;
+
+  /// No description provided for @catalogKeywordSearchHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher un mot-clé...'**
+  String get catalogKeywordSearchHint;
+
+  /// No description provided for @catalogOwnedBadge.
+  ///
+  /// In fr, this message translates to:
+  /// **'Possédé ×{count}'**
+  String catalogOwnedBadge(int count);
+
+  /// No description provided for @catalogAllFactionsChip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes'**
+  String get catalogAllFactionsChip;
+
+  /// No description provided for @catalogActiveFiltersTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Filtres actifs'**
+  String get catalogActiveFiltersTitle;
+
+  /// No description provided for @catalogApplyFilters.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appliquer'**
+  String get catalogApplyFilters;
+
   /// No description provided for @catalogFilterCost.
   ///
   /// In fr, this message translates to:
@@ -709,6 +745,42 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Tu ne possèdes que {owned} figurine(s) sur {needed} nécessaires dans cette armée.'**
   String armyBuilderOwnedShortage(int owned, int needed);
+
+  /// No description provided for @armyBuilderChangeDetachment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Changer de détachement'**
+  String get armyBuilderChangeDetachment;
+
+  /// No description provided for @armyBuilderEnhancementsReset.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} amélioration(s) réinitialisée(s) suite au changement de détachement.'**
+  String armyBuilderEnhancementsReset(int count);
+
+  /// No description provided for @armyBuilderWarlord.
+  ///
+  /// In fr, this message translates to:
+  /// **'Warlord'**
+  String get armyBuilderWarlord;
+
+  /// No description provided for @armyBuilderSetWarlord.
+  ///
+  /// In fr, this message translates to:
+  /// **'Désigner comme Warlord'**
+  String get armyBuilderSetWarlord;
+
+  /// No description provided for @armyBuilderUnsetWarlord.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer le statut de Warlord'**
+  String get armyBuilderUnsetWarlord;
+
+  /// No description provided for @armyValidationNoWarlord.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun Warlord désigné'**
+  String get armyValidationNoWarlord;
 
   /// No description provided for @armyBuilderNotesLabel.
   ///

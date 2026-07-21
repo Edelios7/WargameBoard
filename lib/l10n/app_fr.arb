@@ -58,6 +58,17 @@
   "catalogFilterFaction": "Faction",
   "catalogFilterRole": "Rôle",
   "catalogFilterKeywords": "Mots-clés",
+  "catalogAddKeywordFilter": "Ajouter un mot-clé",
+  "catalogKeywordSearchHint": "Rechercher un mot-clé...",
+  "catalogOwnedBadge": "Possédé ×{count}",
+  "@catalogOwnedBadge": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "catalogAllFactionsChip": "Toutes",
+  "catalogActiveFiltersTitle": "Filtres actifs",
+  "catalogApplyFilters": "Appliquer",
   "catalogFilterCost": "Coût (pts)",
   "catalogFilterEdition": "Édition",
   "catalogFilterUnitType": "Type d'unité",
@@ -165,6 +176,17 @@
       "needed": { "type": "int" }
     }
   },
+  "armyBuilderChangeDetachment": "Changer de détachement",
+  "armyBuilderEnhancementsReset": "{count} amélioration(s) réinitialisée(s) suite au changement de détachement.",
+  "@armyBuilderEnhancementsReset": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "armyBuilderWarlord": "Warlord",
+  "armyBuilderSetWarlord": "Désigner comme Warlord",
+  "armyBuilderUnsetWarlord": "Retirer le statut de Warlord",
+  "armyValidationNoWarlord": "Aucun Warlord désigné",
   "armyBuilderNotesLabel": "Notes",
   "armyBuilderDuplicateNameLabel": "Nom de la copie",
   "armyBuilderDuplicateSuffix": "{name} (copie)",

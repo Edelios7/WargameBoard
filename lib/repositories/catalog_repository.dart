@@ -12,7 +12,7 @@ class CatalogRepository {
   Future<List<SearchResult>> search(
     String text, {
     String? factionId,
-    String? keywordId,
+    Set<String> keywordIds = const {},
     String? role,
     String? unitType,
     String? editionId,
@@ -23,7 +23,7 @@ class CatalogRepository {
     return database.datasheetDao.search(
       text,
       factionId: factionId,
-      keywordId: keywordId,
+      keywordIds: keywordIds,
       role: role,
       unitType: unitType,
       editionId: editionId,

@@ -7,6 +7,7 @@ import '../database/models/datasheet_details.dart';
 import '../database/models/search_result.dart';
 import '../database/models/weapon_summary.dart';
 import '../repositories/catalog_repository.dart';
+import 'collection_provider.dart';
 import 'database_provider.dart';
 
 final catalogRepositoryProvider = Provider<CatalogRepository>((ref) {
@@ -19,7 +20,7 @@ final catalogSearchQueryProvider = StateProvider<String>((ref) => '');
 
 final catalogFactionFilterProvider = StateProvider<String?>((ref) => null);
 
-final catalogKeywordFilterProvider = StateProvider<String?>((ref) => null);
+final catalogKeywordFilterProvider = StateProvider<Set<String>>((ref) => {});
 
 final catalogRoleFilterProvider = StateProvider<String?>((ref) => null);
 
@@ -42,7 +43,7 @@ final catalogSearchResultsProvider =
   final repository = ref.watch(catalogRepositoryProvider);
   final query = ref.watch(catalogSearchQueryProvider);
   final factionId = ref.watch(catalogFactionFilterProvider);
-  final keywordId = ref.watch(catalogKeywordFilterProvider);
+  final keywordIds = ref.watch(catalogKeywordFilterProvider);
   final role = ref.watch(catalogRoleFilterProvider);
   final unitType = ref.watch(catalogUnitTypeFilterProvider);
   final editionId = ref.watch(catalogEditionFilterProvider);
@@ -52,7 +53,7 @@ final catalogSearchResultsProvider =
   return repository.search(
     query,
     factionId: factionId,
-    keywordId: keywordId,
+    keywordIds: keywordIds,
     role: role,
     unitType: unitType,
     editionId: editionId,
@@ -112,4 +113,16 @@ final datasheetByIdProvider =
 final weaponsInventoryProvider = FutureProvider<List<WeaponSummary>>((ref) {
   final repository = ref.watch(catalogRepositoryProvider);
   return repository.listWeaponsWithUsage();
+});
+
+/// Quantité possédée par datasheet (toutes entrées de collection
+/// confondues) — utilisé par le Catalogue pour afficher un badge
+/// "possédé" sur les fiches déjà dans la Collection de l'utilisateur.
+final catalogOwnedQuantitiesProvider = Provider<Map<String, int>>((ref) {
+  final entries = ref.watch(collectionEntriesProvider).value ?? const [];
+  final result = <String, int>{};
+  for (final entry in entries) {
+    result[entry.datasheetId] = (result[entry.datasheetId] ?? 0) + entry.quantity;
+  }
+  return result;
 });

@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -6,7 +7,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/faction_colors.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
-import '../../../database/app_database.dart' show Faction;
+import '../../../database/app_database.dart' show Faction, Keyword;
 import '../../../database/models/catalog_sort.dart';
 import '../../../database/models/search_result.dart';
 import '../../../l10n/app_localizations.dart';
@@ -32,7 +33,7 @@ class CatalogPage extends ConsumerWidget {
     final pointsRange = ref.watch(catalogPointsRangeProvider);
     final hasActiveFilters =
         factionFilter != null ||
-        keywordFilter != null ||
+        keywordFilter.isNotEmpty ||
         roleFilter != null ||
         unitTypeFilter != null ||
         editionFilter != null ||
@@ -157,10 +158,19 @@ class _FactionQuickAccessBar extends ConsumerWidget {
                 height: 92,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
-                  itemCount: sorted.length,
+                  itemCount: sorted.length + 1,
                   separatorBuilder: (_, __) => const SizedBox(width: 10),
                   itemBuilder: (context, index) {
-                    final faction = sorted[index];
+                    if (index == 0) {
+                      return _AllFactionsTile(
+                        label: l10n.catalogAllFactionsChip,
+                        selected: selectedFactionId == null,
+                        onTap: () => ref
+                            .read(catalogFactionFilterProvider.notifier)
+                            .state = null,
+                      );
+                    }
+                    final faction = sorted[index - 1];
                     final selected = faction.id == selectedFactionId;
                     return _FactionTile(
                       faction: faction,
@@ -179,6 +189,81 @@ class _FactionQuickAccessBar extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// Tuile "Toutes" en tête de la barre d'accès rapide aux factions —
+/// avant, il fallait deviner qu'on pouvait retaper la faction déjà
+/// sélectionnée pour retirer le filtre ; là c'est un état explicite.
+class _AllFactionsTile extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _AllFactionsTile({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Container(
+          width: 76,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+          decoration: BoxDecoration(
+            color: selected
+                ? AppColors.primary.withValues(alpha: .16)
+                : AppColors.surfaceElevated,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: selected ? AppColors.primary : AppColors.border,
+              width: selected ? 1.6 : 1,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: selected
+                      ? AppColors.primary
+                      : AppColors.surface,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.apps_rounded,
+                  size: 18,
+                  color:
+                      selected ? Colors.white : AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: AppTextStyles.caption.copyWith(
+                  fontSize: 10.5,
+                  color: selected
+                      ? AppColors.textPrimary
+                      : AppColors.textSecondary,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -310,9 +395,13 @@ class _FiltersPanel extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                l10n.catalogFilterTitle.toUpperCase(),
-                style: AppTextStyles.eyebrow,
+              Flexible(
+                child: Text(
+                  l10n.catalogFilterTitle.toUpperCase(),
+                  style: AppTextStyles.eyebrow,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               if (hasActiveFilters)
                 InkWell(
@@ -320,7 +409,7 @@ class _FiltersPanel extends ConsumerWidget {
                     ref.read(catalogFactionFilterProvider.notifier).state =
                         null;
                     ref.read(catalogKeywordFilterProvider.notifier).state =
-                        null;
+                        {};
                     ref.read(catalogRoleFilterProvider.notifier).state = null;
                     ref.read(catalogUnitTypeFilterProvider.notifier).state =
                         null;
@@ -374,12 +463,12 @@ class _FiltersPanel extends ConsumerWidget {
           keywordsAsync.when(
             loading: () => const SizedBox.shrink(),
             error: (_, __) => const SizedBox.shrink(),
-            data: (keywords) => _FilterDropdown(
-              value: keywordFilter,
-              allLabel: l10n.catalogFilterAllKeywords,
-              items: {for (final k in keywords) k.id: k.name},
+            data: (keywords) => _KeywordMultiSelect(
+              keywords: keywords,
+              selected: keywordFilter,
               onChanged: (value) =>
-                  ref.read(catalogKeywordFilterProvider.notifier).state = value,
+                  ref.read(catalogKeywordFilterProvider.notifier).state =
+                      value,
             ),
           ),
           const SizedBox(height: 14),
@@ -489,6 +578,7 @@ class _ResultsList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final sortBy = ref.watch(catalogSortProvider);
+    final ownedQuantities = ref.watch(catalogOwnedQuantitiesProvider);
 
     return resultsAsync.when(
       loading: () => const Center(
@@ -531,12 +621,24 @@ class _ResultsList extends ConsumerWidget {
                 ],
               ),
             ),
+            const _ActiveFiltersRow(),
             if (results.isEmpty)
               Expanded(
                 child: Center(
-                  child: Text(
-                    l10n.catalogEmptyResults,
-                    style: AppTextStyles.caption,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.search_off_rounded,
+                        size: 36,
+                        color: AppColors.textSecondary,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        l10n.catalogEmptyResults,
+                        style: AppTextStyles.caption,
+                      ),
+                    ],
                   ),
                 ),
               )
@@ -550,6 +652,7 @@ class _ResultsList extends ConsumerWidget {
                     return _DatasheetListItem(
                       result: result,
                       selected: result.id == selectedId,
+                      ownedQuantity: ownedQuantities[result.id] ?? 0,
                       onTap: () => onSelect(result.id),
                     );
                   },
@@ -559,6 +662,91 @@ class _ResultsList extends ConsumerWidget {
         );
       },
     );
+  }
+}
+
+/// Résumé des filtres actifs sous forme de chips retirables, pour ne pas
+/// avoir à rouvrir chaque menu déroulant du panneau de filtres pour
+/// savoir ce qui est actif ou pour l'enlever.
+class _ActiveFiltersRow extends ConsumerWidget {
+  const _ActiveFiltersRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final factionFilter = ref.watch(catalogFactionFilterProvider);
+    final keywordFilter = ref.watch(catalogKeywordFilterProvider);
+    final roleFilter = ref.watch(catalogRoleFilterProvider);
+    final unitTypeFilter = ref.watch(catalogUnitTypeFilterProvider);
+    final editionFilter = ref.watch(catalogEditionFilterProvider);
+    final pointsRange = ref.watch(catalogPointsRangeProvider);
+
+    final factions = ref.watch(factionsListProvider).value ?? const [];
+    final keywords = ref.watch(keywordsListProvider).value ?? const [];
+    final editions = ref.watch(editionsListProvider).value ?? const [];
+
+    final chips = <Widget>[];
+
+    if (factionFilter != null) {
+      final name = factions
+          .where((f) => f.id == factionFilter)
+          .map((f) => f.name)
+          .firstOrNull;
+      chips.add(_activeFilterChip(
+        name ?? factionFilter,
+        () => ref.read(catalogFactionFilterProvider.notifier).state = null,
+      ));
+    }
+    for (final keywordId in keywordFilter) {
+      final name = keywords
+          .where((k) => k.id == keywordId)
+          .map((k) => k.name)
+          .firstOrNull;
+      chips.add(_activeFilterChip(
+        name ?? keywordId,
+        () => ref.read(catalogKeywordFilterProvider.notifier).state = {
+          ...keywordFilter,
+        }..remove(keywordId),
+      ));
+    }
+    if (roleFilter != null) {
+      chips.add(_activeFilterChip(
+        roleFilter,
+        () => ref.read(catalogRoleFilterProvider.notifier).state = null,
+      ));
+    }
+    if (unitTypeFilter != null) {
+      chips.add(_activeFilterChip(
+        unitTypeFilter,
+        () => ref.read(catalogUnitTypeFilterProvider.notifier).state = null,
+      ));
+    }
+    if (editionFilter != null) {
+      final name = editions
+          .where((e) => e.id == editionFilter)
+          .map((e) => e.name)
+          .firstOrNull;
+      chips.add(_activeFilterChip(
+        name ?? editionFilter,
+        () => ref.read(catalogEditionFilterProvider.notifier).state = null,
+      ));
+    }
+    if (pointsRange != null) {
+      chips.add(_activeFilterChip(
+        '${pointsRange.start.round()}-${pointsRange.end.round()} pts',
+        () => ref.read(catalogPointsRangeProvider.notifier).state = null,
+      ));
+    }
+
+    if (chips.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+      child: Wrap(spacing: 6, runSpacing: 6, children: chips),
+    );
+  }
+
+  Widget _activeFilterChip(String label, VoidCallback onRemove) {
+    return AppChip(label: label, accent: true, onDeleted: onRemove);
   }
 }
 
@@ -621,6 +809,182 @@ class _FilterLabel extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(label.toUpperCase(), style: AppTextStyles.eyebrow),
+    );
+  }
+}
+
+/// Filtre "mots-clés" à choix multiples : contrairement aux autres
+/// filtres (faction, rôle...), une fiche porte souvent plusieurs
+/// mots-clés utiles à combiner (ex. Infantry + Character), donc un
+/// simple menu déroulant mono-sélection était trop limitant.
+class _KeywordMultiSelect extends StatelessWidget {
+  final List<Keyword> keywords;
+  final Set<String> selected;
+  final ValueChanged<Set<String>> onChanged;
+
+  const _KeywordMultiSelect({
+    required this.keywords,
+    required this.selected,
+    required this.onChanged,
+  });
+
+  Future<void> _openPicker(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final chosen = await showModalBottomSheet<Set<String>>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (sheetContext) => _KeywordPickerSheet(
+        keywords: keywords,
+        initiallySelected: selected,
+        l10n: l10n,
+      ),
+    );
+    if (chosen != null) onChanged(chosen);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final selectedKeywords = keywords.where((k) => selected.contains(k.id));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (selected.isNotEmpty) ...[
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: selectedKeywords
+                .map(
+                  (keyword) => AppChip(
+                    label: keyword.name,
+                    accent: true,
+                    onDeleted: () => onChanged({...selected}..remove(keyword.id)),
+                  ),
+                )
+                .toList(),
+          ),
+          const SizedBox(height: 8),
+        ],
+        OutlinedButton.icon(
+          onPressed: () => _openPicker(context),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.textSecondary,
+            side: const BorderSide(color: AppColors.border),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          icon: const Icon(Icons.add_rounded, size: 16),
+          label: Text(
+            l10n.catalogAddKeywordFilter,
+            style: AppTextStyles.caption,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _KeywordPickerSheet extends StatefulWidget {
+  final List<Keyword> keywords;
+  final Set<String> initiallySelected;
+  final AppLocalizations l10n;
+
+  const _KeywordPickerSheet({
+    required this.keywords,
+    required this.initiallySelected,
+    required this.l10n,
+  });
+
+  @override
+  State<_KeywordPickerSheet> createState() => _KeywordPickerSheetState();
+}
+
+class _KeywordPickerSheetState extends State<_KeywordPickerSheet> {
+  final Set<String> _selected = {};
+  String _query = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _selected.addAll(widget.initiallySelected);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sorted = [...widget.keywords]
+      ..sort((a, b) => a.name.compareTo(b.name));
+    final filtered = _query.isEmpty
+        ? sorted
+        : sorted
+            .where((k) => k.name.toLowerCase().contains(_query.toLowerCase()))
+            .toList();
+
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 16,
+          bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.l10n.catalogFilterKeywords.toUpperCase(),
+                style: AppTextStyles.eyebrow,
+              ),
+              const SizedBox(height: 12),
+              _SearchField(
+                hintText: widget.l10n.catalogKeywordSearchHint,
+                onChanged: (value) => setState(() => _query = value),
+              ),
+              const SizedBox(height: 8),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: filtered.length,
+                  itemBuilder: (context, index) {
+                    final keyword = filtered[index];
+                    final checked = _selected.contains(keyword.id);
+                    return CheckboxListTile(
+                      value: checked,
+                      dense: true,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      activeColor: AppColors.primary,
+                      title: Text(keyword.name, style: AppTextStyles.body),
+                      onChanged: (value) => setState(() {
+                        if (value ?? false) {
+                          _selected.add(keyword.id);
+                        } else {
+                          _selected.remove(keyword.id);
+                        }
+                      }),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  style:
+                      FilledButton.styleFrom(backgroundColor: AppColors.primary),
+                  onPressed: () => Navigator.of(context).pop(_selected),
+                  child: Text(widget.l10n.catalogApplyFilters),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -712,12 +1076,14 @@ class _FilterDropdown extends StatelessWidget {
 class _DatasheetListItem extends StatelessWidget {
   final SearchResult result;
   final bool selected;
+  final int ownedQuantity;
   final VoidCallback onTap;
 
   const _DatasheetListItem({
     required this.result,
     required this.selected,
     required this.onTap,
+    this.ownedQuantity = 0,
   });
 
   @override
@@ -818,6 +1184,8 @@ class _DatasheetListItem extends StatelessWidget {
                                   spacing: 6,
                                   runSpacing: 4,
                                   children: [
+                                    if (ownedQuantity > 0)
+                                      _OwnedBadge(quantity: ownedQuantity),
                                     if (result.unitType != null)
                                       AppChip(label: result.unitType!),
                                     if (result.subtitle != null)
@@ -849,6 +1217,47 @@ class _DatasheetListItem extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Badge "possédé ×N" affiché sur les fiches déjà présentes dans la
+/// Collection de l'utilisateur, pour relier visuellement le Catalogue
+/// (ce qu'on peut jouer) à ce qu'on possède réellement.
+class _OwnedBadge extends StatelessWidget {
+  final int quantity;
+
+  const _OwnedBadge({required this.quantity});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: AppColors.success.withValues(alpha: .16),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: AppColors.success.withValues(alpha: .4)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.check_circle_rounded,
+            size: 11,
+            color: AppColors.success,
+          ),
+          const SizedBox(width: 3),
+          Flexible(
+            child: Text(
+              l10n.catalogOwnedBadge(quantity),
+              style: AppTextStyles.eyebrow.copyWith(color: AppColors.success),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       ),
     );
   }

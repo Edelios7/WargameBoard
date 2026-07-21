@@ -130,6 +130,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get catalogFilterKeywords => 'Keywords';
 
   @override
+  String get catalogAddKeywordFilter => 'Add a keyword';
+
+  @override
+  String get catalogKeywordSearchHint => 'Search for a keyword...';
+
+  @override
+  String catalogOwnedBadge(int count) {
+    return 'Owned ×$count';
+  }
+
+  @override
+  String get catalogAllFactionsChip => 'All';
+
+  @override
+  String get catalogActiveFiltersTitle => 'Active filters';
+
+  @override
+  String get catalogApplyFilters => 'Apply';
+
+  @override
   String get catalogFilterCost => 'Cost (pts)';
 
   @override
@@ -335,6 +355,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String armyBuilderOwnedShortage(int owned, int needed) {
     return 'You only own $owned model(s) out of the $needed needed in this army.';
   }
+
+  @override
+  String get armyBuilderChangeDetachment => 'Change detachment';
+
+  @override
+  String armyBuilderEnhancementsReset(int count) {
+    return '$count enhancement(s) reset after changing detachment.';
+  }
+
+  @override
+  String get armyBuilderWarlord => 'Warlord';
+
+  @override
+  String get armyBuilderSetWarlord => 'Set as Warlord';
+
+  @override
+  String get armyBuilderUnsetWarlord => 'Remove Warlord status';
+
+  @override
+  String get armyValidationNoWarlord => 'No Warlord selected';
 
   @override
   String get armyBuilderNotesLabel => 'Notes';

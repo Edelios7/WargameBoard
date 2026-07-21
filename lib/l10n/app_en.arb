@@ -58,6 +58,17 @@
   "catalogFilterFaction": "Faction",
   "catalogFilterRole": "Role",
   "catalogFilterKeywords": "Keywords",
+  "catalogAddKeywordFilter": "Add a keyword",
+  "catalogKeywordSearchHint": "Search for a keyword...",
+  "catalogOwnedBadge": "Owned ×{count}",
+  "@catalogOwnedBadge": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "catalogAllFactionsChip": "All",
+  "catalogActiveFiltersTitle": "Active filters",
+  "catalogApplyFilters": "Apply",
   "catalogFilterCost": "Cost (pts)",
   "catalogFilterEdition": "Edition",
   "catalogFilterUnitType": "Unit type",
@@ -166,6 +177,17 @@
       "needed": { "type": "int" }
     }
   },
+  "armyBuilderChangeDetachment": "Change detachment",
+  "armyBuilderEnhancementsReset": "{count} enhancement(s) reset after changing detachment.",
+  "@armyBuilderEnhancementsReset": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "armyBuilderWarlord": "Warlord",
+  "armyBuilderSetWarlord": "Set as Warlord",
+  "armyBuilderUnsetWarlord": "Remove Warlord status",
+  "armyValidationNoWarlord": "No Warlord selected",
   "armyBuilderNotesLabel": "Notes",
   "armyBuilderDuplicateNameLabel": "Copy name",
   "armyBuilderDuplicateSuffix": "{name} (copy)",

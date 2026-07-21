@@ -130,6 +130,26 @@ class AppLocalizationsFr extends AppLocalizations {
   String get catalogFilterKeywords => 'Mots-clés';
 
   @override
+  String get catalogAddKeywordFilter => 'Ajouter un mot-clé';
+
+  @override
+  String get catalogKeywordSearchHint => 'Rechercher un mot-clé...';
+
+  @override
+  String catalogOwnedBadge(int count) {
+    return 'Possédé ×$count';
+  }
+
+  @override
+  String get catalogAllFactionsChip => 'Toutes';
+
+  @override
+  String get catalogActiveFiltersTitle => 'Filtres actifs';
+
+  @override
+  String get catalogApplyFilters => 'Appliquer';
+
+  @override
   String get catalogFilterCost => 'Coût (pts)';
 
   @override
@@ -337,6 +357,26 @@ class AppLocalizationsFr extends AppLocalizations {
   String armyBuilderOwnedShortage(int owned, int needed) {
     return 'Tu ne possèdes que $owned figurine(s) sur $needed nécessaires dans cette armée.';
   }
+
+  @override
+  String get armyBuilderChangeDetachment => 'Changer de détachement';
+
+  @override
+  String armyBuilderEnhancementsReset(int count) {
+    return '$count amélioration(s) réinitialisée(s) suite au changement de détachement.';
+  }
+
+  @override
+  String get armyBuilderWarlord => 'Warlord';
+
+  @override
+  String get armyBuilderSetWarlord => 'Désigner comme Warlord';
+
+  @override
+  String get armyBuilderUnsetWarlord => 'Retirer le statut de Warlord';
+
+  @override
+  String get armyValidationNoWarlord => 'Aucun Warlord désigné';
 
   @override
   String get armyBuilderNotesLabel => 'Notes';

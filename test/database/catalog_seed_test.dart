@@ -72,13 +72,28 @@ void main() {
 
   test('search filters by keyword', () async {
     final flying =
-        await database.datasheetDao.search('', keywordId: 'kw-fly');
+        await database.datasheetDao.search('', keywordIds: {'kw-fly'});
     expect(flying, hasLength(1));
     expect(flying.single.name, 'Sanguinary Guard');
 
     final deathCompany = await database.datasheetDao
-        .search('', keywordId: 'kw-death-company');
+        .search('', keywordIds: {'kw-death-company'});
     expect(deathCompany.single.name, 'Death Company Marines');
+  });
+
+  test('search filters by multiple keywords with AND semantics', () async {
+    final results = await database.datasheetDao.search(
+      '',
+      keywordIds: {'kw-death-company', 'kw-fly'},
+    );
+    // Aucune fiche du seed ne porte les deux mots-clés à la fois.
+    expect(results, isEmpty);
+
+    final bothPresent = await database.datasheetDao.search(
+      '',
+      keywordIds: {'kw-death-company', 'kw-infantry'},
+    );
+    expect(bothPresent.map((d) => d.name), contains('Death Company Marines'));
   });
 
   test('Orks are seeded as a distinct faction', () async {
