@@ -184,6 +184,16 @@ class CollectionDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
+  /// Quantité totale possédée pour une datasheet, tous les jours
+  /// d'achat confondus — utilisé par l'army builder pour signaler
+  /// "il t'en manque N" sur une unité de la liste en cours.
+  Future<int> getOwnedQuantity(String datasheetId) async {
+    final rows = await (select(ownedMiniatures)
+          ..where((t) => t.datasheetId.equals(datasheetId)))
+        .get();
+    return rows.fold<int>(0, (sum, row) => sum + row.quantity);
+  }
+
   Future<CollectionSummary> getSummary() async {
     final entries = await listEntries();
     var totalModels = 0;

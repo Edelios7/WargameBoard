@@ -63,3 +63,15 @@ final stratagemsForDetachmentProvider =
   final repository = ref.watch(armyRepositoryProvider);
   return repository.getStratagemsForDetachment(detachmentId);
 });
+
+/// Choix d'équipement optionnel actuels d'une unité d'armée, par
+/// groupe d'équipement. Invalidé après un changement de sélection pour
+/// refléter le nouveau chargement d'armes de l'unité.
+final unitEquipmentSelectionsProvider =
+    FutureProvider.family<Map<String, List<String>>, String>((
+  ref,
+  armyUnitId,
+) {
+  final repository = ref.watch(armyRepositoryProvider);
+  return repository.getUnitEquipmentSelections(armyUnitId);
+});

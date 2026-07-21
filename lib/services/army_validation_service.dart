@@ -5,6 +5,7 @@ enum ArmyValidationIssue {
   emptyArmy,
   noDetachmentSelected,
   tooManyEnhancements,
+  noWarlordSelected,
 }
 
 class ArmyValidationResult {
@@ -50,6 +51,9 @@ class ArmyValidationService {
         army.units.where((u) => u.enhancementId != null).length;
     if (enhancementsCount > maxEnhancements) {
       errors.add(ArmyValidationIssue.tooManyEnhancements);
+    }
+    if (army.units.isNotEmpty && !army.units.any((u) => u.isWarlord)) {
+      warnings.add(ArmyValidationIssue.noWarlordSelected);
     }
 
     return ArmyValidationResult(

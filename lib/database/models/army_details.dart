@@ -33,6 +33,15 @@ class ArmyUnitDetails {
   final String? enhancementName;
   final int enhancementPoints;
 
+  /// Choix d'armes optionnelles actuels, un libellé par groupe
+  /// d'équipement de la datasheet (ex. "Arme spéciale : Lance-flammes")
+  /// — vide si la datasheet n'a pas de groupe d'équipement optionnel.
+  final List<String> equipmentChoices;
+
+  /// Une seule unité par armée peut être le Warlord — concept
+  /// obligatoire des règles de tournoi 10e/11e édition.
+  final bool isWarlord;
+
   const ArmyUnitDetails({
     required this.id,
     required this.datasheetId,
@@ -45,6 +54,8 @@ class ArmyUnitDetails {
     this.enhancementId,
     this.enhancementName,
     this.enhancementPoints = 0,
+    this.equipmentChoices = const [],
+    this.isWarlord = false,
   });
 
   int get points => datasheetPoints + enhancementPoints;

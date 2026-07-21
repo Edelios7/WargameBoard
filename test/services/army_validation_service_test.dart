@@ -34,12 +34,25 @@ void main() {
     ),
   ];
 
+  const oneUnitWithWarlord = [
+    ArmyUnitDetails(
+      id: 'u1',
+      datasheetId: 'ds-1',
+      datasheetName: 'Test Unit',
+      modelCount: 1,
+      minimumModels: 1,
+      maximumModels: 1,
+      datasheetPoints: 90,
+      isWarlord: true,
+    ),
+  ];
+
   test('a valid, complete army has no errors or warnings', () {
     final result = service.validate(army(
       totalPoints: 90,
       pointsLimit: 2000,
       detachmentId: 'det-1',
-      units: oneUnit,
+      units: oneUnitWithWarlord,
     ));
 
     expect(result.isValid, isTrue);
@@ -81,6 +94,22 @@ void main() {
     expect(
       result.warnings,
       isNot(contains(ArmyValidationIssue.noDetachmentSelected)),
+    );
+  });
+
+  test('a non-empty army with no Warlord warns', () {
+    final result = service.validate(army(units: oneUnit));
+
+    expect(result.isValid, isTrue);
+    expect(result.warnings, contains(ArmyValidationIssue.noWarlordSelected));
+  });
+
+  test('designating a Warlord clears the warning', () {
+    final result = service.validate(army(units: oneUnitWithWarlord));
+
+    expect(
+      result.warnings,
+      isNot(contains(ArmyValidationIssue.noWarlordSelected)),
     );
   });
 }

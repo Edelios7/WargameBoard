@@ -27,6 +27,15 @@ final collectionSummaryProvider = FutureProvider<CollectionSummary>((ref) {
   return repository.getSummary();
 });
 
+/// Quantité possédée d'une datasheet donnée — utilisé par l'army
+/// builder pour signaler un manque face à ce qui est réellement dans
+/// la vitrine du joueur.
+final ownedQuantityProvider =
+    FutureProvider.family<int, String>((ref, datasheetId) {
+  final repository = ref.watch(collectionRepositoryProvider);
+  return repository.getOwnedQuantity(datasheetId);
+});
+
 final wishlistItemsProvider =
     FutureProvider<List<WishlistItemDetails>>((ref) {
   final repository = ref.watch(collectionRepositoryProvider);

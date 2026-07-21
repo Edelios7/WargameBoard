@@ -16,6 +16,12 @@ class ArmyUnits extends Table {
 
   IntColumn get modelCount => integer()();
 
+  /// Une seule unité par armée peut être le Warlord (concept obligatoire
+  /// des règles 10e/11e éditions) — l'unicité est appliquée côté DAO,
+  /// pas par une contrainte SQL.
+  BoolColumn get isWarlord =>
+      boolean().withDefault(const Constant(false))();
+
   IntColumn get displayOrder =>
       integer().withDefault(const Constant(0))();
 

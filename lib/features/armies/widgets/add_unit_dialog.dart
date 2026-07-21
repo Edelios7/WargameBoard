@@ -10,8 +10,13 @@ import '../../../providers/catalog_provider.dart';
 
 class AddUnitDialog extends ConsumerStatefulWidget {
   final String armyId;
+  final String factionId;
 
-  const AddUnitDialog({super.key, required this.armyId});
+  const AddUnitDialog({
+    super.key,
+    required this.armyId,
+    required this.factionId,
+  });
 
   @override
   ConsumerState<AddUnitDialog> createState() => _AddUnitDialogState();
@@ -30,7 +35,10 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
   Future<void> _search(String query) async {
     setState(() => _loading = true);
     final repository = ref.read(catalogRepositoryProvider);
-    final results = await repository.search(query);
+    final results = await repository.search(
+      query,
+      factionId: widget.factionId,
+    );
     if (!mounted) return;
     setState(() {
       _results = results;
@@ -115,6 +123,15 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
                                     ? Text(
                                         result.subtitle!,
                                         style: AppTextStyles.caption,
+                                      )
+                                    : null,
+                                trailing: result.points != null
+                                    ? Text(
+                                        l10n.pointsSuffix(result.points!),
+                                        style: AppTextStyles.body.copyWith(
+                                          color: AppColors.primary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       )
                                     : null,
                                 onTap: () => _addUnit(result),

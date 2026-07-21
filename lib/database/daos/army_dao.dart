@@ -190,6 +190,46 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     await _touchArmy(unit.armyId);
   }
 
+  /// Change le détachement d'une armée déjà créée. Les enhancements
+  /// sont propres à un détachement (voir [getEnhancementsForDetachment])
+  /// : les choix déjà faits sur les unités deviennent invalides et sont
+  /// réinitialisés. Retourne le nombre d'unités dont un enhancement a
+  /// été retiré, pour que l'UI puisse en informer l'utilisateur.
+  Future<int> setDetachment(String armyId, String? detachmentId) async {
+    await (update(armies)..where((t) => t.id.equals(armyId))).write(
+      ArmiesCompanion(
+        detachmentId: Value(detachmentId),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+
+    final unitsWithEnhancement = await (select(armyUnits)
+          ..where((t) =>
+              t.armyId.equals(armyId) & t.enhancementId.isNotNull()))
+        .get();
+    if (unitsWithEnhancement.isNotEmpty) {
+      await (update(armyUnits)..where((t) => t.armyId.equals(armyId))).write(
+        const ArmyUnitsCompanion(enhancementId: Value(null)),
+      );
+    }
+    return unitsWithEnhancement.length;
+  }
+
+  /// Désigne (ou retire, si `armyUnitId` est null) le Warlord de
+  /// l'armée. Une seule unité peut l'être : les autres sont
+  /// désélectionnées au passage.
+  Future<void> setWarlord(String armyId, String? armyUnitId) async {
+    await (update(armyUnits)..where((t) => t.armyId.equals(armyId))).write(
+      const ArmyUnitsCompanion(isWarlord: Value(false)),
+    );
+    if (armyUnitId != null) {
+      await (update(armyUnits)..where((t) => t.id.equals(armyUnitId))).write(
+        const ArmyUnitsCompanion(isWarlord: Value(true)),
+      );
+    }
+    await _touchArmy(armyId);
+  }
+
   Future<void> updateNotes(String armyId, String? notes) {
     return (update(armies)..where((t) => t.id.equals(armyId))).write(
       ArmiesCompanion(
@@ -333,6 +373,7 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         enhancementId: enhancement?.id,
         enhancementName: enhancement?.name,
         enhancementPoints: enhancementPoints,
+        isWarlord: unit.isWarlord,
       ));
     }
 

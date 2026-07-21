@@ -14021,6 +14021,21 @@ class $ArmyUnitsTable extends ArmyUnits
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _isWarlordMeta = const VerificationMeta(
+    'isWarlord',
+  );
+  @override
+  late final GeneratedColumn<bool> isWarlord = GeneratedColumn<bool>(
+    'is_warlord',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_warlord" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _displayOrderMeta = const VerificationMeta(
     'displayOrder',
   );
@@ -14052,6 +14067,7 @@ class $ArmyUnitsTable extends ArmyUnits
     datasheetId,
     enhancementId,
     modelCount,
+    isWarlord,
     displayOrder,
     createdAt,
   ];
@@ -14108,6 +14124,12 @@ class $ArmyUnitsTable extends ArmyUnits
     } else if (isInserting) {
       context.missing(_modelCountMeta);
     }
+    if (data.containsKey('is_warlord')) {
+      context.handle(
+        _isWarlordMeta,
+        isWarlord.isAcceptableOrUnknown(data['is_warlord']!, _isWarlordMeta),
+      );
+    }
     if (data.containsKey('display_order')) {
       context.handle(
         _displayOrderMeta,
@@ -14152,6 +14174,10 @@ class $ArmyUnitsTable extends ArmyUnits
         DriftSqlType.int,
         data['${effectivePrefix}model_count'],
       )!,
+      isWarlord: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_warlord'],
+      )!,
       displayOrder: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}display_order'],
@@ -14175,6 +14201,11 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
   final String datasheetId;
   final String? enhancementId;
   final int modelCount;
+
+  /// Une seule unité par armée peut être le Warlord (concept obligatoire
+  /// des règles 10e/11e éditions) — l'unicité est appliquée côté DAO,
+  /// pas par une contrainte SQL.
+  final bool isWarlord;
   final int displayOrder;
   final DateTime createdAt;
   const ArmyUnit({
@@ -14183,6 +14214,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
     required this.datasheetId,
     this.enhancementId,
     required this.modelCount,
+    required this.isWarlord,
     required this.displayOrder,
     required this.createdAt,
   });
@@ -14196,6 +14228,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
       map['enhancement_id'] = Variable<String>(enhancementId);
     }
     map['model_count'] = Variable<int>(modelCount);
+    map['is_warlord'] = Variable<bool>(isWarlord);
     map['display_order'] = Variable<int>(displayOrder);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
@@ -14210,6 +14243,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
           ? const Value.absent()
           : Value(enhancementId),
       modelCount: Value(modelCount),
+      isWarlord: Value(isWarlord),
       displayOrder: Value(displayOrder),
       createdAt: Value(createdAt),
     );
@@ -14226,6 +14260,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
       datasheetId: serializer.fromJson<String>(json['datasheetId']),
       enhancementId: serializer.fromJson<String?>(json['enhancementId']),
       modelCount: serializer.fromJson<int>(json['modelCount']),
+      isWarlord: serializer.fromJson<bool>(json['isWarlord']),
       displayOrder: serializer.fromJson<int>(json['displayOrder']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
@@ -14239,6 +14274,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
       'datasheetId': serializer.toJson<String>(datasheetId),
       'enhancementId': serializer.toJson<String?>(enhancementId),
       'modelCount': serializer.toJson<int>(modelCount),
+      'isWarlord': serializer.toJson<bool>(isWarlord),
       'displayOrder': serializer.toJson<int>(displayOrder),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
@@ -14250,6 +14286,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
     String? datasheetId,
     Value<String?> enhancementId = const Value.absent(),
     int? modelCount,
+    bool? isWarlord,
     int? displayOrder,
     DateTime? createdAt,
   }) => ArmyUnit(
@@ -14260,6 +14297,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
         ? enhancementId.value
         : this.enhancementId,
     modelCount: modelCount ?? this.modelCount,
+    isWarlord: isWarlord ?? this.isWarlord,
     displayOrder: displayOrder ?? this.displayOrder,
     createdAt: createdAt ?? this.createdAt,
   );
@@ -14276,6 +14314,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
       modelCount: data.modelCount.present
           ? data.modelCount.value
           : this.modelCount,
+      isWarlord: data.isWarlord.present ? data.isWarlord.value : this.isWarlord,
       displayOrder: data.displayOrder.present
           ? data.displayOrder.value
           : this.displayOrder,
@@ -14291,6 +14330,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
           ..write('datasheetId: $datasheetId, ')
           ..write('enhancementId: $enhancementId, ')
           ..write('modelCount: $modelCount, ')
+          ..write('isWarlord: $isWarlord, ')
           ..write('displayOrder: $displayOrder, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
@@ -14304,6 +14344,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
     datasheetId,
     enhancementId,
     modelCount,
+    isWarlord,
     displayOrder,
     createdAt,
   );
@@ -14316,6 +14357,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
           other.datasheetId == this.datasheetId &&
           other.enhancementId == this.enhancementId &&
           other.modelCount == this.modelCount &&
+          other.isWarlord == this.isWarlord &&
           other.displayOrder == this.displayOrder &&
           other.createdAt == this.createdAt);
 }
@@ -14326,6 +14368,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
   final Value<String> datasheetId;
   final Value<String?> enhancementId;
   final Value<int> modelCount;
+  final Value<bool> isWarlord;
   final Value<int> displayOrder;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
@@ -14335,6 +14378,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
     this.datasheetId = const Value.absent(),
     this.enhancementId = const Value.absent(),
     this.modelCount = const Value.absent(),
+    this.isWarlord = const Value.absent(),
     this.displayOrder = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -14345,6 +14389,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
     required String datasheetId,
     this.enhancementId = const Value.absent(),
     required int modelCount,
+    this.isWarlord = const Value.absent(),
     this.displayOrder = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -14358,6 +14403,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
     Expression<String>? datasheetId,
     Expression<String>? enhancementId,
     Expression<int>? modelCount,
+    Expression<bool>? isWarlord,
     Expression<int>? displayOrder,
     Expression<DateTime>? createdAt,
     Expression<int>? rowid,
@@ -14368,6 +14414,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
       if (datasheetId != null) 'datasheet_id': datasheetId,
       if (enhancementId != null) 'enhancement_id': enhancementId,
       if (modelCount != null) 'model_count': modelCount,
+      if (isWarlord != null) 'is_warlord': isWarlord,
       if (displayOrder != null) 'display_order': displayOrder,
       if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
@@ -14380,6 +14427,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
     Value<String>? datasheetId,
     Value<String?>? enhancementId,
     Value<int>? modelCount,
+    Value<bool>? isWarlord,
     Value<int>? displayOrder,
     Value<DateTime>? createdAt,
     Value<int>? rowid,
@@ -14390,6 +14438,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
       datasheetId: datasheetId ?? this.datasheetId,
       enhancementId: enhancementId ?? this.enhancementId,
       modelCount: modelCount ?? this.modelCount,
+      isWarlord: isWarlord ?? this.isWarlord,
       displayOrder: displayOrder ?? this.displayOrder,
       createdAt: createdAt ?? this.createdAt,
       rowid: rowid ?? this.rowid,
@@ -14414,6 +14463,9 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
     if (modelCount.present) {
       map['model_count'] = Variable<int>(modelCount.value);
     }
+    if (isWarlord.present) {
+      map['is_warlord'] = Variable<bool>(isWarlord.value);
+    }
     if (displayOrder.present) {
       map['display_order'] = Variable<int>(displayOrder.value);
     }
@@ -14434,6 +14486,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
           ..write('datasheetId: $datasheetId, ')
           ..write('enhancementId: $enhancementId, ')
           ..write('modelCount: $modelCount, ')
+          ..write('isWarlord: $isWarlord, ')
           ..write('displayOrder: $displayOrder, ')
           ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
@@ -24918,6 +24971,7 @@ typedef $$ArmyUnitsTableCreateCompanionBuilder =
       required String datasheetId,
       Value<String?> enhancementId,
       required int modelCount,
+      Value<bool> isWarlord,
       Value<int> displayOrder,
       Value<DateTime> createdAt,
       Value<int> rowid,
@@ -24929,6 +24983,7 @@ typedef $$ArmyUnitsTableUpdateCompanionBuilder =
       Value<String> datasheetId,
       Value<String?> enhancementId,
       Value<int> modelCount,
+      Value<bool> isWarlord,
       Value<int> displayOrder,
       Value<DateTime> createdAt,
       Value<int> rowid,
@@ -24965,6 +25020,11 @@ class $$ArmyUnitsTableFilterComposer
 
   ColumnFilters<int> get modelCount => $composableBuilder(
     column: $table.modelCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isWarlord => $composableBuilder(
+    column: $table.isWarlord,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -25013,6 +25073,11 @@ class $$ArmyUnitsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get isWarlord => $composableBuilder(
+    column: $table.isWarlord,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get displayOrder => $composableBuilder(
     column: $table.displayOrder,
     builder: (column) => ColumnOrderings(column),
@@ -25053,6 +25118,9 @@ class $$ArmyUnitsTableAnnotationComposer
     column: $table.modelCount,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get isWarlord =>
+      $composableBuilder(column: $table.isWarlord, builder: (column) => column);
 
   GeneratedColumn<int> get displayOrder => $composableBuilder(
     column: $table.displayOrder,
@@ -25096,6 +25164,7 @@ class $$ArmyUnitsTableTableManager
                 Value<String> datasheetId = const Value.absent(),
                 Value<String?> enhancementId = const Value.absent(),
                 Value<int> modelCount = const Value.absent(),
+                Value<bool> isWarlord = const Value.absent(),
                 Value<int> displayOrder = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -25105,6 +25174,7 @@ class $$ArmyUnitsTableTableManager
                 datasheetId: datasheetId,
                 enhancementId: enhancementId,
                 modelCount: modelCount,
+                isWarlord: isWarlord,
                 displayOrder: displayOrder,
                 createdAt: createdAt,
                 rowid: rowid,
@@ -25116,6 +25186,7 @@ class $$ArmyUnitsTableTableManager
                 required String datasheetId,
                 Value<String?> enhancementId = const Value.absent(),
                 required int modelCount,
+                Value<bool> isWarlord = const Value.absent(),
                 Value<int> displayOrder = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -25125,6 +25196,7 @@ class $$ArmyUnitsTableTableManager
                 datasheetId: datasheetId,
                 enhancementId: enhancementId,
                 modelCount: modelCount,
+                isWarlord: isWarlord,
                 displayOrder: displayOrder,
                 createdAt: createdAt,
                 rowid: rowid,

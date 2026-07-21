@@ -20,11 +20,15 @@ class ArmyListFormatter {
 
     for (final unit in army.units) {
       buffer.write('- ${unit.datasheetName} x${unit.modelCount}');
+      if (unit.isWarlord) buffer.write(' [Warlord]');
       buffer.write(' (${unit.points} pts)');
       if (unit.enhancementName != null) {
         buffer.write(' [${unit.enhancementName} +${unit.enhancementPoints} pts]');
       }
       buffer.writeln();
+      for (final choice in unit.equipmentChoices) {
+        buffer.writeln('    · $choice');
+      }
     }
 
     if (army.notes != null && army.notes!.trim().isNotEmpty) {

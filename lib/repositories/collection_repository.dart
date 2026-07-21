@@ -16,6 +16,10 @@ class CollectionRepository {
     return database.collectionDao.getSummary();
   }
 
+  Future<int> getOwnedQuantity(String datasheetId) {
+    return database.collectionDao.getOwnedQuantity(datasheetId);
+  }
+
   Future<String> addEntry({
     required String datasheetId,
     required int quantity,
