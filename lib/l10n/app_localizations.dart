@@ -116,11 +116,11 @@ abstract class AppLocalizations {
   /// **'Catalogue'**
   String get navCatalog;
 
-  /// No description provided for @navExplorer.
+  /// No description provided for @navRules.
   ///
   /// In fr, this message translates to:
   /// **'Règles'**
-  String get navExplorer;
+  String get navRules;
 
   /// No description provided for @navArmies.
   ///
@@ -908,6 +908,102 @@ abstract class AppLocalizations {
   /// **'Notes (optionnel)'**
   String get wishlistNotesDialogLabel;
 
+  /// No description provided for @collectionSearchHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher dans la collection...'**
+  String get collectionSearchHint;
+
+  /// No description provided for @collectionStatArmiesSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'{complete} complètes'**
+  String collectionStatArmiesSub(int complete);
+
+  /// No description provided for @collectionStatModelsPaintedSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Peintes : {count} ({percent}%)'**
+  String collectionStatModelsPaintedSub(int count, int percent);
+
+  /// No description provided for @collectionValueTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valeur de la collection'**
+  String get collectionValueTitle;
+
+  /// No description provided for @collectionValueUnquantifiedSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non quantifiable'**
+  String get collectionValueUnquantifiedSub;
+
+  /// No description provided for @collectionValueTierStarting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Naissante'**
+  String get collectionValueTierStarting;
+
+  /// No description provided for @collectionValueTierSolid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Solide'**
+  String get collectionValueTierSolid;
+
+  /// No description provided for @collectionValueTierEpic.
+  ///
+  /// In fr, this message translates to:
+  /// **'Épique'**
+  String get collectionValueTierEpic;
+
+  /// No description provided for @collectionValueTierLegendary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Légendaire'**
+  String get collectionValueTierLegendary;
+
+  /// No description provided for @collectionFilterFactionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Faction'**
+  String get collectionFilterFactionTitle;
+
+  /// No description provided for @collectionFilterStateTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'État'**
+  String get collectionFilterStateTitle;
+
+  /// No description provided for @collectionStateUnbuilt.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non assemblées'**
+  String get collectionStateUnbuilt;
+
+  /// No description provided for @collectionMyArmiesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes armées'**
+  String get collectionMyArmiesTitle;
+
+  /// No description provided for @collectionRecentAdditionsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouts récents'**
+  String get collectionRecentAdditionsTitle;
+
+  /// No description provided for @collectionAllItemsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toute la collection'**
+  String get collectionAllItemsTitle;
+
+  /// No description provided for @collectionNoResultsForFilters.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune figurine ne correspond aux filtres'**
+  String get collectionNoResultsForFilters;
+
   /// No description provided for @statsArmiesCount.
   ///
   /// In fr, this message translates to:
@@ -1562,35 +1658,203 @@ abstract class AppLocalizations {
   /// **'Faction adverse (optionnel)'**
   String get battleOpponentFactionLabel;
 
-  /// No description provided for @explorerTabKeywords.
+  /// No description provided for @rulesSearchHint.
   ///
   /// In fr, this message translates to:
-  /// **'Mots-clés'**
-  String get explorerTabKeywords;
+  /// **'Rechercher une règle, une faction...'**
+  String get rulesSearchHint;
 
-  /// No description provided for @explorerTabAbilities.
+  /// No description provided for @rulesAddButton.
   ///
   /// In fr, this message translates to:
-  /// **'Capacités'**
-  String get explorerTabAbilities;
+  /// **'Ajouter une règle'**
+  String get rulesAddButton;
 
-  /// No description provided for @explorerSearchHint.
+  /// No description provided for @rulesTabMain.
   ///
   /// In fr, this message translates to:
-  /// **'Rechercher une règle...'**
-  String get explorerSearchHint;
+  /// **'Règles principales'**
+  String get rulesTabMain;
 
-  /// No description provided for @explorerEmpty.
+  /// No description provided for @rulesTabAdditional.
   ///
   /// In fr, this message translates to:
-  /// **'Aucune règle trouvée'**
-  String get explorerEmpty;
+  /// **'Règles additionnelles'**
+  String get rulesTabAdditional;
 
-  /// No description provided for @explorerViewInCatalog.
+  /// No description provided for @rulesCategoryAll.
   ///
   /// In fr, this message translates to:
-  /// **'Voir les unités'**
-  String get explorerViewInCatalog;
+  /// **'Toutes'**
+  String get rulesCategoryAll;
+
+  /// No description provided for @rulesCategoryMain.
+  ///
+  /// In fr, this message translates to:
+  /// **'Règles principales'**
+  String get rulesCategoryMain;
+
+  /// No description provided for @rulesCategoryMissions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Missions'**
+  String get rulesCategoryMissions;
+
+  /// No description provided for @rulesCategoryFaqs.
+  ///
+  /// In fr, this message translates to:
+  /// **'FAQs'**
+  String get rulesCategoryFaqs;
+
+  /// No description provided for @rulesCategoryErrata.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erratas'**
+  String get rulesCategoryErrata;
+
+  /// No description provided for @rulesCategoryProfiles.
+  ///
+  /// In fr, this message translates to:
+  /// **'Points et profils'**
+  String get rulesCategoryProfiles;
+
+  /// No description provided for @rulesDocumentsCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} documents'**
+  String rulesDocumentsCount(int count);
+
+  /// No description provided for @rulesBadgeMain.
+  ///
+  /// In fr, this message translates to:
+  /// **'RÈGLE PRINCIPALE'**
+  String get rulesBadgeMain;
+
+  /// No description provided for @rulesBadgeCurrent.
+  ///
+  /// In fr, this message translates to:
+  /// **'ACTUELLE'**
+  String get rulesBadgeCurrent;
+
+  /// No description provided for @rulesBadgeUpToDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'À jour'**
+  String get rulesBadgeUpToDate;
+
+  /// No description provided for @rulesVersionLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'VERSION'**
+  String get rulesVersionLabel;
+
+  /// No description provided for @rulesLastUpdateLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dernière mise à jour'**
+  String get rulesLastUpdateLabel;
+
+  /// No description provided for @rulesOpenBook.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouvrir le livre de règles'**
+  String get rulesOpenBook;
+
+  /// No description provided for @rulesViewErrata.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir les erratas ({count})'**
+  String rulesViewErrata(int count);
+
+  /// No description provided for @rulesOpenBookSnackbar.
+  ///
+  /// In fr, this message translates to:
+  /// **'PDF stocké localement : {path}'**
+  String rulesOpenBookSnackbar(String path);
+
+  /// No description provided for @rulesOpenBookMissing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun PDF local pour ce document pour le moment'**
+  String get rulesOpenBookMissing;
+
+  /// No description provided for @rulesRecentDocuments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Documents récents'**
+  String get rulesRecentDocuments;
+
+  /// No description provided for @rulesPopularRules.
+  ///
+  /// In fr, this message translates to:
+  /// **'Règles populaires'**
+  String get rulesPopularRules;
+
+  /// No description provided for @rulesSeeAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir tout'**
+  String get rulesSeeAll;
+
+  /// No description provided for @rulesHelpTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Besoin d\'aide ?'**
+  String get rulesHelpTitle;
+
+  /// No description provided for @rulesHelpHowToPlay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment jouer ?'**
+  String get rulesHelpHowToPlay;
+
+  /// No description provided for @rulesHelpHowToPlaySub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Apprendre les bases'**
+  String get rulesHelpHowToPlaySub;
+
+  /// No description provided for @rulesHelpVideos.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vidéos explicatives'**
+  String get rulesHelpVideos;
+
+  /// No description provided for @rulesHelpVideosSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tutoriels et exemples'**
+  String get rulesHelpVideosSub;
+
+  /// No description provided for @rulesHelpApplication.
+  ///
+  /// In fr, this message translates to:
+  /// **'Application des règles'**
+  String get rulesHelpApplication;
+
+  /// No description provided for @rulesHelpApplicationSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cas pratiques'**
+  String get rulesHelpApplicationSub;
+
+  /// No description provided for @rulesHelpGlossary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Glossaire'**
+  String get rulesHelpGlossary;
+
+  /// No description provided for @rulesHelpGlossarySub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous les termes'**
+  String get rulesHelpGlossarySub;
+
+  /// No description provided for @rulesEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun document trouvé'**
+  String get rulesEmpty;
 
   /// No description provided for @profileCommandant.
   ///

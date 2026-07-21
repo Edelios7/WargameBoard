@@ -7,8 +7,8 @@ import '../features/armies/pages/armies_page.dart';
 import '../features/battle/pages/battle_page.dart';
 import '../features/catalog/pages/catalog_page.dart';
 import '../features/collection/pages/collection_page.dart';
-import '../features/explorer/pages/explorer_page.dart';
 import '../features/profile/pages/profile_page.dart';
+import '../features/rules/pages/rules_page.dart';
 import '../features/settings/pages/settings_page.dart';
 import '../features/statistics/pages/statistics_page.dart';
 import 'navigation.dart';
@@ -19,7 +19,7 @@ class AppShell extends ConsumerWidget {
   static const _pages = <AppTab, Widget>{
     AppTab.dashboard: DashboardPage(),
     AppTab.catalog: CatalogPage(),
-    AppTab.explorer: ExplorerPage(),
+    AppTab.rules: RulesPage(),
     AppTab.armies: ArmiesPage(),
     AppTab.battles: BattlePage(),
     AppTab.collection: CollectionPage(),

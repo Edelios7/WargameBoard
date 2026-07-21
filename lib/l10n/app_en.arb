@@ -5,7 +5,7 @@
 
   "navDashboard": "Dashboard",
   "navCatalog": "Catalog",
-  "navExplorer": "Rules",
+  "navRules": "Rules",
   "navArmies": "Armies",
   "navBattles": "Battles",
   "navCollection": "Collection",
@@ -224,6 +224,34 @@
   "wishlistMoveToCollection": "Mark as acquired",
   "wishlistNotesDialogLabel": "Notes (optional)",
 
+  "collectionSearchHint": "Search the collection...",
+  "collectionStatArmiesSub": "{complete} complete",
+  "@collectionStatArmiesSub": {
+    "placeholders": {
+      "complete": { "type": "int" }
+    }
+  },
+  "collectionStatModelsPaintedSub": "Painted: {count} ({percent}%)",
+  "@collectionStatModelsPaintedSub": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "percent": { "type": "int" }
+    }
+  },
+  "collectionValueTitle": "Collection value",
+  "collectionValueUnquantifiedSub": "Unquantifiable",
+  "collectionValueTierStarting": "Starting out",
+  "collectionValueTierSolid": "Solid",
+  "collectionValueTierEpic": "Epic",
+  "collectionValueTierLegendary": "Legendary",
+  "collectionFilterFactionTitle": "Faction",
+  "collectionFilterStateTitle": "State",
+  "collectionStateUnbuilt": "Unbuilt",
+  "collectionMyArmiesTitle": "My armies",
+  "collectionRecentAdditionsTitle": "Recent additions",
+  "collectionAllItemsTitle": "Whole collection",
+  "collectionNoResultsForFilters": "No miniature matches the filters",
+
   "statsArmiesCount": "Armies created",
   "statsCollectionEntries": "Units in collection",
   "statsCollectionModels": "Models in collection",
@@ -371,11 +399,54 @@
   "battleLocationLabel": "Location (optional)",
   "battleOpponentFactionLabel": "Opponent faction (optional)",
 
-  "explorerTabKeywords": "Keywords",
-  "explorerTabAbilities": "Abilities",
-  "explorerSearchHint": "Search for a rule...",
-  "explorerEmpty": "No rule found",
-  "explorerViewInCatalog": "View units",
+  "rulesSearchHint": "Search for a rule, a faction...",
+  "rulesAddButton": "Add a rule",
+  "rulesTabMain": "Main rules",
+  "rulesTabAdditional": "Additional rules",
+  "rulesCategoryAll": "All",
+  "rulesCategoryMain": "Main rules",
+  "rulesCategoryMissions": "Missions",
+  "rulesCategoryFaqs": "FAQs",
+  "rulesCategoryErrata": "Errata",
+  "rulesCategoryProfiles": "Points and profiles",
+  "rulesDocumentsCount": "{count} documents",
+  "@rulesDocumentsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "rulesBadgeMain": "MAIN RULE",
+  "rulesBadgeCurrent": "CURRENT",
+  "rulesBadgeUpToDate": "Up to date",
+  "rulesVersionLabel": "VERSION",
+  "rulesLastUpdateLabel": "Last update",
+  "rulesOpenBook": "Open the rulebook",
+  "rulesViewErrata": "View errata ({count})",
+  "@rulesViewErrata": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "rulesOpenBookSnackbar": "PDF stored locally: {path}",
+  "@rulesOpenBookSnackbar": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "rulesOpenBookMissing": "No local PDF for this document yet",
+  "rulesRecentDocuments": "Recent documents",
+  "rulesPopularRules": "Popular rules",
+  "rulesSeeAll": "See all",
+  "rulesHelpTitle": "Need help?",
+  "rulesHelpHowToPlay": "How to play?",
+  "rulesHelpHowToPlaySub": "Learn the basics",
+  "rulesHelpVideos": "Explainer videos",
+  "rulesHelpVideosSub": "Tutorials and examples",
+  "rulesHelpApplication": "Applying the rules",
+  "rulesHelpApplicationSub": "Practical cases",
+  "rulesHelpGlossary": "Glossary",
+  "rulesHelpGlossarySub": "All the terms",
+  "rulesEmpty": "No document found",
 
   "profileCommandant": "Commander",
   "profileLevelShort": "Level {level}",

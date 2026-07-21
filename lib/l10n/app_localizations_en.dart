@@ -18,7 +18,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navCatalog => 'Catalog';
 
   @override
-  String get navExplorer => 'Rules';
+  String get navRules => 'Rules';
 
   @override
   String get navArmies => 'Armies';
@@ -443,6 +443,59 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wishlistNotesDialogLabel => 'Notes (optional)';
 
   @override
+  String get collectionSearchHint => 'Search the collection...';
+
+  @override
+  String collectionStatArmiesSub(int complete) {
+    return '$complete complete';
+  }
+
+  @override
+  String collectionStatModelsPaintedSub(int count, int percent) {
+    return 'Painted: $count ($percent%)';
+  }
+
+  @override
+  String get collectionValueTitle => 'Collection value';
+
+  @override
+  String get collectionValueUnquantifiedSub => 'Unquantifiable';
+
+  @override
+  String get collectionValueTierStarting => 'Starting out';
+
+  @override
+  String get collectionValueTierSolid => 'Solid';
+
+  @override
+  String get collectionValueTierEpic => 'Epic';
+
+  @override
+  String get collectionValueTierLegendary => 'Legendary';
+
+  @override
+  String get collectionFilterFactionTitle => 'Faction';
+
+  @override
+  String get collectionFilterStateTitle => 'State';
+
+  @override
+  String get collectionStateUnbuilt => 'Unbuilt';
+
+  @override
+  String get collectionMyArmiesTitle => 'My armies';
+
+  @override
+  String get collectionRecentAdditionsTitle => 'Recent additions';
+
+  @override
+  String get collectionAllItemsTitle => 'Whole collection';
+
+  @override
+  String get collectionNoResultsForFilters =>
+      'No miniature matches the filters';
+
+  @override
   String get statsArmiesCount => 'Armies created';
 
   @override
@@ -790,19 +843,109 @@ class AppLocalizationsEn extends AppLocalizations {
   String get battleOpponentFactionLabel => 'Opponent faction (optional)';
 
   @override
-  String get explorerTabKeywords => 'Keywords';
+  String get rulesSearchHint => 'Search for a rule, a faction...';
 
   @override
-  String get explorerTabAbilities => 'Abilities';
+  String get rulesAddButton => 'Add a rule';
 
   @override
-  String get explorerSearchHint => 'Search for a rule...';
+  String get rulesTabMain => 'Main rules';
 
   @override
-  String get explorerEmpty => 'No rule found';
+  String get rulesTabAdditional => 'Additional rules';
 
   @override
-  String get explorerViewInCatalog => 'View units';
+  String get rulesCategoryAll => 'All';
+
+  @override
+  String get rulesCategoryMain => 'Main rules';
+
+  @override
+  String get rulesCategoryMissions => 'Missions';
+
+  @override
+  String get rulesCategoryFaqs => 'FAQs';
+
+  @override
+  String get rulesCategoryErrata => 'Errata';
+
+  @override
+  String get rulesCategoryProfiles => 'Points and profiles';
+
+  @override
+  String rulesDocumentsCount(int count) {
+    return '$count documents';
+  }
+
+  @override
+  String get rulesBadgeMain => 'MAIN RULE';
+
+  @override
+  String get rulesBadgeCurrent => 'CURRENT';
+
+  @override
+  String get rulesBadgeUpToDate => 'Up to date';
+
+  @override
+  String get rulesVersionLabel => 'VERSION';
+
+  @override
+  String get rulesLastUpdateLabel => 'Last update';
+
+  @override
+  String get rulesOpenBook => 'Open the rulebook';
+
+  @override
+  String rulesViewErrata(int count) {
+    return 'View errata ($count)';
+  }
+
+  @override
+  String rulesOpenBookSnackbar(String path) {
+    return 'PDF stored locally: $path';
+  }
+
+  @override
+  String get rulesOpenBookMissing => 'No local PDF for this document yet';
+
+  @override
+  String get rulesRecentDocuments => 'Recent documents';
+
+  @override
+  String get rulesPopularRules => 'Popular rules';
+
+  @override
+  String get rulesSeeAll => 'See all';
+
+  @override
+  String get rulesHelpTitle => 'Need help?';
+
+  @override
+  String get rulesHelpHowToPlay => 'How to play?';
+
+  @override
+  String get rulesHelpHowToPlaySub => 'Learn the basics';
+
+  @override
+  String get rulesHelpVideos => 'Explainer videos';
+
+  @override
+  String get rulesHelpVideosSub => 'Tutorials and examples';
+
+  @override
+  String get rulesHelpApplication => 'Applying the rules';
+
+  @override
+  String get rulesHelpApplicationSub => 'Practical cases';
+
+  @override
+  String get rulesHelpGlossary => 'Glossary';
+
+  @override
+  String get rulesHelpGlossarySub => 'All the terms';
+
+  @override
+  String get rulesEmpty => 'No document found';
 
   @override
   String get profileCommandant => 'Commander';

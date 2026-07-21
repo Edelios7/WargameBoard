@@ -18,7 +18,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navCatalog => 'Catalogue';
 
   @override
-  String get navExplorer => 'Règles';
+  String get navRules => 'Règles';
 
   @override
   String get navArmies => 'Armées';
@@ -448,6 +448,59 @@ class AppLocalizationsFr extends AppLocalizations {
   String get wishlistNotesDialogLabel => 'Notes (optionnel)';
 
   @override
+  String get collectionSearchHint => 'Rechercher dans la collection...';
+
+  @override
+  String collectionStatArmiesSub(int complete) {
+    return '$complete complètes';
+  }
+
+  @override
+  String collectionStatModelsPaintedSub(int count, int percent) {
+    return 'Peintes : $count ($percent%)';
+  }
+
+  @override
+  String get collectionValueTitle => 'Valeur de la collection';
+
+  @override
+  String get collectionValueUnquantifiedSub => 'Non quantifiable';
+
+  @override
+  String get collectionValueTierStarting => 'Naissante';
+
+  @override
+  String get collectionValueTierSolid => 'Solide';
+
+  @override
+  String get collectionValueTierEpic => 'Épique';
+
+  @override
+  String get collectionValueTierLegendary => 'Légendaire';
+
+  @override
+  String get collectionFilterFactionTitle => 'Faction';
+
+  @override
+  String get collectionFilterStateTitle => 'État';
+
+  @override
+  String get collectionStateUnbuilt => 'Non assemblées';
+
+  @override
+  String get collectionMyArmiesTitle => 'Mes armées';
+
+  @override
+  String get collectionRecentAdditionsTitle => 'Ajouts récents';
+
+  @override
+  String get collectionAllItemsTitle => 'Toute la collection';
+
+  @override
+  String get collectionNoResultsForFilters =>
+      'Aucune figurine ne correspond aux filtres';
+
+  @override
   String get statsArmiesCount => 'Armées créées';
 
   @override
@@ -796,19 +849,110 @@ class AppLocalizationsFr extends AppLocalizations {
   String get battleOpponentFactionLabel => 'Faction adverse (optionnel)';
 
   @override
-  String get explorerTabKeywords => 'Mots-clés';
+  String get rulesSearchHint => 'Rechercher une règle, une faction...';
 
   @override
-  String get explorerTabAbilities => 'Capacités';
+  String get rulesAddButton => 'Ajouter une règle';
 
   @override
-  String get explorerSearchHint => 'Rechercher une règle...';
+  String get rulesTabMain => 'Règles principales';
 
   @override
-  String get explorerEmpty => 'Aucune règle trouvée';
+  String get rulesTabAdditional => 'Règles additionnelles';
 
   @override
-  String get explorerViewInCatalog => 'Voir les unités';
+  String get rulesCategoryAll => 'Toutes';
+
+  @override
+  String get rulesCategoryMain => 'Règles principales';
+
+  @override
+  String get rulesCategoryMissions => 'Missions';
+
+  @override
+  String get rulesCategoryFaqs => 'FAQs';
+
+  @override
+  String get rulesCategoryErrata => 'Erratas';
+
+  @override
+  String get rulesCategoryProfiles => 'Points et profils';
+
+  @override
+  String rulesDocumentsCount(int count) {
+    return '$count documents';
+  }
+
+  @override
+  String get rulesBadgeMain => 'RÈGLE PRINCIPALE';
+
+  @override
+  String get rulesBadgeCurrent => 'ACTUELLE';
+
+  @override
+  String get rulesBadgeUpToDate => 'À jour';
+
+  @override
+  String get rulesVersionLabel => 'VERSION';
+
+  @override
+  String get rulesLastUpdateLabel => 'Dernière mise à jour';
+
+  @override
+  String get rulesOpenBook => 'Ouvrir le livre de règles';
+
+  @override
+  String rulesViewErrata(int count) {
+    return 'Voir les erratas ($count)';
+  }
+
+  @override
+  String rulesOpenBookSnackbar(String path) {
+    return 'PDF stocké localement : $path';
+  }
+
+  @override
+  String get rulesOpenBookMissing =>
+      'Aucun PDF local pour ce document pour le moment';
+
+  @override
+  String get rulesRecentDocuments => 'Documents récents';
+
+  @override
+  String get rulesPopularRules => 'Règles populaires';
+
+  @override
+  String get rulesSeeAll => 'Voir tout';
+
+  @override
+  String get rulesHelpTitle => 'Besoin d\'aide ?';
+
+  @override
+  String get rulesHelpHowToPlay => 'Comment jouer ?';
+
+  @override
+  String get rulesHelpHowToPlaySub => 'Apprendre les bases';
+
+  @override
+  String get rulesHelpVideos => 'Vidéos explicatives';
+
+  @override
+  String get rulesHelpVideosSub => 'Tutoriels et exemples';
+
+  @override
+  String get rulesHelpApplication => 'Application des règles';
+
+  @override
+  String get rulesHelpApplicationSub => 'Cas pratiques';
+
+  @override
+  String get rulesHelpGlossary => 'Glossaire';
+
+  @override
+  String get rulesHelpGlossarySub => 'Tous les termes';
+
+  @override
+  String get rulesEmpty => 'Aucun document trouvé';
 
   @override
   String get profileCommandant => 'Commandant';

@@ -5,7 +5,7 @@
 
   "navDashboard": "Dashboard",
   "navCatalog": "Catalogue",
-  "navExplorer": "Règles",
+  "navRules": "Règles",
   "navArmies": "Armées",
   "navBattles": "Batailles",
   "navCollection": "Collection",
@@ -224,6 +224,34 @@
   "wishlistMoveToCollection": "Marquer comme acquis",
   "wishlistNotesDialogLabel": "Notes (optionnel)",
 
+  "collectionSearchHint": "Rechercher dans la collection...",
+  "collectionStatArmiesSub": "{complete} complètes",
+  "@collectionStatArmiesSub": {
+    "placeholders": {
+      "complete": { "type": "int" }
+    }
+  },
+  "collectionStatModelsPaintedSub": "Peintes : {count} ({percent}%)",
+  "@collectionStatModelsPaintedSub": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "percent": { "type": "int" }
+    }
+  },
+  "collectionValueTitle": "Valeur de la collection",
+  "collectionValueUnquantifiedSub": "Non quantifiable",
+  "collectionValueTierStarting": "Naissante",
+  "collectionValueTierSolid": "Solide",
+  "collectionValueTierEpic": "Épique",
+  "collectionValueTierLegendary": "Légendaire",
+  "collectionFilterFactionTitle": "Faction",
+  "collectionFilterStateTitle": "État",
+  "collectionStateUnbuilt": "Non assemblées",
+  "collectionMyArmiesTitle": "Mes armées",
+  "collectionRecentAdditionsTitle": "Ajouts récents",
+  "collectionAllItemsTitle": "Toute la collection",
+  "collectionNoResultsForFilters": "Aucune figurine ne correspond aux filtres",
+
   "statsArmiesCount": "Armées créées",
   "statsCollectionEntries": "Unités en collection",
   "statsCollectionModels": "Figurines en collection",
@@ -371,11 +399,54 @@
   "battleLocationLabel": "Lieu (optionnel)",
   "battleOpponentFactionLabel": "Faction adverse (optionnel)",
 
-  "explorerTabKeywords": "Mots-clés",
-  "explorerTabAbilities": "Capacités",
-  "explorerSearchHint": "Rechercher une règle...",
-  "explorerEmpty": "Aucune règle trouvée",
-  "explorerViewInCatalog": "Voir les unités",
+  "rulesSearchHint": "Rechercher une règle, une faction...",
+  "rulesAddButton": "Ajouter une règle",
+  "rulesTabMain": "Règles principales",
+  "rulesTabAdditional": "Règles additionnelles",
+  "rulesCategoryAll": "Toutes",
+  "rulesCategoryMain": "Règles principales",
+  "rulesCategoryMissions": "Missions",
+  "rulesCategoryFaqs": "FAQs",
+  "rulesCategoryErrata": "Erratas",
+  "rulesCategoryProfiles": "Points et profils",
+  "rulesDocumentsCount": "{count} documents",
+  "@rulesDocumentsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "rulesBadgeMain": "RÈGLE PRINCIPALE",
+  "rulesBadgeCurrent": "ACTUELLE",
+  "rulesBadgeUpToDate": "À jour",
+  "rulesVersionLabel": "VERSION",
+  "rulesLastUpdateLabel": "Dernière mise à jour",
+  "rulesOpenBook": "Ouvrir le livre de règles",
+  "rulesViewErrata": "Voir les erratas ({count})",
+  "@rulesViewErrata": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "rulesOpenBookSnackbar": "PDF stocké localement : {path}",
+  "@rulesOpenBookSnackbar": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "rulesOpenBookMissing": "Aucun PDF local pour ce document pour le moment",
+  "rulesRecentDocuments": "Documents récents",
+  "rulesPopularRules": "Règles populaires",
+  "rulesSeeAll": "Voir tout",
+  "rulesHelpTitle": "Besoin d'aide ?",
+  "rulesHelpHowToPlay": "Comment jouer ?",
+  "rulesHelpHowToPlaySub": "Apprendre les bases",
+  "rulesHelpVideos": "Vidéos explicatives",
+  "rulesHelpVideosSub": "Tutoriels et exemples",
+  "rulesHelpApplication": "Application des règles",
+  "rulesHelpApplicationSub": "Cas pratiques",
+  "rulesHelpGlossary": "Glossaire",
+  "rulesHelpGlossarySub": "Tous les termes",
+  "rulesEmpty": "Aucun document trouvé",
 
   "profileCommandant": "Commandant",
   "profileLevelShort": "Niveau {level}",

@@ -57,5 +57,9 @@ local_assets/**/*.webp
 # uniquement, jamais commité (contenu dérivé de règles officielles GW)
 local_assets/wh40k_reference/
 
+# PDFs officiels des livres de règles GW - usage privé uniquement,
+# jamais commités
+local_assets/rules/*.pdf
+
 # Sortie de l'outil manuel test/features/catalog_screenshot_test.dart
 catalog_screenshot.png

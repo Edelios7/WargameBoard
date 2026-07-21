@@ -110,7 +110,7 @@ class Sidebar extends ConsumerWidget {
                 children: [
                   _item(0, Icons.home_rounded, l10n.navDashboard),
                   _item(1, Icons.auto_stories_rounded, l10n.navCatalog),
-                  _item(2, Icons.menu_book_rounded, l10n.navExplorer),
+                  _item(2, Icons.menu_book_rounded, l10n.navRules),
                   _item(3, Icons.groups_rounded, l10n.navArmies),
                   _item(
                     4,

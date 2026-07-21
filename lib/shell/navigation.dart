@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 enum AppTab {
   dashboard,
   catalog,
-  explorer,
+  rules,
   armies,
   battles,
   collection,

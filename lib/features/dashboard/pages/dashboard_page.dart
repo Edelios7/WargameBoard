@@ -924,7 +924,7 @@ class _RecentAdditionsCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '${l10n.collectionQuantityLabel(entry.quantity)}',
+                          l10n.collectionQuantityLabel(entry.quantity),
                           style: AppTextStyles.caption,
                         ),
                       ],

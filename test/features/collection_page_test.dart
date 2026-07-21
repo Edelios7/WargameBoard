@@ -63,7 +63,12 @@ void main() {
     final addAssembled =
         find.byIcon(Icons.add_circle_outline_rounded).first;
 
+    await tester.ensureVisible(addAssembled);
+    await tester.pumpAndSettle();
     await tester.tap(addAssembled);
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(addAssembled);
     await tester.pumpAndSettle();
     await tester.tap(addAssembled);
     await tester.pumpAndSettle();
