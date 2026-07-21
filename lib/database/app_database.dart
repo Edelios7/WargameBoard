@@ -47,6 +47,7 @@ import 'tables/stratagems_table.dart';
 
 import 'tables/armies_table.dart';
 import 'tables/army_units_table.dart';
+import 'tables/army_unit_equipment_selections_table.dart';
 
 import 'tables/owned_miniatures_table.dart';
 import 'tables/wishlist_items_table.dart';
@@ -131,6 +132,7 @@ part 'app_database.g.dart';
     // ===== ARMIES =====
     Armies,
     ArmyUnits,
+    ArmyUnitEquipmentSelections,
 
     // ===== COLLECTION =====
     OwnedMiniatures,
@@ -196,7 +198,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 12;
 
   // =========================
   // Migrations
@@ -249,6 +251,12 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(xpCategoryTotals);
             await m.createTable(xpFactionTotals);
             await xpDao.seedCategories();
+          }
+          if (from < 11) {
+            await m.createTable(armyUnitEquipmentSelections);
+          }
+          if (from < 12) {
+            await m.addColumn(datasheetCosts, datasheetCosts.modelCount);
           }
         },
 

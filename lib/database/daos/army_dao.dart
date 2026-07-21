@@ -3,7 +3,9 @@ import 'package:uuid/uuid.dart';
 
 import '../app_database.dart';
 import '../models/army_details.dart';
+import '../models/cost_bracket.dart';
 import '../tables/armies_table.dart';
+import '../tables/army_unit_equipment_selections_table.dart';
 import '../tables/army_units_table.dart';
 import '../tables/datasheet_costs_table.dart';
 import '../tables/datasheets_table.dart';
@@ -20,6 +22,7 @@ part 'army_dao.g.dart';
   tables: [
     Armies,
     ArmyUnits,
+    ArmyUnitEquipmentSelections,
     Factions,
     Datasheets,
     DatasheetCosts,
@@ -96,6 +99,9 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     final unit = await (select(armyUnits)
           ..where((t) => t.id.equals(armyUnitId)))
         .getSingleOrNull();
+    await (delete(armyUnitEquipmentSelections)
+          ..where((t) => t.armyUnitId.equals(armyUnitId)))
+        .go();
     await (delete(armyUnits)..where((t) => t.id.equals(armyUnitId))).go();
     if (unit != null) await _touchArmy(unit.armyId);
   }
@@ -137,6 +143,50 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     await (update(armyUnits)..where((t) => t.id.equals(armyUnitId))).write(
       ArmyUnitsCompanion(enhancementId: Value(enhancementId)),
     );
+    await _touchArmy(unit.armyId);
+  }
+
+  /// Choix d'équipement optionnel actuels d'une unité, groupés par
+  /// groupe d'équipement. Un groupe absent de la map signifie "options
+  /// par défaut de la datasheet" (rien n'a encore été changé).
+  Future<Map<String, List<String>>> getUnitEquipmentSelections(
+    String armyUnitId,
+  ) async {
+    final rows = await (select(armyUnitEquipmentSelections)
+          ..where((t) => t.armyUnitId.equals(armyUnitId)))
+        .get();
+    final result = <String, List<String>>{};
+    for (final row in rows) {
+      result.putIfAbsent(row.groupId, () => []).add(row.optionId);
+    }
+    return result;
+  }
+
+  /// Remplace le choix d'équipement d'une unité pour un groupe donné.
+  /// `optionIds` vide retombe sur les options par défaut de la
+  /// datasheet (voir [getUnitEquipmentSelections]).
+  Future<void> setUnitEquipmentSelection(
+    String armyUnitId,
+    String groupId,
+    List<String> optionIds,
+  ) async {
+    await (delete(armyUnitEquipmentSelections)
+          ..where((t) =>
+              t.armyUnitId.equals(armyUnitId) & t.groupId.equals(groupId)))
+        .go();
+    for (final optionId in optionIds) {
+      await into(armyUnitEquipmentSelections).insert(
+        ArmyUnitEquipmentSelectionsCompanion.insert(
+          id: _uuid.v4(),
+          armyUnitId: armyUnitId,
+          groupId: groupId,
+          optionId: optionId,
+        ),
+      );
+    }
+    final unit = await (select(armyUnits)
+          ..where((t) => t.id.equals(armyUnitId)))
+        .getSingle();
     await _touchArmy(unit.armyId);
   }
 
@@ -242,15 +292,6 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     final unitsQuery = select(armyUnits).join([
       innerJoin(datasheets, datasheets.id.equalsExp(armyUnits.datasheetId)),
       leftOuterJoin(
-        datasheetCosts,
-        datasheetCosts.datasheetId.equalsExp(armyUnits.datasheetId),
-      ),
-      leftOuterJoin(
-        editions,
-        editions.id.equalsExp(datasheetCosts.editionId) &
-            editions.isCurrent.equals(true),
-      ),
-      leftOuterJoin(
         unitSizes,
         unitSizes.datasheetId.equalsExp(armyUnits.datasheetId),
       ),
@@ -263,15 +304,21 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
       ..orderBy([OrderingTerm.asc(armyUnits.displayOrder)]);
 
     final unitRows = await unitsQuery.get();
+    final datasheetIds =
+        unitRows.map((row) => row.readTable(armyUnits).datasheetId).toSet();
+    final costsByDatasheet =
+        await _getCostBracketsByDatasheet(datasheetIds.toList());
+
     final units = <ArmyUnitDetails>[];
     var totalPoints = 0;
     for (final row in unitRows) {
       final unit = row.readTable(armyUnits);
       final datasheet = row.readTable(datasheets);
-      final cost = row.readTableOrNull(datasheetCosts);
       final size = row.readTableOrNull(unitSizes);
       final enhancement = row.readTableOrNull(enhancements);
-      final datasheetPoints = cost?.points ?? 0;
+      final brackets = costsByDatasheet[unit.datasheetId] ?? const [];
+      final datasheetPoints =
+          resolveCostForModelCount(brackets, unit.modelCount);
       final enhancementPoints = enhancement?.points ?? 0;
       totalPoints += datasheetPoints + enhancementPoints;
       units.add(ArmyUnitDetails(
@@ -305,15 +352,6 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
 
   Future<int> _totalPoints(String armyId) async {
     final query = select(armyUnits).join([
-      innerJoin(
-        datasheetCosts,
-        datasheetCosts.datasheetId.equalsExp(armyUnits.datasheetId),
-      ),
-      innerJoin(
-        editions,
-        editions.id.equalsExp(datasheetCosts.editionId) &
-            editions.isCurrent.equals(true),
-      ),
       leftOuterJoin(
         enhancements,
         enhancements.id.equalsExp(armyUnits.enhancementId),
@@ -322,12 +360,64 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
       ..where(armyUnits.armyId.equals(armyId));
 
     final rows = await query.get();
+    final datasheetIds =
+        rows.map((row) => row.readTable(armyUnits).datasheetId).toSet();
+    final costsByDatasheet =
+        await _getCostBracketsByDatasheet(datasheetIds.toList());
+
     var total = 0;
     for (final row in rows) {
-      total += row.readTable(datasheetCosts).points;
+      final unit = row.readTable(armyUnits);
+      final brackets = costsByDatasheet[unit.datasheetId] ?? const [];
+      total += resolveCostForModelCount(brackets, unit.modelCount);
       final enhancement = row.readTableOrNull(enhancements);
       total += enhancement?.points ?? 0;
     }
     return total;
+  }
+
+  /// Récupère les paliers de coût (voir [CostBracket]) de plusieurs
+  /// datasheets en une passe, groupés par datasheetId, pour éviter de
+  /// faire fanner-out une jointure directe sur `datasheetCosts` (une
+  /// datasheet à plusieurs paliers a plusieurs lignes de coût, ce qui
+  /// compterait les points en double si on la joignait naïvement).
+  Future<Map<String, List<CostBracket>>> _getCostBracketsByDatasheet(
+    List<String> datasheetIds,
+  ) async {
+    if (datasheetIds.isEmpty) return {};
+
+    final query = select(datasheetCosts).join([
+      innerJoin(editions, editions.id.equalsExp(datasheetCosts.editionId)),
+    ])
+      ..where(datasheetCosts.datasheetId.isIn(datasheetIds) &
+          editions.isCurrent.equals(true));
+
+    final rows = await query.get();
+    final result = <String, List<CostBracket>>{};
+    for (final row in rows) {
+      final cost = row.readTable(datasheetCosts);
+      result.putIfAbsent(cost.datasheetId, () => []).add(
+            CostBracket(modelCount: cost.modelCount, points: cost.points),
+          );
+    }
+
+    // Repli tolérant (mêmes règles que DatasheetDao) pour les datasheets
+    // dont le coût n'est pas rattaché à l'édition courante.
+    final missingIds =
+        datasheetIds.where((id) => !result.containsKey(id)).toList();
+    for (final id in missingIds) {
+      final fallbackRows = await (select(datasheetCosts)
+            ..where((t) => t.datasheetId.equals(id)))
+          .get();
+      if (fallbackRows.isEmpty) continue;
+      final editionId = fallbackRows.first.editionId;
+      result[id] = fallbackRows
+          .where((row) => row.editionId == editionId)
+          .map((row) =>
+              CostBracket(modelCount: row.modelCount, points: row.points))
+          .toList();
+    }
+
+    return result;
   }
 }

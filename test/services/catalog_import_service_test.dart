@@ -105,6 +105,51 @@ void main() {
     expect(details!.points, 85);
   });
 
+  test('imports per-model-count cost brackets and resolves them correctly',
+      () async {
+    await service.importJson(jsonEncode({
+      'datasheets': [
+        {
+          'id': 'ds-test-bracketed',
+          'name': 'Bracketed Squad',
+          'factionId': seedFactionId,
+          'battlefieldRole': 'Battleline',
+          'unitType': 'Infantry',
+          'editionId': seedEditionId,
+          'costs': [
+            {'models': 5, 'points': 90},
+            {'models': 10, 'points': 160},
+          ],
+          'minimumModels': 5,
+          'maximumModels': 10,
+          'defaultModels': 5,
+        },
+      ],
+    }));
+
+    final search = await database.datasheetDao.search('Bracketed');
+    final datasheetId = search.single.id;
+
+    final details = await database.datasheetDao.getDatasheet(datasheetId);
+    // Le coût affiché par défaut correspond au palier de la taille par
+    // défaut (5), pas un coût arbitraire ou une moyenne des paliers.
+    expect(details!.points, 90);
+
+    expect(
+      await database.datasheetDao.getCostForModelCount(datasheetId, 5),
+      90,
+    );
+    expect(
+      await database.datasheetDao.getCostForModelCount(datasheetId, 10),
+      160,
+    );
+    // Pas un simple doublement du coût à 5 figurines.
+    expect(
+      await database.datasheetDao.getCostForModelCount(datasheetId, 10),
+      isNot(90 * 2),
+    );
+  });
+
   test('imports a new faction with a datasheet, models and weapons',
       () async {
     await service.importJson(jsonEncode({

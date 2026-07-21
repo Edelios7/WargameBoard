@@ -6582,6 +6582,17 @@ class $DatasheetCostsTable extends DatasheetCosts
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _modelCountMeta = const VerificationMeta(
+    'modelCount',
+  );
+  @override
+  late final GeneratedColumn<int> modelCount = GeneratedColumn<int>(
+    'model_count',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _powerLevelMeta = const VerificationMeta(
     'powerLevel',
   );
@@ -6611,6 +6622,7 @@ class $DatasheetCostsTable extends DatasheetCosts
     datasheetId,
     editionId,
     points,
+    modelCount,
     powerLevel,
     createdAt,
   ];
@@ -6658,6 +6670,12 @@ class $DatasheetCostsTable extends DatasheetCosts
     } else if (isInserting) {
       context.missing(_pointsMeta);
     }
+    if (data.containsKey('model_count')) {
+      context.handle(
+        _modelCountMeta,
+        modelCount.isAcceptableOrUnknown(data['model_count']!, _modelCountMeta),
+      );
+    }
     if (data.containsKey('power_level')) {
       context.handle(
         _powerLevelMeta,
@@ -6695,6 +6713,10 @@ class $DatasheetCostsTable extends DatasheetCosts
         DriftSqlType.int,
         data['${effectivePrefix}points'],
       )!,
+      modelCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}model_count'],
+      ),
       powerLevel: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}power_level'],
@@ -6717,6 +6739,18 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
   final String datasheetId;
   final String editionId;
   final int points;
+
+  /// Nombre de figurines auquel ce coût s'applique. `null` signifie que
+  /// la fiche n'a qu'un seul palier de coût (unité à taille fixe, ou
+  /// donnée historique important qui n'a pas encore de palier détaillé) :
+  /// dans ce cas ce coût s'applique quel que soit l'effectif choisi.
+  ///
+  /// Une même fiche peut avoir plusieurs lignes ici (une par palier
+  /// officiel, ex. 5 modèles / 10 modèles), chacune avec un coût propre —
+  /// contrairement aux datasheets qui montent en coût de façon linéaire,
+  /// beaucoup d'unités Warhammer 40k ont un coût par palier qui n'est pas
+  /// un simple multiple du coût de base.
+  final int? modelCount;
   final int? powerLevel;
   final DateTime createdAt;
   const DatasheetCost({
@@ -6724,6 +6758,7 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
     required this.datasheetId,
     required this.editionId,
     required this.points,
+    this.modelCount,
     this.powerLevel,
     required this.createdAt,
   });
@@ -6734,6 +6769,9 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
     map['datasheet_id'] = Variable<String>(datasheetId);
     map['edition_id'] = Variable<String>(editionId);
     map['points'] = Variable<int>(points);
+    if (!nullToAbsent || modelCount != null) {
+      map['model_count'] = Variable<int>(modelCount);
+    }
     if (!nullToAbsent || powerLevel != null) {
       map['power_level'] = Variable<int>(powerLevel);
     }
@@ -6747,6 +6785,9 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
       datasheetId: Value(datasheetId),
       editionId: Value(editionId),
       points: Value(points),
+      modelCount: modelCount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(modelCount),
       powerLevel: powerLevel == null && nullToAbsent
           ? const Value.absent()
           : Value(powerLevel),
@@ -6764,6 +6805,7 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
       datasheetId: serializer.fromJson<String>(json['datasheetId']),
       editionId: serializer.fromJson<String>(json['editionId']),
       points: serializer.fromJson<int>(json['points']),
+      modelCount: serializer.fromJson<int?>(json['modelCount']),
       powerLevel: serializer.fromJson<int?>(json['powerLevel']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
@@ -6776,6 +6818,7 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
       'datasheetId': serializer.toJson<String>(datasheetId),
       'editionId': serializer.toJson<String>(editionId),
       'points': serializer.toJson<int>(points),
+      'modelCount': serializer.toJson<int?>(modelCount),
       'powerLevel': serializer.toJson<int?>(powerLevel),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
@@ -6786,6 +6829,7 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
     String? datasheetId,
     String? editionId,
     int? points,
+    Value<int?> modelCount = const Value.absent(),
     Value<int?> powerLevel = const Value.absent(),
     DateTime? createdAt,
   }) => DatasheetCost(
@@ -6793,6 +6837,7 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
     datasheetId: datasheetId ?? this.datasheetId,
     editionId: editionId ?? this.editionId,
     points: points ?? this.points,
+    modelCount: modelCount.present ? modelCount.value : this.modelCount,
     powerLevel: powerLevel.present ? powerLevel.value : this.powerLevel,
     createdAt: createdAt ?? this.createdAt,
   );
@@ -6804,6 +6849,9 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
           : this.datasheetId,
       editionId: data.editionId.present ? data.editionId.value : this.editionId,
       points: data.points.present ? data.points.value : this.points,
+      modelCount: data.modelCount.present
+          ? data.modelCount.value
+          : this.modelCount,
       powerLevel: data.powerLevel.present
           ? data.powerLevel.value
           : this.powerLevel,
@@ -6818,6 +6866,7 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
           ..write('datasheetId: $datasheetId, ')
           ..write('editionId: $editionId, ')
           ..write('points: $points, ')
+          ..write('modelCount: $modelCount, ')
           ..write('powerLevel: $powerLevel, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
@@ -6825,8 +6874,15 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, datasheetId, editionId, points, powerLevel, createdAt);
+  int get hashCode => Object.hash(
+    id,
+    datasheetId,
+    editionId,
+    points,
+    modelCount,
+    powerLevel,
+    createdAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -6835,6 +6891,7 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
           other.datasheetId == this.datasheetId &&
           other.editionId == this.editionId &&
           other.points == this.points &&
+          other.modelCount == this.modelCount &&
           other.powerLevel == this.powerLevel &&
           other.createdAt == this.createdAt);
 }
@@ -6844,6 +6901,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
   final Value<String> datasheetId;
   final Value<String> editionId;
   final Value<int> points;
+  final Value<int?> modelCount;
   final Value<int?> powerLevel;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
@@ -6852,6 +6910,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
     this.datasheetId = const Value.absent(),
     this.editionId = const Value.absent(),
     this.points = const Value.absent(),
+    this.modelCount = const Value.absent(),
     this.powerLevel = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -6861,6 +6920,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
     required String datasheetId,
     required String editionId,
     required int points,
+    this.modelCount = const Value.absent(),
     this.powerLevel = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -6873,6 +6933,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
     Expression<String>? datasheetId,
     Expression<String>? editionId,
     Expression<int>? points,
+    Expression<int>? modelCount,
     Expression<int>? powerLevel,
     Expression<DateTime>? createdAt,
     Expression<int>? rowid,
@@ -6882,6 +6943,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
       if (datasheetId != null) 'datasheet_id': datasheetId,
       if (editionId != null) 'edition_id': editionId,
       if (points != null) 'points': points,
+      if (modelCount != null) 'model_count': modelCount,
       if (powerLevel != null) 'power_level': powerLevel,
       if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
@@ -6893,6 +6955,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
     Value<String>? datasheetId,
     Value<String>? editionId,
     Value<int>? points,
+    Value<int?>? modelCount,
     Value<int?>? powerLevel,
     Value<DateTime>? createdAt,
     Value<int>? rowid,
@@ -6902,6 +6965,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
       datasheetId: datasheetId ?? this.datasheetId,
       editionId: editionId ?? this.editionId,
       points: points ?? this.points,
+      modelCount: modelCount ?? this.modelCount,
       powerLevel: powerLevel ?? this.powerLevel,
       createdAt: createdAt ?? this.createdAt,
       rowid: rowid ?? this.rowid,
@@ -6923,6 +6987,9 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
     if (points.present) {
       map['points'] = Variable<int>(points.value);
     }
+    if (modelCount.present) {
+      map['model_count'] = Variable<int>(modelCount.value);
+    }
     if (powerLevel.present) {
       map['power_level'] = Variable<int>(powerLevel.value);
     }
@@ -6942,6 +7009,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
           ..write('datasheetId: $datasheetId, ')
           ..write('editionId: $editionId, ')
           ..write('points: $points, ')
+          ..write('modelCount: $modelCount, ')
           ..write('powerLevel: $powerLevel, ')
           ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
@@ -14374,6 +14442,382 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
   }
 }
 
+class $ArmyUnitEquipmentSelectionsTable extends ArmyUnitEquipmentSelections
+    with
+        TableInfo<
+          $ArmyUnitEquipmentSelectionsTable,
+          ArmyUnitEquipmentSelection
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ArmyUnitEquipmentSelectionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _armyUnitIdMeta = const VerificationMeta(
+    'armyUnitId',
+  );
+  @override
+  late final GeneratedColumn<String> armyUnitId = GeneratedColumn<String>(
+    'army_unit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _groupIdMeta = const VerificationMeta(
+    'groupId',
+  );
+  @override
+  late final GeneratedColumn<String> groupId = GeneratedColumn<String>(
+    'group_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _optionIdMeta = const VerificationMeta(
+    'optionId',
+  );
+  @override
+  late final GeneratedColumn<String> optionId = GeneratedColumn<String>(
+    'option_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    armyUnitId,
+    groupId,
+    optionId,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'army_unit_equipment_selections';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ArmyUnitEquipmentSelection> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('army_unit_id')) {
+      context.handle(
+        _armyUnitIdMeta,
+        armyUnitId.isAcceptableOrUnknown(
+          data['army_unit_id']!,
+          _armyUnitIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_armyUnitIdMeta);
+    }
+    if (data.containsKey('group_id')) {
+      context.handle(
+        _groupIdMeta,
+        groupId.isAcceptableOrUnknown(data['group_id']!, _groupIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_groupIdMeta);
+    }
+    if (data.containsKey('option_id')) {
+      context.handle(
+        _optionIdMeta,
+        optionId.isAcceptableOrUnknown(data['option_id']!, _optionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_optionIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ArmyUnitEquipmentSelection map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ArmyUnitEquipmentSelection(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      armyUnitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}army_unit_id'],
+      )!,
+      groupId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}group_id'],
+      )!,
+      optionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}option_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ArmyUnitEquipmentSelectionsTable createAlias(String alias) {
+    return $ArmyUnitEquipmentSelectionsTable(attachedDatabase, alias);
+  }
+}
+
+class ArmyUnitEquipmentSelection extends DataClass
+    implements Insertable<ArmyUnitEquipmentSelection> {
+  final String id;
+  final String armyUnitId;
+  final String groupId;
+  final String optionId;
+  final DateTime createdAt;
+  const ArmyUnitEquipmentSelection({
+    required this.id,
+    required this.armyUnitId,
+    required this.groupId,
+    required this.optionId,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['army_unit_id'] = Variable<String>(armyUnitId);
+    map['group_id'] = Variable<String>(groupId);
+    map['option_id'] = Variable<String>(optionId);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  ArmyUnitEquipmentSelectionsCompanion toCompanion(bool nullToAbsent) {
+    return ArmyUnitEquipmentSelectionsCompanion(
+      id: Value(id),
+      armyUnitId: Value(armyUnitId),
+      groupId: Value(groupId),
+      optionId: Value(optionId),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory ArmyUnitEquipmentSelection.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ArmyUnitEquipmentSelection(
+      id: serializer.fromJson<String>(json['id']),
+      armyUnitId: serializer.fromJson<String>(json['armyUnitId']),
+      groupId: serializer.fromJson<String>(json['groupId']),
+      optionId: serializer.fromJson<String>(json['optionId']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'armyUnitId': serializer.toJson<String>(armyUnitId),
+      'groupId': serializer.toJson<String>(groupId),
+      'optionId': serializer.toJson<String>(optionId),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  ArmyUnitEquipmentSelection copyWith({
+    String? id,
+    String? armyUnitId,
+    String? groupId,
+    String? optionId,
+    DateTime? createdAt,
+  }) => ArmyUnitEquipmentSelection(
+    id: id ?? this.id,
+    armyUnitId: armyUnitId ?? this.armyUnitId,
+    groupId: groupId ?? this.groupId,
+    optionId: optionId ?? this.optionId,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  ArmyUnitEquipmentSelection copyWithCompanion(
+    ArmyUnitEquipmentSelectionsCompanion data,
+  ) {
+    return ArmyUnitEquipmentSelection(
+      id: data.id.present ? data.id.value : this.id,
+      armyUnitId: data.armyUnitId.present
+          ? data.armyUnitId.value
+          : this.armyUnitId,
+      groupId: data.groupId.present ? data.groupId.value : this.groupId,
+      optionId: data.optionId.present ? data.optionId.value : this.optionId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ArmyUnitEquipmentSelection(')
+          ..write('id: $id, ')
+          ..write('armyUnitId: $armyUnitId, ')
+          ..write('groupId: $groupId, ')
+          ..write('optionId: $optionId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, armyUnitId, groupId, optionId, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ArmyUnitEquipmentSelection &&
+          other.id == this.id &&
+          other.armyUnitId == this.armyUnitId &&
+          other.groupId == this.groupId &&
+          other.optionId == this.optionId &&
+          other.createdAt == this.createdAt);
+}
+
+class ArmyUnitEquipmentSelectionsCompanion
+    extends UpdateCompanion<ArmyUnitEquipmentSelection> {
+  final Value<String> id;
+  final Value<String> armyUnitId;
+  final Value<String> groupId;
+  final Value<String> optionId;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const ArmyUnitEquipmentSelectionsCompanion({
+    this.id = const Value.absent(),
+    this.armyUnitId = const Value.absent(),
+    this.groupId = const Value.absent(),
+    this.optionId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ArmyUnitEquipmentSelectionsCompanion.insert({
+    required String id,
+    required String armyUnitId,
+    required String groupId,
+    required String optionId,
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       armyUnitId = Value(armyUnitId),
+       groupId = Value(groupId),
+       optionId = Value(optionId);
+  static Insertable<ArmyUnitEquipmentSelection> custom({
+    Expression<String>? id,
+    Expression<String>? armyUnitId,
+    Expression<String>? groupId,
+    Expression<String>? optionId,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (armyUnitId != null) 'army_unit_id': armyUnitId,
+      if (groupId != null) 'group_id': groupId,
+      if (optionId != null) 'option_id': optionId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ArmyUnitEquipmentSelectionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? armyUnitId,
+    Value<String>? groupId,
+    Value<String>? optionId,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return ArmyUnitEquipmentSelectionsCompanion(
+      id: id ?? this.id,
+      armyUnitId: armyUnitId ?? this.armyUnitId,
+      groupId: groupId ?? this.groupId,
+      optionId: optionId ?? this.optionId,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (armyUnitId.present) {
+      map['army_unit_id'] = Variable<String>(armyUnitId.value);
+    }
+    if (groupId.present) {
+      map['group_id'] = Variable<String>(groupId.value);
+    }
+    if (optionId.present) {
+      map['option_id'] = Variable<String>(optionId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ArmyUnitEquipmentSelectionsCompanion(')
+          ..write('id: $id, ')
+          ..write('armyUnitId: $armyUnitId, ')
+          ..write('groupId: $groupId, ')
+          ..write('optionId: $optionId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $OwnedMiniaturesTable extends OwnedMiniatures
     with TableInfo<$OwnedMiniaturesTable, OwnedMiniature> {
   @override
@@ -17065,6 +17509,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $StratagemsTable stratagems = $StratagemsTable(this);
   late final $ArmiesTable armies = $ArmiesTable(this);
   late final $ArmyUnitsTable armyUnits = $ArmyUnitsTable(this);
+  late final $ArmyUnitEquipmentSelectionsTable armyUnitEquipmentSelections =
+      $ArmyUnitEquipmentSelectionsTable(this);
   late final $OwnedMiniaturesTable ownedMiniatures = $OwnedMiniaturesTable(
     this,
   );
@@ -17124,6 +17570,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     stratagems,
     armies,
     armyUnits,
+    armyUnitEquipmentSelections,
     ownedMiniatures,
     wishlistItems,
     battles,
@@ -20389,6 +20836,7 @@ typedef $$DatasheetCostsTableCreateCompanionBuilder =
       required String datasheetId,
       required String editionId,
       required int points,
+      Value<int?> modelCount,
       Value<int?> powerLevel,
       Value<DateTime> createdAt,
       Value<int> rowid,
@@ -20399,6 +20847,7 @@ typedef $$DatasheetCostsTableUpdateCompanionBuilder =
       Value<String> datasheetId,
       Value<String> editionId,
       Value<int> points,
+      Value<int?> modelCount,
       Value<int?> powerLevel,
       Value<DateTime> createdAt,
       Value<int> rowid,
@@ -20430,6 +20879,11 @@ class $$DatasheetCostsTableFilterComposer
 
   ColumnFilters<int> get points => $composableBuilder(
     column: $table.points,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get modelCount => $composableBuilder(
+    column: $table.modelCount,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -20473,6 +20927,11 @@ class $$DatasheetCostsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get modelCount => $composableBuilder(
+    column: $table.modelCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get powerLevel => $composableBuilder(
     column: $table.powerLevel,
     builder: (column) => ColumnOrderings(column),
@@ -20506,6 +20965,11 @@ class $$DatasheetCostsTableAnnotationComposer
 
   GeneratedColumn<int> get points =>
       $composableBuilder(column: $table.points, builder: (column) => column);
+
+  GeneratedColumn<int> get modelCount => $composableBuilder(
+    column: $table.modelCount,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get powerLevel => $composableBuilder(
     column: $table.powerLevel,
@@ -20553,6 +21017,7 @@ class $$DatasheetCostsTableTableManager
                 Value<String> datasheetId = const Value.absent(),
                 Value<String> editionId = const Value.absent(),
                 Value<int> points = const Value.absent(),
+                Value<int?> modelCount = const Value.absent(),
                 Value<int?> powerLevel = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -20561,6 +21026,7 @@ class $$DatasheetCostsTableTableManager
                 datasheetId: datasheetId,
                 editionId: editionId,
                 points: points,
+                modelCount: modelCount,
                 powerLevel: powerLevel,
                 createdAt: createdAt,
                 rowid: rowid,
@@ -20571,6 +21037,7 @@ class $$DatasheetCostsTableTableManager
                 required String datasheetId,
                 required String editionId,
                 required int points,
+                Value<int?> modelCount = const Value.absent(),
                 Value<int?> powerLevel = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -20579,6 +21046,7 @@ class $$DatasheetCostsTableTableManager
                 datasheetId: datasheetId,
                 editionId: editionId,
                 points: points,
+                modelCount: modelCount,
                 powerLevel: powerLevel,
                 createdAt: createdAt,
                 rowid: rowid,
@@ -24683,6 +25151,227 @@ typedef $$ArmyUnitsTableProcessedTableManager =
       ArmyUnit,
       PrefetchHooks Function()
     >;
+typedef $$ArmyUnitEquipmentSelectionsTableCreateCompanionBuilder =
+    ArmyUnitEquipmentSelectionsCompanion Function({
+      required String id,
+      required String armyUnitId,
+      required String groupId,
+      required String optionId,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+typedef $$ArmyUnitEquipmentSelectionsTableUpdateCompanionBuilder =
+    ArmyUnitEquipmentSelectionsCompanion Function({
+      Value<String> id,
+      Value<String> armyUnitId,
+      Value<String> groupId,
+      Value<String> optionId,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$ArmyUnitEquipmentSelectionsTableFilterComposer
+    extends Composer<_$AppDatabase, $ArmyUnitEquipmentSelectionsTable> {
+  $$ArmyUnitEquipmentSelectionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get armyUnitId => $composableBuilder(
+    column: $table.armyUnitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get groupId => $composableBuilder(
+    column: $table.groupId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get optionId => $composableBuilder(
+    column: $table.optionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ArmyUnitEquipmentSelectionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ArmyUnitEquipmentSelectionsTable> {
+  $$ArmyUnitEquipmentSelectionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get armyUnitId => $composableBuilder(
+    column: $table.armyUnitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get groupId => $composableBuilder(
+    column: $table.groupId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get optionId => $composableBuilder(
+    column: $table.optionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ArmyUnitEquipmentSelectionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ArmyUnitEquipmentSelectionsTable> {
+  $$ArmyUnitEquipmentSelectionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get armyUnitId => $composableBuilder(
+    column: $table.armyUnitId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get groupId =>
+      $composableBuilder(column: $table.groupId, builder: (column) => column);
+
+  GeneratedColumn<String> get optionId =>
+      $composableBuilder(column: $table.optionId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$ArmyUnitEquipmentSelectionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ArmyUnitEquipmentSelectionsTable,
+          ArmyUnitEquipmentSelection,
+          $$ArmyUnitEquipmentSelectionsTableFilterComposer,
+          $$ArmyUnitEquipmentSelectionsTableOrderingComposer,
+          $$ArmyUnitEquipmentSelectionsTableAnnotationComposer,
+          $$ArmyUnitEquipmentSelectionsTableCreateCompanionBuilder,
+          $$ArmyUnitEquipmentSelectionsTableUpdateCompanionBuilder,
+          (
+            ArmyUnitEquipmentSelection,
+            BaseReferences<
+              _$AppDatabase,
+              $ArmyUnitEquipmentSelectionsTable,
+              ArmyUnitEquipmentSelection
+            >,
+          ),
+          ArmyUnitEquipmentSelection,
+          PrefetchHooks Function()
+        > {
+  $$ArmyUnitEquipmentSelectionsTableTableManager(
+    _$AppDatabase db,
+    $ArmyUnitEquipmentSelectionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ArmyUnitEquipmentSelectionsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$ArmyUnitEquipmentSelectionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ArmyUnitEquipmentSelectionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> armyUnitId = const Value.absent(),
+                Value<String> groupId = const Value.absent(),
+                Value<String> optionId = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ArmyUnitEquipmentSelectionsCompanion(
+                id: id,
+                armyUnitId: armyUnitId,
+                groupId: groupId,
+                optionId: optionId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String armyUnitId,
+                required String groupId,
+                required String optionId,
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ArmyUnitEquipmentSelectionsCompanion.insert(
+                id: id,
+                armyUnitId: armyUnitId,
+                groupId: groupId,
+                optionId: optionId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ArmyUnitEquipmentSelectionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ArmyUnitEquipmentSelectionsTable,
+      ArmyUnitEquipmentSelection,
+      $$ArmyUnitEquipmentSelectionsTableFilterComposer,
+      $$ArmyUnitEquipmentSelectionsTableOrderingComposer,
+      $$ArmyUnitEquipmentSelectionsTableAnnotationComposer,
+      $$ArmyUnitEquipmentSelectionsTableCreateCompanionBuilder,
+      $$ArmyUnitEquipmentSelectionsTableUpdateCompanionBuilder,
+      (
+        ArmyUnitEquipmentSelection,
+        BaseReferences<
+          _$AppDatabase,
+          $ArmyUnitEquipmentSelectionsTable,
+          ArmyUnitEquipmentSelection
+        >,
+      ),
+      ArmyUnitEquipmentSelection,
+      PrefetchHooks Function()
+    >;
 typedef $$OwnedMiniaturesTableCreateCompanionBuilder =
     OwnedMiniaturesCompanion Function({
       required String id,
@@ -26148,6 +26837,12 @@ class $AppDatabaseManager {
       $$ArmiesTableTableManager(_db, _db.armies);
   $$ArmyUnitsTableTableManager get armyUnits =>
       $$ArmyUnitsTableTableManager(_db, _db.armyUnits);
+  $$ArmyUnitEquipmentSelectionsTableTableManager
+  get armyUnitEquipmentSelections =>
+      $$ArmyUnitEquipmentSelectionsTableTableManager(
+        _db,
+        _db.armyUnitEquipmentSelections,
+      );
   $$OwnedMiniaturesTableTableManager get ownedMiniatures =>
       $$OwnedMiniaturesTableTableManager(_db, _db.ownedMiniatures);
   $$WishlistItemsTableTableManager get wishlistItems =>

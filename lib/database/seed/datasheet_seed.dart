@@ -160,12 +160,24 @@ Future<void> _seedDeathCompanyMarines(AppDatabase db) async {
     await _linkDatasheetAbility(db, dsDeathCompanyMarines, ab);
   }
 
+  // Deux paliers de coût réels (Munitorum Field Manual) : le coût par
+  // figurine baisse à 10 modèles, ce n'est pas un simple x2 du coût à 5.
   await db.into(db.datasheetCosts).insert(
         DatasheetCostsCompanion.insert(
-          id: 'cost-death-company',
+          id: 'cost-death-company-5',
           datasheetId: dsDeathCompanyMarines,
           editionId: seedEditionId,
-          points: 90,
+          points: 85,
+          modelCount: const Value(5),
+        ),
+      );
+  await db.into(db.datasheetCosts).insert(
+        DatasheetCostsCompanion.insert(
+          id: 'cost-death-company-10',
+          datasheetId: dsDeathCompanyMarines,
+          editionId: seedEditionId,
+          points: 160,
+          modelCount: const Value(10),
         ),
       );
 

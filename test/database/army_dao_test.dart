@@ -80,6 +80,33 @@ void main() {
     expect(army.totalPoints, 0);
   });
 
+  test(
+      'points reflect the bracket for the chosen model count, not a linear scale',
+      () async {
+    final armyId = await database.armyDao.createArmy(
+      name: 'Escouade test',
+      factionId: seedFactionId,
+    );
+    final results = await database.datasheetDao.search('Death Company');
+    final unitId = await database.armyDao.addUnit(
+      armyId: armyId,
+      datasheetId: results.single.id,
+      modelCount: 5,
+    );
+
+    final atFive = await database.armyDao.getArmy(armyId);
+    expect(atFive!.units.single.datasheetPoints, 85);
+    expect(atFive.totalPoints, 85);
+
+    await database.armyDao.updateModelCount(unitId, 10);
+
+    final atTen = await database.armyDao.getArmy(armyId);
+    expect(atTen!.units.single.datasheetPoints, 160);
+    expect(atTen.totalPoints, 160);
+    // Le coût à 10 figurines n'est pas un simple doublement de celui à 5.
+    expect(atTen.totalPoints, isNot(atFive.totalPoints * 2));
+  });
+
   test('updateModelCount clamps to the datasheet min/max range', () async {
     final armyId = await database.armyDao.createArmy(
       name: 'Escouade test',

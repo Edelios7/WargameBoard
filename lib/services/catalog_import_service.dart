@@ -47,7 +47,9 @@ class CatalogImportException implements Exception {
 ///   "datasheets": [{
 ///     "id": "...", "name": "...", "factionId": "...",
 ///     "battlefieldRole": "...", "unitType": "...",
-///     "points": 90, "editionId": "...",
+///     "editionId": "...",
+///     "points": 90,
+///     "costs": [{"models": 5, "points": 90}, {"models": 10, "points": 160}],
 ///     "minimumModels": 1, "maximumModels": 1, "defaultModels": 1,
 ///     "keywordIds": ["..."], "abilityIds": ["..."],
 ///     "weaponIds": ["..."],
@@ -57,6 +59,11 @@ class CatalogImportException implements Exception {
 ///   }]
 /// }
 /// ```
+/// `points` (coût unique) et `costs` (liste de paliers par taille
+/// d'unité, voir `DatasheetCosts.modelCount`) sont mutuellement
+/// exclusifs — `costs`, quand fourni, a priorité. Beaucoup d'unités
+/// Warhammer 40k coûtent un montant différent selon le nombre de
+/// figurines (souvent pas un simple multiple), d'où ces paliers.
 ///
 /// L'import est un upsert : réimporter le même id met à jour la ligne
 /// (c'est le mécanisme prévu pour les mises à jour de points/erratas).
@@ -248,17 +255,49 @@ class CatalogImportService {
             ),
           );
 
-      final points = item['points'] as int?;
       final editionId = item['editionId'] as String?;
-      if (points != null && editionId != null) {
-        await database.into(database.datasheetCosts).insertOnConflictUpdate(
-              DatasheetCostsCompanion.insert(
-                id: 'cost-$datasheetId',
-                datasheetId: datasheetId,
-                editionId: editionId,
-                points: points,
-              ),
+      final costBrackets = item['costs'];
+      if (costBrackets is List && editionId != null) {
+        // Plusieurs paliers de coût par taille d'unité (ex. 5 modèles
+        // = 90 pts, 10 modèles = 160 pts) — voir DatasheetCosts.modelCount.
+        for (final entry in costBrackets) {
+          if (entry is! Map<String, dynamic>) {
+            throw CatalogImportException(
+              'Palier de coût invalide pour la datasheet $datasheetId.',
             );
+          }
+          final bracketPoints = entry['points'] as int?;
+          if (bracketPoints == null) {
+            throw CatalogImportException(
+              'Palier de coût sans "points" pour la datasheet $datasheetId.',
+            );
+          }
+          final modelCount = entry['models'] as int?;
+          final bracketId = modelCount != null
+              ? 'cost-$datasheetId-$modelCount'
+              : 'cost-$datasheetId';
+          await database.into(database.datasheetCosts).insertOnConflictUpdate(
+                DatasheetCostsCompanion.insert(
+                  id: bracketId,
+                  datasheetId: datasheetId,
+                  editionId: editionId,
+                  points: bracketPoints,
+                  modelCount: Value(modelCount),
+                ),
+              );
+        }
+      } else {
+        final points = item['points'] as int?;
+        if (points != null && editionId != null) {
+          await database.into(database.datasheetCosts).insertOnConflictUpdate(
+                DatasheetCostsCompanion.insert(
+                  id: 'cost-$datasheetId',
+                  datasheetId: datasheetId,
+                  editionId: editionId,
+                  points: points,
+                ),
+              );
+        }
       }
 
       final minModels = item['minimumModels'] as int?;

@@ -4,11 +4,14 @@ jour datasheet_costs pour les datasheets existantes qui matchent par
 nom (meme matcher tolerant EN/FR que apply_faction_pack_updates.py,
 la base ayant des noms francais).
 
-Simplification assumee : le schema de l'appli ne stocke qu'UN cout en
-points par datasheet (pas de palier par taille d'unite). Quand le MFM
-liste plusieurs paliers (ex. 5 modeles = 85 pts, 10 modeles = 160 pts),
-on retient le palier le plus bas (taille de depart), coherent avec la
-notion de "prix de base" utilisee ailleurs dans l'appli.
+Le schema stocke un cout par palier de taille d'unite (colonne
+datasheet_costs.model_count) : quand le MFM liste plusieurs paliers
+(ex. 5 modeles = 85 pts, 10 modeles = 160 pts), on ecrit une ligne par
+palier au lieu de ne garder que le moins cher — beaucoup d'unites
+Warhammer 40k ne montent pas en cout de facon lineaire avec l'effectif.
+Necessite que l'appli ait deja applique sa migration de schema (qui
+ajoute cette colonne) avant de lancer ce script avec --apply.
+
 On rattache aussi tout a l'edition existante 'ed-w40k-10e' : l'appli ne
 modelise pas encore plusieurs editions, cette ligne fait office
 d'edition "courante" unique (marquee is_current), donc on ne cree pas
@@ -187,19 +190,33 @@ def parse_mfm(path):
     return factions
 
 
+def _has_model_count_column(cur):
+    cur.execute("pragma table_info(datasheet_costs)")
+    return any(row[1] == "model_count" for row in cur.fetchall())
+
+
 def main():
     apply = "--apply" in sys.argv
     only = sys.argv[sys.argv.index("--only") + 1] if "--only" in sys.argv else None
 
     factions = parse_mfm(MFM_PATH)
 
+    con = sqlite3.connect(DB_PATH)
+    cur = con.cursor()
+
+    if apply and not _has_model_count_column(cur):
+        con.close()
+        print(
+            "ERREUR : la colonne datasheet_costs.model_count n'existe pas encore "
+            "dans cette base. Lance l'appli une fois (elle applique la migration "
+            "de schema au demarrage) avant de relancer ce script avec --apply."
+        )
+        sys.exit(1)
+
     if apply:
         backup = DB_PATH + ".bak-mfm-points-" + datetime.now().strftime("%Y%m%d-%H%M%S")
         shutil.copy2(DB_PATH, backup)
         print("Backup:", backup)
-
-    con = sqlite3.connect(DB_PATH)
-    cur = con.cursor()
 
     report = ["# Rapport de mise a jour des points (Munitorum Field Manual)", ""]
     totals = {"applied": 0, "ambiguous": 0, "unmatched": 0, "skipped_faction": 0}
@@ -229,7 +246,15 @@ def main():
         report.append(f"{len(units)} unites listees dans le MFM, {len(candidates)} fiches en base.\n")
 
         for u in units:
-            base_size, base_pts = min(u["costs"], key=lambda c: c[0])
+            # Deduplique par taille (une meme taille peut apparaitre deux
+            # fois si la mise en page PDF repete une ligne), garde le
+            # premier cout rencontre pour chaque taille.
+            brackets = {}
+            for size, pts in u["costs"]:
+                brackets.setdefault(size, pts)
+            sorted_brackets = sorted(brackets.items())
+            base_size, base_pts = sorted_brackets[0]
+
             m = best_match(u["name"], candidates)
             if m is None:
                 report.append(f"- **{u['name']}** ({base_pts} pts / {base_size} mod.) : aucune correspondance, non applique.")
@@ -246,14 +271,28 @@ def main():
 
             datasheet_id = m["id"]
             if apply:
+                # Retire l'ancienne ligne "cout unique" (sans palier) si
+                # elle existe, pour ne pas laisser une valeur perimee a
+                # cote des paliers qu'on va ecrire.
                 cur.execute(
-                    "insert into datasheet_costs (id, datasheet_id, edition_id, points) "
-                    "values (?,?,?,?) "
-                    "on conflict(id) do update set points=excluded.points",
-                    (f"cost-{datasheet_id}", datasheet_id, EDITION_ID, base_pts),
+                    "delete from datasheet_costs where id = ?",
+                    (f"cost-{datasheet_id}",),
                 )
+                for size, pts in sorted_brackets:
+                    cur.execute(
+                        "insert into datasheet_costs "
+                        "(id, datasheet_id, edition_id, points, model_count) "
+                        "values (?,?,?,?,?) "
+                        "on conflict(id) do update set points=excluded.points, "
+                        "model_count=excluded.model_count",
+                        (f"cost-{datasheet_id}-{size}", datasheet_id, EDITION_ID, pts, size),
+                    )
             totals["applied"] += 1
-            multi = f" (base de {len(u['costs'])} paliers)" if len(u["costs"]) > 1 else ""
+            multi = (
+                " (" + ", ".join(f"{s} mod. = {p} pts" for s, p in sorted_brackets) + ")"
+                if len(sorted_brackets) > 1
+                else ""
+            )
             report.append(
                 f"- **{u['name']}** -> *{m['name']}* (score {m['score']:.2f}) : "
                 f"{base_pts} pts{multi}."

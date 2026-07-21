@@ -6,6 +6,8 @@ part of 'army_dao.dart';
 mixin _$ArmyDaoMixin on DatabaseAccessor<AppDatabase> {
   $ArmiesTable get armies => attachedDatabase.armies;
   $ArmyUnitsTable get armyUnits => attachedDatabase.armyUnits;
+  $ArmyUnitEquipmentSelectionsTable get armyUnitEquipmentSelections =>
+      attachedDatabase.armyUnitEquipmentSelections;
   $FactionsTable get factions => attachedDatabase.factions;
   $DatasheetsTable get datasheets => attachedDatabase.datasheets;
   $DatasheetCostsTable get datasheetCosts => attachedDatabase.datasheetCosts;
@@ -24,6 +26,12 @@ class ArmyDaoManager {
       $$ArmiesTableTableManager(_db.attachedDatabase, _db.armies);
   $$ArmyUnitsTableTableManager get armyUnits =>
       $$ArmyUnitsTableTableManager(_db.attachedDatabase, _db.armyUnits);
+  $$ArmyUnitEquipmentSelectionsTableTableManager
+  get armyUnitEquipmentSelections =>
+      $$ArmyUnitEquipmentSelectionsTableTableManager(
+        _db.attachedDatabase,
+        _db.armyUnitEquipmentSelections,
+      );
   $$FactionsTableTableManager get factions =>
       $$FactionsTableTableManager(_db.attachedDatabase, _db.factions);
   $$DatasheetsTableTableManager get datasheets =>

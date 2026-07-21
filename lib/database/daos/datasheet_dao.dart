@@ -4,6 +4,7 @@ import '../../domain/xp/xp_awards.dart';
 import '../app_database.dart';
 import '../models/ability_details.dart';
 import '../models/catalog_sort.dart';
+import '../models/cost_bracket.dart';
 import '../models/datasheet_details.dart';
 import '../models/equipment_details.dart';
 import '../models/model_details.dart';
@@ -19,6 +20,7 @@ import '../tables/datasheet_models_table.dart';
 import '../tables/datasheet_weapons_table.dart';
 import '../tables/datasheets_table.dart';
 import '../tables/editions_table.dart';
+import '../tables/equipment_choices_table.dart';
 import '../tables/equipment_groups_table.dart';
 import '../tables/equipment_options_table.dart';
 import '../tables/factions_table.dart';
@@ -51,6 +53,7 @@ part 'datasheet_dao.g.dart';
     WeaponProfiles,
     EquipmentGroups,
     EquipmentOptions,
+    EquipmentChoices,
     UnitSizes,
     ArmyUnits,
   ],
@@ -176,36 +179,28 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     if (unitType != null) {
       query.where(datasheets.unitType.equals(unitType));
     }
-    if (minPoints != null) {
-      query.where(costPoints.isBiggerOrEqualValue(minPoints));
-    }
-    if (maxPoints != null) {
-      query.where(costPoints.isSmallerOrEqualValue(maxPoints));
-    }
+    // minPoints/maxPoints se filtrent en Dart plus bas, après
+    // déduplication des paliers de coût — voir commentaire ci-dessous.
 
-    switch (sortBy) {
-      case CatalogSort.nameAsc:
-        query.orderBy([OrderingTerm.asc(datasheets.name)]);
-        break;
-      case CatalogSort.pointsAsc:
-        query.orderBy([
-          OrderingTerm.asc(costPoints),
-          OrderingTerm.asc(datasheets.name),
-        ]);
-        break;
-      case CatalogSort.pointsDesc:
-        query.orderBy([
-          OrderingTerm.desc(costPoints),
-          OrderingTerm.asc(datasheets.name),
-        ]);
-        break;
-    }
+    // Le tri SQL n'est qu'indicatif ici : une datasheet à plusieurs
+    // paliers de coût (voir DatasheetCosts.modelCount) produit une ligne
+    // par palier via le join ci-dessus, donc on trie/filtre à nouveau en
+    // Dart après avoir dédupliqué (une seule entrée par datasheet, celle
+    // au palier le moins cher, cohérent avec l'affichage "coût de base").
+    query.orderBy([OrderingTerm.asc(datasheets.name)]);
 
     final rows = await query.get();
-    return rows.map((row) {
+    final byDatasheetId = <String, SearchResult>{};
+    for (final row in rows) {
       final datasheet = row.readTable(datasheets);
       final faction = row.readTable(factions);
-      return SearchResult(
+      final points = row.read(costPoints);
+      final existing = byDatasheetId[datasheet.id];
+      if (existing != null &&
+          (existing.points ?? _maxSearchPoints) <= (points ?? _maxSearchPoints)) {
+        continue;
+      }
+      byDatasheetId[datasheet.id] = SearchResult(
         id: datasheet.id,
         name: datasheet.name,
         type: 'datasheet',
@@ -215,10 +210,39 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
         gameSystemId: faction.gameSystemId,
         editionId: null,
         unitType: datasheet.unitType,
-        points: row.read(costPoints),
+        points: points,
       );
-    }).toList();
+    }
+
+    var results = byDatasheetId.values.toList();
+    if (minPoints != null) {
+      results = results.where((r) => (r.points ?? 0) >= minPoints).toList();
+    }
+    if (maxPoints != null) {
+      results = results.where((r) => (r.points ?? 0) <= maxPoints).toList();
+    }
+
+    switch (sortBy) {
+      case CatalogSort.nameAsc:
+        results.sort((a, b) => a.name.compareTo(b.name));
+        break;
+      case CatalogSort.pointsAsc:
+        results.sort((a, b) {
+          final cmp = (a.points ?? 0).compareTo(b.points ?? 0);
+          return cmp != 0 ? cmp : a.name.compareTo(b.name);
+        });
+        break;
+      case CatalogSort.pointsDesc:
+        results.sort((a, b) {
+          final cmp = (b.points ?? 0).compareTo(a.points ?? 0);
+          return cmp != 0 ? cmp : a.name.compareTo(b.name);
+        });
+        break;
+    }
+    return results;
   }
+
+  static const _maxSearchPoints = 1 << 30;
 
   Future<List<String>> getDistinctRoles() async {
     final query = selectOnly(datasheets, distinct: true)
@@ -261,13 +285,15 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     final datasheet = row.readTable(datasheets);
     final faction = row.readTable(factions);
 
-    final cost = await _getCurrentCost(id);
+    final unit = await _getUnitDetails(id);
+    final costs = await _getCostBrackets(id);
+    final points = resolveCostForModelCount(costs.brackets, unit.defaultSize);
     final keywordNames = await _getKeywordNames(id);
     final abilityDetails = await _getAbilityDetails(id);
     final models = await _getModels(id);
     final weaponDetails = await _getWeapons(id);
     final equipment = await _getEquipment(id);
-    final unit = await _getUnitDetails(id);
+    final equipmentGroups = await _getEquipmentGroups(id);
 
     return DatasheetDetails(
       id: datasheet.id,
@@ -276,18 +302,27 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
       factionId: faction.id,
       factionName: faction.name,
       gameSystemId: faction.gameSystemId,
-      editionId: cost.editionId,
+      editionId: costs.editionId,
       keywords: keywordNames,
       abilities: abilityDetails,
       models: models,
       weapons: weaponDetails,
       equipment: equipment,
+      equipmentGroups: equipmentGroups,
       unit: unit,
-      points: cost.points,
+      points: points,
+      costBrackets: costs.brackets,
     );
   }
 
-  Future<({int points, String editionId})> _getCurrentCost(
+  /// Coût en points pour un nombre de figurines donné, en tenant compte
+  /// des paliers de coût par taille d'unité (voir [resolveCostForModelCount]).
+  Future<int> getCostForModelCount(String datasheetId, int modelCount) async {
+    final costs = await _getCostBrackets(datasheetId);
+    return resolveCostForModelCount(costs.brackets, modelCount);
+  }
+
+  Future<({List<CostBracket> brackets, String editionId})> _getCostBrackets(
       String datasheetId) async {
     final query = select(datasheetCosts).join([
       innerJoin(editions, editions.id.equalsExp(datasheetCosts.editionId)),
@@ -295,17 +330,30 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
       ..where(datasheetCosts.datasheetId.equals(datasheetId) &
           editions.isCurrent.equals(true));
 
-    final currentRow = await query.getSingleOrNull();
-    if (currentRow != null) {
-      final cost = currentRow.readTable(datasheetCosts);
-      return (points: cost.points, editionId: cost.editionId);
+    final currentRows = await query.get();
+    if (currentRows.isNotEmpty) {
+      final brackets = currentRows.map((row) {
+        final cost = row.readTable(datasheetCosts);
+        return CostBracket(modelCount: cost.modelCount, points: cost.points);
+      }).toList();
+      return (
+        brackets: brackets,
+        editionId: currentRows.first.readTable(datasheetCosts).editionId,
+      );
     }
 
-    final fallback = await (select(datasheetCosts)
-          ..where((t) => t.datasheetId.equals(datasheetId))
-          ..limit(1))
-        .getSingleOrNull();
-    return (points: fallback?.points ?? 0, editionId: fallback?.editionId ?? '');
+    final fallbackRows = await (select(datasheetCosts)
+          ..where((t) => t.datasheetId.equals(datasheetId)))
+        .get();
+    if (fallbackRows.isEmpty) {
+      return (brackets: const <CostBracket>[], editionId: '');
+    }
+    final editionId = fallbackRows.first.editionId;
+    final brackets = fallbackRows
+        .where((row) => row.editionId == editionId)
+        .map((row) => CostBracket(modelCount: row.modelCount, points: row.points))
+        .toList();
+    return (brackets: brackets, editionId: editionId);
   }
 
   Future<List<String>> _getKeywordNames(String datasheetId) async {
@@ -441,6 +489,41 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
       result.add(EquipmentDetails(
         groupName: group.name,
         options: options.map((o) => o.name).toList(),
+      ));
+    }
+    return result;
+  }
+
+  Future<List<EquipmentGroupDetails>> _getEquipmentGroups(
+      String datasheetId) async {
+    final groups = await (select(equipmentGroups)
+          ..where((t) => t.datasheetId.equals(datasheetId))
+          ..orderBy([(t) => OrderingTerm.asc(t.displayOrder)]))
+        .get();
+
+    final result = <EquipmentGroupDetails>[];
+    for (final group in groups) {
+      final options = await (select(equipmentOptions)
+            ..where((t) => t.groupId.equals(group.id))
+            ..orderBy([(t) => OrderingTerm.asc(t.displayOrder)]))
+          .get();
+      final choice = await (select(equipmentChoices)
+            ..where((t) => t.groupId.equals(group.id))
+            ..limit(1))
+          .getSingleOrNull();
+      result.add(EquipmentGroupDetails(
+        id: group.id,
+        name: group.name,
+        minimumChoices: choice?.minimumChoices ?? 1,
+        maximumChoices: choice?.maximumChoices ?? 1,
+        options: options
+            .map((o) => EquipmentOptionDetails(
+                  id: o.id,
+                  name: o.name,
+                  weaponId: o.weaponId,
+                  isDefault: o.isDefault,
+                ))
+            .toList(),
       ));
     }
     return result;
