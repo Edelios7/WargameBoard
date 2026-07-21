@@ -6,6 +6,8 @@ part of 'weapon_dao.dart';
 mixin _$WeaponDaoMixin on DatabaseAccessor<AppDatabase> {
   $WeaponsTable get weapons => attachedDatabase.weapons;
   $WeaponProfilesTable get weaponProfiles => attachedDatabase.weaponProfiles;
+  $DatasheetWeaponsTable get datasheetWeapons =>
+      attachedDatabase.datasheetWeapons;
   WeaponDaoManager get managers => WeaponDaoManager(this);
 }
 
@@ -18,5 +20,10 @@ class WeaponDaoManager {
       $$WeaponProfilesTableTableManager(
         _db.attachedDatabase,
         _db.weaponProfiles,
+      );
+  $$DatasheetWeaponsTableTableManager get datasheetWeapons =>
+      $$DatasheetWeaponsTableTableManager(
+        _db.attachedDatabase,
+        _db.datasheetWeapons,
       );
 }

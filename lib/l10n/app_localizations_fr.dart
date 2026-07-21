@@ -168,6 +168,43 @@ class AppLocalizationsFr extends AppLocalizations {
   String get catalogBackToCatalog => 'Catalogue';
 
   @override
+  String get catalogWeaponsButton => 'Armes';
+
+  @override
+  String get catalogWeaponsTitle => 'Inventaire des armes';
+
+  @override
+  String get catalogWeaponsSearchHint => 'Rechercher une arme...';
+
+  @override
+  String catalogWeaponsCount(int count) {
+    return '$count armes';
+  }
+
+  @override
+  String get catalogWeaponsFilterAll => 'Toutes';
+
+  @override
+  String get catalogWeaponsFilterRanged => 'Tir';
+
+  @override
+  String get catalogWeaponsFilterMelee => 'Mêlée';
+
+  @override
+  String get catalogWeaponsFilterMissingProfile => 'Profil manquant';
+
+  @override
+  String catalogWeaponsUsedBy(int count) {
+    return '$count fiches';
+  }
+
+  @override
+  String get catalogWeaponsNoProfile => 'Aucun profil de statistiques importé';
+
+  @override
+  String get catalogWeaponsEmpty => 'Aucune arme ne correspond';
+
+  @override
   String get sectionDescription => 'Description';
 
   @override

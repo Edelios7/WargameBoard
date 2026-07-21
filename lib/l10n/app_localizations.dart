@@ -398,6 +398,72 @@ abstract class AppLocalizations {
   /// **'Catalogue'**
   String get catalogBackToCatalog;
 
+  /// No description provided for @catalogWeaponsButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Armes'**
+  String get catalogWeaponsButton;
+
+  /// No description provided for @catalogWeaponsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Inventaire des armes'**
+  String get catalogWeaponsTitle;
+
+  /// No description provided for @catalogWeaponsSearchHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher une arme...'**
+  String get catalogWeaponsSearchHint;
+
+  /// No description provided for @catalogWeaponsCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} armes'**
+  String catalogWeaponsCount(int count);
+
+  /// No description provided for @catalogWeaponsFilterAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes'**
+  String get catalogWeaponsFilterAll;
+
+  /// No description provided for @catalogWeaponsFilterRanged.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tir'**
+  String get catalogWeaponsFilterRanged;
+
+  /// No description provided for @catalogWeaponsFilterMelee.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mêlée'**
+  String get catalogWeaponsFilterMelee;
+
+  /// No description provided for @catalogWeaponsFilterMissingProfile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil manquant'**
+  String get catalogWeaponsFilterMissingProfile;
+
+  /// No description provided for @catalogWeaponsUsedBy.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} fiches'**
+  String catalogWeaponsUsedBy(int count);
+
+  /// No description provided for @catalogWeaponsNoProfile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun profil de statistiques importé'**
+  String get catalogWeaponsNoProfile;
+
+  /// No description provided for @catalogWeaponsEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune arme ne correspond'**
+  String get catalogWeaponsEmpty;
+
   /// No description provided for @sectionDescription.
   ///
   /// In fr, this message translates to:

@@ -2,6 +2,7 @@ import '../database/app_database.dart';
 import '../database/models/catalog_sort.dart';
 import '../database/models/datasheet_details.dart';
 import '../database/models/search_result.dart';
+import '../database/models/weapon_summary.dart';
 
 class CatalogRepository {
   final AppDatabase database;
@@ -44,4 +45,7 @@ class CatalogRepository {
   Future<List<Edition>> getEditions() => database.datasheetDao.getEditions();
 
   Future<int> getMaxPoints() => database.datasheetDao.getMaxPoints();
+
+  Future<List<WeaponSummary>> listWeaponsWithUsage() =>
+      database.weaponDao.listWeaponsWithUsage();
 }

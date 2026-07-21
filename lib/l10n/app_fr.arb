@@ -75,6 +75,27 @@
   "catalogSeeLess": "Voir moins",
   "catalogViewFullSheet": "Voir la fiche complète",
   "catalogBackToCatalog": "Catalogue",
+  "catalogWeaponsButton": "Armes",
+  "catalogWeaponsTitle": "Inventaire des armes",
+  "catalogWeaponsSearchHint": "Rechercher une arme...",
+  "catalogWeaponsCount": "{count} armes",
+  "@catalogWeaponsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "catalogWeaponsFilterAll": "Toutes",
+  "catalogWeaponsFilterRanged": "Tir",
+  "catalogWeaponsFilterMelee": "Mêlée",
+  "catalogWeaponsFilterMissingProfile": "Profil manquant",
+  "catalogWeaponsUsedBy": "{count} fiches",
+  "@catalogWeaponsUsedBy": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "catalogWeaponsNoProfile": "Aucun profil de statistiques importé",
+  "catalogWeaponsEmpty": "Aucune arme ne correspond",
   "sectionDescription": "Description",
 
   "sectionUnitSize": "Effectif",

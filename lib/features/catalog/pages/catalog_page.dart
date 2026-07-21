@@ -10,6 +10,7 @@ import '../../../database/models/search_result.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/catalog_provider.dart';
 import '../widgets/catalog_preview_panel.dart';
+import 'weapons_inventory_page.dart';
 
 class CatalogPage extends ConsumerWidget {
   const CatalogPage({super.key});
@@ -44,17 +45,32 @@ class CatalogPage extends ConsumerWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(l10n.navCatalog.toUpperCase(),
-                        style: AppTextStyles.heading),
-                    const SizedBox(height: 4),
-                    Text(
-                      l10n.catalogBreadcrumbAllUnits,
-                      style: AppTextStyles.caption,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(l10n.navCatalog.toUpperCase(),
+                          style: AppTextStyles.heading),
+                      const SizedBox(height: 4),
+                      Text(
+                        l10n.catalogBreadcrumbAllUnits,
+                        style: AppTextStyles.caption,
+                      ),
+                    ],
+                  ),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const WeaponsInventoryPage(),
                     ),
-                  ],
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.textPrimary,
+                    side: const BorderSide(color: AppColors.border),
+                  ),
+                  icon: const Icon(Icons.hardware_rounded, size: 18),
+                  label: Text(l10n.catalogWeaponsButton),
                 ),
               ],
             ),

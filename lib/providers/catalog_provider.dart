@@ -5,6 +5,7 @@ import '../database/app_database.dart';
 import '../database/models/catalog_sort.dart';
 import '../database/models/datasheet_details.dart';
 import '../database/models/search_result.dart';
+import '../database/models/weapon_summary.dart';
 import '../repositories/catalog_repository.dart';
 import 'database_provider.dart';
 
@@ -106,4 +107,9 @@ final datasheetByIdProvider =
     FutureProvider.family<DatasheetDetails?, String>((ref, id) {
   final repository = ref.watch(catalogRepositoryProvider);
   return repository.getDatasheet(id);
+});
+
+final weaponsInventoryProvider = FutureProvider<List<WeaponSummary>>((ref) {
+  final repository = ref.watch(catalogRepositoryProvider);
+  return repository.listWeaponsWithUsage();
 });

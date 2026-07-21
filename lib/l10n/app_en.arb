@@ -75,6 +75,27 @@
   "catalogSeeLess": "See less",
   "catalogViewFullSheet": "View full datasheet",
   "catalogBackToCatalog": "Catalog",
+  "catalogWeaponsButton": "Weapons",
+  "catalogWeaponsTitle": "Weapons inventory",
+  "catalogWeaponsSearchHint": "Search for a weapon...",
+  "catalogWeaponsCount": "{count} weapons",
+  "@catalogWeaponsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "catalogWeaponsFilterAll": "All",
+  "catalogWeaponsFilterRanged": "Ranged",
+  "catalogWeaponsFilterMelee": "Melee",
+  "catalogWeaponsFilterMissingProfile": "Missing profile",
+  "catalogWeaponsUsedBy": "{count} datasheets",
+  "@catalogWeaponsUsedBy": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "catalogWeaponsNoProfile": "No stat profile imported",
+  "catalogWeaponsEmpty": "No weapon matches",
   "sectionDescription": "Description",
 
   "sectionUnitSize": "Unit size",
