@@ -62,7 +62,7 @@ class _ProfileContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _CommandantHeader(summary: summary),
-        const SizedBox(height: 28),
+        const _DecorativeDivider(),
         Text(l10n.profileCategoriesTitle, style: AppTextStyles.title),
         const SizedBox(height: 12),
         LayoutBuilder(
@@ -85,7 +85,7 @@ class _ProfileContent extends StatelessWidget {
             );
           },
         ),
-        const SizedBox(height: 28),
+        const _DecorativeDivider(),
         Text(l10n.profileFactionsTitle, style: AppTextStyles.title),
         const SizedBox(height: 12),
         if (summary.factions.isEmpty)
@@ -108,6 +108,32 @@ class _ProfileContent extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// Séparateur décoratif entre deux sections de la page (voir
+/// local_assets/decor/README.md) — retombe sur un simple espacement si
+/// l'image n'est pas présente localement.
+class _DecorativeDivider extends StatelessWidget {
+  const _DecorativeDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    final file = LocalCatalogImages.decor('separator-fine-gold-imperial');
+    if (file == null) return const SizedBox(height: 28);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Opacity(
+            opacity: 0.7,
+            child: Image.file(file, height: 18, fit: BoxFit.contain),
+          ),
+        ),
+      ),
     );
   }
 }

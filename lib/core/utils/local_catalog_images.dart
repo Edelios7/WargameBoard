@@ -45,4 +45,9 @@ class LocalCatalogImages {
   /// local_assets/branding/. Jamais commités (contenu généré, esthétique
   /// proche de l'imagerie GW).
   static File? branding(String name) => _find('branding', name);
+
+  /// Éléments décoratifs génériques (séparateurs, coins, bordures de
+  /// cadre, filigranes...), voir local_assets/decor/README.md — pas
+  /// liés à une faction ou une fiche précise.
+  static File? decor(String name) => _find('decor', name);
 }
