@@ -62,6 +62,13 @@
   "catalogFilterEdition": "Edition",
   "catalogFilterUnitType": "Unit type",
   "catalogBreadcrumbAllUnits": "All units",
+  "catalogCostBracketLabel": "{models} models: {points} pts",
+  "@catalogCostBracketLabel": {
+    "placeholders": {
+      "models": { "type": "int" },
+      "points": { "type": "int" }
+    }
+  },
   "catalogSortLabel": "Sort by:",
   "catalogSortNameAsc": "Name (A-Z)",
   "catalogSortPointsAsc": "Points (ascending)",
@@ -151,6 +158,14 @@
   "armyBuilderCopyList": "Copy list",
   "armyBuilderCopiedToClipboard": "List copied to clipboard",
   "armyBuilderDuplicate": "Duplicate army",
+  "armyBuilderDuplicateUnit": "Duplicate unit",
+  "armyBuilderOwnedShortage": "You only own {owned} model(s) out of the {needed} needed in this army.",
+  "@armyBuilderOwnedShortage": {
+    "placeholders": {
+      "owned": { "type": "int" },
+      "needed": { "type": "int" }
+    }
+  },
   "armyBuilderNotesLabel": "Notes",
   "armyBuilderDuplicateNameLabel": "Copy name",
   "armyBuilderDuplicateSuffix": "{name} (copy)",
@@ -216,6 +231,28 @@
   "armyBuilderEditUnit": "Edit unit",
   "armyBuilderRemoveUnit": "Remove unit",
   "armyBuilderModelCountLabel": "Model count",
+  "armyBuilderPickOne": "Pick an option",
+  "armyBuilderPickUpTo": "Pick up to {count} options",
+  "@armyBuilderPickUpTo": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "armyBuilderSave": "Save",
+  "armyBuilderRemoveUnitConfirmTitle": "Remove this unit?",
+  "armyBuilderRemoveUnitConfirmMessage": "{name} will be removed from the list. This action is permanent.",
+  "@armyBuilderRemoveUnitConfirmMessage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "armyBuilderDeleteArmyConfirmTitle": "Delete this army?",
+  "armyBuilderDeleteArmyConfirmMessage": "{name} and all its units will be permanently deleted.",
+  "@armyBuilderDeleteArmyConfirmMessage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
 
   "collectionAddEntry": "Add to collection",
   "collectionExportTooltip": "Export",

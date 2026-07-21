@@ -13,7 +13,16 @@ import '../../../providers/xp_provider.dart';
 class AddCollectionEntryDialog extends ConsumerStatefulWidget {
   final bool wishlist;
 
-  const AddCollectionEntryDialog({super.key, this.wishlist = false});
+  /// Datasheet pré-sélectionnée (ex. depuis le Catalogue) : évite à
+  /// l'utilisateur de retaper la recherche pour l'unité qu'il vient de
+  /// consulter.
+  final SearchResult? initialResult;
+
+  const AddCollectionEntryDialog({
+    super.key,
+    this.wishlist = false,
+    this.initialResult,
+  });
 
   @override
   ConsumerState<AddCollectionEntryDialog> createState() =>
@@ -25,6 +34,8 @@ class _AddCollectionEntryDialogState
   List<SearchResult> _results = const [];
   bool _loading = false;
   SearchResult? _selected;
+  late final _searchController =
+      TextEditingController(text: widget.initialResult?.name ?? '');
   final _quantityController = TextEditingController(text: '1');
   final _notesController = TextEditingController();
   final _priceController = TextEditingController();
@@ -32,11 +43,13 @@ class _AddCollectionEntryDialogState
   @override
   void initState() {
     super.initState();
-    _search('');
+    _selected = widget.initialResult;
+    _search(_searchController.text);
   }
 
   @override
   void dispose() {
+    _searchController.dispose();
     _quantityController.dispose();
     _notesController.dispose();
     _priceController.dispose();
@@ -106,7 +119,8 @@ class _AddCollectionEntryDialogState
               ),
               const SizedBox(height: 16),
               TextField(
-                autofocus: true,
+                controller: _searchController,
+                autofocus: widget.initialResult == null,
                 onChanged: _search,
                 style: AppTextStyles.body,
                 decoration: InputDecoration(

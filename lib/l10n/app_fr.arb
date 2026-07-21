@@ -62,6 +62,13 @@
   "catalogFilterEdition": "Édition",
   "catalogFilterUnitType": "Type d'unité",
   "catalogBreadcrumbAllUnits": "Toutes les unités",
+  "catalogCostBracketLabel": "{models} fig. : {points} pts",
+  "@catalogCostBracketLabel": {
+    "placeholders": {
+      "models": { "type": "int" },
+      "points": { "type": "int" }
+    }
+  },
   "catalogSortLabel": "Trier par :",
   "catalogSortNameAsc": "Nom (A-Z)",
   "catalogSortPointsAsc": "Points (croissant)",
@@ -150,6 +157,14 @@
   "armyBuilderCopyList": "Copier la liste",
   "armyBuilderCopiedToClipboard": "Liste copiée dans le presse-papier",
   "armyBuilderDuplicate": "Dupliquer l'armée",
+  "armyBuilderDuplicateUnit": "Dupliquer l'unité",
+  "armyBuilderOwnedShortage": "Tu ne possèdes que {owned} figurine(s) sur {needed} nécessaires dans cette armée.",
+  "@armyBuilderOwnedShortage": {
+    "placeholders": {
+      "owned": { "type": "int" },
+      "needed": { "type": "int" }
+    }
+  },
   "armyBuilderNotesLabel": "Notes",
   "armyBuilderDuplicateNameLabel": "Nom de la copie",
   "armyBuilderDuplicateSuffix": "{name} (copie)",
@@ -216,6 +231,28 @@
   "armyBuilderEditUnit": "Modifier l'unité",
   "armyBuilderRemoveUnit": "Retirer l'unité",
   "armyBuilderModelCountLabel": "Nombre de figurines",
+  "armyBuilderPickOne": "Choisis une option",
+  "armyBuilderPickUpTo": "Choisis jusqu'à {count} options",
+  "@armyBuilderPickUpTo": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "armyBuilderSave": "Enregistrer",
+  "armyBuilderRemoveUnitConfirmTitle": "Retirer cette unité ?",
+  "armyBuilderRemoveUnitConfirmMessage": "{name} sera retirée de la liste. Cette action est définitive.",
+  "@armyBuilderRemoveUnitConfirmMessage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "armyBuilderDeleteArmyConfirmTitle": "Supprimer cette armée ?",
+  "armyBuilderDeleteArmyConfirmMessage": "{name} et toutes ses unités seront supprimées définitivement.",
+  "@armyBuilderDeleteArmyConfirmMessage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
 
   "collectionAddEntry": "Ajouter à la collection",
   "collectionExportTooltip": "Exporter",

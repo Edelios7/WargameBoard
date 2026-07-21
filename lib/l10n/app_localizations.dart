@@ -350,6 +350,12 @@ abstract class AppLocalizations {
   /// **'Toutes les unités'**
   String get catalogBreadcrumbAllUnits;
 
+  /// No description provided for @catalogCostBracketLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'{models} fig. : {points} pts'**
+  String catalogCostBracketLabel(int models, int points);
+
   /// No description provided for @catalogSortLabel.
   ///
   /// In fr, this message translates to:
@@ -692,6 +698,18 @@ abstract class AppLocalizations {
   /// **'Dupliquer l\'armée'**
   String get armyBuilderDuplicate;
 
+  /// No description provided for @armyBuilderDuplicateUnit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dupliquer l\'unité'**
+  String get armyBuilderDuplicateUnit;
+
+  /// No description provided for @armyBuilderOwnedShortage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tu ne possèdes que {owned} figurine(s) sur {needed} nécessaires dans cette armée.'**
+  String armyBuilderOwnedShortage(int owned, int needed);
+
   /// No description provided for @armyBuilderNotesLabel.
   ///
   /// In fr, this message translates to:
@@ -919,6 +937,48 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Nombre de figurines'**
   String get armyBuilderModelCountLabel;
+
+  /// No description provided for @armyBuilderPickOne.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisis une option'**
+  String get armyBuilderPickOne;
+
+  /// No description provided for @armyBuilderPickUpTo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisis jusqu\'à {count} options'**
+  String armyBuilderPickUpTo(int count);
+
+  /// No description provided for @armyBuilderSave.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer'**
+  String get armyBuilderSave;
+
+  /// No description provided for @armyBuilderRemoveUnitConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer cette unité ?'**
+  String get armyBuilderRemoveUnitConfirmTitle;
+
+  /// No description provided for @armyBuilderRemoveUnitConfirmMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} sera retirée de la liste. Cette action est définitive.'**
+  String armyBuilderRemoveUnitConfirmMessage(String name);
+
+  /// No description provided for @armyBuilderDeleteArmyConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer cette armée ?'**
+  String get armyBuilderDeleteArmyConfirmTitle;
+
+  /// No description provided for @armyBuilderDeleteArmyConfirmMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} et toutes ses unités seront supprimées définitivement.'**
+  String armyBuilderDeleteArmyConfirmMessage(String name);
 
   /// No description provided for @collectionAddEntry.
   ///

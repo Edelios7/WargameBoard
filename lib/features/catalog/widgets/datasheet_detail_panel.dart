@@ -5,6 +5,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
 import '../../../database/models/ability_details.dart';
+import '../../../database/models/cost_bracket.dart';
 import '../../../database/models/datasheet_details.dart';
 import '../../../domain/catalog/core_ability_glossary.dart';
 import '../../../l10n/app_localizations.dart';
@@ -123,15 +124,9 @@ class DatasheetDetailPanel extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(sheet.name, style: AppTextStyles.heading),
-                    ),
-                    _pointsBadge(l10n, sheet.points),
-                  ],
-                ),
+                Text(sheet.name, style: AppTextStyles.heading),
+                const SizedBox(height: 8),
+                _costDisplay(l10n, sheet),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -170,6 +165,40 @@ class DatasheetDetailPanel extends StatelessWidget {
         style: AppTextStyles.body.copyWith(
           color: AppColors.primary,
           fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  /// Affiche le coût de la fiche : un badge simple si elle n'a qu'un seul
+  /// palier de coût, ou un badge par palier (voir DatasheetCosts.modelCount)
+  /// quand le coût dépend du nombre de figurines choisi.
+  Widget _costDisplay(AppLocalizations l10n, DatasheetDetails sheet) {
+    final sized = sheet.costBrackets.where((b) => b.modelCount != null).toList()
+      ..sort((a, b) => a.modelCount!.compareTo(b.modelCount!));
+    if (sized.length <= 1) {
+      return _pointsBadge(l10n, sheet.points);
+    }
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: sized.map((bracket) => _bracketChip(l10n, bracket)).toList(),
+    );
+  }
+
+  Widget _bracketChip(AppLocalizations l10n, CostBracket bracket) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: .14),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.primary.withValues(alpha: .35)),
+      ),
+      child: Text(
+        l10n.catalogCostBracketLabel(bracket.modelCount!, bracket.points),
+        style: AppTextStyles.caption.copyWith(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );

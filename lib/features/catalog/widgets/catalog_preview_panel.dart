@@ -4,9 +4,12 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
+import '../../../database/models/cost_bracket.dart';
 import '../../../database/models/datasheet_details.dart';
 import '../../../database/models/model_details.dart';
+import '../../../database/models/search_result.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../collection/widgets/add_collection_entry_dialog.dart';
 import '../pages/datasheet_full_page.dart';
 
 class CatalogPreviewPanel extends StatefulWidget {
@@ -81,7 +84,13 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
                   ),
                 ),
                 _iconButton(
+                  Icons.add_rounded,
+                  tooltip: l10n.collectionAddEntry,
+                  onTap: () => _addToCollection(context, sheet),
+                ),
+                _iconButton(
                   Icons.open_in_full_rounded,
+                  tooltip: l10n.catalogViewFullSheet,
                   onTap: () => _openFullSheet(context, sheet.id),
                 ),
               ],
@@ -89,7 +98,7 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
             const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerRight,
-              child: _pointsBadge(l10n, sheet.points),
+              child: _costDisplay(l10n, sheet),
             ),
             const SizedBox(height: 16),
             if (imageFile != null) ...[
@@ -175,8 +184,26 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
     );
   }
 
-  Widget _iconButton(IconData icon, {VoidCallback? onTap}) {
-    return Material(
+  void _addToCollection(BuildContext context, DatasheetDetails sheet) {
+    showDialog(
+      context: context,
+      builder: (_) => AddCollectionEntryDialog(
+        initialResult: SearchResult(
+          id: sheet.id,
+          name: sheet.name,
+          type: 'datasheet',
+          factionId: sheet.factionId,
+          factionName: sheet.factionName,
+          gameSystemId: sheet.gameSystemId,
+          editionId: sheet.editionId,
+          points: sheet.points,
+        ),
+      ),
+    );
+  }
+
+  Widget _iconButton(IconData icon, {VoidCallback? onTap, String? tooltip}) {
+    final button = Material(
       color: AppColors.surfaceElevated,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
@@ -189,6 +216,43 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
             border: Border.all(color: AppColors.border),
           ),
           child: Icon(icon, size: 16, color: AppColors.textSecondary),
+        ),
+      ),
+    );
+    return tooltip == null ? button : Tooltip(message: tooltip, child: button);
+  }
+
+  /// Affiche le coût de la fiche : un badge simple si elle n'a qu'un seul
+  /// palier de coût, ou un badge par palier (voir DatasheetCosts.modelCount)
+  /// quand le coût dépend du nombre de figurines choisi — beaucoup d'unités
+  /// Warhammer 40k ne montent pas en coût de façon linéaire avec l'effectif.
+  Widget _costDisplay(AppLocalizations l10n, DatasheetDetails sheet) {
+    final sized = sheet.costBrackets.where((b) => b.modelCount != null).toList()
+      ..sort((a, b) => a.modelCount!.compareTo(b.modelCount!));
+    if (sized.length <= 1) {
+      return _pointsBadge(l10n, sheet.points);
+    }
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      alignment: WrapAlignment.end,
+      children: sized.map((bracket) => _bracketChip(l10n, bracket)).toList(),
+    );
+  }
+
+  Widget _bracketChip(AppLocalizations l10n, CostBracket bracket) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: .14),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.primary.withValues(alpha: .35)),
+      ),
+      child: Text(
+        l10n.catalogCostBracketLabel(bracket.modelCount!, bracket.points),
+        style: AppTextStyles.caption.copyWith(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );

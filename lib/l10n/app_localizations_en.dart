@@ -142,6 +142,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get catalogBreadcrumbAllUnits => 'All units';
 
   @override
+  String catalogCostBracketLabel(int models, int points) {
+    return '$models models: $points pts';
+  }
+
+  @override
   String get catalogSortLabel => 'Sort by:';
 
   @override
@@ -324,6 +329,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get armyBuilderDuplicate => 'Duplicate army';
 
   @override
+  String get armyBuilderDuplicateUnit => 'Duplicate unit';
+
+  @override
+  String armyBuilderOwnedShortage(int owned, int needed) {
+    return 'You only own $owned model(s) out of the $needed needed in this army.';
+  }
+
+  @override
   String get armyBuilderNotesLabel => 'Notes';
 
   @override
@@ -447,6 +460,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get armyBuilderModelCountLabel => 'Model count';
+
+  @override
+  String get armyBuilderPickOne => 'Pick an option';
+
+  @override
+  String armyBuilderPickUpTo(int count) {
+    return 'Pick up to $count options';
+  }
+
+  @override
+  String get armyBuilderSave => 'Save';
+
+  @override
+  String get armyBuilderRemoveUnitConfirmTitle => 'Remove this unit?';
+
+  @override
+  String armyBuilderRemoveUnitConfirmMessage(String name) {
+    return '$name will be removed from the list. This action is permanent.';
+  }
+
+  @override
+  String get armyBuilderDeleteArmyConfirmTitle => 'Delete this army?';
+
+  @override
+  String armyBuilderDeleteArmyConfirmMessage(String name) {
+    return '$name and all its units will be permanently deleted.';
+  }
 
   @override
   String get collectionAddEntry => 'Add to collection';
