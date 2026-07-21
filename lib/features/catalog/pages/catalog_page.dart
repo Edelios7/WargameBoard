@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/faction_colors.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
+import '../../../database/app_database.dart' show Faction;
 import '../../../database/models/catalog_sort.dart';
 import '../../../database/models/search_result.dart';
 import '../../../l10n/app_localizations.dart';
@@ -28,7 +30,8 @@ class CatalogPage extends ConsumerWidget {
     final unitTypeFilter = ref.watch(catalogUnitTypeFilterProvider);
     final editionFilter = ref.watch(catalogEditionFilterProvider);
     final pointsRange = ref.watch(catalogPointsRangeProvider);
-    final hasActiveFilters = factionFilter != null ||
+    final hasActiveFilters =
+        factionFilter != null ||
         keywordFilter != null ||
         roleFilter != null ||
         unitTypeFilter != null ||
@@ -49,8 +52,10 @@ class CatalogPage extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(l10n.navCatalog.toUpperCase(),
-                          style: AppTextStyles.heading),
+                      Text(
+                        l10n.navCatalog.toUpperCase(),
+                        style: AppTextStyles.heading,
+                      ),
                       const SizedBox(height: 4),
                       Text(
                         l10n.catalogBreadcrumbAllUnits,
@@ -75,14 +80,13 @@ class CatalogPage extends ConsumerWidget {
               ],
             ),
           ),
+          const _FactionQuickAccessBar(),
           const SizedBox(height: 4),
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final filtersWidth =
-                    constraints.maxWidth < 700 ? 200.0 : 232.0;
-                final resultsWidth =
-                    constraints.maxWidth < 700 ? 260.0 : 320.0;
+                final filtersWidth = constraints.maxWidth < 700 ? 200.0 : 232.0;
+                final resultsWidth = constraints.maxWidth < 700 ? 260.0 : 320.0;
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -99,9 +103,11 @@ class CatalogPage extends ConsumerWidget {
                       child: _ResultsList(
                         resultsAsync: resultsAsync,
                         selectedId: selectedId,
-                        onSelect: (id) => ref
-                            .read(selectedDatasheetIdProvider.notifier)
-                            .state = id,
+                        onSelect: (id) =>
+                            ref
+                                    .read(selectedDatasheetIdProvider.notifier)
+                                    .state =
+                                id,
                       ),
                     ),
                     Container(width: 1, color: AppColors.border),
@@ -117,6 +123,154 @@ class CatalogPage extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _FactionQuickAccessBar extends ConsumerWidget {
+  const _FactionQuickAccessBar();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final factionsAsync = ref.watch(factionsListProvider);
+    final selectedFactionId = ref.watch(catalogFactionFilterProvider);
+
+    return factionsAsync.when(
+      loading: () => const SizedBox(height: 100),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (factions) {
+        if (factions.isEmpty) return const SizedBox.shrink();
+        final sorted = [...factions]..sort((a, b) => a.name.compareTo(b.name));
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(28, 0, 28, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.catalogQuickAccessFactions.toUpperCase(),
+                style: AppTextStyles.eyebrow,
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 92,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: sorted.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 10),
+                  itemBuilder: (context, index) {
+                    final faction = sorted[index];
+                    final selected = faction.id == selectedFactionId;
+                    return _FactionTile(
+                      faction: faction,
+                      selected: selected,
+                      onTap: () =>
+                          ref
+                              .read(catalogFactionFilterProvider.notifier)
+                              .state = selected
+                          ? null
+                          : faction.id,
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _FactionTile extends StatelessWidget {
+  final Faction faction;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _FactionTile({
+    required this.faction,
+    required this.selected,
+    required this.onTap,
+  });
+
+  String get _initials {
+    if (faction.shortName != null && faction.shortName!.isNotEmpty) {
+      return faction.shortName!.substring(
+        0,
+        faction.shortName!.length.clamp(0, 3),
+      );
+    }
+    final words = faction.name
+        .split(RegExp(r'[\s\-\(\)]+'))
+        .where((w) => w.isNotEmpty)
+        .toList();
+    if (words.isEmpty) return '?';
+    if (words.length == 1) return words.first.substring(0, 2).toUpperCase();
+    return (words[0][0] + words[1][0]).toUpperCase();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = FactionColors.of(faction.id);
+    final iconFile = LocalCatalogImages.faction(faction.id);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Container(
+          width: 76,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+          decoration: BoxDecoration(
+            color: selected
+                ? color.withValues(alpha: .16)
+                : AppColors.surfaceElevated,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: selected ? color : AppColors.border,
+              width: selected ? 1.6 : 1,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                clipBehavior: Clip.antiAlias,
+                child: iconFile != null
+                    ? Image.file(iconFile, fit: BoxFit.cover)
+                    : Center(
+                        child: Text(
+                          _initials,
+                          style: AppTextStyles.caption.copyWith(
+                            color: FactionColors.onColor(color),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                faction.name,
+                style: AppTextStyles.caption.copyWith(
+                  fontSize: 10.5,
+                  color: selected
+                      ? AppColors.textPrimary
+                      : AppColors.textSecondary,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -156,8 +310,10 @@ class _FiltersPanel extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(l10n.catalogFilterTitle.toUpperCase(),
-                  style: AppTextStyles.eyebrow),
+              Text(
+                l10n.catalogFilterTitle.toUpperCase(),
+                style: AppTextStyles.eyebrow,
+              ),
               if (hasActiveFilters)
                 InkWell(
                   onTap: () {
@@ -170,13 +326,13 @@ class _FiltersPanel extends ConsumerWidget {
                         null;
                     ref.read(catalogEditionFilterProvider.notifier).state =
                         null;
-                    ref.read(catalogPointsRangeProvider.notifier).state =
-                        null;
+                    ref.read(catalogPointsRangeProvider.notifier).state = null;
                   },
                   child: Text(
                     l10n.catalogResetFilters,
-                    style: AppTextStyles.caption
-                        .copyWith(color: AppColors.primary),
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
             ],
@@ -197,8 +353,7 @@ class _FiltersPanel extends ConsumerWidget {
               allLabel: l10n.catalogFilterAllFactions,
               items: {for (final f in factions) f.id: f.name},
               onChanged: (value) =>
-                  ref.read(catalogFactionFilterProvider.notifier).state =
-                      value,
+                  ref.read(catalogFactionFilterProvider.notifier).state = value,
             ),
           ),
           const SizedBox(height: 14),
@@ -224,8 +379,7 @@ class _FiltersPanel extends ConsumerWidget {
               allLabel: l10n.catalogFilterAllKeywords,
               items: {for (final k in keywords) k.id: k.name},
               onChanged: (value) =>
-                  ref.read(catalogKeywordFilterProvider.notifier).state =
-                      value,
+                  ref.read(catalogKeywordFilterProvider.notifier).state = value,
             ),
           ),
           const SizedBox(height: 14),
@@ -253,16 +407,18 @@ class _FiltersPanel extends ConsumerWidget {
                         range.start.clamp(0, bound),
                         range.end.clamp(0, bound),
                       ),
-                      onChanged: (values) => ref
-                          .read(catalogPointsRangeProvider.notifier)
-                          .state = values,
+                      onChanged: (values) =>
+                          ref.read(catalogPointsRangeProvider.notifier).state =
+                              values,
                     ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('${range.start.round()}',
-                          style: AppTextStyles.caption),
+                      Text(
+                        '${range.start.round()}',
+                        style: AppTextStyles.caption,
+                      ),
                       Text(
                         range.end.round() >= bound.round()
                             ? '${bound.round()}+'
@@ -285,8 +441,7 @@ class _FiltersPanel extends ConsumerWidget {
               allLabel: l10n.catalogFilterAllEditions,
               items: {for (final e in editions) e.id: e.name},
               onChanged: (value) =>
-                  ref.read(catalogEditionFilterProvider.notifier).state =
-                      value,
+                  ref.read(catalogEditionFilterProvider.notifier).state = value,
             ),
           ),
           const SizedBox(height: 14),
@@ -366,9 +521,8 @@ class _ResultsList extends ConsumerWidget {
                   Flexible(
                     child: _SortDropdown(
                       value: sortBy,
-                      onChanged: (value) => ref
-                          .read(catalogSortProvider.notifier)
-                          .state = value,
+                      onChanged: (value) =>
+                          ref.read(catalogSortProvider.notifier).state = value,
                     ),
                   ),
                 ],
@@ -427,8 +581,7 @@ class _SortDropdown extends StatelessWidget {
           .map(
             (sort) => PopupMenuItem(
               value: sort,
-              child:
-                  Text(labels[sort]!, style: AppTextStyles.caption),
+              child: Text(labels[sort]!, style: AppTextStyles.caption),
             ),
           )
           .toList(),
@@ -444,8 +597,11 @@ class _SortDropdown extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 2),
-          const Icon(Icons.expand_more_rounded,
-              size: 16, color: AppColors.textSecondary),
+          const Icon(
+            Icons.expand_more_rounded,
+            size: 16,
+            color: AppColors.textSecondary,
+          ),
         ],
       ),
     );
@@ -565,6 +721,9 @@ class _DatasheetListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final imageFile = LocalCatalogImages.datasheet(result.id);
+    final factionColor = result.factionId != null
+        ? FactionColors.of(result.factionId!)
+        : AppColors.textSecondary;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -573,11 +732,11 @@ class _DatasheetListItem extends StatelessWidget {
             ? AppColors.primary.withValues(alpha: .10)
             : AppColors.surfaceElevated,
         borderRadius: BorderRadius.circular(10),
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
           onTap: onTap,
           child: Container(
-            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
@@ -585,72 +744,105 @@ class _DatasheetListItem extends StatelessWidget {
                 width: selected ? 1.4 : 1,
               ),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: imageFile != null
-                      ? Image.file(
-                          imageFile,
-                          width: 52,
-                          height: 52,
-                          fit: BoxFit.cover,
-                        )
-                      : Container(
-                          width: 52,
-                          height: 52,
-                          color: AppColors.surface,
-                          child: const Icon(
-                            Icons.shield_outlined,
-                            color: AppColors.textSecondary,
-                            size: 20,
-                          ),
-                        ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        result.name,
-                        style: AppTextStyles.body,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      if (result.factionName != null) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          result.factionName!,
-                          style: AppTextStyles.caption,
-                        ),
-                      ],
-                      const SizedBox(height: 6),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 4,
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(width: 4, color: factionColor),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (result.unitType != null)
-                            AppChip(label: result.unitType!),
-                          if (result.subtitle != null)
-                            AppChip(label: result.subtitle!, accent: selected),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: imageFile != null
+                                ? Image.file(
+                                    imageFile,
+                                    width: 52,
+                                    height: 52,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Container(
+                                    width: 52,
+                                    height: 52,
+                                    color: factionColor.withValues(alpha: .16),
+                                    child: Icon(
+                                      Icons.shield_outlined,
+                                      color: factionColor,
+                                      size: 20,
+                                    ),
+                                  ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  result.name,
+                                  style: AppTextStyles.body,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                if (result.factionName != null) ...[
+                                  const SizedBox(height: 3),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 7,
+                                        height: 7,
+                                        decoration: BoxDecoration(
+                                          color: factionColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Flexible(
+                                        child: Text(
+                                          result.factionName!,
+                                          style: AppTextStyles.caption,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                                const SizedBox(height: 6),
+                                Wrap(
+                                  spacing: 6,
+                                  runSpacing: 4,
+                                  children: [
+                                    if (result.unitType != null)
+                                      AppChip(label: result.unitType!),
+                                    if (result.subtitle != null)
+                                      AppChip(
+                                        label: result.subtitle!,
+                                        accent: selected,
+                                      ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (result.points != null) ...[
+                            const SizedBox(width: 8),
+                            Text(
+                              l10n.pointsSuffix(result.points!),
+                              style: AppTextStyles.caption.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
-                    ],
-                  ),
-                ),
-                if (result.points != null) ...[
-                  const SizedBox(width: 8),
-                  Text(
-                    l10n.pointsSuffix(result.points!),
-                    style: AppTextStyles.caption.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
                     ),
                   ),
                 ],
-              ],
+              ),
             ),
           ),
         ),
