@@ -166,7 +166,10 @@ class _CommandantHeader extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             l10n.profileXpProgress(level.xpIntoLevel, level.xpForNextLevel),
-            style: AppTextStyles.caption,
+            style: AppTextStyles.body.copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppColors.primary,
+            ),
           ),
         ],
       ),
@@ -248,7 +251,10 @@ class _FactionRow extends StatelessWidget {
           width: 64,
           child: Text(
             l10n.profileLevelShort(faction.level.level),
-            style: AppTextStyles.caption,
+            style: AppTextStyles.body.copyWith(
+              fontWeight: FontWeight.w700,
+              color: AppColors.primary,
+            ),
             textAlign: TextAlign.right,
           ),
         ),

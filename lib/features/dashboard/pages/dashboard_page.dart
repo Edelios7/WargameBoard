@@ -739,6 +739,7 @@ class _LastBattleTile extends ConsumerWidget {
                   child: Text(
                     resultLabel,
                     style: AppTextStyles.eyebrow.copyWith(
+                      fontSize: 13,
                       color: isVictory ? AppColors.success : AppColors.error,
                     ),
                   ),
@@ -1068,7 +1069,10 @@ class _RecentAdditionsCard extends StatelessWidget {
                         ),
                         Text(
                           l10n.collectionQuantityLabel(entry.quantity),
-                          style: AppTextStyles.caption,
+                          style: AppTextStyles.caption.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primary,
+                          ),
                         ),
                       ],
                     ),
@@ -1210,7 +1214,10 @@ class _NextBattleCard extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             myFactionName ?? battle!.armyName ?? '—',
-                            style: AppTextStyles.caption,
+                            style: AppTextStyles.body.copyWith(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
@@ -1238,7 +1245,10 @@ class _NextBattleCard extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             opponentFactionName ?? battle!.opponentName ?? '—',
-                            style: AppTextStyles.caption,
+                            style: AppTextStyles.body.copyWith(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,

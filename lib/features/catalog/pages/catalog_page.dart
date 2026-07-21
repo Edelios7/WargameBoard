@@ -462,7 +462,10 @@ class _FiltersPanel extends ConsumerWidget {
             const SizedBox(height: 20),
             Text(
               l10n.catalogResultsCount(resultsCount!),
-              style: AppTextStyles.caption,
+              style: AppTextStyles.body.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppColors.primary,
+              ),
             ),
           ],
         ],

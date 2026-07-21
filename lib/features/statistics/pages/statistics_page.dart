@@ -91,7 +91,7 @@ class StatisticsPage extends ConsumerWidget {
                   battleStats.defeats,
                   battleStats.draws,
                 ),
-                style: AppTextStyles.caption,
+                style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
               ),
             ],
             const SizedBox(height: 28),
@@ -101,9 +101,21 @@ class StatisticsPage extends ConsumerWidget {
               data: (summary) => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    l10n.statsPaintingProgress,
-                    style: AppTextStyles.caption,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.statsPaintingProgress.toUpperCase(),
+                        style: AppTextStyles.eyebrow,
+                      ),
+                      Text(
+                        '${(summary.paintedRatio * 100).round()}%',
+                        style: AppTextStyles.body.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   ClipRRect(
@@ -221,7 +233,15 @@ class _ArmyPointsBar extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Text('${army.totalPoints} pts', style: AppTextStyles.caption),
+              Text(
+                '${army.totalPoints} pts',
+                style: AppTextStyles.body.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: army.isOverLimit
+                      ? AppColors.error
+                      : AppColors.primary,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 6),

@@ -315,24 +315,22 @@ class _ArmyBuilderPage extends ConsumerWidget {
             }
             return Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
-              child: Wrap(
-                spacing: 12,
-                runSpacing: 4,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   ...validation.errors.map(
-                    (issue) => Text(
-                      _warningLabel(l10n, issue),
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.error,
-                      ),
+                    (issue) => _ValidationLine(
+                      icon: Icons.error_outline_rounded,
+                      color: AppColors.error,
+                      text: _warningLabel(l10n, issue),
                     ),
                   ),
                   ...validation.warnings.map(
-                    (issue) => Text(
-                      _warningLabel(l10n, issue),
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.warning,
-                      ),
+                    (issue) => _ValidationLine(
+                      icon: Icons.warning_amber_rounded,
+                      color: AppColors.warning,
+                      text: _warningLabel(l10n, issue),
                     ),
                   ),
                 ],
@@ -367,6 +365,41 @@ class _ArmyBuilderPage extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _ValidationLine extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String text;
+
+  const _ValidationLine({
+    required this.icon,
+    required this.color,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              text,
+              style: AppTextStyles.body.copyWith(
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -779,14 +812,21 @@ class _UnitRosterRow extends StatelessWidget {
                       if (unit.modelCount > 1)
                         Text(
                           'x${unit.modelCount}',
-                          style: AppTextStyles.caption,
+                          style: AppTextStyles.caption.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                     ],
                   ),
                 ),
                 Text(
                   l10n.pointsSuffix(unit.points),
-                  style: AppTextStyles.caption,
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),
@@ -1652,11 +1692,28 @@ class _StratagemsDialog extends ConsumerWidget {
                                   ),
                                 ],
                               ),
-                              if (stratagem.phase != null)
-                                Text(
-                                  stratagem.phase!,
-                                  style: AppTextStyles.caption,
+                              if (stratagem.phase != null) ...[
+                                const SizedBox(height: 4),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary.withValues(
+                                      alpha: .14,
+                                    ),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    stratagem.phase!,
+                                    style: AppTextStyles.caption.copyWith(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
+                              ],
                               if (stratagem.description != null) ...[
                                 const SizedBox(height: 4),
                                 Text(

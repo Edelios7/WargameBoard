@@ -136,14 +136,26 @@ class _BattleCard extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  battle.opponentName ?? battle.missionName ?? '—',
-                  style: AppTextStyles.body,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        battle.opponentName ?? battle.missionName ?? '—',
+                        style: AppTextStyles.body,
+                      ),
+                    ),
+                    Text(
+                      dateFormat.format(battle.playedAt),
+                      style: AppTextStyles.caption.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
                   [
-                    dateFormat.format(battle.playedAt),
                     if (battle.armyName != null) battle.armyName!,
                     if (battle.missionName != null &&
                         battle.opponentName != null)
@@ -164,9 +176,14 @@ class _BattleCard extends ConsumerWidget {
             ),
           ),
           if (battle.myScore != null && battle.opponentScore != null)
-            Text(
-              l10n.battleScoreLine(battle.myScore!, battle.opponentScore!),
-              style: AppTextStyles.body,
+            Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: Text(
+                l10n.battleScoreLine(battle.myScore!, battle.opponentScore!),
+                style: AppTextStyles.title.copyWith(
+                  color: _resultColor(battle.result),
+                ),
+              ),
             ),
           IconButton(
             icon: const Icon(Icons.close_rounded),

@@ -181,7 +181,7 @@ class DatasheetDetailPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title.toUpperCase(), style: AppTextStyles.caption),
+          Text(title.toUpperCase(), style: AppTextStyles.eyebrow),
           const SizedBox(height: 10),
           content,
         ],
