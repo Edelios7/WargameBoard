@@ -22,10 +22,6 @@ const Map<String, String> kCoreAbilityGlossary = {
       'Cette unité peut être placée en Réserve avant la bataille. Depuis '
           'la Réserve Stratégique, elle peut être déployée n\'importe où '
           'sur le champ de bataille à plus de 9" de tout modèle ennemi.',
-  'assaut teleporte':
-      'Cette unité peut être placée en Réserve avant la bataille. Depuis '
-          'la Réserve Stratégique, elle peut être déployée n\'importe où '
-          'sur le champ de bataille à plus de 9" de tout modèle ennemi.',
   'infiltrateurs':
       'Pendant le déploiement, cette unité peut être installée n\'importe '
           'où sur le champ de bataille à plus de 9" de la zone de '
