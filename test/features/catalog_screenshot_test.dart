@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:drift/native.dart';
@@ -27,19 +26,18 @@ void main() {
   // correction : ignoré par défaut (n'écrit rien sans CATALOG_SCREENSHOT_PATH),
   // à lancer explicitement via `CATALOG_SCREENSHOT_PATH=out.png flutter test
   // test/features/catalog_screenshot_test.dart`.
+  setUpAll(() async {
+    final fontsRoot = Platform.environment['FLUTTER_MATERIAL_FONTS_DIR'];
+    if (fontsRoot != null) {
+      await _loadFont('Roboto', '$fontsRoot/roboto-regular.ttf');
+      await _loadFont('MaterialIcons', '$fontsRoot/materialicons-regular.otf');
+    }
+  });
+
   testWidgets(
     'catalog page screenshot',
     skip: Platform.environment['CATALOG_SCREENSHOT_PATH'] == null,
     (tester) async {
-      final fontsRoot = Platform.environment['FLUTTER_MATERIAL_FONTS_DIR'];
-      if (fontsRoot != null) {
-        await _loadFont('Roboto', '$fontsRoot/roboto-regular.ttf');
-        await _loadFont(
-          'MaterialIcons',
-          '$fontsRoot/materialicons-regular.otf',
-        );
-      }
-
       final database = AppDatabase.forTesting(NativeDatabase.memory());
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
@@ -91,16 +89,19 @@ void main() {
       final boundary =
           boundaryKey.currentContext!.findRenderObject()
               as RenderRepaintBoundary;
-      final image = await boundary.toImage(pixelRatio: 1.0);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      final bytes = byteData!.buffer.asUint8List();
+      await tester.runAsync(() async {
+        final image = await boundary.toImage(pixelRatio: 1.0);
+        final byteData =
+            await image.toByteData(format: ui.ImageByteFormat.png);
+        final bytes = byteData!.buffer.asUint8List();
 
-      final outPath =
-          Platform.environment['CATALOG_SCREENSHOT_PATH'] ??
-          'catalog_screenshot.png';
-      final file = File(outPath);
-      file.parent.createSync(recursive: true);
-      file.writeAsBytesSync(bytes);
+        final outPath =
+            Platform.environment['CATALOG_SCREENSHOT_PATH'] ??
+            'catalog_screenshot.png';
+        final file = File(outPath);
+        file.parent.createSync(recursive: true);
+        file.writeAsBytesSync(bytes);
+      });
 
       await database.close();
     },
