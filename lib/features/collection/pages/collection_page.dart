@@ -13,6 +13,7 @@ import '../../../database/models/army_details.dart';
 import '../../../database/models/battle_details.dart';
 import '../../../database/models/collection_item_details.dart';
 import '../../../database/tables/battles_table.dart';
+import '../../../domain/catalog/factions/space_marine_chapters.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/army_provider.dart';
 import '../../../providers/battle_provider.dart';
@@ -37,25 +38,12 @@ int _stateCount(CollectionItemDetails entry, _PaintState state) {
 }
 
 /// Clé sentinelle utilisée par le filtre de faction pour désigner le
-/// groupe "Space Marines" (qui regroupe les chapitres/sous-factions
-/// ci-dessous), plutôt qu'une faction unique portant ce nom exact.
+/// groupe "Space Marines" (qui regroupe les chapitres/sous-factions),
+/// plutôt qu'une faction unique portant ce nom exact. Le regroupement
+/// lui-même (chapitres + faction générique) vit dans
+/// domain/catalog/factions/space_marine_chapters.dart, partagé avec le
+/// filtre d'ajout d'unité de l'army builder.
 const _spaceMarinesGroupKey = '__space_marines_group__';
-
-/// Noms de faction considérés comme des chapitres/déclinaisons de Space
-/// Marines dans les données importées (chaque chapitre est sa propre
-/// faction en base, il n'y a pas de hiérarchie explicite en DB).
-const _spaceMarineChapterFactionNames = <String>{
-  'Space Marines',
-  'Blood Angels',
-  'Dark Angels',
-  'Space Wolves',
-  'Imperial Fists',
-  'Black Templars',
-  'Deathwatch',
-  'Salamanders',
-  'Raven Guard',
-  'Ultramarines',
-};
 
 class CollectionPage extends ConsumerStatefulWidget {
   const CollectionPage({super.key});
@@ -262,7 +250,7 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
     }
     if (_factionFilter != null) {
       if (_factionFilter == _spaceMarinesGroupKey) {
-        if (!_spaceMarineChapterFactionNames.contains(entry.factionName)) {
+        if (!isSpaceMarineFactionName(entry.factionName)) {
           return false;
         }
       } else if (entry.factionName != _factionFilter) {
@@ -654,13 +642,9 @@ class _FactionQuickAccessRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final presentFactions = entries.map((e) => e.factionName).toSet();
-    final hasSpaceMarines = presentFactions.any(
-      _spaceMarineChapterFactionNames.contains,
-    );
+    final hasSpaceMarines = presentFactions.any(isSpaceMarineFactionName);
     final otherFactions =
-        presentFactions
-            .where((f) => !_spaceMarineChapterFactionNames.contains(f))
-            .toList()
+        presentFactions.where((f) => !isSpaceMarineFactionName(f)).toList()
           ..sort();
 
     if (!hasSpaceMarines && otherFactions.isEmpty) {
@@ -668,8 +652,7 @@ class _FactionQuickAccessRow extends StatelessWidget {
     }
 
     final chapters = factionFilter == _spaceMarinesGroupKey
-        ? (presentFactions.where(_spaceMarineChapterFactionNames.contains).toList()
-            ..sort())
+        ? (presentFactions.where(isSpaceMarineFactionName).toList()..sort())
         : const <String>[];
 
     return Padding(

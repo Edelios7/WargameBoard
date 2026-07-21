@@ -15,12 +15,14 @@ const String wpAngelusBoltgun = 'wp-angelus-boltgun';
 const String dsCaptain = 'ds-captain';
 const String dsDeathCompanyMarines = 'ds-death-company-marines';
 const String dsSanguinaryGuard = 'ds-sanguinary-guard';
+const String dsIntercessorSquad = 'ds-intercessor-squad';
 
 Future<void> seedDatasheets(AppDatabase db) async {
   await _seedWeapons(db);
   await _seedCaptain(db);
   await _seedDeathCompanyMarines(db);
   await _seedSanguinaryGuard(db);
+  await _seedIntercessorSquad(db);
 }
 
 Future<void> _seedWeapons(AppDatabase db) async {
@@ -252,6 +254,68 @@ Future<void> _seedSanguinaryGuard(AppDatabase db) async {
           minimumModels: 3,
           maximumModels: 6,
           defaultModels: 3,
+        ),
+      );
+}
+
+/// Unité Space Marines "générique" (faction distincte de chaque
+/// chapitre) — sert à vérifier qu'une armée d'un chapitre comme Blood
+/// Angels peut aussi voir/jouer les unités Space Marines de base, pas
+/// seulement celles de sa propre faction stricte.
+Future<void> _seedIntercessorSquad(AppDatabase db) async {
+  await db.into(db.datasheets).insert(
+        DatasheetsCompanion.insert(
+          id: dsIntercessorSquad,
+          factionId: seedSpaceMarinesFactionId,
+          name: 'Intercessor Squad',
+          battlefieldRole: 'Battleline',
+          unitType: 'Infantry',
+        ),
+      );
+
+  const modelId = 'dm-intercessor-squad';
+  await db.into(db.datasheetModels).insert(
+        DatasheetModelsCompanion.insert(
+          id: modelId,
+          datasheetId: dsIntercessorSquad,
+          name: 'Intercessor',
+        ),
+      );
+
+  await db.into(db.modelProfiles).insert(
+        ModelProfilesCompanion.insert(
+          id: 'mp-intercessor-squad',
+          datasheetModelId: modelId,
+          name: 'Intercessor',
+          movement: 6,
+          toughness: 4,
+          save: 3,
+          wounds: 2,
+          leadership: 6,
+          objectiveControl: 2,
+        ),
+      );
+
+  for (final kw in [kwInfantry, kwAdeptusAstartes, kwImperium]) {
+    await _linkDatasheetKeyword(db, dsIntercessorSquad, kw);
+  }
+
+  await db.into(db.datasheetCosts).insert(
+        DatasheetCostsCompanion.insert(
+          id: 'cost-intercessor-squad',
+          datasheetId: dsIntercessorSquad,
+          editionId: seedEditionId,
+          points: 80,
+        ),
+      );
+
+  await db.into(db.unitSizes).insert(
+        UnitSizesCompanion.insert(
+          id: 'size-intercessor-squad',
+          datasheetId: dsIntercessorSquad,
+          minimumModels: 5,
+          maximumModels: 10,
+          defaultModels: 5,
         ),
       );
 }

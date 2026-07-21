@@ -6,6 +6,7 @@ const String seedGameSystemId = 'gs-w40k';
 const String seedEditionId = 'ed-w40k-10e';
 const String seedFactionId = 'fac-blood-angels';
 const String seedOrksFactionId = 'fac-orks';
+const String seedSpaceMarinesFactionId = 'fac-space-marines-adeptus-astartes';
 
 Future<void> seedFactions(AppDatabase db) async {
   await db.into(db.gameSystems).insert(
@@ -51,6 +52,24 @@ Future<void> seedFactions(AppDatabase db) async {
             "du combat et une technologie aussi rudimentaire qu'efficace.",
           ),
           displayOrder: const Value(1),
+        ),
+      );
+
+  // Faction générique, distincte de chaque chapitre (ex. Blood Angels) —
+  // reproduit la structure des données réelles importées, où les unités
+  // Space Marines "de base" (non propres à un chapitre) vivent sous
+  // cette faction plutôt que sous celle du chapitre.
+  await db.into(db.factions).insert(
+        FactionsCompanion.insert(
+          id: seedSpaceMarinesFactionId,
+          gameSystemId: seedGameSystemId,
+          name: 'Space Marines (Adeptus Astartes)',
+          shortName: const Value('SM'),
+          description: const Value(
+            "Guerriers post-humains de l'Adeptus Astartes, socle commun à "
+            "tous les chapitres de Space Marines.",
+          ),
+          displayOrder: const Value(2),
         ),
       );
 }

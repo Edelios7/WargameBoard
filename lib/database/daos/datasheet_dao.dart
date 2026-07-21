@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+import '../../domain/catalog/factions/space_marine_chapters.dart';
 import '../../domain/xp/xp_awards.dart';
 import '../app_database.dart';
 import '../models/ability_details.dart';
@@ -165,7 +166,8 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
       ..where(datasheets.name.like(pattern));
 
     if (factionId != null) {
-      query.where(datasheets.factionId.equals(factionId));
+      final matchIds = await _resolveFactionIdsForFilter(factionId);
+      query.where(datasheets.factionId.isIn(matchIds));
     }
     if (role != null) {
       query.where(datasheets.battlefieldRole.equals(role));
@@ -263,6 +265,33 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
   }
 
   static const _maxSearchPoints = 1 << 30;
+
+  /// Élargit un filtre de faction pour les chapitres de Space Marines :
+  /// une armée Blood Angels peut aussi jouer des unités Space Marines
+  /// génériques (pas propres à un chapitre), qui sont une faction à
+  /// part dans les données importées. Sans ça, filtrer par faction lors
+  /// de l'ajout d'une unité ne montrerait que les fiches strictement
+  /// Blood Angels, en excluant à tort tout le "socle" Space Marines
+  /// commun. L'inverse n'est pas vrai : une armée Space Marines
+  /// générique ne doit pas voir apparaître les unités propres à un
+  /// chapitre (ex. personnages nommés Blood Angels).
+  Future<List<String>> _resolveFactionIdsForFilter(String factionId) async {
+    final target = await (select(factions)
+          ..where((t) => t.id.equals(factionId)))
+        .getSingleOrNull();
+    if (target == null || !isSpaceMarineFactionName(target.name)) {
+      return [factionId];
+    }
+    if (isGenericSpaceMarinesFactionName(target.name)) {
+      return [factionId];
+    }
+
+    final allFactions = await select(factions).get();
+    final genericIds = allFactions
+        .where((f) => isGenericSpaceMarinesFactionName(f.name))
+        .map((f) => f.id);
+    return {factionId, ...genericIds}.toList();
+  }
 
   Future<List<String>> getDistinctRoles() async {
     final query = selectOnly(datasheets, distinct: true)

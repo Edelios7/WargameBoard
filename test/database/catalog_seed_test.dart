@@ -1,6 +1,7 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wargameboard/database/app_database.dart';
+import 'package:wargameboard/database/seed/faction_seed.dart';
 
 void main() {
   late AppDatabase database;
@@ -19,6 +20,40 @@ void main() {
     expect(results, hasLength(1));
     expect(results.single.name, 'Sanguinary Guard');
     expect(results.single.factionName, 'Blood Angels');
+  });
+
+  test(
+      'filtering by a Space Marines chapter also surfaces generic Space Marines units',
+      () async {
+    final results = await database.datasheetDao.search(
+      '',
+      factionId: seedFactionId, // Blood Angels
+    );
+
+    expect(results.map((r) => r.name), contains('Captain'));
+    expect(results.map((r) => r.name), contains('Intercessor Squad'));
+  });
+
+  test(
+      'filtering by the generic Space Marines faction does NOT surface chapter-specific units',
+      () async {
+    final results = await database.datasheetDao.search(
+      '',
+      factionId: seedSpaceMarinesFactionId,
+    );
+
+    expect(results.map((r) => r.name), contains('Intercessor Squad'));
+    expect(results.map((r) => r.name), isNot(contains('Captain')));
+  });
+
+  test('filtering by a non-Space-Marines faction is unaffected', () async {
+    final results = await database.datasheetDao.search(
+      '',
+      factionId: seedOrksFactionId,
+    );
+
+    expect(results, isNotEmpty);
+    expect(results.every((r) => r.factionName == 'Orks'), isTrue);
   });
 
   test('getDatasheet resolves full details including weapons and keywords', () async {
@@ -41,9 +76,12 @@ void main() {
   });
 
   test('search filters by faction', () async {
+    // 3 fiches propres à Blood Angels + Intercessor Squad (Space
+    // Marines générique), voir le test dédié plus haut sur ce
+    // comportement.
     final matching = await database.datasheetDao
         .search('', factionId: 'fac-blood-angels');
-    expect(matching, hasLength(3));
+    expect(matching, hasLength(4));
 
     final none =
         await database.datasheetDao.search('', factionId: 'fac-unknown');
