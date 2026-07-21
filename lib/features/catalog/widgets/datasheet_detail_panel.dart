@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -33,22 +33,22 @@ class DatasheetDetailPanel extends StatelessWidget {
     final sheet = datasheet;
     if (sheet == null) {
       return Center(
-        child: Text(
-          l10n.catalogSelectPrompt,
-          style: AppTextStyles.caption,
-        ),
+        child: Text(l10n.catalogSelectPrompt, style: AppTextStyles.caption),
       );
     }
 
     final imageFile = LocalCatalogImages.datasheet(sheet.id);
     final factionIcon = LocalCatalogImages.faction(sheet.factionId);
+    final factionBanner = imageFile == null
+        ? LocalCatalogImages.factionBanner(sheet.factionId)
+        : null;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _hero(sheet, imageFile, factionIcon, l10n),
+          _hero(sheet, imageFile, factionIcon, factionBanner, l10n),
           const SizedBox(height: 28),
           _section(
             l10n.sectionUnitSize,
@@ -81,6 +81,7 @@ class DatasheetDetailPanel extends StatelessWidget {
     DatasheetDetails sheet,
     dynamic imageFile,
     dynamic factionIcon,
+    dynamic factionBanner,
     AppLocalizations l10n,
   ) {
     return Container(
@@ -113,6 +114,33 @@ class DatasheetDetailPanel extends StatelessWidget {
                           AppColors.surfaceElevated.withValues(alpha: .95),
                         ],
                         stops: const [0.4, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          else if (factionBanner != null)
+            // Pas de visuel propre à la fiche : la bannière de faction
+            // habille l'en-tête à la place d'un bloc vide.
+            Stack(
+              children: [
+                Image.file(
+                  factionBanner,
+                  height: 90,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          AppColors.surfaceElevated.withValues(alpha: .35),
+                          AppColors.surfaceElevated.withValues(alpha: .9),
+                        ],
                       ),
                     ),
                   ),
@@ -229,9 +257,12 @@ class DatasheetDetailPanel extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (sheet.models.length > 1) ...[
-                    Text(model.name, style: AppTextStyles.body.copyWith(
-                      fontWeight: FontWeight.w600,
-                    )),
+                    Text(
+                      model.name,
+                      style: AppTextStyles.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                   ],
                   Row(
@@ -301,14 +332,18 @@ class DatasheetDetailPanel extends StatelessWidget {
 
     for (final weapon in sheet.weapons) {
       if (weapon.profiles.isEmpty) {
-        rows.add(TableRow(children: [
-          _weaponCell(weapon.name, bold: true),
-          _weaponCell(weapon.type, alignEnd: true),
-          _weaponCell('—', alignEnd: true),
-          _weaponCell('—', alignEnd: true),
-          _weaponCell('—', alignEnd: true),
-          _weaponCell('—', alignEnd: true),
-        ]));
+        rows.add(
+          TableRow(
+            children: [
+              _weaponCell(weapon.name, bold: true),
+              _weaponCell(weapon.type, alignEnd: true),
+              _weaponCell('—', alignEnd: true),
+              _weaponCell('—', alignEnd: true),
+              _weaponCell('—', alignEnd: true),
+              _weaponCell('—', alignEnd: true),
+            ],
+          ),
+        );
         continue;
       }
       for (var i = 0; i < weapon.profiles.length; i++) {
@@ -316,17 +351,21 @@ class DatasheetDetailPanel extends StatelessWidget {
         final label = weapon.profiles.length > 1
             ? '${weapon.name} — ${profile.name}'
             : weapon.name;
-        rows.add(TableRow(children: [
-          _weaponCell(label, bold: true),
-          _weaponCell(
-            profile.isMelee ? l10n.weaponMelee : '${profile.range}"',
-            alignEnd: true,
+        rows.add(
+          TableRow(
+            children: [
+              _weaponCell(label, bold: true),
+              _weaponCell(
+                profile.isMelee ? l10n.weaponMelee : '${profile.range}"',
+                alignEnd: true,
+              ),
+              _weaponCell(profile.attacks, alignEnd: true),
+              _weaponCell('${profile.strength}', alignEnd: true),
+              _weaponCell('${profile.armorPenetration}', alignEnd: true),
+              _weaponCell(profile.damage, alignEnd: true),
+            ],
           ),
-          _weaponCell(profile.attacks, alignEnd: true),
-          _weaponCell('${profile.strength}', alignEnd: true),
-          _weaponCell('${profile.armorPenetration}', alignEnd: true),
-          _weaponCell(profile.damage, alignEnd: true),
-        ]));
+        );
       }
     }
 
@@ -433,26 +472,29 @@ class DatasheetDetailPanel extends StatelessWidget {
                     Text(ability.description, style: AppTextStyles.caption),
                   ] else ...[
                     const SizedBox(height: 6),
-                    Builder(builder: (context) {
-                      final generic =
-                          lookupCoreAbilityDescription(ability.name);
-                      if (generic != null) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            AppChip(label: l10n.abilityGenericRuleTag),
-                            const SizedBox(height: 6),
-                            Text(generic, style: AppTextStyles.caption),
-                          ],
+                    Builder(
+                      builder: (context) {
+                        final generic = lookupCoreAbilityDescription(
+                          ability.name,
                         );
-                      }
-                      return Text(
-                        l10n.abilityNoTextAvailable,
-                        style: AppTextStyles.caption.copyWith(
-                          fontStyle: FontStyle.italic,
-                        ),
-                      );
-                    }),
+                        if (generic != null) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              AppChip(label: l10n.abilityGenericRuleTag),
+                              const SizedBox(height: 6),
+                              Text(generic, style: AppTextStyles.caption),
+                            ],
+                          );
+                        }
+                        return Text(
+                          l10n.abilityNoTextAvailable,
+                          style: AppTextStyles.caption.copyWith(
+                            fontStyle: FontStyle.italic,
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ],
               ),

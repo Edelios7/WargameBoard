@@ -39,46 +39,72 @@ class CatalogPage extends ConsumerWidget {
         editionFilter != null ||
         pointsRange != null;
 
+    final headerBannerFile = factionFilter != null
+        ? LocalCatalogImages.factionBanner(factionFilter)
+        : null;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(28, 24, 28, 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.navCatalog.toUpperCase(),
-                        style: AppTextStyles.heading,
+          Container(
+            decoration: headerBannerFile != null
+                ? BoxDecoration(
+                    image: DecorationImage(
+                      image: FileImage(headerBannerFile),
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : null,
+            child: Container(
+              decoration: headerBannerFile != null
+                  ? BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          AppColors.background.withValues(alpha: .9),
+                          AppColors.background.withValues(alpha: .6),
+                        ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        l10n.catalogBreadcrumbAllUnits,
-                        style: AppTextStyles.caption,
-                      ),
-                    ],
-                  ),
-                ),
-                OutlinedButton.icon(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const WeaponsInventoryPage(),
+                    )
+                  : null,
+              padding: const EdgeInsets.fromLTRB(28, 24, 28, 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.navCatalog.toUpperCase(),
+                          style: AppTextStyles.heading,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          l10n.catalogBreadcrumbAllUnits,
+                          style: AppTextStyles.caption,
+                        ),
+                      ],
                     ),
                   ),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.textPrimary,
-                    side: const BorderSide(color: AppColors.border),
+                  OutlinedButton.icon(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const WeaponsInventoryPage(),
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.textPrimary,
+                      side: const BorderSide(color: AppColors.border),
+                    ),
+                    icon: const Icon(Icons.hardware_rounded, size: 18),
+                    label: Text(l10n.catalogWeaponsButton),
                   ),
-                  icon: const Icon(Icons.hardware_rounded, size: 18),
-                  label: Text(l10n.catalogWeaponsButton),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           const _FactionQuickAccessBar(),
@@ -165,9 +191,11 @@ class _FactionQuickAccessBar extends ConsumerWidget {
                       return _AllFactionsTile(
                         label: l10n.catalogAllFactionsChip,
                         selected: selectedFactionId == null,
-                        onTap: () => ref
-                            .read(catalogFactionFilterProvider.notifier)
-                            .state = null,
+                        onTap: () =>
+                            ref
+                                    .read(catalogFactionFilterProvider.notifier)
+                                    .state =
+                                null,
                       );
                     }
                     final faction = sorted[index - 1];
@@ -234,16 +262,13 @@ class _AllFactionsTile extends StatelessWidget {
                 width: 34,
                 height: 34,
                 decoration: BoxDecoration(
-                  color: selected
-                      ? AppColors.primary
-                      : AppColors.surface,
+                  color: selected ? AppColors.primary : AppColors.surface,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.apps_rounded,
                   size: 18,
-                  color:
-                      selected ? Colors.white : AppColors.textSecondary,
+                  color: selected ? Colors.white : AppColors.textSecondary,
                 ),
               ),
               const SizedBox(height: 6),
@@ -408,8 +433,7 @@ class _FiltersPanel extends ConsumerWidget {
                   onTap: () {
                     ref.read(catalogFactionFilterProvider.notifier).state =
                         null;
-                    ref.read(catalogKeywordFilterProvider.notifier).state =
-                        {};
+                    ref.read(catalogKeywordFilterProvider.notifier).state = {};
                     ref.read(catalogRoleFilterProvider.notifier).state = null;
                     ref.read(catalogUnitTypeFilterProvider.notifier).state =
                         null;
@@ -467,8 +491,7 @@ class _FiltersPanel extends ConsumerWidget {
               keywords: keywords,
               selected: keywordFilter,
               onChanged: (value) =>
-                  ref.read(catalogKeywordFilterProvider.notifier).state =
-                      value,
+                  ref.read(catalogKeywordFilterProvider.notifier).state = value,
             ),
           ),
           const SizedBox(height: 14),
@@ -691,50 +714,62 @@ class _ActiveFiltersRow extends ConsumerWidget {
           .where((f) => f.id == factionFilter)
           .map((f) => f.name)
           .firstOrNull;
-      chips.add(_activeFilterChip(
-        name ?? factionFilter,
-        () => ref.read(catalogFactionFilterProvider.notifier).state = null,
-      ));
+      chips.add(
+        _activeFilterChip(
+          name ?? factionFilter,
+          () => ref.read(catalogFactionFilterProvider.notifier).state = null,
+        ),
+      );
     }
     for (final keywordId in keywordFilter) {
       final name = keywords
           .where((k) => k.id == keywordId)
           .map((k) => k.name)
           .firstOrNull;
-      chips.add(_activeFilterChip(
-        name ?? keywordId,
-        () => ref.read(catalogKeywordFilterProvider.notifier).state = {
-          ...keywordFilter,
-        }..remove(keywordId),
-      ));
+      chips.add(
+        _activeFilterChip(
+          name ?? keywordId,
+          () => ref.read(catalogKeywordFilterProvider.notifier).state = {
+            ...keywordFilter,
+          }..remove(keywordId),
+        ),
+      );
     }
     if (roleFilter != null) {
-      chips.add(_activeFilterChip(
-        roleFilter,
-        () => ref.read(catalogRoleFilterProvider.notifier).state = null,
-      ));
+      chips.add(
+        _activeFilterChip(
+          roleFilter,
+          () => ref.read(catalogRoleFilterProvider.notifier).state = null,
+        ),
+      );
     }
     if (unitTypeFilter != null) {
-      chips.add(_activeFilterChip(
-        unitTypeFilter,
-        () => ref.read(catalogUnitTypeFilterProvider.notifier).state = null,
-      ));
+      chips.add(
+        _activeFilterChip(
+          unitTypeFilter,
+          () => ref.read(catalogUnitTypeFilterProvider.notifier).state = null,
+        ),
+      );
     }
     if (editionFilter != null) {
       final name = editions
           .where((e) => e.id == editionFilter)
           .map((e) => e.name)
           .firstOrNull;
-      chips.add(_activeFilterChip(
-        name ?? editionFilter,
-        () => ref.read(catalogEditionFilterProvider.notifier).state = null,
-      ));
+      chips.add(
+        _activeFilterChip(
+          name ?? editionFilter,
+          () => ref.read(catalogEditionFilterProvider.notifier).state = null,
+        ),
+      );
     }
     if (pointsRange != null) {
-      chips.add(_activeFilterChip(
-        '${pointsRange.start.round()}-${pointsRange.end.round()} pts',
-        () => ref.read(catalogPointsRangeProvider.notifier).state = null,
-      ));
+      chips.add(
+        _activeFilterChip(
+          '${pointsRange.start.round()}-${pointsRange.end.round()} pts',
+          () => ref.read(catalogPointsRangeProvider.notifier).state = null,
+        ),
+      );
     }
 
     if (chips.isEmpty) return const SizedBox.shrink();
@@ -863,7 +898,8 @@ class _KeywordMultiSelect extends StatelessWidget {
                   (keyword) => AppChip(
                     label: keyword.name,
                     accent: true,
-                    onDeleted: () => onChanged({...selected}..remove(keyword.id)),
+                    onDeleted: () =>
+                        onChanged({...selected}..remove(keyword.id)),
                   ),
                 )
                 .toList(),
@@ -922,8 +958,8 @@ class _KeywordPickerSheetState extends State<_KeywordPickerSheet> {
     final filtered = _query.isEmpty
         ? sorted
         : sorted
-            .where((k) => k.name.toLowerCase().contains(_query.toLowerCase()))
-            .toList();
+              .where((k) => k.name.toLowerCase().contains(_query.toLowerCase()))
+              .toList();
 
     return SafeArea(
       child: Padding(
@@ -975,8 +1011,9 @@ class _KeywordPickerSheetState extends State<_KeywordPickerSheet> {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                  style:
-                      FilledButton.styleFrom(backgroundColor: AppColors.primary),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                  ),
                   onPressed: () => Navigator.of(context).pop(_selected),
                   child: Text(widget.l10n.catalogApplyFilters),
                 ),
@@ -1243,11 +1280,7 @@ class _OwnedBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.check_circle_rounded,
-            size: 11,
-            color: AppColors.success,
-          ),
+          Icon(Icons.check_circle_rounded, size: 11, color: AppColors.success),
           const SizedBox(width: 3),
           Flexible(
             child: Text(
