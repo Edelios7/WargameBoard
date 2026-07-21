@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/utils/local_catalog_images.dart';
 import '../database/models/collection_item_details.dart';
 import '../database/models/search_result.dart';
 import 'catalog_provider.dart';
@@ -118,4 +119,18 @@ final catalogStatsProvider = FutureProvider<CatalogStats>((ref) async {
     abilities: abilities.length,
     keywords: keywords.length,
   );
+});
+
+/// Id d'une datasheet de la faction donnée pour laquelle une image de
+/// référence locale existe (voir local_assets/datasheets/README.md), utilisée
+/// comme illustration décorative. Retourne null si la faction n'a aucune
+/// image locale disponible.
+final factionHeroImageIdProvider =
+    FutureProvider.family<String?, String>((ref, factionId) async {
+  final repository = ref.watch(catalogRepositoryProvider);
+  final results = await repository.search('', factionId: factionId);
+  for (final result in results) {
+    if (LocalCatalogImages.datasheet(result.id) != null) return result.id;
+  }
+  return null;
 });

@@ -18,6 +18,24 @@ import sys
 
 from pypdf import PdfReader
 
+_DASH_MAP = {
+    0x2010: "-", 0x2011: "-", 0x2012: "-", 0x2013: "-", 0x2014: "-", 0x2212: "-",
+    0x2018: "'", 0x2019: "'", 0x201C: '"', 0x201D: '"',
+}
+
+
+def normalize(line):
+    return line.translate(_DASH_MAP)
+
+
+BANNER_RE = re.compile(
+    r"^(W\s*ARHAMMER\s*LEGENDS|WARHAMMER LEGENDS|DATASHEETS|"
+    r"IMPERIAL ARMOUR DATASHEETS|LEGENDS DATASHEETS|RULES UPDATES|"
+    r"RANGED WEAPONS|MELEE WEAPONS|WARGEAR OPTIONS|WARGEAR ABILITIES|"
+    r"UNIT COMPOSITION|ABILITIES|KEYWORDS|FACTION KEYWORDS)\s*$",
+    re.IGNORECASE,
+)
+
 PDF_DIR = r"C:/Projet/wargameboard/local_assets/wh40k_reference/PDFS/à jour"
 OUT_DIR = r"C:/Projet/wargameboard/local_assets/wh40k_reference/parsed_json"
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -45,6 +63,8 @@ def is_heading(line):
     l = line.strip()
     if not (3 <= len(l) <= 60):
         return False
+    if BANNER_RE.match(l):
+        return False
     letters = [c for c in l if c.isalpha()]
     if len(letters) < 3:
         return False
@@ -53,6 +73,7 @@ def is_heading(line):
 
 
 def clean_kw_list(raw):
+    raw = re.split(r"FACTION KEYWORDS\s*:", raw, flags=re.IGNORECASE)[0]
     parts = re.split(r"[;,]", raw)
     return [p.strip().strip(".") for p in parts if p.strip()]
 
@@ -92,7 +113,7 @@ def parse_pdf(path):
             units.append(current)
 
     for text in pages:
-        lines = [l.strip() for l in text.splitlines() if l.strip()]
+        lines = [normalize(l.strip()) for l in text.splitlines() if l.strip()]
         if not lines:
             continue
 

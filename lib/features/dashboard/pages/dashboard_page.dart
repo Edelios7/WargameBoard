@@ -47,6 +47,11 @@ class DashboardPage extends ConsumerWidget {
         armies.fold<int>(0, (sum, a) => sum + a.totalPoints);
     final summary = summaryAsync.value;
     final entries = entriesAsync.value ?? const <CollectionItemDetails>[];
+    final heroFactionId = armies.isEmpty
+        ? null
+        : armies
+            .reduce((a, b) => a.totalPoints >= b.totalPoints ? a : b)
+            .factionId;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -57,6 +62,7 @@ class DashboardPage extends ConsumerWidget {
           children: [
             _DashboardHeader(
               displayName: displayName,
+              heroFactionId: heroFactionId,
               onOpenSettings: () => goTo(AppTab.settings),
               onOpenProfile: () => goTo(AppTab.profile),
               onSearch: (query) {
@@ -238,24 +244,26 @@ class DashboardPage extends ConsumerWidget {
   }
 }
 
-class _DashboardHeader extends StatefulWidget {
+class _DashboardHeader extends ConsumerStatefulWidget {
   final String? displayName;
+  final String? heroFactionId;
   final VoidCallback onOpenSettings;
   final VoidCallback onOpenProfile;
   final ValueChanged<String> onSearch;
 
   const _DashboardHeader({
     required this.displayName,
+    required this.heroFactionId,
     required this.onOpenSettings,
     required this.onOpenProfile,
     required this.onSearch,
   });
 
   @override
-  State<_DashboardHeader> createState() => _DashboardHeaderState();
+  ConsumerState<_DashboardHeader> createState() => _DashboardHeaderState();
 }
 
-class _DashboardHeaderState extends State<_DashboardHeader> {
+class _DashboardHeaderState extends ConsumerState<_DashboardHeader> {
   final _searchController = TextEditingController();
 
   @override
@@ -270,6 +278,11 @@ class _DashboardHeaderState extends State<_DashboardHeader> {
     final greeting = widget.displayName == null || widget.displayName!.isEmpty
         ? l10n.dashboardGreetingAnon
         : l10n.dashboardGreetingNamed(widget.displayName!);
+    final heroImageId = widget.heroFactionId == null
+        ? null
+        : ref.watch(factionHeroImageIdProvider(widget.heroFactionId!)).value;
+    final heroFile =
+        heroImageId == null ? null : LocalCatalogImages.datasheet(heroImageId);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -358,23 +371,44 @@ class _DashboardHeaderState extends State<_DashboardHeader> {
           ],
         );
 
-        if (!wide) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              greetingBlock,
-              const SizedBox(height: 16),
-              actionsRow,
-            ],
-          );
-        }
+        final content = !wide
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  greetingBlock,
+                  const SizedBox(height: 16),
+                  actionsRow,
+                ],
+              )
+            : Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(child: greetingBlock),
+                  actionsRow,
+                ],
+              );
 
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(child: greetingBlock),
-            actionsRow,
-          ],
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceElevated,
+              image: heroFile == null
+                  ? null
+                  : DecorationImage(
+                      image: FileImage(heroFile),
+                      fit: BoxFit.cover,
+                      alignment: Alignment.topCenter,
+                      colorFilter: ColorFilter.mode(
+                        AppColors.background.withValues(alpha: .68),
+                        BlendMode.darken,
+                      ),
+                    ),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: content,
+          ),
         );
       },
     );
@@ -500,14 +534,14 @@ class _StatTile extends StatelessWidget {
   }
 }
 
-class _LastBattleTile extends StatelessWidget {
+class _LastBattleTile extends ConsumerWidget {
   final BattleDetails? battle;
   final VoidCallback onTap;
 
   const _LastBattleTile({required this.battle, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
 
     if (battle == null) {
@@ -553,6 +587,13 @@ class _LastBattleTile extends StatelessWidget {
       null => null,
     };
 
+    final opponentFactionId = battle!.opponentFactionId;
+    final heroImageId = opponentFactionId == null
+        ? null
+        : ref.watch(factionHeroImageIdProvider(opponentFactionId)).value;
+    final heroFile =
+        heroImageId == null ? null : LocalCatalogImages.datasheet(heroImageId);
+
     return Material(
       color: AppColors.surfaceElevated,
       borderRadius: BorderRadius.circular(14),
@@ -564,14 +605,26 @@ class _LastBattleTile extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border.all(color: AppColors.border),
             borderRadius: BorderRadius.circular(14),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.primary.withValues(alpha: .18),
-                AppColors.surfaceElevated,
-              ],
-            ),
+            image: heroFile == null
+                ? null
+                : DecorationImage(
+                    image: FileImage(heroFile),
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      AppColors.surfaceElevated.withValues(alpha: .55),
+                      BlendMode.darken,
+                    ),
+                  ),
+            gradient: heroFile != null
+                ? null
+                : LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.primary.withValues(alpha: .18),
+                      AppColors.surfaceElevated,
+                    ],
+                  ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -669,58 +722,7 @@ class _YourArmiesCard extends StatelessWidget {
             ...shown.map(
               (army) => Padding(
                 padding: const EdgeInsets.only(bottom: 10),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              army.name,
-                              style: AppTextStyles.body,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              army.factionName,
-                              style: AppTextStyles.caption,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: (army.isOverLimit
-                                  ? AppColors.error
-                                  : AppColors.success)
-                              .withValues(alpha: .14),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          army.isOverLimit
-                              ? l10n.dashboardArmyStatusWarning
-                              : l10n.dashboardArmyStatusOk,
-                          style: AppTextStyles.eyebrow.copyWith(
-                            color: army.isOverLimit
-                                ? AppColors.error
-                                : AppColors.success,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                child: _ArmyRow(army: army),
               ),
             ),
           const SizedBox(height: 4),
@@ -737,6 +739,84 @@ class _YourArmiesCard extends StatelessWidget {
               ),
               icon: const Icon(Icons.add_rounded, size: 18),
               label: Text(l10n.dashboardCreateArmyShort),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ArmyRow extends ConsumerWidget {
+  final ArmyListItem army;
+
+  const _ArmyRow({required this.army});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final heroImageId =
+        ref.watch(factionHeroImageIdProvider(army.factionId)).value;
+    final heroFile =
+        heroImageId == null ? null : LocalCatalogImages.datasheet(heroImageId);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: heroFile != null
+                ? Image.file(heroFile, width: 36, height: 36, fit: BoxFit.cover)
+                : Container(
+                    width: 36,
+                    height: 36,
+                    color: AppColors.surfaceElevated,
+                    child: const Icon(
+                      Icons.shield_outlined,
+                      size: 18,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  army.name,
+                  style: AppTextStyles.body,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  army.factionName,
+                  style: AppTextStyles.caption,
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: (army.isOverLimit ? AppColors.error : AppColors.success)
+                  .withValues(alpha: .14),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              army.isOverLimit
+                  ? l10n.dashboardArmyStatusWarning
+                  : l10n.dashboardArmyStatusOk,
+              style: AppTextStyles.eyebrow.copyWith(
+                color: army.isOverLimit ? AppColors.error : AppColors.success,
+              ),
             ),
           ),
         ],
