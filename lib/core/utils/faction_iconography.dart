@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/faction_glyph_icon.dart';
 import '../widgets/ork_head_icon.dart';
 
 /// Icône + couleur d'accent associées à une faction, pour habiller les
@@ -21,57 +22,63 @@ class FactionBadge {
   const FactionBadge(this.icon, this.color, {this.glyphBuilder});
 }
 
+FactionBadge _glyph(GlyphKind kind, Color color, {IconData fallback = Icons.shield_outlined}) {
+  return FactionBadge(
+    fallback,
+    color,
+    glyphBuilder: (size, glyphColor) =>
+        FactionGlyphIcon(kind: kind, size: size, color: glyphColor),
+  );
+}
+
 class FactionIconography {
   FactionIconography._();
 
   static final List<MapEntry<String, FactionBadge>> _entries = [
     MapEntry('blood angels', FactionBadge(Icons.water_drop_rounded, AppColors.error)),
     MapEntry('dark angels', FactionBadge(Icons.nightlight_round, Color(0xFF2E7D5B))),
-    MapEntry('space wolves', FactionBadge(Icons.pets_rounded, Color(0xFF6FB7E8))),
-    MapEntry('imperial fists', FactionBadge(Icons.shield_rounded, AppColors.warning)),
-    MapEntry('ultramarines', FactionBadge(Icons.shield_rounded, AppColors.info)),
-    MapEntry('black templars', FactionBadge(Icons.gavel_rounded, Colors.white70)),
+    MapEntry('space wolves', _glyph(GlyphKind.wolfHead, Color(0xFF6FB7E8))),
+    MapEntry('imperial fists', _glyph(GlyphKind.fist, AppColors.warning)),
+    MapEntry('black templars', _glyph(GlyphKind.sword, Colors.white70)),
     MapEntry('deathwatch', FactionBadge(Icons.remove_red_eye_rounded, Color(0xFF9AA3AD))),
-    MapEntry('salamanders', FactionBadge(Icons.local_fire_department_rounded, AppColors.error)),
-    MapEntry('raven guard', FactionBadge(Icons.flight_rounded, Color(0xFF9AA3AD))),
-    MapEntry('space marines', FactionBadge(Icons.shield_rounded, AppColors.info)),
-    MapEntry('adeptus custodes', FactionBadge(Icons.military_tech_rounded, AppColors.warning)),
+    MapEntry('salamanders', _glyph(GlyphKind.lizard, Color(0xFF2FBF71))),
+    MapEntry('raven guard', _glyph(GlyphKind.raven, Color(0xFF9AA3AD))),
+    MapEntry('ultramarines', _glyph(GlyphKind.helmet, AppColors.info)),
+    MapEntry('astra militarum', _glyph(GlyphKind.helmet, Color(0xFF8A9A5B))),
+    MapEntry('imperial guard', _glyph(GlyphKind.helmet, Color(0xFF8A9A5B))),
+    MapEntry('space marines', _glyph(GlyphKind.helmet, AppColors.info)),
+    MapEntry('adeptus custodes', _glyph(GlyphKind.spear, AppColors.warning)),
     MapEntry('adeptus mechanicus', FactionBadge(Icons.precision_manufacturing_rounded, Color(0xFFC0682B))),
-    MapEntry('adepta sororitas', FactionBadge(Icons.local_fire_department_rounded, AppColors.error)),
-    MapEntry('astra militarum', FactionBadge(Icons.groups_rounded, Color(0xFF8A9A5B))),
-    MapEntry('imperial guard', FactionBadge(Icons.groups_rounded, Color(0xFF8A9A5B))),
+    MapEntry('adepta sororitas', _glyph(GlyphKind.chalice, AppColors.error)),
     MapEntry('grey knights', FactionBadge(Icons.security_rounded, Color(0xFFB8C4CE))),
-    MapEntry('imperial knights', FactionBadge(Icons.castle_rounded, Color(0xFF6D6F86))),
-    MapEntry('chaos knights', FactionBadge(Icons.castle_rounded, AppColors.error)),
-    MapEntry(
-      'orks',
-      FactionBadge(
-        Icons.forest_rounded,
-        AppColors.success,
-        glyphBuilder: (size, color) => OrkHeadIcon(size: size, color: color),
-      ),
-    ),
-    MapEntry('tyranids', FactionBadge(Icons.bug_report_rounded, Color(0xFF8E4FBF))),
-    MapEntry('necrons', FactionBadge(Icons.settings_suggest_rounded, Color(0xFF3FBFA6))),
+    MapEntry('imperial knights', _glyph(GlyphKind.knightMech, Color(0xFF6D6F86))),
+    MapEntry('chaos knights', _glyph(GlyphKind.knightMech, AppColors.error)),
+    MapEntry('orks', FactionBadge(
+      Icons.forest_rounded,
+      AppColors.success,
+      glyphBuilder: (size, color) => OrkHeadIcon(size: size, color: color),
+    )),
+    MapEntry('tyranids', _glyph(GlyphKind.claw, Color(0xFF8E4FBF))),
+    MapEntry('genestealer cults', _glyph(GlyphKind.claw, Color(0xFFB0475B))),
+    MapEntry('necrons', _glyph(GlyphKind.robotSkull, Color(0xFF3FBFA6))),
     MapEntry('aeldari', FactionBadge(Icons.auto_awesome_rounded, Color(0xFF3FBFA6))),
     MapEntry('eldar', FactionBadge(Icons.auto_awesome_rounded, Color(0xFF3FBFA6))),
-    MapEntry('drukhari', FactionBadge(Icons.dark_mode_rounded, Color(0xFF7A4FBF))),
+    MapEntry('drukhari', _glyph(GlyphKind.dagger, Color(0xFF7A4FBF))),
     MapEntry('t\'au', FactionBadge(Icons.rocket_launch_rounded, Color(0xFFE0813F))),
     MapEntry('tau empire', FactionBadge(Icons.rocket_launch_rounded, Color(0xFFE0813F))),
-    MapEntry('genestealer cults', FactionBadge(Icons.bug_report_rounded, Color(0xFFB0475B))),
-    MapEntry('leagues of votann', FactionBadge(Icons.construction_rounded, Color(0xFFC49A3A))),
-    MapEntry('death guard', FactionBadge(Icons.coronavirus_rounded, Color(0xFF6E8A4A))),
-    MapEntry('thousand sons', FactionBadge(Icons.local_fire_department_rounded, AppColors.info)),
-    MapEntry('world eaters', FactionBadge(Icons.bolt_rounded, AppColors.error)),
-    MapEntry('emperor\'s children', FactionBadge(Icons.music_note_rounded, Color(0xFFC85FA8))),
-    MapEntry('alpha legion', FactionBadge(Icons.change_history_rounded, AppColors.success)),
+    MapEntry('leagues of votann', _glyph(GlyphKind.anvil, Color(0xFFC49A3A))),
+    MapEntry('death guard', _glyph(GlyphKind.plagueSkull, Color(0xFF6E8A4A))),
+    MapEntry('nurgle', _glyph(GlyphKind.plagueSkull, AppColors.success)),
+    MapEntry('thousand sons', _glyph(GlyphKind.flameEye, AppColors.info)),
+    MapEntry('tzeentch', _glyph(GlyphKind.flameEye, Color(0xFF8E4FBF))),
+    MapEntry('world eaters', _glyph(GlyphKind.axe, AppColors.error)),
+    MapEntry('khorne', _glyph(GlyphKind.axe, Color(0xFFB0332F))),
+    MapEntry('emperor\'s children', _glyph(GlyphKind.mask, Color(0xFFC85FA8))),
+    MapEntry('slaanesh', _glyph(GlyphKind.mask, Color(0xFFC85FA8))),
+    MapEntry('alpha legion', _glyph(GlyphKind.hydra, AppColors.success)),
     MapEntry('iron warriors', FactionBadge(Icons.fort_rounded, Color(0xFF9AA3AD))),
-    MapEntry('chaos space marines', FactionBadge(Icons.whatshot_rounded, AppColors.error)),
-    MapEntry('nurgle', FactionBadge(Icons.coronavirus_rounded, AppColors.success)),
-    MapEntry('slaanesh', FactionBadge(Icons.auto_awesome_rounded, Color(0xFFC85FA8))),
-    MapEntry('tzeentch', FactionBadge(Icons.local_fire_department_rounded, AppColors.info)),
-    MapEntry('khorne', FactionBadge(Icons.bolt_rounded, AppColors.error)),
-    MapEntry('chaos daemons', FactionBadge(Icons.whatshot_rounded, Color(0xFF7A4FBF))),
+    MapEntry('chaos space marines', _glyph(GlyphKind.hornedSkull, AppColors.error)),
+    MapEntry('chaos daemons', _glyph(GlyphKind.hornedSkull, Color(0xFF7A4FBF))),
   ];
 
   static const List<Color> _fallbackPalette = [
