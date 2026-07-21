@@ -89,6 +89,7 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
                   _factionId ??= factions.isNotEmpty ? factions.first.id : null;
                   return DropdownButtonFormField<String>(
                     initialValue: _factionId,
+                    isExpanded: true,
                     dropdownColor: AppColors.surface,
                     style: AppTextStyles.body,
                     decoration: InputDecoration(
@@ -105,7 +106,10 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
                         .map(
                           (faction) => DropdownMenuItem(
                             value: faction.id,
-                            child: Text(faction.name),
+                            child: Text(
+                              faction.name,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         )
                         .toList(),
@@ -132,6 +136,7 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
                         if (detachments.isEmpty) return const SizedBox.shrink();
                         return DropdownButtonFormField<String?>(
                           initialValue: _detachmentId,
+                          isExpanded: true,
                           dropdownColor: AppColors.surface,
                           style: AppTextStyles.body,
                           decoration: InputDecoration(
@@ -152,7 +157,10 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
                             ...detachments.map(
                               (d) => DropdownMenuItem<String?>(
                                 value: d.id,
-                                child: Text(d.name),
+                                child: Text(
+                                  d.name,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ),
                           ],

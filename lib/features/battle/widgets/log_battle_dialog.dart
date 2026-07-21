@@ -158,6 +158,7 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
                 error: (_, __) => const SizedBox.shrink(),
                 data: (factions) => DropdownButtonFormField<String?>(
                   initialValue: _opponentFactionId,
+                  isExpanded: true,
                   dropdownColor: AppColors.surface,
                   style: AppTextStyles.body,
                   decoration: _decoration(l10n.battleOpponentFactionLabel),
@@ -169,7 +170,10 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
                     ...factions.map(
                       (faction) => DropdownMenuItem<String?>(
                         value: faction.id,
-                        child: Text(faction.name),
+                        child: Text(
+                          faction.name,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                   ],
@@ -197,6 +201,7 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
                 error: (_, __) => const SizedBox.shrink(),
                 data: (armies) => DropdownButtonFormField<String?>(
                   initialValue: _armyId,
+                  isExpanded: true,
                   dropdownColor: AppColors.surface,
                   style: AppTextStyles.body,
                   decoration: _decoration(l10n.battleArmyLabel),
@@ -208,7 +213,10 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
                     ...armies.map(
                       (army) => DropdownMenuItem<String?>(
                         value: army.id,
-                        child: Text(army.name),
+                        child: Text(
+                          army.name,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                   ],
