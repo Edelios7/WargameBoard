@@ -360,6 +360,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get armyBuilderChangeDetachment => 'Change detachment';
 
   @override
+  String get armyBuilderOnlyOwnedFilter => 'Only my collection';
+
+  @override
+  String get armyBuilderToBuy => 'To buy';
+
+  @override
   String armyBuilderEnhancementsReset(int count) {
     return '$count enhancement(s) reset after changing detachment.';
   }
@@ -1181,4 +1187,75 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get battleTypeTournament => 'Tournament';
+
+  @override
+  String get battleTypeCrusade => 'Crusade';
+
+  @override
+  String get battleSetupTitle => 'New battle setup';
+
+  @override
+  String get battleSetupStart => 'Start battle';
+
+  @override
+  String get battlePointsLimitLabel => 'Points limit';
+
+  @override
+  String get battleMissionPackLabel => 'Mission pack (optional)';
+
+  @override
+  String get battleTerrainLabel => 'Terrain (optional)';
+
+  @override
+  String get battleLogExistingGame => 'Log a game already played';
+
+  @override
+  String get battleDashboardResume => 'Battle in progress';
+
+  @override
+  String get battleDashboardResumeSubtitle => 'Resume your ongoing battle';
+
+  @override
+  String battleDashboardRound(int round) {
+    return 'Round $round';
+  }
+
+  @override
+  String get battlePhaseCommand => 'Command';
+
+  @override
+  String get battlePhaseMovement => 'Movement';
+
+  @override
+  String get battlePhaseShooting => 'Shooting';
+
+  @override
+  String get battlePhaseCharge => 'Charge';
+
+  @override
+  String get battlePhaseFight => 'Fight';
+
+  @override
+  String get battlePhaseMorale => 'Morale';
+
+  @override
+  String get battleDashboardNextPhase => 'Next phase';
+
+  @override
+  String get battleDashboardMyCp => 'My CP';
+
+  @override
+  String get battleDashboardOpponentCp => 'Opponent CP';
+
+  @override
+  String get battleDashboardEvents => 'Battle log';
+
+  @override
+  String get battleDashboardAddEvent => 'Add event';
+
+  @override
+  String get battleDashboardEventHint => 'What happened?';
+
+  @override
+  String get battleDashboardFinish => 'Finish battle';
 }

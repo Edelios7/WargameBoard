@@ -16,6 +16,18 @@ class BattleDetails {
   final String? notes;
   final DateTime playedAt;
 
+  // Suivi de partie en direct — `null` pour les parties créées via l'ancien
+  // flux rétroactif.
+  final BattleStatus? status;
+  final int? currentRound;
+  final BattlePhase? currentPhase;
+  final int? myCommandPoints;
+  final int? opponentCommandPoints;
+  final String? missionPack;
+  final String? terrain;
+  final int? pointsLimit;
+  final bool? myTurnActive;
+
   const BattleDetails({
     required this.id,
     this.armyId,
@@ -31,8 +43,21 @@ class BattleDetails {
     this.opponentScore,
     this.notes,
     required this.playedAt,
+    this.status,
+    this.currentRound,
+    this.currentPhase,
+    this.myCommandPoints,
+    this.opponentCommandPoints,
+    this.missionPack,
+    this.terrain,
+    this.pointsLimit,
+    this.myTurnActive,
   });
 
-  bool get isUpcoming =>
-      result == null && playedAt.isAfter(DateTime.now());
+  bool get isUpcoming => result == null && playedAt.isAfter(DateTime.now());
+
+  /// Vrai pour une partie en cours de suivi en direct (setup ou active) —
+  /// `status == null` (ligne legacy) est toujours traité comme terminé.
+  bool get isLive =>
+      status == BattleStatus.setup || status == BattleStatus.active;
 }

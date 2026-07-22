@@ -178,6 +178,8 @@
     }
   },
   "armyBuilderChangeDetachment": "Change detachment",
+  "armyBuilderOnlyOwnedFilter": "Only my collection",
+  "armyBuilderToBuy": "To buy",
   "armyBuilderEnhancementsReset": "{count} enhancement(s) reset after changing detachment.",
   "@armyBuilderEnhancementsReset": {
     "placeholders": {
@@ -580,5 +582,35 @@
   "battleTypeLabel": "Game type",
   "battleTypeMatched": "Matched play",
   "battleTypeNarrative": "Narrative",
-  "battleTypeTournament": "Tournament"
+  "battleTypeTournament": "Tournament",
+  "battleTypeCrusade": "Crusade",
+
+  "battleSetupTitle": "New battle setup",
+  "battleSetupStart": "Start battle",
+  "battlePointsLimitLabel": "Points limit",
+  "battleMissionPackLabel": "Mission pack (optional)",
+  "battleTerrainLabel": "Terrain (optional)",
+  "battleLogExistingGame": "Log a game already played",
+
+  "battleDashboardResume": "Battle in progress",
+  "battleDashboardResumeSubtitle": "Resume your ongoing battle",
+  "battleDashboardRound": "Round {round}",
+  "@battleDashboardRound": {
+    "placeholders": {
+      "round": { "type": "int" }
+    }
+  },
+  "battlePhaseCommand": "Command",
+  "battlePhaseMovement": "Movement",
+  "battlePhaseShooting": "Shooting",
+  "battlePhaseCharge": "Charge",
+  "battlePhaseFight": "Fight",
+  "battlePhaseMorale": "Morale",
+  "battleDashboardNextPhase": "Next phase",
+  "battleDashboardMyCp": "My CP",
+  "battleDashboardOpponentCp": "Opponent CP",
+  "battleDashboardEvents": "Battle log",
+  "battleDashboardAddEvent": "Add event",
+  "battleDashboardEventHint": "What happened?",
+  "battleDashboardFinish": "Finish battle"
 }

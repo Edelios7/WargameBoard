@@ -752,6 +752,18 @@ abstract class AppLocalizations {
   /// **'Changer de détachement'**
   String get armyBuilderChangeDetachment;
 
+  /// No description provided for @armyBuilderOnlyOwnedFilter.
+  ///
+  /// In fr, this message translates to:
+  /// **'Uniquement ma collection'**
+  String get armyBuilderOnlyOwnedFilter;
+
+  /// No description provided for @armyBuilderToBuy.
+  ///
+  /// In fr, this message translates to:
+  /// **'À acheter'**
+  String get armyBuilderToBuy;
+
   /// No description provided for @armyBuilderEnhancementsReset.
   ///
   /// In fr, this message translates to:
@@ -2269,6 +2281,144 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Tournoi'**
   String get battleTypeTournament;
+
+  /// No description provided for @battleTypeCrusade.
+  ///
+  /// In fr, this message translates to:
+  /// **'Croisade'**
+  String get battleTypeCrusade;
+
+  /// No description provided for @battleSetupTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Préparation de la partie'**
+  String get battleSetupTitle;
+
+  /// No description provided for @battleSetupStart.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lancer la partie'**
+  String get battleSetupStart;
+
+  /// No description provided for @battlePointsLimitLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Format (points)'**
+  String get battlePointsLimitLabel;
+
+  /// No description provided for @battleMissionPackLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pack de missions (optionnel)'**
+  String get battleMissionPackLabel;
+
+  /// No description provided for @battleTerrainLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terrain (optionnel)'**
+  String get battleTerrainLabel;
+
+  /// No description provided for @battleLogExistingGame.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer une partie déjà jouée'**
+  String get battleLogExistingGame;
+
+  /// No description provided for @battleDashboardResume.
+  ///
+  /// In fr, this message translates to:
+  /// **'Partie en cours'**
+  String get battleDashboardResume;
+
+  /// No description provided for @battleDashboardResumeSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Reprendre la partie en cours'**
+  String get battleDashboardResumeSubtitle;
+
+  /// No description provided for @battleDashboardRound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Round {round}'**
+  String battleDashboardRound(int round);
+
+  /// No description provided for @battlePhaseCommand.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commandement'**
+  String get battlePhaseCommand;
+
+  /// No description provided for @battlePhaseMovement.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mouvement'**
+  String get battlePhaseMovement;
+
+  /// No description provided for @battlePhaseShooting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tir'**
+  String get battlePhaseShooting;
+
+  /// No description provided for @battlePhaseCharge.
+  ///
+  /// In fr, this message translates to:
+  /// **'Charge'**
+  String get battlePhaseCharge;
+
+  /// No description provided for @battlePhaseFight.
+  ///
+  /// In fr, this message translates to:
+  /// **'Combat'**
+  String get battlePhaseFight;
+
+  /// No description provided for @battlePhaseMorale.
+  ///
+  /// In fr, this message translates to:
+  /// **'Moral'**
+  String get battlePhaseMorale;
+
+  /// No description provided for @battleDashboardNextPhase.
+  ///
+  /// In fr, this message translates to:
+  /// **'Phase suivante'**
+  String get battleDashboardNextPhase;
+
+  /// No description provided for @battleDashboardMyCp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes PC'**
+  String get battleDashboardMyCp;
+
+  /// No description provided for @battleDashboardOpponentCp.
+  ///
+  /// In fr, this message translates to:
+  /// **'PC adverses'**
+  String get battleDashboardOpponentCp;
+
+  /// No description provided for @battleDashboardEvents.
+  ///
+  /// In fr, this message translates to:
+  /// **'Journal de bataille'**
+  String get battleDashboardEvents;
+
+  /// No description provided for @battleDashboardAddEvent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un événement'**
+  String get battleDashboardAddEvent;
+
+  /// No description provided for @battleDashboardEventHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Que s\'est-il passé ?'**
+  String get battleDashboardEventHint;
+
+  /// No description provided for @battleDashboardFinish.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminer la partie'**
+  String get battleDashboardFinish;
 }
 
 class _AppLocalizationsDelegate

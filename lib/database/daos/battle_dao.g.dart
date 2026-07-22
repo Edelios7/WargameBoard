@@ -5,6 +5,7 @@ part of 'battle_dao.dart';
 // ignore_for_file: type=lint
 mixin _$BattleDaoMixin on DatabaseAccessor<AppDatabase> {
   $BattlesTable get battles => attachedDatabase.battles;
+  $BattleEventsTable get battleEvents => attachedDatabase.battleEvents;
   $ArmiesTable get armies => attachedDatabase.armies;
   $FactionsTable get factions => attachedDatabase.factions;
   BattleDaoManager get managers => BattleDaoManager(this);
@@ -15,6 +16,8 @@ class BattleDaoManager {
   BattleDaoManager(this._db);
   $$BattlesTableTableManager get battles =>
       $$BattlesTableTableManager(_db.attachedDatabase, _db.battles);
+  $$BattleEventsTableTableManager get battleEvents =>
+      $$BattleEventsTableTableManager(_db.attachedDatabase, _db.battleEvents);
   $$ArmiesTableTableManager get armies =>
       $$ArmiesTableTableManager(_db.attachedDatabase, _db.armies);
   $$FactionsTableTableManager get factions =>

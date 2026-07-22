@@ -16038,6 +16038,103 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
     defaultValue: currentDateAndTime,
   );
   @override
+  late final GeneratedColumnWithTypeConverter<BattleStatus?, String> status =
+      GeneratedColumn<String>(
+        'status',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<BattleStatus?>($BattlesTable.$converterstatusn);
+  static const VerificationMeta _currentRoundMeta = const VerificationMeta(
+    'currentRound',
+  );
+  @override
+  late final GeneratedColumn<int> currentRound = GeneratedColumn<int>(
+    'current_round',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<BattlePhase?, String>
+  currentPhase = GeneratedColumn<String>(
+    'current_phase',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  ).withConverter<BattlePhase?>($BattlesTable.$convertercurrentPhasen);
+  static const VerificationMeta _myCommandPointsMeta = const VerificationMeta(
+    'myCommandPoints',
+  );
+  @override
+  late final GeneratedColumn<int> myCommandPoints = GeneratedColumn<int>(
+    'my_command_points',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _opponentCommandPointsMeta =
+      const VerificationMeta('opponentCommandPoints');
+  @override
+  late final GeneratedColumn<int> opponentCommandPoints = GeneratedColumn<int>(
+    'opponent_command_points',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _missionPackMeta = const VerificationMeta(
+    'missionPack',
+  );
+  @override
+  late final GeneratedColumn<String> missionPack = GeneratedColumn<String>(
+    'mission_pack',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _terrainMeta = const VerificationMeta(
+    'terrain',
+  );
+  @override
+  late final GeneratedColumn<String> terrain = GeneratedColumn<String>(
+    'terrain',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _pointsLimitMeta = const VerificationMeta(
+    'pointsLimit',
+  );
+  @override
+  late final GeneratedColumn<int> pointsLimit = GeneratedColumn<int>(
+    'points_limit',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _myTurnActiveMeta = const VerificationMeta(
+    'myTurnActive',
+  );
+  @override
+  late final GeneratedColumn<bool> myTurnActive = GeneratedColumn<bool>(
+    'my_turn_active',
+    aliasedName,
+    true,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("my_turn_active" IN (0, 1))',
+    ),
+  );
+  @override
   List<GeneratedColumn> get $columns => [
     id,
     armyId,
@@ -16052,6 +16149,15 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
     notes,
     playedAt,
     createdAt,
+    status,
+    currentRound,
+    currentPhase,
+    myCommandPoints,
+    opponentCommandPoints,
+    missionPack,
+    terrain,
+    pointsLimit,
+    myTurnActive,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -16142,6 +16248,66 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
+    if (data.containsKey('current_round')) {
+      context.handle(
+        _currentRoundMeta,
+        currentRound.isAcceptableOrUnknown(
+          data['current_round']!,
+          _currentRoundMeta,
+        ),
+      );
+    }
+    if (data.containsKey('my_command_points')) {
+      context.handle(
+        _myCommandPointsMeta,
+        myCommandPoints.isAcceptableOrUnknown(
+          data['my_command_points']!,
+          _myCommandPointsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('opponent_command_points')) {
+      context.handle(
+        _opponentCommandPointsMeta,
+        opponentCommandPoints.isAcceptableOrUnknown(
+          data['opponent_command_points']!,
+          _opponentCommandPointsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('mission_pack')) {
+      context.handle(
+        _missionPackMeta,
+        missionPack.isAcceptableOrUnknown(
+          data['mission_pack']!,
+          _missionPackMeta,
+        ),
+      );
+    }
+    if (data.containsKey('terrain')) {
+      context.handle(
+        _terrainMeta,
+        terrain.isAcceptableOrUnknown(data['terrain']!, _terrainMeta),
+      );
+    }
+    if (data.containsKey('points_limit')) {
+      context.handle(
+        _pointsLimitMeta,
+        pointsLimit.isAcceptableOrUnknown(
+          data['points_limit']!,
+          _pointsLimitMeta,
+        ),
+      );
+    }
+    if (data.containsKey('my_turn_active')) {
+      context.handle(
+        _myTurnActiveMeta,
+        myTurnActive.isAcceptableOrUnknown(
+          data['my_turn_active']!,
+          _myTurnActiveMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -16207,6 +16373,46 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      status: $BattlesTable.$converterstatusn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}status'],
+        ),
+      ),
+      currentRound: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}current_round'],
+      ),
+      currentPhase: $BattlesTable.$convertercurrentPhasen.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}current_phase'],
+        ),
+      ),
+      myCommandPoints: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}my_command_points'],
+      ),
+      opponentCommandPoints: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}opponent_command_points'],
+      ),
+      missionPack: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mission_pack'],
+      ),
+      terrain: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}terrain'],
+      ),
+      pointsLimit: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}points_limit'],
+      ),
+      myTurnActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}my_turn_active'],
+      ),
     );
   }
 
@@ -16221,6 +16427,18 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
       JsonTypeConverter2.asNullable($converterresult);
   static JsonTypeConverter2<BattleType, String, String> $convertertype =
       const EnumNameConverter<BattleType>(BattleType.values);
+  static JsonTypeConverter2<BattleStatus, String, String> $converterstatus =
+      const EnumNameConverter<BattleStatus>(BattleStatus.values);
+  static JsonTypeConverter2<BattleStatus?, String?, String?> $converterstatusn =
+      JsonTypeConverter2.asNullable($converterstatus);
+  static JsonTypeConverter2<BattlePhase, String, String>
+  $convertercurrentPhase = const EnumNameConverter<BattlePhase>(
+    BattlePhase.values,
+  );
+  static JsonTypeConverter2<BattlePhase?, String?, String?>
+  $convertercurrentPhasen = JsonTypeConverter2.asNullable(
+    $convertercurrentPhase,
+  );
 }
 
 class Battle extends DataClass implements Insertable<Battle> {
@@ -16237,6 +16455,17 @@ class Battle extends DataClass implements Insertable<Battle> {
   final String? notes;
   final DateTime playedAt;
   final DateTime createdAt;
+  final BattleStatus? status;
+  final int? currentRound;
+  final BattlePhase? currentPhase;
+  final int? myCommandPoints;
+  final int? opponentCommandPoints;
+  final String? missionPack;
+  final String? terrain;
+  final int? pointsLimit;
+
+  /// `true` = c'est mon tour actif, `false` = celui de l'adversaire.
+  final bool? myTurnActive;
   const Battle({
     required this.id,
     this.armyId,
@@ -16251,6 +16480,15 @@ class Battle extends DataClass implements Insertable<Battle> {
     this.notes,
     required this.playedAt,
     required this.createdAt,
+    this.status,
+    this.currentRound,
+    this.currentPhase,
+    this.myCommandPoints,
+    this.opponentCommandPoints,
+    this.missionPack,
+    this.terrain,
+    this.pointsLimit,
+    this.myTurnActive,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -16290,6 +16528,37 @@ class Battle extends DataClass implements Insertable<Battle> {
     }
     map['played_at'] = Variable<DateTime>(playedAt);
     map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || status != null) {
+      map['status'] = Variable<String>(
+        $BattlesTable.$converterstatusn.toSql(status),
+      );
+    }
+    if (!nullToAbsent || currentRound != null) {
+      map['current_round'] = Variable<int>(currentRound);
+    }
+    if (!nullToAbsent || currentPhase != null) {
+      map['current_phase'] = Variable<String>(
+        $BattlesTable.$convertercurrentPhasen.toSql(currentPhase),
+      );
+    }
+    if (!nullToAbsent || myCommandPoints != null) {
+      map['my_command_points'] = Variable<int>(myCommandPoints);
+    }
+    if (!nullToAbsent || opponentCommandPoints != null) {
+      map['opponent_command_points'] = Variable<int>(opponentCommandPoints);
+    }
+    if (!nullToAbsent || missionPack != null) {
+      map['mission_pack'] = Variable<String>(missionPack);
+    }
+    if (!nullToAbsent || terrain != null) {
+      map['terrain'] = Variable<String>(terrain);
+    }
+    if (!nullToAbsent || pointsLimit != null) {
+      map['points_limit'] = Variable<int>(pointsLimit);
+    }
+    if (!nullToAbsent || myTurnActive != null) {
+      map['my_turn_active'] = Variable<bool>(myTurnActive);
+    }
     return map;
   }
 
@@ -16326,6 +16595,33 @@ class Battle extends DataClass implements Insertable<Battle> {
           : Value(notes),
       playedAt: Value(playedAt),
       createdAt: Value(createdAt),
+      status: status == null && nullToAbsent
+          ? const Value.absent()
+          : Value(status),
+      currentRound: currentRound == null && nullToAbsent
+          ? const Value.absent()
+          : Value(currentRound),
+      currentPhase: currentPhase == null && nullToAbsent
+          ? const Value.absent()
+          : Value(currentPhase),
+      myCommandPoints: myCommandPoints == null && nullToAbsent
+          ? const Value.absent()
+          : Value(myCommandPoints),
+      opponentCommandPoints: opponentCommandPoints == null && nullToAbsent
+          ? const Value.absent()
+          : Value(opponentCommandPoints),
+      missionPack: missionPack == null && nullToAbsent
+          ? const Value.absent()
+          : Value(missionPack),
+      terrain: terrain == null && nullToAbsent
+          ? const Value.absent()
+          : Value(terrain),
+      pointsLimit: pointsLimit == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pointsLimit),
+      myTurnActive: myTurnActive == null && nullToAbsent
+          ? const Value.absent()
+          : Value(myTurnActive),
     );
   }
 
@@ -16354,6 +16650,21 @@ class Battle extends DataClass implements Insertable<Battle> {
       notes: serializer.fromJson<String?>(json['notes']),
       playedAt: serializer.fromJson<DateTime>(json['playedAt']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      status: $BattlesTable.$converterstatusn.fromJson(
+        serializer.fromJson<String?>(json['status']),
+      ),
+      currentRound: serializer.fromJson<int?>(json['currentRound']),
+      currentPhase: $BattlesTable.$convertercurrentPhasen.fromJson(
+        serializer.fromJson<String?>(json['currentPhase']),
+      ),
+      myCommandPoints: serializer.fromJson<int?>(json['myCommandPoints']),
+      opponentCommandPoints: serializer.fromJson<int?>(
+        json['opponentCommandPoints'],
+      ),
+      missionPack: serializer.fromJson<String?>(json['missionPack']),
+      terrain: serializer.fromJson<String?>(json['terrain']),
+      pointsLimit: serializer.fromJson<int?>(json['pointsLimit']),
+      myTurnActive: serializer.fromJson<bool?>(json['myTurnActive']),
     );
   }
   @override
@@ -16377,6 +16688,19 @@ class Battle extends DataClass implements Insertable<Battle> {
       'notes': serializer.toJson<String?>(notes),
       'playedAt': serializer.toJson<DateTime>(playedAt),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'status': serializer.toJson<String?>(
+        $BattlesTable.$converterstatusn.toJson(status),
+      ),
+      'currentRound': serializer.toJson<int?>(currentRound),
+      'currentPhase': serializer.toJson<String?>(
+        $BattlesTable.$convertercurrentPhasen.toJson(currentPhase),
+      ),
+      'myCommandPoints': serializer.toJson<int?>(myCommandPoints),
+      'opponentCommandPoints': serializer.toJson<int?>(opponentCommandPoints),
+      'missionPack': serializer.toJson<String?>(missionPack),
+      'terrain': serializer.toJson<String?>(terrain),
+      'pointsLimit': serializer.toJson<int?>(pointsLimit),
+      'myTurnActive': serializer.toJson<bool?>(myTurnActive),
     };
   }
 
@@ -16394,6 +16718,15 @@ class Battle extends DataClass implements Insertable<Battle> {
     Value<String?> notes = const Value.absent(),
     DateTime? playedAt,
     DateTime? createdAt,
+    Value<BattleStatus?> status = const Value.absent(),
+    Value<int?> currentRound = const Value.absent(),
+    Value<BattlePhase?> currentPhase = const Value.absent(),
+    Value<int?> myCommandPoints = const Value.absent(),
+    Value<int?> opponentCommandPoints = const Value.absent(),
+    Value<String?> missionPack = const Value.absent(),
+    Value<String?> terrain = const Value.absent(),
+    Value<int?> pointsLimit = const Value.absent(),
+    Value<bool?> myTurnActive = const Value.absent(),
   }) => Battle(
     id: id ?? this.id,
     armyId: armyId.present ? armyId.value : this.armyId,
@@ -16412,6 +16745,19 @@ class Battle extends DataClass implements Insertable<Battle> {
     notes: notes.present ? notes.value : this.notes,
     playedAt: playedAt ?? this.playedAt,
     createdAt: createdAt ?? this.createdAt,
+    status: status.present ? status.value : this.status,
+    currentRound: currentRound.present ? currentRound.value : this.currentRound,
+    currentPhase: currentPhase.present ? currentPhase.value : this.currentPhase,
+    myCommandPoints: myCommandPoints.present
+        ? myCommandPoints.value
+        : this.myCommandPoints,
+    opponentCommandPoints: opponentCommandPoints.present
+        ? opponentCommandPoints.value
+        : this.opponentCommandPoints,
+    missionPack: missionPack.present ? missionPack.value : this.missionPack,
+    terrain: terrain.present ? terrain.value : this.terrain,
+    pointsLimit: pointsLimit.present ? pointsLimit.value : this.pointsLimit,
+    myTurnActive: myTurnActive.present ? myTurnActive.value : this.myTurnActive,
   );
   Battle copyWithCompanion(BattlesCompanion data) {
     return Battle(
@@ -16436,6 +16782,29 @@ class Battle extends DataClass implements Insertable<Battle> {
       notes: data.notes.present ? data.notes.value : this.notes,
       playedAt: data.playedAt.present ? data.playedAt.value : this.playedAt,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      status: data.status.present ? data.status.value : this.status,
+      currentRound: data.currentRound.present
+          ? data.currentRound.value
+          : this.currentRound,
+      currentPhase: data.currentPhase.present
+          ? data.currentPhase.value
+          : this.currentPhase,
+      myCommandPoints: data.myCommandPoints.present
+          ? data.myCommandPoints.value
+          : this.myCommandPoints,
+      opponentCommandPoints: data.opponentCommandPoints.present
+          ? data.opponentCommandPoints.value
+          : this.opponentCommandPoints,
+      missionPack: data.missionPack.present
+          ? data.missionPack.value
+          : this.missionPack,
+      terrain: data.terrain.present ? data.terrain.value : this.terrain,
+      pointsLimit: data.pointsLimit.present
+          ? data.pointsLimit.value
+          : this.pointsLimit,
+      myTurnActive: data.myTurnActive.present
+          ? data.myTurnActive.value
+          : this.myTurnActive,
     );
   }
 
@@ -16454,13 +16823,22 @@ class Battle extends DataClass implements Insertable<Battle> {
           ..write('opponentScore: $opponentScore, ')
           ..write('notes: $notes, ')
           ..write('playedAt: $playedAt, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('status: $status, ')
+          ..write('currentRound: $currentRound, ')
+          ..write('currentPhase: $currentPhase, ')
+          ..write('myCommandPoints: $myCommandPoints, ')
+          ..write('opponentCommandPoints: $opponentCommandPoints, ')
+          ..write('missionPack: $missionPack, ')
+          ..write('terrain: $terrain, ')
+          ..write('pointsLimit: $pointsLimit, ')
+          ..write('myTurnActive: $myTurnActive')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     armyId,
     opponentName,
@@ -16474,7 +16852,16 @@ class Battle extends DataClass implements Insertable<Battle> {
     notes,
     playedAt,
     createdAt,
-  );
+    status,
+    currentRound,
+    currentPhase,
+    myCommandPoints,
+    opponentCommandPoints,
+    missionPack,
+    terrain,
+    pointsLimit,
+    myTurnActive,
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -16491,7 +16878,16 @@ class Battle extends DataClass implements Insertable<Battle> {
           other.opponentScore == this.opponentScore &&
           other.notes == this.notes &&
           other.playedAt == this.playedAt &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.status == this.status &&
+          other.currentRound == this.currentRound &&
+          other.currentPhase == this.currentPhase &&
+          other.myCommandPoints == this.myCommandPoints &&
+          other.opponentCommandPoints == this.opponentCommandPoints &&
+          other.missionPack == this.missionPack &&
+          other.terrain == this.terrain &&
+          other.pointsLimit == this.pointsLimit &&
+          other.myTurnActive == this.myTurnActive);
 }
 
 class BattlesCompanion extends UpdateCompanion<Battle> {
@@ -16508,6 +16904,15 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
   final Value<String?> notes;
   final Value<DateTime> playedAt;
   final Value<DateTime> createdAt;
+  final Value<BattleStatus?> status;
+  final Value<int?> currentRound;
+  final Value<BattlePhase?> currentPhase;
+  final Value<int?> myCommandPoints;
+  final Value<int?> opponentCommandPoints;
+  final Value<String?> missionPack;
+  final Value<String?> terrain;
+  final Value<int?> pointsLimit;
+  final Value<bool?> myTurnActive;
   final Value<int> rowid;
   const BattlesCompanion({
     this.id = const Value.absent(),
@@ -16523,6 +16928,15 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     this.notes = const Value.absent(),
     this.playedAt = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.status = const Value.absent(),
+    this.currentRound = const Value.absent(),
+    this.currentPhase = const Value.absent(),
+    this.myCommandPoints = const Value.absent(),
+    this.opponentCommandPoints = const Value.absent(),
+    this.missionPack = const Value.absent(),
+    this.terrain = const Value.absent(),
+    this.pointsLimit = const Value.absent(),
+    this.myTurnActive = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   BattlesCompanion.insert({
@@ -16539,6 +16953,15 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     this.notes = const Value.absent(),
     this.playedAt = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.status = const Value.absent(),
+    this.currentRound = const Value.absent(),
+    this.currentPhase = const Value.absent(),
+    this.myCommandPoints = const Value.absent(),
+    this.opponentCommandPoints = const Value.absent(),
+    this.missionPack = const Value.absent(),
+    this.terrain = const Value.absent(),
+    this.pointsLimit = const Value.absent(),
+    this.myTurnActive = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id);
   static Insertable<Battle> custom({
@@ -16555,6 +16978,15 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     Expression<String>? notes,
     Expression<DateTime>? playedAt,
     Expression<DateTime>? createdAt,
+    Expression<String>? status,
+    Expression<int>? currentRound,
+    Expression<String>? currentPhase,
+    Expression<int>? myCommandPoints,
+    Expression<int>? opponentCommandPoints,
+    Expression<String>? missionPack,
+    Expression<String>? terrain,
+    Expression<int>? pointsLimit,
+    Expression<bool>? myTurnActive,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -16571,6 +17003,16 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
       if (notes != null) 'notes': notes,
       if (playedAt != null) 'played_at': playedAt,
       if (createdAt != null) 'created_at': createdAt,
+      if (status != null) 'status': status,
+      if (currentRound != null) 'current_round': currentRound,
+      if (currentPhase != null) 'current_phase': currentPhase,
+      if (myCommandPoints != null) 'my_command_points': myCommandPoints,
+      if (opponentCommandPoints != null)
+        'opponent_command_points': opponentCommandPoints,
+      if (missionPack != null) 'mission_pack': missionPack,
+      if (terrain != null) 'terrain': terrain,
+      if (pointsLimit != null) 'points_limit': pointsLimit,
+      if (myTurnActive != null) 'my_turn_active': myTurnActive,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -16589,6 +17031,15 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     Value<String?>? notes,
     Value<DateTime>? playedAt,
     Value<DateTime>? createdAt,
+    Value<BattleStatus?>? status,
+    Value<int?>? currentRound,
+    Value<BattlePhase?>? currentPhase,
+    Value<int?>? myCommandPoints,
+    Value<int?>? opponentCommandPoints,
+    Value<String?>? missionPack,
+    Value<String?>? terrain,
+    Value<int?>? pointsLimit,
+    Value<bool?>? myTurnActive,
     Value<int>? rowid,
   }) {
     return BattlesCompanion(
@@ -16605,6 +17056,16 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
       notes: notes ?? this.notes,
       playedAt: playedAt ?? this.playedAt,
       createdAt: createdAt ?? this.createdAt,
+      status: status ?? this.status,
+      currentRound: currentRound ?? this.currentRound,
+      currentPhase: currentPhase ?? this.currentPhase,
+      myCommandPoints: myCommandPoints ?? this.myCommandPoints,
+      opponentCommandPoints:
+          opponentCommandPoints ?? this.opponentCommandPoints,
+      missionPack: missionPack ?? this.missionPack,
+      terrain: terrain ?? this.terrain,
+      pointsLimit: pointsLimit ?? this.pointsLimit,
+      myTurnActive: myTurnActive ?? this.myTurnActive,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -16655,6 +17116,39 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (status.present) {
+      map['status'] = Variable<String>(
+        $BattlesTable.$converterstatusn.toSql(status.value),
+      );
+    }
+    if (currentRound.present) {
+      map['current_round'] = Variable<int>(currentRound.value);
+    }
+    if (currentPhase.present) {
+      map['current_phase'] = Variable<String>(
+        $BattlesTable.$convertercurrentPhasen.toSql(currentPhase.value),
+      );
+    }
+    if (myCommandPoints.present) {
+      map['my_command_points'] = Variable<int>(myCommandPoints.value);
+    }
+    if (opponentCommandPoints.present) {
+      map['opponent_command_points'] = Variable<int>(
+        opponentCommandPoints.value,
+      );
+    }
+    if (missionPack.present) {
+      map['mission_pack'] = Variable<String>(missionPack.value);
+    }
+    if (terrain.present) {
+      map['terrain'] = Variable<String>(terrain.value);
+    }
+    if (pointsLimit.present) {
+      map['points_limit'] = Variable<int>(pointsLimit.value);
+    }
+    if (myTurnActive.present) {
+      map['my_turn_active'] = Variable<bool>(myTurnActive.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -16676,6 +17170,476 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
           ..write('opponentScore: $opponentScore, ')
           ..write('notes: $notes, ')
           ..write('playedAt: $playedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('status: $status, ')
+          ..write('currentRound: $currentRound, ')
+          ..write('currentPhase: $currentPhase, ')
+          ..write('myCommandPoints: $myCommandPoints, ')
+          ..write('opponentCommandPoints: $opponentCommandPoints, ')
+          ..write('missionPack: $missionPack, ')
+          ..write('terrain: $terrain, ')
+          ..write('pointsLimit: $pointsLimit, ')
+          ..write('myTurnActive: $myTurnActive, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $BattleEventsTable extends BattleEvents
+    with TableInfo<$BattleEventsTable, BattleEvent> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BattleEventsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _battleIdMeta = const VerificationMeta(
+    'battleId',
+  );
+  @override
+  late final GeneratedColumn<String> battleId = GeneratedColumn<String>(
+    'battle_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _roundMeta = const VerificationMeta('round');
+  @override
+  late final GeneratedColumn<int> round = GeneratedColumn<int>(
+    'round',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<BattlePhase?, String> phase =
+      GeneratedColumn<String>(
+        'phase',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<BattlePhase?>($BattleEventsTable.$converterphasen);
+  static const VerificationMeta _labelMeta = const VerificationMeta('label');
+  @override
+  late final GeneratedColumn<String> label = GeneratedColumn<String>(
+    'label',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cpDeltaMeta = const VerificationMeta(
+    'cpDelta',
+  );
+  @override
+  late final GeneratedColumn<int> cpDelta = GeneratedColumn<int>(
+    'cp_delta',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    battleId,
+    round,
+    phase,
+    label,
+    cpDelta,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'battle_events';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BattleEvent> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('battle_id')) {
+      context.handle(
+        _battleIdMeta,
+        battleId.isAcceptableOrUnknown(data['battle_id']!, _battleIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_battleIdMeta);
+    }
+    if (data.containsKey('round')) {
+      context.handle(
+        _roundMeta,
+        round.isAcceptableOrUnknown(data['round']!, _roundMeta),
+      );
+    }
+    if (data.containsKey('label')) {
+      context.handle(
+        _labelMeta,
+        label.isAcceptableOrUnknown(data['label']!, _labelMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_labelMeta);
+    }
+    if (data.containsKey('cp_delta')) {
+      context.handle(
+        _cpDeltaMeta,
+        cpDelta.isAcceptableOrUnknown(data['cp_delta']!, _cpDeltaMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BattleEvent map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BattleEvent(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      battleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}battle_id'],
+      )!,
+      round: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}round'],
+      ),
+      phase: $BattleEventsTable.$converterphasen.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}phase'],
+        ),
+      ),
+      label: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}label'],
+      )!,
+      cpDelta: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cp_delta'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BattleEventsTable createAlias(String alias) {
+    return $BattleEventsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<BattlePhase, String, String> $converterphase =
+      const EnumNameConverter<BattlePhase>(BattlePhase.values);
+  static JsonTypeConverter2<BattlePhase?, String?, String?> $converterphasen =
+      JsonTypeConverter2.asNullable($converterphase);
+}
+
+class BattleEvent extends DataClass implements Insertable<BattleEvent> {
+  final String id;
+  final String battleId;
+  final int? round;
+  final BattlePhase? phase;
+  final String label;
+  final int? cpDelta;
+  final DateTime createdAt;
+  const BattleEvent({
+    required this.id,
+    required this.battleId,
+    this.round,
+    this.phase,
+    required this.label,
+    this.cpDelta,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['battle_id'] = Variable<String>(battleId);
+    if (!nullToAbsent || round != null) {
+      map['round'] = Variable<int>(round);
+    }
+    if (!nullToAbsent || phase != null) {
+      map['phase'] = Variable<String>(
+        $BattleEventsTable.$converterphasen.toSql(phase),
+      );
+    }
+    map['label'] = Variable<String>(label);
+    if (!nullToAbsent || cpDelta != null) {
+      map['cp_delta'] = Variable<int>(cpDelta);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  BattleEventsCompanion toCompanion(bool nullToAbsent) {
+    return BattleEventsCompanion(
+      id: Value(id),
+      battleId: Value(battleId),
+      round: round == null && nullToAbsent
+          ? const Value.absent()
+          : Value(round),
+      phase: phase == null && nullToAbsent
+          ? const Value.absent()
+          : Value(phase),
+      label: Value(label),
+      cpDelta: cpDelta == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cpDelta),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory BattleEvent.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BattleEvent(
+      id: serializer.fromJson<String>(json['id']),
+      battleId: serializer.fromJson<String>(json['battleId']),
+      round: serializer.fromJson<int?>(json['round']),
+      phase: $BattleEventsTable.$converterphasen.fromJson(
+        serializer.fromJson<String?>(json['phase']),
+      ),
+      label: serializer.fromJson<String>(json['label']),
+      cpDelta: serializer.fromJson<int?>(json['cpDelta']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'battleId': serializer.toJson<String>(battleId),
+      'round': serializer.toJson<int?>(round),
+      'phase': serializer.toJson<String?>(
+        $BattleEventsTable.$converterphasen.toJson(phase),
+      ),
+      'label': serializer.toJson<String>(label),
+      'cpDelta': serializer.toJson<int?>(cpDelta),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  BattleEvent copyWith({
+    String? id,
+    String? battleId,
+    Value<int?> round = const Value.absent(),
+    Value<BattlePhase?> phase = const Value.absent(),
+    String? label,
+    Value<int?> cpDelta = const Value.absent(),
+    DateTime? createdAt,
+  }) => BattleEvent(
+    id: id ?? this.id,
+    battleId: battleId ?? this.battleId,
+    round: round.present ? round.value : this.round,
+    phase: phase.present ? phase.value : this.phase,
+    label: label ?? this.label,
+    cpDelta: cpDelta.present ? cpDelta.value : this.cpDelta,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  BattleEvent copyWithCompanion(BattleEventsCompanion data) {
+    return BattleEvent(
+      id: data.id.present ? data.id.value : this.id,
+      battleId: data.battleId.present ? data.battleId.value : this.battleId,
+      round: data.round.present ? data.round.value : this.round,
+      phase: data.phase.present ? data.phase.value : this.phase,
+      label: data.label.present ? data.label.value : this.label,
+      cpDelta: data.cpDelta.present ? data.cpDelta.value : this.cpDelta,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BattleEvent(')
+          ..write('id: $id, ')
+          ..write('battleId: $battleId, ')
+          ..write('round: $round, ')
+          ..write('phase: $phase, ')
+          ..write('label: $label, ')
+          ..write('cpDelta: $cpDelta, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, battleId, round, phase, label, cpDelta, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BattleEvent &&
+          other.id == this.id &&
+          other.battleId == this.battleId &&
+          other.round == this.round &&
+          other.phase == this.phase &&
+          other.label == this.label &&
+          other.cpDelta == this.cpDelta &&
+          other.createdAt == this.createdAt);
+}
+
+class BattleEventsCompanion extends UpdateCompanion<BattleEvent> {
+  final Value<String> id;
+  final Value<String> battleId;
+  final Value<int?> round;
+  final Value<BattlePhase?> phase;
+  final Value<String> label;
+  final Value<int?> cpDelta;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const BattleEventsCompanion({
+    this.id = const Value.absent(),
+    this.battleId = const Value.absent(),
+    this.round = const Value.absent(),
+    this.phase = const Value.absent(),
+    this.label = const Value.absent(),
+    this.cpDelta = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BattleEventsCompanion.insert({
+    required String id,
+    required String battleId,
+    this.round = const Value.absent(),
+    this.phase = const Value.absent(),
+    required String label,
+    this.cpDelta = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       battleId = Value(battleId),
+       label = Value(label);
+  static Insertable<BattleEvent> custom({
+    Expression<String>? id,
+    Expression<String>? battleId,
+    Expression<int>? round,
+    Expression<String>? phase,
+    Expression<String>? label,
+    Expression<int>? cpDelta,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (battleId != null) 'battle_id': battleId,
+      if (round != null) 'round': round,
+      if (phase != null) 'phase': phase,
+      if (label != null) 'label': label,
+      if (cpDelta != null) 'cp_delta': cpDelta,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BattleEventsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? battleId,
+    Value<int?>? round,
+    Value<BattlePhase?>? phase,
+    Value<String>? label,
+    Value<int?>? cpDelta,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return BattleEventsCompanion(
+      id: id ?? this.id,
+      battleId: battleId ?? this.battleId,
+      round: round ?? this.round,
+      phase: phase ?? this.phase,
+      label: label ?? this.label,
+      cpDelta: cpDelta ?? this.cpDelta,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (battleId.present) {
+      map['battle_id'] = Variable<String>(battleId.value);
+    }
+    if (round.present) {
+      map['round'] = Variable<int>(round.value);
+    }
+    if (phase.present) {
+      map['phase'] = Variable<String>(
+        $BattleEventsTable.$converterphasen.toSql(phase.value),
+      );
+    }
+    if (label.present) {
+      map['label'] = Variable<String>(label.value);
+    }
+    if (cpDelta.present) {
+      map['cp_delta'] = Variable<int>(cpDelta.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BattleEventsCompanion(')
+          ..write('id: $id, ')
+          ..write('battleId: $battleId, ')
+          ..write('round: $round, ')
+          ..write('phase: $phase, ')
+          ..write('label: $label, ')
+          ..write('cpDelta: $cpDelta, ')
           ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -17569,6 +18533,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $WishlistItemsTable wishlistItems = $WishlistItemsTable(this);
   late final $BattlesTable battles = $BattlesTable(this);
+  late final $BattleEventsTable battleEvents = $BattleEventsTable(this);
   late final $ProjectsTable projects = $ProjectsTable(this);
   late final $XpCategoryTotalsTable xpCategoryTotals = $XpCategoryTotalsTable(
     this,
@@ -17627,6 +18592,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     ownedMiniatures,
     wishlistItems,
     battles,
+    battleEvents,
     projects,
     xpCategoryTotals,
     xpFactionTotals,
@@ -25987,6 +26953,15 @@ typedef $$BattlesTableCreateCompanionBuilder =
       Value<String?> notes,
       Value<DateTime> playedAt,
       Value<DateTime> createdAt,
+      Value<BattleStatus?> status,
+      Value<int?> currentRound,
+      Value<BattlePhase?> currentPhase,
+      Value<int?> myCommandPoints,
+      Value<int?> opponentCommandPoints,
+      Value<String?> missionPack,
+      Value<String?> terrain,
+      Value<int?> pointsLimit,
+      Value<bool?> myTurnActive,
       Value<int> rowid,
     });
 typedef $$BattlesTableUpdateCompanionBuilder =
@@ -26004,6 +26979,15 @@ typedef $$BattlesTableUpdateCompanionBuilder =
       Value<String?> notes,
       Value<DateTime> playedAt,
       Value<DateTime> createdAt,
+      Value<BattleStatus?> status,
+      Value<int?> currentRound,
+      Value<BattlePhase?> currentPhase,
+      Value<int?> myCommandPoints,
+      Value<int?> opponentCommandPoints,
+      Value<String?> missionPack,
+      Value<String?> terrain,
+      Value<int?> pointsLimit,
+      Value<bool?> myTurnActive,
       Value<int> rowid,
     });
 
@@ -26082,6 +27066,53 @@ class $$BattlesTableFilterComposer
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnWithTypeConverterFilters<BattleStatus?, BattleStatus, String>
+  get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get currentRound => $composableBuilder(
+    column: $table.currentRound,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<BattlePhase?, BattlePhase, String>
+  get currentPhase => $composableBuilder(
+    column: $table.currentPhase,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get myCommandPoints => $composableBuilder(
+    column: $table.myCommandPoints,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get opponentCommandPoints => $composableBuilder(
+    column: $table.opponentCommandPoints,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get missionPack => $composableBuilder(
+    column: $table.missionPack,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get terrain => $composableBuilder(
+    column: $table.terrain,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get pointsLimit => $composableBuilder(
+    column: $table.pointsLimit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get myTurnActive => $composableBuilder(
+    column: $table.myTurnActive,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$BattlesTableOrderingComposer
@@ -26157,6 +27188,51 @@ class $$BattlesTableOrderingComposer
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get currentRound => $composableBuilder(
+    column: $table.currentRound,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get currentPhase => $composableBuilder(
+    column: $table.currentPhase,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get myCommandPoints => $composableBuilder(
+    column: $table.myCommandPoints,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get opponentCommandPoints => $composableBuilder(
+    column: $table.opponentCommandPoints,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get missionPack => $composableBuilder(
+    column: $table.missionPack,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get terrain => $composableBuilder(
+    column: $table.terrain,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get pointsLimit => $composableBuilder(
+    column: $table.pointsLimit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get myTurnActive => $composableBuilder(
+    column: $table.myTurnActive,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$BattlesTableAnnotationComposer
@@ -26214,6 +27290,48 @@ class $$BattlesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<BattleStatus?, String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<int> get currentRound => $composableBuilder(
+    column: $table.currentRound,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<BattlePhase?, String> get currentPhase =>
+      $composableBuilder(
+        column: $table.currentPhase,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<int> get myCommandPoints => $composableBuilder(
+    column: $table.myCommandPoints,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get opponentCommandPoints => $composableBuilder(
+    column: $table.opponentCommandPoints,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get missionPack => $composableBuilder(
+    column: $table.missionPack,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get terrain =>
+      $composableBuilder(column: $table.terrain, builder: (column) => column);
+
+  GeneratedColumn<int> get pointsLimit => $composableBuilder(
+    column: $table.pointsLimit,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get myTurnActive => $composableBuilder(
+    column: $table.myTurnActive,
+    builder: (column) => column,
+  );
 }
 
 class $$BattlesTableTableManager
@@ -26257,6 +27375,15 @@ class $$BattlesTableTableManager
                 Value<String?> notes = const Value.absent(),
                 Value<DateTime> playedAt = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<BattleStatus?> status = const Value.absent(),
+                Value<int?> currentRound = const Value.absent(),
+                Value<BattlePhase?> currentPhase = const Value.absent(),
+                Value<int?> myCommandPoints = const Value.absent(),
+                Value<int?> opponentCommandPoints = const Value.absent(),
+                Value<String?> missionPack = const Value.absent(),
+                Value<String?> terrain = const Value.absent(),
+                Value<int?> pointsLimit = const Value.absent(),
+                Value<bool?> myTurnActive = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => BattlesCompanion(
                 id: id,
@@ -26272,6 +27399,15 @@ class $$BattlesTableTableManager
                 notes: notes,
                 playedAt: playedAt,
                 createdAt: createdAt,
+                status: status,
+                currentRound: currentRound,
+                currentPhase: currentPhase,
+                myCommandPoints: myCommandPoints,
+                opponentCommandPoints: opponentCommandPoints,
+                missionPack: missionPack,
+                terrain: terrain,
+                pointsLimit: pointsLimit,
+                myTurnActive: myTurnActive,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -26289,6 +27425,15 @@ class $$BattlesTableTableManager
                 Value<String?> notes = const Value.absent(),
                 Value<DateTime> playedAt = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<BattleStatus?> status = const Value.absent(),
+                Value<int?> currentRound = const Value.absent(),
+                Value<BattlePhase?> currentPhase = const Value.absent(),
+                Value<int?> myCommandPoints = const Value.absent(),
+                Value<int?> opponentCommandPoints = const Value.absent(),
+                Value<String?> missionPack = const Value.absent(),
+                Value<String?> terrain = const Value.absent(),
+                Value<int?> pointsLimit = const Value.absent(),
+                Value<bool?> myTurnActive = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => BattlesCompanion.insert(
                 id: id,
@@ -26304,6 +27449,15 @@ class $$BattlesTableTableManager
                 notes: notes,
                 playedAt: playedAt,
                 createdAt: createdAt,
+                status: status,
+                currentRound: currentRound,
+                currentPhase: currentPhase,
+                myCommandPoints: myCommandPoints,
+                opponentCommandPoints: opponentCommandPoints,
+                missionPack: missionPack,
+                terrain: terrain,
+                pointsLimit: pointsLimit,
+                myTurnActive: myTurnActive,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -26326,6 +27480,245 @@ typedef $$BattlesTableProcessedTableManager =
       $$BattlesTableUpdateCompanionBuilder,
       (Battle, BaseReferences<_$AppDatabase, $BattlesTable, Battle>),
       Battle,
+      PrefetchHooks Function()
+    >;
+typedef $$BattleEventsTableCreateCompanionBuilder =
+    BattleEventsCompanion Function({
+      required String id,
+      required String battleId,
+      Value<int?> round,
+      Value<BattlePhase?> phase,
+      required String label,
+      Value<int?> cpDelta,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+typedef $$BattleEventsTableUpdateCompanionBuilder =
+    BattleEventsCompanion Function({
+      Value<String> id,
+      Value<String> battleId,
+      Value<int?> round,
+      Value<BattlePhase?> phase,
+      Value<String> label,
+      Value<int?> cpDelta,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$BattleEventsTableFilterComposer
+    extends Composer<_$AppDatabase, $BattleEventsTable> {
+  $$BattleEventsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get battleId => $composableBuilder(
+    column: $table.battleId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get round => $composableBuilder(
+    column: $table.round,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<BattlePhase?, BattlePhase, String> get phase =>
+      $composableBuilder(
+        column: $table.phase,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get cpDelta => $composableBuilder(
+    column: $table.cpDelta,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BattleEventsTableOrderingComposer
+    extends Composer<_$AppDatabase, $BattleEventsTable> {
+  $$BattleEventsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get battleId => $composableBuilder(
+    column: $table.battleId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get round => $composableBuilder(
+    column: $table.round,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get phase => $composableBuilder(
+    column: $table.phase,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get cpDelta => $composableBuilder(
+    column: $table.cpDelta,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BattleEventsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BattleEventsTable> {
+  $$BattleEventsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get battleId =>
+      $composableBuilder(column: $table.battleId, builder: (column) => column);
+
+  GeneratedColumn<int> get round =>
+      $composableBuilder(column: $table.round, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<BattlePhase?, String> get phase =>
+      $composableBuilder(column: $table.phase, builder: (column) => column);
+
+  GeneratedColumn<String> get label =>
+      $composableBuilder(column: $table.label, builder: (column) => column);
+
+  GeneratedColumn<int> get cpDelta =>
+      $composableBuilder(column: $table.cpDelta, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$BattleEventsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BattleEventsTable,
+          BattleEvent,
+          $$BattleEventsTableFilterComposer,
+          $$BattleEventsTableOrderingComposer,
+          $$BattleEventsTableAnnotationComposer,
+          $$BattleEventsTableCreateCompanionBuilder,
+          $$BattleEventsTableUpdateCompanionBuilder,
+          (
+            BattleEvent,
+            BaseReferences<_$AppDatabase, $BattleEventsTable, BattleEvent>,
+          ),
+          BattleEvent,
+          PrefetchHooks Function()
+        > {
+  $$BattleEventsTableTableManager(_$AppDatabase db, $BattleEventsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BattleEventsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BattleEventsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BattleEventsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> battleId = const Value.absent(),
+                Value<int?> round = const Value.absent(),
+                Value<BattlePhase?> phase = const Value.absent(),
+                Value<String> label = const Value.absent(),
+                Value<int?> cpDelta = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BattleEventsCompanion(
+                id: id,
+                battleId: battleId,
+                round: round,
+                phase: phase,
+                label: label,
+                cpDelta: cpDelta,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String battleId,
+                Value<int?> round = const Value.absent(),
+                Value<BattlePhase?> phase = const Value.absent(),
+                required String label,
+                Value<int?> cpDelta = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BattleEventsCompanion.insert(
+                id: id,
+                battleId: battleId,
+                round: round,
+                phase: phase,
+                label: label,
+                cpDelta: cpDelta,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BattleEventsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BattleEventsTable,
+      BattleEvent,
+      $$BattleEventsTableFilterComposer,
+      $$BattleEventsTableOrderingComposer,
+      $$BattleEventsTableAnnotationComposer,
+      $$BattleEventsTableCreateCompanionBuilder,
+      $$BattleEventsTableUpdateCompanionBuilder,
+      (
+        BattleEvent,
+        BaseReferences<_$AppDatabase, $BattleEventsTable, BattleEvent>,
+      ),
+      BattleEvent,
       PrefetchHooks Function()
     >;
 typedef $$ProjectsTableCreateCompanionBuilder =
@@ -26921,6 +28314,8 @@ class $AppDatabaseManager {
       $$WishlistItemsTableTableManager(_db, _db.wishlistItems);
   $$BattlesTableTableManager get battles =>
       $$BattlesTableTableManager(_db, _db.battles);
+  $$BattleEventsTableTableManager get battleEvents =>
+      $$BattleEventsTableTableManager(_db, _db.battleEvents);
   $$ProjectsTableTableManager get projects =>
       $$ProjectsTableTableManager(_db, _db.projects);
   $$XpCategoryTotalsTableTableManager get xpCategoryTotals =>

@@ -9,6 +9,8 @@ import '../../../database/models/battle_details.dart';
 import '../../../database/tables/battles_table.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/battle_provider.dart';
+import '../widgets/battle_dashboard.dart';
+import '../widgets/battle_setup_dialog.dart';
 import '../widgets/log_battle_dialog.dart';
 
 class BattlePage extends ConsumerWidget {
@@ -16,64 +18,117 @@ class BattlePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
-    final battlesAsync = ref.watch(battlesListProvider);
+    final activeBattleAsync = ref.watch(activeBattleProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(l10n.navBattles, style: AppTextStyles.heading),
-                FilledButton.icon(
-                  style:
-                      FilledButton.styleFrom(backgroundColor: AppColors.primary),
-                  onPressed: () => showDialog(
-                    context: context,
-                    builder: (_) => const LogBattleDialog(),
-                  ),
-                  icon: const Icon(Icons.add_rounded),
-                  label: Text(l10n.battleNewBattle),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Expanded(
-              child: battlesAsync.when(
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                ),
-                error: (error, _) => Center(
-                  child: Text('$error', style: AppTextStyles.caption),
-                ),
-                data: (battles) {
-                  if (battles.isEmpty) {
-                    return Center(
-                      child: Text(
-                        l10n.battleEmptyList,
-                        style: AppTextStyles.caption,
-                      ),
-                    );
-                  }
-                  return ListView.builder(
-                    itemCount: battles.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: _BattleCard(battle: battles[index]),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
+      body: activeBattleAsync.when(
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
         ),
+        error: (error, _) =>
+            Center(child: Text('$error', style: AppTextStyles.caption)),
+        data: (activeBattle) => activeBattle != null
+            ? BattleDashboard(battle: activeBattle)
+            : const _BattleHistoryView(),
+      ),
+    );
+  }
+}
+
+class _BattleHistoryView extends ConsumerWidget {
+  const _BattleHistoryView();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final battlesAsync = ref.watch(battlesListProvider);
+
+    return Padding(
+      padding: const EdgeInsets.all(28),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth > 760;
+              final title = Text(l10n.navBattles, style: AppTextStyles.heading);
+              final controls = Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (_) => const LogBattleDialog(),
+                    ),
+                    child: Text(
+                      l10n.battleLogExistingGame,
+                      style: AppTextStyles.body.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                  FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                    ),
+                    onPressed: () async {
+                      final started = await showDialog<String?>(
+                        context: context,
+                        builder: (_) => const BattleSetupDialog(),
+                      );
+                      if (started != null) ref.invalidate(activeBattleProvider);
+                    },
+                    icon: const Icon(Icons.add_rounded),
+                    label: Text(l10n.battleNewBattle),
+                  ),
+                ],
+              );
+
+              if (!wide) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [title, const SizedBox(height: 12), controls],
+                );
+              }
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [title, controls],
+              );
+            },
+          ),
+          const SizedBox(height: 24),
+          Expanded(
+            child: battlesAsync.when(
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              ),
+              error: (error, _) =>
+                  Center(child: Text('$error', style: AppTextStyles.caption)),
+              data: (battles) {
+                if (battles.isEmpty) {
+                  return Center(
+                    child: Text(
+                      l10n.battleEmptyList,
+                      style: AppTextStyles.caption,
+                    ),
+                  );
+                }
+                return ListView.builder(
+                  itemCount: battles.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _BattleCard(battle: battles[index]),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -111,7 +166,9 @@ class _BattleCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final dateFormat = DateFormat.yMMMd(Localizations.localeOf(context).toString());
+    final dateFormat = DateFormat.yMMMd(
+      Localizations.localeOf(context).toString(),
+    );
 
     return AppCard(
       child: Row(

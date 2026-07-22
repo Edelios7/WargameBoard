@@ -30,13 +30,15 @@ void main() {
     await database.close();
   });
 
-  testWidgets('logging a battle shows it in the history', (tester) async {
+  testWidgets('logging a past battle shows it in the history', (
+    tester,
+  ) async {
     await tester.pumpWidget(wrap());
     await tester.pumpAndSettle();
 
     expect(find.text('Aucune partie enregistrée'), findsOneWidget);
 
-    await tester.tap(find.text('Nouvelle partie'));
+    await tester.tap(find.text('Enregistrer une partie déjà jouée'));
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextField).first, 'Marc');
@@ -47,6 +49,29 @@ void main() {
 
     expect(find.text('Marc'), findsOneWidget);
     expect(find.text('Victoire'), findsOneWidget);
+  });
+
+  testWidgets('starting a new battle shows the live dashboard', (
+    tester,
+  ) async {
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Nouvelle partie'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).first, 'Marc');
+    await tester.ensureVisible(find.text('Lancer la partie'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Lancer la partie'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Marc'), findsOneWidget);
+    expect(find.text('Round 1'), findsOneWidget);
+    expect(find.text('Commandement'), findsOneWidget);
+
+    // The battle in progress isn't in the history yet.
+    expect(find.text('Aucune partie enregistrée'), findsNothing);
   });
 
   testWidgets('deleting a battle removes it from the history', (tester) async {

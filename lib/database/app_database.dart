@@ -53,6 +53,7 @@ import 'tables/owned_miniatures_table.dart';
 import 'tables/wishlist_items_table.dart';
 
 import 'tables/battles_table.dart';
+import 'tables/battle_events_table.dart';
 
 import 'tables/projects_table.dart';
 
@@ -140,6 +141,7 @@ part 'app_database.g.dart';
 
     // ===== BATTLES =====
     Battles,
+    BattleEvents,
 
     // ===== PROJECTS =====
     Projects,
@@ -198,7 +200,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 14;
 
   // =========================
   // Migrations
@@ -226,97 +228,129 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (Migrator m) async {
-          await m.createAll();
-          await seedCatalog(this);
-          await xpDao.seedCategories();
-        },
+    onCreate: (Migrator m) async {
+      await m.createAll();
+      await seedCatalog(this);
+      await xpDao.seedCategories();
+    },
 
-        onUpgrade: (Migrator m, int from, int to) async {
-          if (from < 2) {
-            if (!await _hasTable('armies')) await m.createTable(armies);
-            if (!await _hasTable('army_units')) await m.createTable(armyUnits);
-          }
-          if (from < 3) {
-            if (!await _hasColumn('armies', 'points_limit')) {
-              await m.addColumn(armies, armies.pointsLimit);
-            }
-          }
-          if (from < 4) {
-            if (!await _hasTable('owned_miniatures')) {
-              await m.createTable(ownedMiniatures);
-            }
-          }
-          if (from < 5) {
-            if (!await _hasTable('battles')) await m.createTable(battles);
-          }
-          if (from < 6) {
-            if (!await _hasTable('detachments')) {
-              await m.createTable(detachments);
-            }
-            if (!await _hasTable('enhancements')) {
-              await m.createTable(enhancements);
-            }
-            if (!await _hasColumn('armies', 'detachment_id')) {
-              await m.addColumn(armies, armies.detachmentId);
-            }
-            if (!await _hasColumn('army_units', 'enhancement_id')) {
-              await m.addColumn(armyUnits, armyUnits.enhancementId);
-            }
-          }
-          if (from < 7) {
-            if (!await _hasTable('stratagems')) {
-              await m.createTable(stratagems);
-            }
-          }
-          if (from < 8) {
-            if (!await _hasTable('wishlist_items')) {
-              await m.createTable(wishlistItems);
-            }
-          }
-          if (from < 9) {
-            // Backfill des profils d'armes sur les bases déjà créées
-            // avant leur introduction dans le seed.
-            await seedWeaponProfiles(this);
-          }
-          if (from < 10) {
-            if (!await _hasColumn('battles', 'opponent_faction_id')) {
-              await m.addColumn(battles, battles.opponentFactionId);
-            }
-            if (!await _hasColumn('battles', 'location')) {
-              await m.addColumn(battles, battles.location);
-            }
-            if (!await _hasColumn('battles', 'type')) {
-              await m.addColumn(battles, battles.type);
-            }
-            if (!await _hasTable('projects')) await m.createTable(projects);
-            if (!await _hasTable('xp_category_totals')) {
-              await m.createTable(xpCategoryTotals);
-            }
-            if (!await _hasTable('xp_faction_totals')) {
-              await m.createTable(xpFactionTotals);
-            }
-            await xpDao.seedCategories();
-          }
-          if (from < 11) {
-            if (!await _hasTable('army_unit_equipment_selections')) {
-              await m.createTable(armyUnitEquipmentSelections);
-            }
-          }
-          if (from < 12) {
-            if (!await _hasColumn('datasheet_costs', 'model_count')) {
-              await m.addColumn(datasheetCosts, datasheetCosts.modelCount);
-            }
-          }
-          if (from < 13) {
-            if (!await _hasColumn('army_units', 'is_warlord')) {
-              await m.addColumn(armyUnits, armyUnits.isWarlord);
-            }
-          }
-        },
+    onUpgrade: (Migrator m, int from, int to) async {
+      if (from < 2) {
+        if (!await _hasTable('armies')) await m.createTable(armies);
+        if (!await _hasTable('army_units')) await m.createTable(armyUnits);
+      }
+      if (from < 3) {
+        if (!await _hasColumn('armies', 'points_limit')) {
+          await m.addColumn(armies, armies.pointsLimit);
+        }
+      }
+      if (from < 4) {
+        if (!await _hasTable('owned_miniatures')) {
+          await m.createTable(ownedMiniatures);
+        }
+      }
+      if (from < 5) {
+        if (!await _hasTable('battles')) await m.createTable(battles);
+      }
+      if (from < 6) {
+        if (!await _hasTable('detachments')) {
+          await m.createTable(detachments);
+        }
+        if (!await _hasTable('enhancements')) {
+          await m.createTable(enhancements);
+        }
+        if (!await _hasColumn('armies', 'detachment_id')) {
+          await m.addColumn(armies, armies.detachmentId);
+        }
+        if (!await _hasColumn('army_units', 'enhancement_id')) {
+          await m.addColumn(armyUnits, armyUnits.enhancementId);
+        }
+      }
+      if (from < 7) {
+        if (!await _hasTable('stratagems')) {
+          await m.createTable(stratagems);
+        }
+      }
+      if (from < 8) {
+        if (!await _hasTable('wishlist_items')) {
+          await m.createTable(wishlistItems);
+        }
+      }
+      if (from < 9) {
+        // Backfill des profils d'armes sur les bases déjà créées
+        // avant leur introduction dans le seed.
+        await seedWeaponProfiles(this);
+      }
+      if (from < 10) {
+        if (!await _hasColumn('battles', 'opponent_faction_id')) {
+          await m.addColumn(battles, battles.opponentFactionId);
+        }
+        if (!await _hasColumn('battles', 'location')) {
+          await m.addColumn(battles, battles.location);
+        }
+        if (!await _hasColumn('battles', 'type')) {
+          await m.addColumn(battles, battles.type);
+        }
+        if (!await _hasTable('projects')) await m.createTable(projects);
+        if (!await _hasTable('xp_category_totals')) {
+          await m.createTable(xpCategoryTotals);
+        }
+        if (!await _hasTable('xp_faction_totals')) {
+          await m.createTable(xpFactionTotals);
+        }
+        await xpDao.seedCategories();
+      }
+      if (from < 11) {
+        if (!await _hasTable('army_unit_equipment_selections')) {
+          await m.createTable(armyUnitEquipmentSelections);
+        }
+      }
+      if (from < 12) {
+        if (!await _hasColumn('datasheet_costs', 'model_count')) {
+          await m.addColumn(datasheetCosts, datasheetCosts.modelCount);
+        }
+      }
+      if (from < 13) {
+        if (!await _hasColumn('army_units', 'is_warlord')) {
+          await m.addColumn(armyUnits, armyUnits.isWarlord);
+        }
+      }
+      if (from < 14) {
+        if (!await _hasColumn('battles', 'status')) {
+          await m.addColumn(battles, battles.status);
+        }
+        if (!await _hasColumn('battles', 'current_round')) {
+          await m.addColumn(battles, battles.currentRound);
+        }
+        if (!await _hasColumn('battles', 'current_phase')) {
+          await m.addColumn(battles, battles.currentPhase);
+        }
+        if (!await _hasColumn('battles', 'my_command_points')) {
+          await m.addColumn(battles, battles.myCommandPoints);
+        }
+        if (!await _hasColumn('battles', 'opponent_command_points')) {
+          await m.addColumn(battles, battles.opponentCommandPoints);
+        }
+        if (!await _hasColumn('battles', 'mission_pack')) {
+          await m.addColumn(battles, battles.missionPack);
+        }
+        if (!await _hasColumn('battles', 'terrain')) {
+          await m.addColumn(battles, battles.terrain);
+        }
+        if (!await _hasColumn('battles', 'points_limit')) {
+          await m.addColumn(battles, battles.pointsLimit);
+        }
+        if (!await _hasColumn('battles', 'my_turn_active')) {
+          await m.addColumn(battles, battles.myTurnActive);
+        }
+        if (!await _hasTable('battle_events')) {
+          await m.createTable(battleEvents);
+        }
+      }
+    },
 
-        beforeOpen: (details) async {
-          // Initialisation future (PRAGMA, seed de données, etc.)
-        },
-      );
+    beforeOpen: (details) async {
+      // Initialisation future (PRAGMA, seed de données, etc.)
+    },
+  );
 }

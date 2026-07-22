@@ -362,6 +362,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get armyBuilderChangeDetachment => 'Changer de détachement';
 
   @override
+  String get armyBuilderOnlyOwnedFilter => 'Uniquement ma collection';
+
+  @override
+  String get armyBuilderToBuy => 'À acheter';
+
+  @override
   String armyBuilderEnhancementsReset(int count) {
     return '$count amélioration(s) réinitialisée(s) suite au changement de détachement.';
   }
@@ -1190,4 +1196,75 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get battleTypeTournament => 'Tournoi';
+
+  @override
+  String get battleTypeCrusade => 'Croisade';
+
+  @override
+  String get battleSetupTitle => 'Préparation de la partie';
+
+  @override
+  String get battleSetupStart => 'Lancer la partie';
+
+  @override
+  String get battlePointsLimitLabel => 'Format (points)';
+
+  @override
+  String get battleMissionPackLabel => 'Pack de missions (optionnel)';
+
+  @override
+  String get battleTerrainLabel => 'Terrain (optionnel)';
+
+  @override
+  String get battleLogExistingGame => 'Enregistrer une partie déjà jouée';
+
+  @override
+  String get battleDashboardResume => 'Partie en cours';
+
+  @override
+  String get battleDashboardResumeSubtitle => 'Reprendre la partie en cours';
+
+  @override
+  String battleDashboardRound(int round) {
+    return 'Round $round';
+  }
+
+  @override
+  String get battlePhaseCommand => 'Commandement';
+
+  @override
+  String get battlePhaseMovement => 'Mouvement';
+
+  @override
+  String get battlePhaseShooting => 'Tir';
+
+  @override
+  String get battlePhaseCharge => 'Charge';
+
+  @override
+  String get battlePhaseFight => 'Combat';
+
+  @override
+  String get battlePhaseMorale => 'Moral';
+
+  @override
+  String get battleDashboardNextPhase => 'Phase suivante';
+
+  @override
+  String get battleDashboardMyCp => 'Mes PC';
+
+  @override
+  String get battleDashboardOpponentCp => 'PC adverses';
+
+  @override
+  String get battleDashboardEvents => 'Journal de bataille';
+
+  @override
+  String get battleDashboardAddEvent => 'Ajouter un événement';
+
+  @override
+  String get battleDashboardEventHint => 'Que s\'est-il passé ?';
+
+  @override
+  String get battleDashboardFinish => 'Terminer la partie';
 }

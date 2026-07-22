@@ -177,6 +177,8 @@
     }
   },
   "armyBuilderChangeDetachment": "Changer de détachement",
+  "armyBuilderOnlyOwnedFilter": "Uniquement ma collection",
+  "armyBuilderToBuy": "À acheter",
   "armyBuilderEnhancementsReset": "{count} amélioration(s) réinitialisée(s) suite au changement de détachement.",
   "@armyBuilderEnhancementsReset": {
     "placeholders": {
@@ -580,5 +582,35 @@
   "battleTypeLabel": "Type de partie",
   "battleTypeMatched": "Partie normale",
   "battleTypeNarrative": "Narrative",
-  "battleTypeTournament": "Tournoi"
+  "battleTypeTournament": "Tournoi",
+  "battleTypeCrusade": "Croisade",
+
+  "battleSetupTitle": "Préparation de la partie",
+  "battleSetupStart": "Lancer la partie",
+  "battlePointsLimitLabel": "Format (points)",
+  "battleMissionPackLabel": "Pack de missions (optionnel)",
+  "battleTerrainLabel": "Terrain (optionnel)",
+  "battleLogExistingGame": "Enregistrer une partie déjà jouée",
+
+  "battleDashboardResume": "Partie en cours",
+  "battleDashboardResumeSubtitle": "Reprendre la partie en cours",
+  "battleDashboardRound": "Round {round}",
+  "@battleDashboardRound": {
+    "placeholders": {
+      "round": { "type": "int" }
+    }
+  },
+  "battlePhaseCommand": "Commandement",
+  "battlePhaseMovement": "Mouvement",
+  "battlePhaseShooting": "Tir",
+  "battlePhaseCharge": "Charge",
+  "battlePhaseFight": "Combat",
+  "battlePhaseMorale": "Moral",
+  "battleDashboardNextPhase": "Phase suivante",
+  "battleDashboardMyCp": "Mes PC",
+  "battleDashboardOpponentCp": "PC adverses",
+  "battleDashboardEvents": "Journal de bataille",
+  "battleDashboardAddEvent": "Ajouter un événement",
+  "battleDashboardEventHint": "Que s'est-il passé ?",
+  "battleDashboardFinish": "Terminer la partie"
 }

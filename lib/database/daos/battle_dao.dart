@@ -3,19 +3,26 @@ import 'package:uuid/uuid.dart';
 
 import '../app_database.dart';
 import '../models/battle_details.dart';
+import '../models/battle_event_details.dart';
 import '../tables/armies_table.dart';
+import '../tables/battle_events_table.dart';
 import '../tables/battles_table.dart';
 import '../tables/factions_table.dart';
 
 part 'battle_dao.g.dart';
 
-@DriftAccessor(
-  tables: [
-    Battles,
-    Armies,
-    Factions,
-  ],
-)
+/// Ordre des phases d'un tour (10e/11e éditions) suivi par
+/// [BattleDao.advancePhase].
+const _battlePhaseOrder = [
+  BattlePhase.command,
+  BattlePhase.movement,
+  BattlePhase.shooting,
+  BattlePhase.charge,
+  BattlePhase.fight,
+  BattlePhase.morale,
+];
+
+@DriftAccessor(tables: [Battles, BattleEvents, Armies, Factions])
 class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   BattleDao(AppDatabase db) : super(db);
 
@@ -54,8 +61,9 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
     return id;
   }
 
-  Future<void> deleteBattle(String id) {
-    return (delete(battles)..where((t) => t.id.equals(id))).go();
+  Future<void> deleteBattle(String id) async {
+    await (delete(battleEvents)..where((t) => t.battleId.equals(id))).go();
+    await (delete(battles)..where((t) => t.id.equals(id))).go();
   }
 
   BattleDetails _fromRow(TypedResult row) {
@@ -77,18 +85,35 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
       opponentScore: battle.opponentScore,
       notes: battle.notes,
       playedAt: battle.playedAt,
+      status: battle.status,
+      currentRound: battle.currentRound,
+      currentPhase: battle.currentPhase,
+      myCommandPoints: battle.myCommandPoints,
+      opponentCommandPoints: battle.opponentCommandPoints,
+      missionPack: battle.missionPack,
+      terrain: battle.terrain,
+      pointsLimit: battle.pointsLimit,
+      myTurnActive: battle.myTurnActive,
     );
   }
 
+  /// Historique des parties terminées — exclut les parties en cours de
+  /// suivi en direct (voir [getActiveBattle]), sans quoi une partie non
+  /// finalisée polluerait l'historique et les statistiques.
   Future<List<BattleDetails>> listBattles() async {
-    final query = select(battles).join([
-      leftOuterJoin(armies, armies.id.equalsExp(battles.armyId)),
-      leftOuterJoin(
-        factions,
-        factions.id.equalsExp(battles.opponentFactionId),
-      ),
-    ])
-      ..orderBy([OrderingTerm.desc(battles.playedAt)]);
+    final query =
+        select(battles).join([
+            leftOuterJoin(armies, armies.id.equalsExp(battles.armyId)),
+            leftOuterJoin(
+              factions,
+              factions.id.equalsExp(battles.opponentFactionId),
+            ),
+          ])
+          ..where(
+            battles.status.isNull() |
+                battles.status.equalsValue(BattleStatus.completed),
+          )
+          ..orderBy([OrderingTerm.desc(battles.playedAt)]);
 
     final rows = await query.get();
     return rows.map(_fromRow).toList();
@@ -96,19 +121,20 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
 
   /// Prochaine partie programmée (date future, sans résultat renseigné).
   Future<BattleDetails?> getNextUpcoming() async {
-    final query = select(battles).join([
-      leftOuterJoin(armies, armies.id.equalsExp(battles.armyId)),
-      leftOuterJoin(
-        factions,
-        factions.id.equalsExp(battles.opponentFactionId),
-      ),
-    ])
-      ..where(
-        battles.playedAt.isBiggerThanValue(DateTime.now()) &
-            battles.result.isNull(),
-      )
-      ..orderBy([OrderingTerm.asc(battles.playedAt)])
-      ..limit(1);
+    final query =
+        select(battles).join([
+            leftOuterJoin(armies, armies.id.equalsExp(battles.armyId)),
+            leftOuterJoin(
+              factions,
+              factions.id.equalsExp(battles.opponentFactionId),
+            ),
+          ])
+          ..where(
+            battles.playedAt.isBiggerThanValue(DateTime.now()) &
+                battles.result.isNull(),
+          )
+          ..orderBy([OrderingTerm.asc(battles.playedAt)])
+          ..limit(1);
 
     final row = await query.getSingleOrNull();
     return row == null ? null : _fromRow(row);
@@ -116,18 +142,195 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
 
   /// Dernière partie jouée (résultat renseigné), la plus récente.
   Future<BattleDetails?> getLastPlayed() async {
-    final query = select(battles).join([
-      leftOuterJoin(armies, armies.id.equalsExp(battles.armyId)),
-      leftOuterJoin(
-        factions,
-        factions.id.equalsExp(battles.opponentFactionId),
-      ),
-    ])
-      ..where(battles.result.isNotNull())
-      ..orderBy([OrderingTerm.desc(battles.playedAt)])
-      ..limit(1);
+    final query =
+        select(battles).join([
+            leftOuterJoin(armies, armies.id.equalsExp(battles.armyId)),
+            leftOuterJoin(
+              factions,
+              factions.id.equalsExp(battles.opponentFactionId),
+            ),
+          ])
+          ..where(battles.result.isNotNull())
+          ..orderBy([OrderingTerm.desc(battles.playedAt)])
+          ..limit(1);
 
     final row = await query.getSingleOrNull();
     return row == null ? null : _fromRow(row);
+  }
+
+  // =========================
+  // Suivi de partie en direct
+  // =========================
+
+  /// Démarre une nouvelle partie suivie en direct (écran Bataille) :
+  /// round 1, phase Commandement, CP à 0.
+  Future<String> startBattle({
+    String? armyId,
+    String? opponentName,
+    String? opponentFactionId,
+    int? pointsLimit,
+    String? missionName,
+    String? missionPack,
+    String? terrain,
+    BattleType type = BattleType.matched,
+  }) async {
+    final id = _uuid.v4();
+    await into(battles).insert(
+      BattlesCompanion.insert(
+        id: id,
+        armyId: Value(armyId),
+        opponentName: Value(opponentName),
+        opponentFactionId: Value(opponentFactionId),
+        missionName: Value(missionName),
+        type: Value(type),
+        status: const Value(BattleStatus.setup),
+        currentRound: const Value(1),
+        currentPhase: const Value(BattlePhase.command),
+        myCommandPoints: const Value(0),
+        opponentCommandPoints: const Value(0),
+        missionPack: Value(missionPack),
+        terrain: Value(terrain),
+        pointsLimit: Value(pointsLimit),
+        myTurnActive: const Value(true),
+      ),
+    );
+    return id;
+  }
+
+  /// Partie en cours de suivi en direct (setup ou active), la plus
+  /// récente — permet de proposer de reprendre la partie au redémarrage
+  /// de l'app.
+  Future<BattleDetails?> getActiveBattle() async {
+    final query =
+        select(battles).join([
+            leftOuterJoin(armies, armies.id.equalsExp(battles.armyId)),
+            leftOuterJoin(
+              factions,
+              factions.id.equalsExp(battles.opponentFactionId),
+            ),
+          ])
+          ..where(
+            battles.status.equalsValue(BattleStatus.setup) |
+                battles.status.equalsValue(BattleStatus.active),
+          )
+          ..orderBy([OrderingTerm.desc(battles.createdAt)])
+          ..limit(1);
+
+    final row = await query.getSingleOrNull();
+    return row == null ? null : _fromRow(row);
+  }
+
+  /// Mise à jour partielle de l'état en direct d'une partie — seuls les
+  /// champs passés en [Value] non absente sont modifiés.
+  Future<void> updateLiveState(
+    String battleId, {
+    Value<BattleStatus?> status = const Value.absent(),
+    Value<int?> currentRound = const Value.absent(),
+    Value<BattlePhase?> currentPhase = const Value.absent(),
+    Value<int?> myCommandPoints = const Value.absent(),
+    Value<int?> opponentCommandPoints = const Value.absent(),
+    Value<int?> myScore = const Value.absent(),
+    Value<int?> opponentScore = const Value.absent(),
+    Value<bool?> myTurnActive = const Value.absent(),
+  }) {
+    return (update(battles)..where((t) => t.id.equals(battleId))).write(
+      BattlesCompanion(
+        status: status,
+        currentRound: currentRound,
+        currentPhase: currentPhase,
+        myCommandPoints: myCommandPoints,
+        opponentCommandPoints: opponentCommandPoints,
+        myScore: myScore,
+        opponentScore: opponentScore,
+        myTurnActive: myTurnActive,
+      ),
+    );
+  }
+
+  /// Passe à la phase suivante du round courant ; après Moral, repart en
+  /// Commandement du round suivant. Passe aussi le statut à `active` s'il
+  /// était encore `setup`.
+  Future<void> advancePhase(String battleId) async {
+    final battle = await (select(
+      battles,
+    )..where((t) => t.id.equals(battleId))).getSingle();
+
+    final currentIndex = battle.currentPhase == null
+        ? -1
+        : _battlePhaseOrder.indexOf(battle.currentPhase!);
+    final isLastPhase = currentIndex == _battlePhaseOrder.length - 1;
+
+    await updateLiveState(
+      battleId,
+      status: const Value(BattleStatus.active),
+      currentPhase: Value(
+        isLastPhase
+            ? _battlePhaseOrder.first
+            : _battlePhaseOrder[currentIndex + 1],
+      ),
+      currentRound: isLastPhase
+          ? Value((battle.currentRound ?? 1) + 1)
+          : const Value.absent(),
+    );
+  }
+
+  Future<void> logEvent(
+    String battleId, {
+    required String label,
+    int? cpDelta,
+    int? round,
+    BattlePhase? phase,
+  }) async {
+    await into(battleEvents).insert(
+      BattleEventsCompanion.insert(
+        id: _uuid.v4(),
+        battleId: battleId,
+        label: label,
+        cpDelta: Value(cpDelta),
+        round: Value(round),
+        phase: Value(phase),
+      ),
+    );
+  }
+
+  Future<List<BattleEventDetails>> getEvents(String battleId) async {
+    final rows =
+        await (select(battleEvents)
+              ..where((t) => t.battleId.equals(battleId))
+              ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+            .get();
+    return rows
+        .map(
+          (row) => BattleEventDetails(
+            id: row.id,
+            battleId: row.battleId,
+            round: row.round,
+            phase: row.phase,
+            label: row.label,
+            cpDelta: row.cpDelta,
+            createdAt: row.createdAt,
+          ),
+        )
+        .toList();
+  }
+
+  /// Finalise une partie suivie en direct — bascule son statut à
+  /// `completed`, ce qui la fait apparaître dans l'historique/les stats.
+  Future<void> finishBattle(
+    String battleId, {
+    BattleResult? result,
+    int? myScore,
+    int? opponentScore,
+    String? notes,
+  }) {
+    return (update(battles)..where((t) => t.id.equals(battleId))).write(
+      BattlesCompanion(
+        status: const Value(BattleStatus.completed),
+        result: Value(result),
+        myScore: Value(myScore),
+        opponentScore: Value(opponentScore),
+        notes: Value(notes),
+      ),
+    );
   }
 }

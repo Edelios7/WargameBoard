@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../database/models/battle_details.dart';
+import '../database/models/battle_event_details.dart';
 import '../database/models/battle_stats.dart';
 import '../repositories/battle_repository.dart';
 import 'database_provider.dart';
@@ -32,3 +33,16 @@ final lastBattleProvider = FutureProvider<BattleDetails?>((ref) {
   final repository = ref.watch(battleRepositoryProvider);
   return repository.getLastPlayed();
 });
+
+/// Partie en cours de suivi en direct (setup ou active), s'il y en a une —
+/// gate entre la liste/historique et le dashboard live sur la page Bataille.
+final activeBattleProvider = FutureProvider<BattleDetails?>((ref) {
+  final repository = ref.watch(battleRepositoryProvider);
+  return repository.getActiveBattle();
+});
+
+final battleEventsProvider =
+    FutureProvider.family<List<BattleEventDetails>, String>((ref, battleId) {
+      final repository = ref.watch(battleRepositoryProvider);
+      return repository.getEvents(battleId);
+    });
