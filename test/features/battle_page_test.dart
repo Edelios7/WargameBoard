@@ -1,8 +1,11 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wargameboard/database/app_database.dart';
+import 'package:wargameboard/database/seed/detachment_seed.dart';
+import 'package:wargameboard/database/seed/faction_seed.dart';
 import 'package:wargameboard/features/battle/pages/battle_page.dart';
 import 'package:wargameboard/l10n/app_localizations.dart';
 import 'package:wargameboard/providers/database_provider.dart';
@@ -30,9 +33,7 @@ void main() {
     await database.close();
   });
 
-  testWidgets('logging a past battle shows it in the history', (
-    tester,
-  ) async {
+  testWidgets('logging a past battle shows it in the history', (tester) async {
     await tester.pumpWidget(wrap());
     await tester.pumpAndSettle();
 
@@ -51,9 +52,7 @@ void main() {
     expect(find.text('Victoire'), findsOneWidget);
   });
 
-  testWidgets('starting a new battle shows the live dashboard', (
-    tester,
-  ) async {
+  testWidgets('starting a new battle shows the live dashboard', (tester) async {
     tester.view.physicalSize = const Size(900, 1100);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -96,6 +95,47 @@ void main() {
     expect(find.text('Récapitulatif de la partie'), findsOneWidget);
     expect(find.text('Le Land Raider a perdu 4 PV.'), findsOneWidget);
   });
+
+  testWidgets(
+    'the stratagem assistant surfaces phase-relevant stratagems and spending CP logs an event',
+    (tester) async {
+      tester.view.physicalSize = const Size(1100, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final armyId = await database.armyDao.createArmy(
+        name: 'Ma liste',
+        factionId: seedFactionId,
+        detachmentId: detAngelicHost,
+      );
+      final battleId = await database.battleDao.startBattle(armyId: armyId);
+      // command -> movement -> shooting -> charge -> fight.
+      for (var i = 0; i < 4; i++) {
+        await database.battleDao.advancePhase(battleId);
+      }
+      await database.battleDao.updateLiveState(
+        battleId,
+        myCommandPoints: const Value(2),
+      );
+
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
+
+      // Combat-phase and any-phase stratagems show up; movement-only doesn't.
+      expect(find.text('No Escape'), findsOneWidget);
+      expect(find.text('Honour the Chapter'), findsOneWidget);
+      expect(find.text('Wings of Fire'), findsNothing);
+
+      await tester.tap(find.text('No Escape'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Utiliser (-1 PC)'));
+      await tester.pumpAndSettle();
+
+      // The CP spend is logged in the battle events journal.
+      expect(find.text('-1 CP'), findsOneWidget);
+    },
+  );
 
   testWidgets('deleting a battle removes it from the history', (tester) async {
     await database.battleDao.addBattle(opponentName: 'Julie');

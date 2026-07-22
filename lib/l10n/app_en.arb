@@ -647,5 +647,13 @@
   "battleDashboardNotesHint": "Write anything worth remembering...",
   "battleDetailTitle": "Battle recap",
   "battleDetailBack": "Back to history",
+  "battleStratagemAssistantTitle": "Stratagems for this phase",
+  "battleStratagemAssistantOpponentTitle": "Opponent stratagems for this phase",
+  "battleStratagemUse": "Use (-{cp} CP)",
+  "@battleStratagemUse": {
+    "placeholders": {
+      "cp": { "type": "int" }
+    }
+  },
   "battleDashboardFinish": "Finish battle"
 }

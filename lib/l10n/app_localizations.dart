@@ -2594,6 +2594,24 @@ abstract class AppLocalizations {
   /// **'Retour à l\'historique'**
   String get battleDetailBack;
 
+  /// No description provided for @battleStratagemAssistantTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stratagèmes pour cette phase'**
+  String get battleStratagemAssistantTitle;
+
+  /// No description provided for @battleStratagemAssistantOpponentTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stratagèmes adverses pour cette phase'**
+  String get battleStratagemAssistantOpponentTitle;
+
+  /// No description provided for @battleStratagemUse.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utiliser (-{cp} PC)'**
+  String battleStratagemUse(int cp);
+
   /// No description provided for @battleDashboardFinish.
   ///
   /// In fr, this message translates to:

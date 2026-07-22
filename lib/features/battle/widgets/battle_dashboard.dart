@@ -16,6 +16,7 @@ import '../../../providers/army_provider.dart';
 import '../../../providers/battle_provider.dart';
 import '../../../providers/xp_provider.dart';
 import '../../catalog/pages/datasheet_full_page.dart';
+import 'stratagem_assistant_block.dart';
 
 const _phaseOrder = [
   BattlePhase.command,
@@ -72,6 +73,27 @@ class BattleDashboard extends ConsumerWidget {
         ),
     ];
 
+    final stratagemBlocks = [
+      if (battle.armyId != null)
+        StratagemAssistantBlock(
+          battle: battle,
+          armyId: battle.armyId!,
+          title: AppLocalizations.of(context)!.battleStratagemAssistantTitle,
+          accentColor: AppColors.primary,
+          mine: true,
+        ),
+      if (battle.opponentArmyId != null)
+        StratagemAssistantBlock(
+          battle: battle,
+          armyId: battle.opponentArmyId!,
+          title: AppLocalizations.of(
+            context,
+          )!.battleStratagemAssistantOpponentTitle,
+          accentColor: AppColors.info,
+          mine: false,
+        ),
+    ];
+
     return Padding(
       padding: const EdgeInsets.all(28),
       child: Column(
@@ -90,6 +112,10 @@ class BattleDashboard extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      for (final block in stratagemBlocks) ...[
+                        block,
+                        const SizedBox(height: 16),
+                      ],
                       for (final roster in rosters) ...[
                         roster,
                         const SizedBox(height: 16),
@@ -113,6 +139,10 @@ class BattleDashboard extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        for (final block in stratagemBlocks) ...[
+                          block,
+                          const SizedBox(height: 16),
+                        ],
                         for (final roster in rosters) ...[
                           roster,
                           const SizedBox(height: 16),

@@ -1370,5 +1370,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get battleDetailBack => 'Retour à l\'historique';
 
   @override
+  String get battleStratagemAssistantTitle => 'Stratagèmes pour cette phase';
+
+  @override
+  String get battleStratagemAssistantOpponentTitle =>
+      'Stratagèmes adverses pour cette phase';
+
+  @override
+  String battleStratagemUse(int cp) {
+    return 'Utiliser (-$cp PC)';
+  }
+
+  @override
   String get battleDashboardFinish => 'Terminer la partie';
 }

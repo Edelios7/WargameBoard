@@ -647,5 +647,13 @@
   "battleDashboardNotesHint": "Note tout ce qui vaut la peine d'être retenu...",
   "battleDetailTitle": "Récapitulatif de la partie",
   "battleDetailBack": "Retour à l'historique",
+  "battleStratagemAssistantTitle": "Stratagèmes pour cette phase",
+  "battleStratagemAssistantOpponentTitle": "Stratagèmes adverses pour cette phase",
+  "battleStratagemUse": "Utiliser (-{cp} PC)",
+  "@battleStratagemUse": {
+    "placeholders": {
+      "cp": { "type": "int" }
+    }
+  },
   "battleDashboardFinish": "Terminer la partie"
 }
