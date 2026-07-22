@@ -60,6 +60,10 @@ final catalogSearchResultsProvider =
     minPoints: pointsRange?.start.round(),
     maxPoints: pointsRange?.end.round(),
     sortBy: sortBy,
+    // Le Catalogue filtre un chapitre de Space Marines à ce chapitre
+    // précis uniquement — pas de repli sur les Space Marines génériques
+    // (contrairement à l'Army Builder, voir add_unit_dialog.dart).
+    includeCompatibleSpaceMarines: false,
   );
 });
 

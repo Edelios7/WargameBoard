@@ -145,6 +145,12 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     int? minPoints,
     int? maxPoints,
     CatalogSort sortBy = CatalogSort.nameAsc,
+    // Un chapitre de Space Marines (Blood Angels, Dark Angels...) peut
+    // aussi jouer les unités génériques "Space Marines (Adeptus
+    // Astartes)" en armée (même chapitre, unités communes) : utile pour
+    // l'Army Builder, mais pas pour le Catalogue où l'utilisateur
+    // s'attend à ne voir QUE les unités propres au chapitre choisi.
+    bool includeCompatibleSpaceMarines = true,
   }) async {
     final pattern = '%$text%';
     final costPoints = datasheetCosts.points;
@@ -166,7 +172,9 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
       ..where(datasheets.name.like(pattern));
 
     if (factionId != null) {
-      final matchIds = await _resolveFactionIdsForFilter(factionId);
+      final matchIds = includeCompatibleSpaceMarines
+          ? await _resolveFactionIdsForFilter(factionId)
+          : [factionId];
       query.where(datasheets.factionId.isIn(matchIds));
     }
     if (role != null) {

@@ -19,6 +19,7 @@ class CatalogRepository {
     int? minPoints,
     int? maxPoints,
     CatalogSort sortBy = CatalogSort.nameAsc,
+    bool includeCompatibleSpaceMarines = true,
   }) {
     return database.datasheetDao.search(
       text,
@@ -30,6 +31,7 @@ class CatalogRepository {
       minPoints: minPoints,
       maxPoints: maxPoints,
       sortBy: sortBy,
+      includeCompatibleSpaceMarines: includeCompatibleSpaceMarines,
     );
   }
 

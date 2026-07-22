@@ -46,6 +46,20 @@ void main() {
     expect(results.map((r) => r.name), isNot(contains('Captain')));
   });
 
+  test(
+      'includeCompatibleSpaceMarines: false restricts a chapter filter to '
+      'that chapter only (Catalogue behaviour)', () async {
+    final results = await database.datasheetDao.search(
+      '',
+      factionId: seedFactionId, // Blood Angels
+      includeCompatibleSpaceMarines: false,
+    );
+
+    expect(results.map((r) => r.name), contains('Captain'));
+    expect(results.map((r) => r.name), isNot(contains('Intercessor Squad')));
+    expect(results.every((r) => r.factionName == 'Blood Angels'), isTrue);
+  });
+
   test('filtering by a non-Space-Marines faction is unaffected', () async {
     final results = await database.datasheetDao.search(
       '',
