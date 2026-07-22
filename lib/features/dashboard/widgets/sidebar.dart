@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/hoverable.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shell/navigation.dart';
 import '../../profile/widgets/commandant_footer.dart';
@@ -23,16 +24,15 @@ class Sidebar extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final titleParts = l10n.appTitle.split(' ');
     final titleTop = titleParts.isNotEmpty ? titleParts.first : l10n.appTitle;
-    final titleBottom =
-        titleParts.length > 1 ? titleParts.sublist(1).join(' ') : '';
+    final titleBottom = titleParts.length > 1
+        ? titleParts.sublist(1).join(' ')
+        : '';
 
     return Container(
       width: 232,
       decoration: BoxDecoration(
         color: AppColors.background,
-        border: Border(
-          right: BorderSide(color: AppColors.border),
-        ),
+        border: Border(right: BorderSide(color: AppColors.border)),
       ),
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 20),
       child: Column(
@@ -112,11 +112,7 @@ class Sidebar extends ConsumerWidget {
                   _item(1, Icons.auto_stories_rounded, l10n.navCatalog),
                   _item(2, Icons.menu_book_rounded, l10n.navRules),
                   _item(3, Icons.groups_rounded, l10n.navArmies),
-                  _item(
-                    4,
-                    Icons.sports_martial_arts_rounded,
-                    l10n.navBattles,
-                  ),
+                  _item(4, Icons.sports_martial_arts_rounded, l10n.navBattles),
                   _item(5, Icons.inventory_2_rounded, l10n.navCollection),
                   _item(6, Icons.bar_chart_rounded, l10n.navStatistics),
                   const SizedBox(height: 12),
@@ -131,37 +127,33 @@ class Sidebar extends ConsumerWidget {
           const SizedBox(height: 12),
           CommandantFooter(
             selected: selectedIndex == AppTab.values.indexOf(AppTab.profile),
-            onTap: () =>
-                onItemSelected(AppTab.values.indexOf(AppTab.profile)),
+            onTap: () => onItemSelected(AppTab.values.indexOf(AppTab.profile)),
           ),
 
           const SizedBox(height: 12),
           Opacity(
             opacity: .45,
-            child: Text(
-              l10n.versionLabel,
-              style: AppTextStyles.body,
-            ),
+            child: Text(l10n.versionLabel, style: AppTextStyles.body),
           ),
         ],
       ),
     );
   }
 
-  Widget _item(
-    int index,
-    IconData icon,
-    String title,
-  ) {
+  Widget _item(int index, IconData icon, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: InkWell(
+      child: Hoverable(
         borderRadius: BorderRadius.circular(12),
-        onTap: () => onItemSelected(index),
-        child: SidebarItem(
-          icon: icon,
-          title: title,
-          selected: selectedIndex == index,
+        scaleAlignment: Alignment.centerLeft,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => onItemSelected(index),
+          child: SidebarItem(
+            icon: icon,
+            title: title,
+            selected: selectedIndex == index,
+          ),
         ),
       ),
     );
