@@ -1249,6 +1249,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get battleSetupTitle => 'New battle setup';
 
   @override
+  String get battleSetupHint =>
+      'Everything below is optional — fill in whatever helps you tell this game apart later.';
+
+  @override
   String get battleSetupStart => 'Start battle';
 
   @override
@@ -1362,6 +1366,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get battleUnitRestore => 'Restore unit';
+
+  @override
+  String get battleUnitManageTooltip =>
+      'Tap to manage this unit (wounds, damage, bonuses/penalties)';
+
+  @override
+  String battleUnitManageTooltipWithModifiers(int count) {
+    return '$count active bonus/penalty — tap to manage this unit';
+  }
+
+  @override
+  String get battleUnitViewTooltip => 'Tap to view the datasheet';
 
   @override
   String get battleUnitModifiersTitle => 'Bonuses / penalties';

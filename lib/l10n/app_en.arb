@@ -612,6 +612,7 @@
   "battleTypeCrusade": "Crusade",
 
   "battleSetupTitle": "New battle setup",
+  "battleSetupHint": "Everything below is optional — fill in whatever helps you tell this game apart later.",
   "battleSetupStart": "Start battle",
   "battlePointsLimitLabel": "Points limit",
   "battleMissionPackLabel": "Mission pack (optional)",
@@ -653,6 +654,14 @@
   "battleUnitDestroyed": "Destroyed",
   "battleUnitMarkDestroyed": "Mark as destroyed",
   "battleUnitRestore": "Restore unit",
+  "battleUnitManageTooltip": "Tap to manage this unit (wounds, damage, bonuses/penalties)",
+  "battleUnitManageTooltipWithModifiers": "{count} active bonus/penalty — tap to manage this unit",
+  "@battleUnitManageTooltipWithModifiers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "battleUnitViewTooltip": "Tap to view the datasheet",
   "battleUnitModifiersTitle": "Bonuses / penalties",
   "battleUnitAddModifier": "Add a bonus/penalty",
   "battleUnitModifierLabelHint": "Reason (optional)",

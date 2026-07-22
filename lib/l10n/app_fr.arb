@@ -612,6 +612,7 @@
   "battleTypeCrusade": "Croisade",
 
   "battleSetupTitle": "Préparation de la partie",
+  "battleSetupHint": "Tous les champs ci-dessous sont facultatifs — renseigne ce qui t'aidera à retrouver cette partie plus tard.",
   "battleSetupStart": "Lancer la partie",
   "battlePointsLimitLabel": "Format (points)",
   "battleMissionPackLabel": "Pack de missions (optionnel)",
@@ -644,7 +645,7 @@
   "battleEndOfRoundReminder": "Avant de continuer, pense à :\n• Marquer tes points d'objectifs primaire/secondaires\n• Vérifier le Choc des bataillons pour les unités affaiblies\n• Retirer les effets temporaires qui expirent ce round\n• Noter les pertes de ce round",
   "battleEndOfRoundDismiss": "Compris",
   "battleDashboardScoreTitle": "Score",
-  "battleDashboardCpTitle": "Command points",
+  "battleDashboardCpTitle": "Points de commandement",
   "battleDashboardMyCp": "Mes PC",
   "battleDashboardOpponentCp": "PC adverses",
   "battleOpponentArmyLabel": "Armée adverse (optionnel, parmi tes armées enregistrées)",
@@ -653,6 +654,14 @@
   "battleUnitDestroyed": "Détruite",
   "battleUnitMarkDestroyed": "Marquer comme détruite",
   "battleUnitRestore": "Restaurer l'unité",
+  "battleUnitManageTooltip": "Toucher pour gérer cette unité (PV, dégâts, bonus/malus)",
+  "battleUnitManageTooltipWithModifiers": "{count} bonus/malus actif(s) — toucher pour gérer cette unité",
+  "@battleUnitManageTooltipWithModifiers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "battleUnitViewTooltip": "Toucher pour voir la fiche",
   "battleUnitModifiersTitle": "Bonus / malus",
   "battleUnitAddModifier": "Ajouter un bonus/malus",
   "battleUnitModifierLabelHint": "Raison (optionnel)",

@@ -1258,6 +1258,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get battleSetupTitle => 'Préparation de la partie';
 
   @override
+  String get battleSetupHint =>
+      'Tous les champs ci-dessous sont facultatifs — renseigne ce qui t\'aidera à retrouver cette partie plus tard.';
+
+  @override
   String get battleSetupStart => 'Lancer la partie';
 
   @override
@@ -1346,7 +1350,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get battleDashboardScoreTitle => 'Score';
 
   @override
-  String get battleDashboardCpTitle => 'Command points';
+  String get battleDashboardCpTitle => 'Points de commandement';
 
   @override
   String get battleDashboardMyCp => 'Mes PC';
@@ -1372,6 +1376,18 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get battleUnitRestore => 'Restaurer l\'unité';
+
+  @override
+  String get battleUnitManageTooltip =>
+      'Toucher pour gérer cette unité (PV, dégâts, bonus/malus)';
+
+  @override
+  String battleUnitManageTooltipWithModifiers(int count) {
+    return '$count bonus/malus actif(s) — toucher pour gérer cette unité';
+  }
+
+  @override
+  String get battleUnitViewTooltip => 'Toucher pour voir la fiche';
 
   @override
   String get battleUnitModifiersTitle => 'Bonus / malus';

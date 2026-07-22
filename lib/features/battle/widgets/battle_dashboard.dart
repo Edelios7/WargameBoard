@@ -807,6 +807,7 @@ class RosterBlock extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final armyAsync = ref.watch(armyByIdProvider(armyId));
     final statesAsync = ref.watch(battleUnitStatesProvider(battleId));
     final modifiersAsync = ref.watch(battleUnitModifiersProvider(battleId));
@@ -859,6 +860,13 @@ class RosterBlock extends ConsumerWidget {
                       destroyed: destroyedIds.contains(unit.id),
                       modifierCount: modifierCounts[unit.id] ?? 0,
                       accentColor: accentColor,
+                      tooltip: readOnly
+                          ? l10n.battleUnitViewTooltip
+                          : (modifierCounts[unit.id] ?? 0) > 0
+                          ? l10n.battleUnitManageTooltipWithModifiers(
+                              modifierCounts[unit.id]!,
+                            )
+                          : l10n.battleUnitManageTooltip,
                       onTap: readOnly
                           ? () => Navigator.of(context).push(
                               MaterialPageRoute(
@@ -893,6 +901,7 @@ class RosterChip extends StatelessWidget {
   final int modifierCount;
   final Color accentColor;
   final VoidCallback onTap;
+  final String? tooltip;
 
   const RosterChip({
     super.key,
@@ -902,71 +911,74 @@ class RosterChip extends StatelessWidget {
     required this.modifierCount,
     required this.accentColor,
     required this.onTap,
+    this.tooltip,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: destroyed ? 0.45 : 1,
-      child: Material(
-        color: AppColors.surface,
+    final chip = Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
         borderRadius: BorderRadius.circular(8),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: destroyed ? AppColors.error : AppColors.border,
-              ),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: destroyed ? AppColors.error : AppColors.border,
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (destroyed)
-                  const Padding(
-                    padding: EdgeInsets.only(right: 6),
-                    child: Icon(
-                      Icons.close_rounded,
-                      size: 14,
-                      color: AppColors.error,
-                    ),
-                  ),
-                Text(
-                  '$label ×$modelCount',
-                  style: AppTextStyles.body.copyWith(
-                    decoration: destroyed
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (destroyed)
+                const Padding(
+                  padding: EdgeInsets.only(right: 6),
+                  child: Icon(
+                    Icons.close_rounded,
+                    size: 14,
+                    color: AppColors.error,
                   ),
                 ),
-                if (modifierCount > 0) ...[
-                  const SizedBox(width: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 1,
-                    ),
-                    decoration: BoxDecoration(
-                      color: accentColor.withValues(alpha: .18),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      '$modifierCount',
-                      style: AppTextStyles.caption.copyWith(
-                        color: accentColor,
-                        fontWeight: FontWeight.w700,
-                      ),
+              Text(
+                '$label ×$modelCount',
+                style: AppTextStyles.body.copyWith(
+                  decoration: destroyed
+                      ? TextDecoration.lineThrough
+                      : TextDecoration.none,
+                ),
+              ),
+              if (modifierCount > 0) ...[
+                const SizedBox(width: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 1,
+                  ),
+                  decoration: BoxDecoration(
+                    color: accentColor.withValues(alpha: .18),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    '$modifierCount',
+                    style: AppTextStyles.caption.copyWith(
+                      color: accentColor,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                ],
+                ),
               ],
-            ),
+            ],
           ),
         ),
       ),
+    );
+
+    return Opacity(
+      opacity: destroyed ? 0.45 : 1,
+      child: tooltip == null ? chip : Tooltip(message: tooltip!, child: chip),
     );
   }
 }

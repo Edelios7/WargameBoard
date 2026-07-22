@@ -2390,6 +2390,12 @@ abstract class AppLocalizations {
   /// **'Préparation de la partie'**
   String get battleSetupTitle;
 
+  /// No description provided for @battleSetupHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous les champs ci-dessous sont facultatifs — renseigne ce qui t\'aidera à retrouver cette partie plus tard.'**
+  String get battleSetupHint;
+
   /// No description provided for @battleSetupStart.
   ///
   /// In fr, this message translates to:
@@ -2549,7 +2555,7 @@ abstract class AppLocalizations {
   /// No description provided for @battleDashboardCpTitle.
   ///
   /// In fr, this message translates to:
-  /// **'Command points'**
+  /// **'Points de commandement'**
   String get battleDashboardCpTitle;
 
   /// No description provided for @battleDashboardMyCp.
@@ -2599,6 +2605,24 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Restaurer l\'unité'**
   String get battleUnitRestore;
+
+  /// No description provided for @battleUnitManageTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toucher pour gérer cette unité (PV, dégâts, bonus/malus)'**
+  String get battleUnitManageTooltip;
+
+  /// No description provided for @battleUnitManageTooltipWithModifiers.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} bonus/malus actif(s) — toucher pour gérer cette unité'**
+  String battleUnitManageTooltipWithModifiers(int count);
+
+  /// No description provided for @battleUnitViewTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toucher pour voir la fiche'**
+  String get battleUnitViewTooltip;
 
   /// No description provided for @battleUnitModifiersTitle.
   ///

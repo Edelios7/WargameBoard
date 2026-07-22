@@ -118,6 +118,11 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(l10n.battleSetupTitle, style: AppTextStyles.title),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.battleSetupHint,
+                    style: AppTextStyles.caption,
+                  ),
                   const SizedBox(height: 20),
                   armiesAsync.when(
                     loading: () =>
