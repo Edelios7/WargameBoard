@@ -7,14 +7,15 @@ import '../services/army_validation_service.dart';
 import 'database_provider.dart';
 import 'xp_provider.dart';
 
-final armyValidationServiceProvider =
-    Provider<ArmyValidationService>((ref) => const ArmyValidationService());
+final armyValidationServiceProvider = Provider<ArmyValidationService>(
+  (ref) => const ArmyValidationService(),
+);
 
 final armyValidationProvider =
     Provider.family<ArmyValidationResult?, ArmyDetails?>((ref, army) {
-  if (army == null) return null;
-  return ref.watch(armyValidationServiceProvider).validate(army);
-});
+      if (army == null) return null;
+      return ref.watch(armyValidationServiceProvider).validate(army);
+    });
 
 final armyRepositoryProvider = Provider<ArmyRepository>((ref) {
   final database = ref.watch(databaseProvider);
@@ -45,33 +46,40 @@ final selectedArmyProvider = FutureProvider<ArmyDetails?>((ref) async {
   return repository.getArmy(armyId);
 });
 
-final detachmentsForFactionProvider =
-    FutureProvider.family<List<DetachmentOption>, String>((ref, factionId) {
+/// Armée par id, indépendante de la sélection courante de l'Army Builder
+/// (voir [selectedArmyProvider]) — utilisée par ex. par le dashboard de
+/// bataille pour afficher le roster de l'armée engagée dans la partie.
+final armyByIdProvider = FutureProvider.family<ArmyDetails?, String>((
+  ref,
+  armyId,
+) {
   final repository = ref.watch(armyRepositoryProvider);
-  return repository.getDetachmentsForFaction(factionId);
+  return repository.getArmy(armyId);
 });
 
+final detachmentsForFactionProvider =
+    FutureProvider.family<List<DetachmentOption>, String>((ref, factionId) {
+      final repository = ref.watch(armyRepositoryProvider);
+      return repository.getDetachmentsForFaction(factionId);
+    });
+
 final enhancementsForDetachmentProvider =
-    FutureProvider.family<List<EnhancementOption>, String>(
-        (ref, detachmentId) {
-  final repository = ref.watch(armyRepositoryProvider);
-  return repository.getEnhancementsForDetachment(detachmentId);
-});
+    FutureProvider.family<List<EnhancementOption>, String>((ref, detachmentId) {
+      final repository = ref.watch(armyRepositoryProvider);
+      return repository.getEnhancementsForDetachment(detachmentId);
+    });
 
 final stratagemsForDetachmentProvider =
     FutureProvider.family<List<StratagemOption>, String>((ref, detachmentId) {
-  final repository = ref.watch(armyRepositoryProvider);
-  return repository.getStratagemsForDetachment(detachmentId);
-});
+      final repository = ref.watch(armyRepositoryProvider);
+      return repository.getStratagemsForDetachment(detachmentId);
+    });
 
 /// Choix d'équipement optionnel actuels d'une unité d'armée, par
 /// groupe d'équipement. Invalidé après un changement de sélection pour
 /// refléter le nouveau chargement d'armes de l'unité.
 final unitEquipmentSelectionsProvider =
-    FutureProvider.family<Map<String, List<String>>, String>((
-  ref,
-  armyUnitId,
-) {
-  final repository = ref.watch(armyRepositoryProvider);
-  return repository.getUnitEquipmentSelections(armyUnitId);
-});
+    FutureProvider.family<Map<String, List<String>>, String>((ref, armyUnitId) {
+      final repository = ref.watch(armyRepositoryProvider);
+      return repository.getUnitEquipmentSelections(armyUnitId);
+    });

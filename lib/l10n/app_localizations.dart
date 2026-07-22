@@ -2396,6 +2396,12 @@ abstract class AppLocalizations {
   /// **'PC adverses'**
   String get battleDashboardOpponentCp;
 
+  /// No description provided for @battleDashboardRoster.
+  ///
+  /// In fr, this message translates to:
+  /// **'Roster'**
+  String get battleDashboardRoster;
+
   /// No description provided for @battleDashboardEvents.
   ///
   /// In fr, this message translates to:

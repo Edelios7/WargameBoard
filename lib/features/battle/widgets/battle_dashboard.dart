@@ -10,8 +10,10 @@ import '../../../database/models/battle_details.dart';
 import '../../../database/models/battle_event_details.dart';
 import '../../../database/tables/battles_table.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../providers/army_provider.dart';
 import '../../../providers/battle_provider.dart';
 import '../../../providers/xp_provider.dart';
+import '../../catalog/pages/datasheet_full_page.dart';
 
 const _phaseOrder = [
   BattlePhase.command,
@@ -68,6 +70,10 @@ class BattleDashboard extends ConsumerWidget {
                   _PhaseBlock(battle: battle),
                   const SizedBox(height: 16),
                   _CommandPointsBlock(battle: battle),
+                  if (battle.armyId != null) ...[
+                    const SizedBox(height: 16),
+                    _RosterBlock(armyId: battle.armyId!),
+                  ],
                   const SizedBox(height: 16),
                   _EventsBlock(battleId: battle.id),
                 ],
@@ -398,6 +404,97 @@ class _CommandPointsBlock extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Roster de l'armée engagée — consultation instantanée d'une fiche
+/// complète sans quitter la partie (voir vision "Assistant de règles").
+class _RosterBlock extends ConsumerWidget {
+  final String armyId;
+
+  const _RosterBlock({required this.armyId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final armyAsync = ref.watch(armyByIdProvider(armyId));
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.battleDashboardRoster.toUpperCase(),
+            style: AppTextStyles.eyebrow,
+          ),
+          const SizedBox(height: 12),
+          armyAsync.when(
+            loading: () =>
+                const LinearProgressIndicator(color: AppColors.primary),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (army) {
+              if (army == null || army.units.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final unit in army.units)
+                    _RosterChip(
+                      label: unit.datasheetName,
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              DatasheetFullPage(datasheetId: unit.datasheetId),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RosterChip extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+
+  const _RosterChip({required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(label, style: AppTextStyles.body),
+              const SizedBox(width: 6),
+              const Icon(
+                Icons.open_in_new_rounded,
+                size: 14,
+                color: AppColors.textSecondary,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

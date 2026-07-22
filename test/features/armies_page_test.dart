@@ -65,7 +65,14 @@ void main() {
     await tester.tap(find.text('Ajouter une unité'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Captain'));
+    final captainTile = find.widgetWithText(ListTile, 'Captain');
+    expect(captainTile, findsOneWidget);
+    await tester.tap(
+      find.descendant(
+        of: captainTile,
+        matching: find.byIcon(Icons.add_circle_rounded),
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Captain'), findsWidgets);
@@ -73,5 +80,50 @@ void main() {
 
     final army = await database.armyDao.getArmy(armyId);
     expect(army!.units, hasLength(1));
+  });
+
+  testWidgets('the quantity stepper adds several copies of a unit at once',
+      (tester) async {
+    final armyId = await database.armyDao.createArmy(
+      name: 'Escouade test',
+      factionId: 'fac-blood-angels',
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Escouade test'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Ajouter une unité'));
+    await tester.pumpAndSettle();
+
+    final captainTile = find.widgetWithText(ListTile, 'Captain');
+    expect(captainTile, findsOneWidget);
+
+    final incrementButton = find.descendant(
+      of: captainTile,
+      matching: find.byIcon(Icons.add_rounded),
+    );
+    await tester.tap(incrementButton);
+    await tester.pump();
+    await tester.tap(incrementButton);
+    await tester.pump();
+
+    expect(find.descendant(of: captainTile, matching: find.text('3')),
+        findsOneWidget);
+
+    await tester.tap(
+      find.descendant(
+        of: captainTile,
+        matching: find.byIcon(Icons.add_circle_rounded),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final army = await database.armyDao.getArmy(armyId);
+    expect(army!.units, hasLength(3));
+    expect(army.units.every((u) => u.datasheetId == army.units.first.datasheetId),
+        isTrue);
   });
 }

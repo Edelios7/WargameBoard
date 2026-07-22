@@ -609,6 +609,7 @@
   "battleDashboardNextPhase": "Next phase",
   "battleDashboardMyCp": "My CP",
   "battleDashboardOpponentCp": "Opponent CP",
+  "battleDashboardRoster": "Roster",
   "battleDashboardEvents": "Battle log",
   "battleDashboardAddEvent": "Add event",
   "battleDashboardEventHint": "What happened?",

@@ -609,6 +609,7 @@
   "battleDashboardNextPhase": "Phase suivante",
   "battleDashboardMyCp": "Mes PC",
   "battleDashboardOpponentCp": "PC adverses",
+  "battleDashboardRoster": "Roster",
   "battleDashboardEvents": "Journal de bataille",
   "battleDashboardAddEvent": "Ajouter un événement",
   "battleDashboardEventHint": "Que s'est-il passé ?",

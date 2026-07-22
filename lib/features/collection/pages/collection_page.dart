@@ -8,6 +8,7 @@ import '../../../core/utils/collection_export_formatter.dart';
 import '../../../core/utils/faction_iconography.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../database/models/army_details.dart';
@@ -1243,24 +1244,30 @@ Future<bool> _confirmRemoveEntry(
 ) async {
   final confirmed = await showDialog<bool>(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      backgroundColor: AppColors.surface,
-      title: Text(l10n.collectionDeleteConfirmTitle, style: AppTextStyles.title),
-      content: Text(
-        l10n.collectionDeleteConfirmMessage(datasheetName),
-        style: AppTextStyles.body,
+    builder: (dialogContext) => AppDialogShortcuts(
+      onEnter: () => Navigator.of(dialogContext).pop(true),
+      child: AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text(
+          l10n.collectionDeleteConfirmTitle,
+          style: AppTextStyles.title,
+        ),
+        content: Text(
+          l10n.collectionDeleteConfirmMessage(datasheetName),
+          style: AppTextStyles.body,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.armyBuilderCancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.collectionDeleteConfirmAction),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(dialogContext).pop(false),
-          child: Text(l10n.armyBuilderCancel),
-        ),
-        FilledButton(
-          style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-          onPressed: () => Navigator.of(dialogContext).pop(true),
-          child: Text(l10n.collectionDeleteConfirmAction),
-        ),
-      ],
     ),
   );
   return confirmed ?? false;

@@ -7,6 +7,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/army_list_formatter.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../database/models/army_details.dart';
@@ -50,21 +51,24 @@ Future<bool> _confirmDelete(
   final l10n = AppLocalizations.of(context)!;
   final confirmed = await showDialog<bool>(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      backgroundColor: AppColors.surface,
-      title: Text(title, style: AppTextStyles.title),
-      content: Text(message, style: AppTextStyles.body),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(dialogContext).pop(false),
-          child: Text(l10n.armyBuilderCancel),
-        ),
-        FilledButton(
-          style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-          onPressed: () => Navigator.of(dialogContext).pop(true),
-          child: Text(confirmLabel),
-        ),
-      ],
+    builder: (dialogContext) => AppDialogShortcuts(
+      onEnter: () => Navigator.of(dialogContext).pop(true),
+      child: AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text(title, style: AppTextStyles.title),
+        content: Text(message, style: AppTextStyles.body),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.armyBuilderCancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(confirmLabel),
+          ),
+        ],
+      ),
     ),
   );
   return confirmed ?? false;
@@ -326,34 +330,36 @@ Future<void> _pickDetachment(
 
   final selected = await showDialog<String?>(
     context: context,
-    builder: (context) => Dialog(
-      backgroundColor: AppColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: 400),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              ListTile(
-                title: Text(
-                  l10n.armyBuilderDetachmentNone,
-                  style: AppTextStyles.body,
-                ),
-                selected: army.detachmentId == null,
-                selectedColor: AppColors.primary,
-                onTap: () => Navigator.of(context).pop(''),
-              ),
-              ...options.map(
-                (option) => ListTile(
-                  title: Text(option.name, style: AppTextStyles.body),
-                  selected: option.id == army.detachmentId,
+    builder: (context) => AppDialogShortcuts(
+      child: Dialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 400),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                ListTile(
+                  title: Text(
+                    l10n.armyBuilderDetachmentNone,
+                    style: AppTextStyles.body,
+                  ),
+                  selected: army.detachmentId == null,
                   selectedColor: AppColors.primary,
-                  onTap: () => Navigator.of(context).pop(option.id),
+                  onTap: () => Navigator.of(context).pop(''),
                 ),
-              ),
-            ],
+                ...options.map(
+                  (option) => ListTile(
+                    title: Text(option.name, style: AppTextStyles.body),
+                    selected: option.id == army.detachmentId,
+                    selectedColor: AppColors.primary,
+                    onTap: () => Navigator.of(context).pop(option.id),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -395,34 +401,36 @@ Future<void> _pickEnhancement(
 
   final selected = await showDialog<String?>(
     context: context,
-    builder: (context) => Dialog(
-      backgroundColor: AppColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: 400),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              ListTile(
-                title: Text(
-                  l10n.armyBuilderEnhancementNone,
-                  style: AppTextStyles.body,
-                ),
-                onTap: () => Navigator.of(context).pop(''),
-              ),
-              ...options.map(
-                (option) => ListTile(
-                  title: Text(option.name, style: AppTextStyles.body),
-                  subtitle: Text(
-                    l10n.pointsSuffix(option.points),
-                    style: AppTextStyles.caption,
+    builder: (context) => AppDialogShortcuts(
+      child: Dialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 400),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                ListTile(
+                  title: Text(
+                    l10n.armyBuilderEnhancementNone,
+                    style: AppTextStyles.body,
                   ),
-                  onTap: () => Navigator.of(context).pop(option.id),
+                  onTap: () => Navigator.of(context).pop(''),
                 ),
-              ),
-            ],
+                ...options.map(
+                  (option) => ListTile(
+                    title: Text(option.name, style: AppTextStyles.body),
+                    subtitle: Text(
+                      l10n.pointsSuffix(option.points),
+                      style: AppTextStyles.caption,
+                    ),
+                    onTap: () => Navigator.of(context).pop(option.id),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1052,7 +1060,10 @@ class _BuilderSidebarState extends ConsumerState<_BuilderSidebar> {
               ),
             ),
           ),
-          const DecorSeparator(maxWidth: 280, padding: EdgeInsets.symmetric(vertical: 10)),
+          const DecorSeparator(
+            maxWidth: 280,
+            padding: EdgeInsets.symmetric(vertical: 10),
+          ),
           Text(
             l10n.armyBuilderRulesSection.toUpperCase(),
             style: AppTextStyles.eyebrow,
@@ -1898,76 +1909,85 @@ class _EquipmentGroupDialogState extends ConsumerState<_EquipmentGroupDialog> {
     final l10n = AppLocalizations.of(context)!;
     final canSave = _selected.length >= widget.group.minimumChoices;
 
-    return Dialog(
-      backgroundColor: AppColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SizedBox(
-          width: 380,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(widget.group.name, style: AppTextStyles.title),
-              const SizedBox(height: 4),
-              Text(
-                _isSingleChoice
-                    ? l10n.armyBuilderPickOne
-                    : l10n.armyBuilderPickUpTo(widget.group.maximumChoices),
-                style: AppTextStyles.caption,
-              ),
-              const SizedBox(height: 12),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 320),
-                child: ListView(
-                  shrinkWrap: true,
-                  children: widget.group.options.map((option) {
-                    return _isSingleChoice
-                        ? RadioListTile<String>(
-                            value: option.id,
-                            groupValue: _selected.isEmpty
-                                ? null
-                                : _selected.first,
-                            onChanged: (_) => _toggle(option.id, true),
-                            title: Text(option.name, style: AppTextStyles.body),
-                            activeColor: AppColors.primary,
-                            contentPadding: EdgeInsets.zero,
-                          )
-                        : CheckboxListTile(
-                            value: _selected.contains(option.id),
-                            onChanged: (value) =>
-                                _toggle(option.id, value ?? false),
-                            title: Text(option.name, style: AppTextStyles.body),
-                            activeColor: AppColors.primary,
-                            contentPadding: EdgeInsets.zero,
-                            controlAffinity: ListTileControlAffinity.leading,
-                          );
-                  }).toList(),
+    return AppDialogShortcuts(
+      onEnter: canSave ? _save : null,
+      child: Dialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: SizedBox(
+            width: 380,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(widget.group.name, style: AppTextStyles.title),
+                const SizedBox(height: 4),
+                Text(
+                  _isSingleChoice
+                      ? l10n.armyBuilderPickOne
+                      : l10n.armyBuilderPickUpTo(widget.group.maximumChoices),
+                  style: AppTextStyles.caption,
                 ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(
-                      l10n.armyBuilderCancel,
-                      style: AppTextStyles.body,
-                    ),
+                const SizedBox(height: 12),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 320),
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: widget.group.options.map((option) {
+                      return _isSingleChoice
+                          ? RadioListTile<String>(
+                              value: option.id,
+                              groupValue: _selected.isEmpty
+                                  ? null
+                                  : _selected.first,
+                              onChanged: (_) => _toggle(option.id, true),
+                              title: Text(
+                                option.name,
+                                style: AppTextStyles.body,
+                              ),
+                              activeColor: AppColors.primary,
+                              contentPadding: EdgeInsets.zero,
+                            )
+                          : CheckboxListTile(
+                              value: _selected.contains(option.id),
+                              onChanged: (value) =>
+                                  _toggle(option.id, value ?? false),
+                              title: Text(
+                                option.name,
+                                style: AppTextStyles.body,
+                              ),
+                              activeColor: AppColors.primary,
+                              contentPadding: EdgeInsets.zero,
+                              controlAffinity: ListTileControlAffinity.leading,
+                            );
+                    }).toList(),
                   ),
-                  const SizedBox(width: 8),
-                  FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(
+                        l10n.armyBuilderCancel,
+                        style: AppTextStyles.body,
+                      ),
                     ),
-                    onPressed: canSave ? _save : null,
-                    child: Text(l10n.armyBuilderSave),
-                  ),
-                ],
-              ),
-            ],
+                    const SizedBox(width: 8),
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                      ),
+                      onPressed: canSave ? _save : null,
+                      child: Text(l10n.armyBuilderSave),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1997,130 +2017,135 @@ class _EditUnitDialog extends ConsumerWidget {
         ) ??
         unit;
 
-    return Dialog(
-      backgroundColor: AppColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SizedBox(
-          width: 380,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(currentUnit.datasheetName, style: AppTextStyles.title),
-              const SizedBox(height: 20),
-              if (currentUnit.maximumModels > currentUnit.minimumModels) ...[
-                Text(
-                  l10n.armyBuilderModelCountLabel,
-                  style: AppTextStyles.caption,
-                ),
-                const SizedBox(height: 8),
+    return AppDialogShortcuts(
+      // Pas de confirmation à Entrée ici : la seule action "principale"
+      // visible serait Retirer l'unité, destructive — on ne veut pas
+      // qu'un Entrée irréfléchi la déclenche.
+      child: Dialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: SizedBox(
+            width: 380,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(currentUnit.datasheetName, style: AppTextStyles.title),
+                const SizedBox(height: 20),
+                if (currentUnit.maximumModels > currentUnit.minimumModels) ...[
+                  Text(
+                    l10n.armyBuilderModelCountLabel,
+                    style: AppTextStyles.caption,
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.remove_circle_outline_rounded),
+                        color: AppColors.textSecondary,
+                        onPressed:
+                            currentUnit.modelCount <= currentUnit.minimumModels
+                            ? null
+                            : () async {
+                                await ref
+                                    .read(armyRepositoryProvider)
+                                    .updateModelCount(
+                                      currentUnit.id,
+                                      currentUnit.modelCount - 1,
+                                    );
+                                ref.invalidate(selectedArmyProvider);
+                                ref.invalidate(armiesListProvider);
+                              },
+                      ),
+                      Text(
+                        '${currentUnit.modelCount}',
+                        style: AppTextStyles.title,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add_circle_outline_rounded),
+                        color: AppColors.textSecondary,
+                        onPressed:
+                            currentUnit.modelCount >= currentUnit.maximumModels
+                            ? null
+                            : () async {
+                                await ref
+                                    .read(armyRepositoryProvider)
+                                    .updateModelCount(
+                                      currentUnit.id,
+                                      currentUnit.modelCount + 1,
+                                    );
+                                ref.invalidate(selectedArmyProvider);
+                                ref.invalidate(armiesListProvider);
+                              },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                if (army.detachmentId != null) ...[
+                  Text(
+                    l10n.armyBuilderEnhancementLabel,
+                    style: AppTextStyles.caption,
+                  ),
+                  const SizedBox(height: 8),
+                  InkWell(
+                    onTap: () => _pickEnhancement(
+                      context,
+                      ref,
+                      army.detachmentId!,
+                      currentUnit,
+                    ),
+                    child: Text(
+                      currentUnit.enhancementName ??
+                          l10n.armyBuilderChooseEnhancement,
+                      style: AppTextStyles.body.copyWith(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.remove_circle_outline_rounded),
-                      color: AppColors.textSecondary,
-                      onPressed:
-                          currentUnit.modelCount <= currentUnit.minimumModels
-                          ? null
-                          : () async {
-                              await ref
-                                  .read(armyRepositoryProvider)
-                                  .updateModelCount(
-                                    currentUnit.id,
-                                    currentUnit.modelCount - 1,
-                                  );
-                              ref.invalidate(selectedArmyProvider);
-                              ref.invalidate(armiesListProvider);
-                            },
+                    TextButton.icon(
+                      onPressed: () async {
+                        final confirmed = await _confirmDelete(
+                          context,
+                          title: l10n.armyBuilderRemoveUnitConfirmTitle,
+                          message: l10n.armyBuilderRemoveUnitConfirmMessage(
+                            currentUnit.datasheetName,
+                          ),
+                          confirmLabel: l10n.armyBuilderRemoveUnit,
+                        );
+                        if (!confirmed || !context.mounted) return;
+                        await ref
+                            .read(armyRepositoryProvider)
+                            .removeUnit(currentUnit.id);
+                        ref.invalidate(selectedArmyProvider);
+                        ref.invalidate(armiesListProvider);
+                        ref.read(selectedUnitIdProvider.notifier).state = null;
+                        if (context.mounted) Navigator.of(context).pop();
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.error,
+                      ),
+                      icon: const Icon(Icons.delete_outline_rounded),
+                      label: Text(l10n.armyBuilderRemoveUnit),
                     ),
-                    Text(
-                      '${currentUnit.modelCount}',
-                      style: AppTextStyles.title,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.add_circle_outline_rounded),
-                      color: AppColors.textSecondary,
-                      onPressed:
-                          currentUnit.modelCount >= currentUnit.maximumModels
-                          ? null
-                          : () async {
-                              await ref
-                                  .read(armyRepositoryProvider)
-                                  .updateModelCount(
-                                    currentUnit.id,
-                                    currentUnit.modelCount + 1,
-                                  );
-                              ref.invalidate(selectedArmyProvider);
-                              ref.invalidate(armiesListProvider);
-                            },
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(
+                        l10n.armyBuilderCancel,
+                        style: AppTextStyles.body,
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
               ],
-              if (army.detachmentId != null) ...[
-                Text(
-                  l10n.armyBuilderEnhancementLabel,
-                  style: AppTextStyles.caption,
-                ),
-                const SizedBox(height: 8),
-                InkWell(
-                  onTap: () => _pickEnhancement(
-                    context,
-                    ref,
-                    army.detachmentId!,
-                    currentUnit,
-                  ),
-                  child: Text(
-                    currentUnit.enhancementName ??
-                        l10n.armyBuilderChooseEnhancement,
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton.icon(
-                    onPressed: () async {
-                      final confirmed = await _confirmDelete(
-                        context,
-                        title: l10n.armyBuilderRemoveUnitConfirmTitle,
-                        message: l10n.armyBuilderRemoveUnitConfirmMessage(
-                          currentUnit.datasheetName,
-                        ),
-                        confirmLabel: l10n.armyBuilderRemoveUnit,
-                      );
-                      if (!confirmed || !context.mounted) return;
-                      await ref
-                          .read(armyRepositoryProvider)
-                          .removeUnit(currentUnit.id);
-                      ref.invalidate(selectedArmyProvider);
-                      ref.invalidate(armiesListProvider);
-                      ref.read(selectedUnitIdProvider.notifier).state = null;
-                      if (context.mounted) Navigator.of(context).pop();
-                    },
-                    style: TextButton.styleFrom(
-                      foregroundColor: AppColors.error,
-                    ),
-                    icon: const Icon(Icons.delete_outline_rounded),
-                    label: Text(l10n.armyBuilderRemoveUnit),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(
-                      l10n.armyBuilderCancel,
-                      style: AppTextStyles.body,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -2138,32 +2163,34 @@ class _NotesDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Dialog(
-      backgroundColor: AppColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SizedBox(
-          width: 420,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n.armyBuilderNotesLabel, style: AppTextStyles.title),
-              const SizedBox(height: 16),
-              _ArmyNotesField(armyId: armyId, initialNotes: initialNotes),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(
-                    l10n.armyBuilderCancel,
-                    style: AppTextStyles.body,
+    return AppDialogShortcuts(
+      child: Dialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: SizedBox(
+            width: 420,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.armyBuilderNotesLabel, style: AppTextStyles.title),
+                const SizedBox(height: 16),
+                _ArmyNotesField(armyId: armyId, initialNotes: initialNotes),
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text(
+                      l10n.armyBuilderCancel,
+                      style: AppTextStyles.body,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -2290,58 +2317,62 @@ class _DuplicateArmyDialogState extends ConsumerState<_DuplicateArmyDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Dialog(
-      backgroundColor: AppColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SizedBox(
-          width: 380,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n.armyBuilderDuplicate, style: AppTextStyles.title),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _nameController,
-                autofocus: true,
-                style: AppTextStyles.body,
-                decoration: InputDecoration(
-                  labelText: l10n.armyBuilderDuplicateNameLabel,
-                  hintText: l10n.armyBuilderDuplicateSuffix(widget.army.name),
-                  hintStyle: AppTextStyles.caption,
-                  labelStyle: AppTextStyles.caption,
-                  filled: true,
-                  fillColor: AppColors.background,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
+    return AppDialogShortcuts(
+      onEnter: _duplicate,
+      child: Dialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: SizedBox(
+            width: 380,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.armyBuilderDuplicate, style: AppTextStyles.title),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _nameController,
+                  autofocus: true,
+                  style: AppTextStyles.body,
+                  onSubmitted: (_) => _duplicate(),
+                  decoration: InputDecoration(
+                    labelText: l10n.armyBuilderDuplicateNameLabel,
+                    hintText: l10n.armyBuilderDuplicateSuffix(widget.army.name),
+                    hintStyle: AppTextStyles.caption,
+                    labelStyle: AppTextStyles.caption,
+                    filled: true,
+                    fillColor: AppColors.background,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(
-                      l10n.armyBuilderCancel,
-                      style: AppTextStyles.body,
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(
+                        l10n.armyBuilderCancel,
+                        style: AppTextStyles.body,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                    const SizedBox(width: 8),
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                      ),
+                      onPressed: _duplicate,
+                      child: Text(l10n.armyBuilderDuplicate),
                     ),
-                    onPressed: _duplicate,
-                    child: Text(l10n.armyBuilderDuplicate),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -2361,104 +2392,108 @@ class _StratagemsDialog extends ConsumerWidget {
       stratagemsForDetachmentProvider(detachmentId),
     );
 
-    return Dialog(
-      backgroundColor: AppColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: SizedBox(
-        width: 460,
-        height: 480,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n.armyBuilderStratagems, style: AppTextStyles.title),
-              const SizedBox(height: 16),
-              Expanded(
-                child: stratagemsAsync.when(
-                  loading: () => const Center(
-                    child: CircularProgressIndicator(color: AppColors.primary),
-                  ),
-                  error: (error, _) => Center(
-                    child: Text('$error', style: AppTextStyles.caption),
-                  ),
-                  data: (stratagems) {
-                    if (stratagems.isEmpty) {
-                      return Center(
-                        child: Text(
-                          l10n.armyBuilderNoStratagems,
-                          style: AppTextStyles.caption,
-                        ),
-                      );
-                    }
-                    return ListView.builder(
-                      itemCount: stratagems.length,
-                      itemBuilder: (context, index) {
-                        final stratagem = stratagems[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 14),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
+    return AppDialogShortcuts(
+      child: Dialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        child: SizedBox(
+          width: 460,
+          height: 480,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.armyBuilderStratagems, style: AppTextStyles.title),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: stratagemsAsync.when(
+                    loading: () => const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    error: (error, _) => Center(
+                      child: Text('$error', style: AppTextStyles.caption),
+                    ),
+                    data: (stratagems) {
+                      if (stratagems.isEmpty) {
+                        return Center(
+                          child: Text(
+                            l10n.armyBuilderNoStratagems,
+                            style: AppTextStyles.caption,
+                          ),
+                        );
+                      }
+                      return ListView.builder(
+                        itemCount: stratagems.length,
+                        itemBuilder: (context, index) {
+                          final stratagem = stratagems[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 14),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        stratagem.name,
+                                        style: AppTextStyles.body,
+                                      ),
+                                    ),
+                                    Text(
+                                      l10n.armyBuilderStratagemCp(
+                                        stratagem.commandPoints,
+                                      ),
+                                      style: AppTextStyles.body.copyWith(
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                if (stratagem.phase != null) ...[
+                                  const SizedBox(height: 4),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary.withValues(
+                                        alpha: .14,
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
                                     child: Text(
-                                      stratagem.name,
-                                      style: AppTextStyles.body,
-                                    ),
-                                  ),
-                                  Text(
-                                    l10n.armyBuilderStratagemCp(
-                                      stratagem.commandPoints,
-                                    ),
-                                    style: AppTextStyles.body.copyWith(
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.w600,
+                                      stratagem.phase!,
+                                      style: AppTextStyles.caption.copyWith(
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                 ],
-                              ),
-                              if (stratagem.phase != null) ...[
-                                const SizedBox(height: 4),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
+                                if (stratagem.description != null) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    stratagem.description!,
+                                    style: AppTextStyles.caption,
                                   ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primary.withValues(
-                                      alpha: .14,
-                                    ),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    stratagem.phase!,
-                                    style: AppTextStyles.caption.copyWith(
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
+                                ],
                               ],
-                              if (stratagem.description != null) ...[
-                                const SizedBox(height: 4),
-                                Text(
-                                  stratagem.description!,
-                                  style: AppTextStyles.caption,
-                                ),
-                              ],
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

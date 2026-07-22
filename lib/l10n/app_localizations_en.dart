@@ -1248,6 +1248,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get battleDashboardOpponentCp => 'Opponent CP';
 
   @override
+  String get battleDashboardRoster => 'Roster';
+
+  @override
   String get battleDashboardEvents => 'Battle log';
 
   @override
