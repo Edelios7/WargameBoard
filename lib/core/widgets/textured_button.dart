@@ -2,20 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
-import '../utils/local_catalog_images.dart';
 
-/// Variante de couleur d'un [TexturedButton] — voir
-/// local_assets/decor/README.md (section `button-bg-*`).
+/// Variante de couleur d'un [TexturedButton].
 enum TexturedButtonVariant { primary, danger, neutral }
 
-/// Bouton habillé de la texture de plaque 40K recadrée depuis les
-/// planches de référence PDF (fond ornemental, coins bagués), avec le
-/// libellé rendu par Flutter par-dessus — jamais gravé dans l'image, pour
-/// rester traduisible EN/FR.
-///
-/// Retombe sur un [FilledButton] classique si l'asset n'est pas présent
-/// en local (contenu jamais commité, voir .gitignore).
-class TexturedButton extends StatelessWidget {
+/// Bouton à dégradé avec halo lumineux, qui grossit légèrement et
+/// s'éclaircit au survol (souris) — pensé pour les actions principales
+/// d'une page (CTA), pas pour un usage généralisé à tous les boutons.
+class TexturedButton extends StatefulWidget {
   final String label;
   final VoidCallback? onPressed;
   final TexturedButtonVariant variant;
@@ -29,89 +23,94 @@ class TexturedButton extends StatelessWidget {
     this.icon,
   });
 
-  String get _colorName => switch (variant) {
-        TexturedButtonVariant.primary => 'purple-corrupted',
-        TexturedButtonVariant.danger => 'red-chaos',
-        TexturedButtonVariant.neutral => 'silver-skull',
+  @override
+  State<TexturedButton> createState() => _TexturedButtonState();
+}
+
+class _TexturedButtonState extends State<TexturedButton> {
+  bool _hovered = false;
+
+  List<Color> get _gradient => switch (widget.variant) {
+        TexturedButtonVariant.primary => const [
+            AppColors.primaryDark,
+            AppColors.primary,
+          ],
+        TexturedButtonVariant.danger => [
+            AppColors.error.withValues(alpha: .55),
+            AppColors.error,
+          ],
+        TexturedButtonVariant.neutral => const [
+            AppColors.surfaceElevated,
+            AppColors.surface,
+          ],
       };
 
-  Color get _fallbackColor => switch (variant) {
-        TexturedButtonVariant.primary => AppColors.primary,
+  Color get _glow => switch (widget.variant) {
+        TexturedButtonVariant.primary => AppColors.primaryLight,
         TexturedButtonVariant.danger => AppColors.error,
-        TexturedButtonVariant.neutral => AppColors.surfaceElevated,
+        TexturedButtonVariant.neutral => AppColors.textSecondary,
       };
-
-  static const _height = 46.0;
 
   @override
   Widget build(BuildContext context) {
-    // Le fond est assemblé en 3 morceaux (coins ornés + bande centrale
-    // répétée) plutôt qu'une seule image étirée : le motif du cadre a des
-    // détails fins qui deviennent flous en BoxFit.fill sur un bouton large,
-    // voir local_assets/decor/README.md (section `button-bg-*`).
-    final leftCap = LocalCatalogImages.decor('button-cap-left-$_colorName');
-    final rightCap = LocalCatalogImages.decor('button-cap-right-$_colorName');
-    final tile = LocalCatalogImages.decor('button-tile-$_colorName');
-    if (leftCap == null || rightCap == null || tile == null) {
-      return FilledButton.icon(
-        style: FilledButton.styleFrom(backgroundColor: _fallbackColor),
-        onPressed: onPressed,
-        icon: icon == null ? const SizedBox.shrink() : Icon(icon),
-        label: Text(label),
-      );
-    }
+    final enabled = widget.onPressed != null;
 
     final content = Row(
       mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (icon != null) ...[
-          Icon(icon, size: 16, color: AppColors.textPrimary),
+        if (widget.icon != null) ...[
+          Icon(widget.icon, size: 17, color: Colors.white),
           const SizedBox(width: 8),
         ],
         Text(
-          label.toUpperCase(),
+          widget.label.toUpperCase(),
           style: AppTextStyles.body.copyWith(
-            color: AppColors.textPrimary,
+            color: Colors.white,
             fontWeight: FontWeight.w700,
-            letterSpacing: 0.5,
+            letterSpacing: 0.6,
           ),
         ),
       ],
     );
 
-    return Opacity(
-      opacity: onPressed == null ? 0.5 : 1,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          child: SizedBox(
-            height: _height,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Image.file(leftCap, height: _height),
-                    Expanded(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: FileImage(tile),
-                            repeat: ImageRepeat.repeatX,
-                            fit: BoxFit.fitHeight,
-                          ),
-                        ),
+    return MouseRegion(
+      cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      onEnter: enabled ? (_) => setState(() => _hovered = true) : null,
+      onExit: enabled ? (_) => setState(() => _hovered = false) : null,
+      child: GestureDetector(
+        onTap: widget.onPressed,
+        child: AnimatedScale(
+          scale: _hovered ? 1.035 : 1,
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.easeOut,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            curve: Curves.easeOut,
+            height: 46,
+            width: double.infinity,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: _gradient,
+              ),
+              border: Border.all(
+                color: _glow.withValues(alpha: _hovered ? 0.95 : 0.4),
+                width: _hovered ? 1.5 : 1,
+              ),
+              boxShadow: _hovered
+                  ? [
+                      BoxShadow(
+                        color: _glow.withValues(alpha: 0.5),
+                        blurRadius: 20,
+                        spreadRadius: 1,
                       ),
-                    ),
-                    Image.file(rightCap, height: _height),
-                  ],
-                ),
-                content,
-              ],
+                    ]
+                  : const [],
             ),
+            child: Opacity(opacity: enabled ? 1 : 0.5, child: content),
           ),
         ),
       ),
