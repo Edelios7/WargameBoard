@@ -3,6 +3,9 @@ import 'package:drift/drift.dart' show Value;
 import '../database/app_database.dart';
 import '../database/models/battle_details.dart';
 import '../database/models/battle_event_details.dart';
+import '../database/models/battle_unit_modifier_details.dart';
+import '../database/models/battle_unit_state_details.dart';
+import '../database/tables/battle_unit_modifiers_table.dart';
 import '../database/tables/battles_table.dart';
 import '../services/xp_service.dart';
 
@@ -170,5 +173,49 @@ class BattleRepository {
       type: type,
       playedAt: DateTime.now(),
     );
+  }
+
+  // =========================
+  // État des unités en direct
+  // =========================
+
+  Future<void> setUnitDestroyed(
+    String battleId,
+    String armyUnitId, {
+    required bool destroyed,
+  }) {
+    return database.battleDao.setUnitDestroyed(
+      battleId,
+      armyUnitId,
+      destroyed: destroyed,
+    );
+  }
+
+  Future<List<BattleUnitStateDetails>> getUnitStates(String battleId) {
+    return database.battleDao.getUnitStates(battleId);
+  }
+
+  Future<String> addUnitModifier(
+    String battleId,
+    String armyUnitId, {
+    required BattleStatKey statKey,
+    required int delta,
+    String? label,
+  }) {
+    return database.battleDao.addUnitModifier(
+      battleId,
+      armyUnitId,
+      statKey: statKey,
+      delta: delta,
+      label: label,
+    );
+  }
+
+  Future<void> removeUnitModifier(String modifierId) {
+    return database.battleDao.removeUnitModifier(modifierId);
+  }
+
+  Future<List<BattleUnitModifierDetails>> getUnitModifiers(String battleId) {
+    return database.battleDao.getUnitModifiers(battleId);
   }
 }

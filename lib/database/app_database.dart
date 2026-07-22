@@ -54,6 +54,8 @@ import 'tables/wishlist_items_table.dart';
 
 import 'tables/battles_table.dart';
 import 'tables/battle_events_table.dart';
+import 'tables/battle_unit_states_table.dart';
+import 'tables/battle_unit_modifiers_table.dart';
 
 import 'tables/projects_table.dart';
 
@@ -142,6 +144,8 @@ part 'app_database.g.dart';
     // ===== BATTLES =====
     Battles,
     BattleEvents,
+    BattleUnitStates,
+    BattleUnitModifiers,
 
     // ===== PROJECTS =====
     Projects,
@@ -200,7 +204,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 14;
+  int get schemaVersion => 15;
 
   // =========================
   // Migrations
@@ -345,6 +349,14 @@ class AppDatabase extends _$AppDatabase {
         }
         if (!await _hasTable('battle_events')) {
           await m.createTable(battleEvents);
+        }
+      }
+      if (from < 15) {
+        if (!await _hasTable('battle_unit_states')) {
+          await m.createTable(battleUnitStates);
+        }
+        if (!await _hasTable('battle_unit_modifiers')) {
+          await m.createTable(battleUnitModifiers);
         }
       }
     },

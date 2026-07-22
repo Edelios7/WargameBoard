@@ -2402,6 +2402,60 @@ abstract class AppLocalizations {
   /// **'Roster'**
   String get battleDashboardRoster;
 
+  /// No description provided for @battleUnitDestroyed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détruite'**
+  String get battleUnitDestroyed;
+
+  /// No description provided for @battleUnitMarkDestroyed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Marquer comme détruite'**
+  String get battleUnitMarkDestroyed;
+
+  /// No description provided for @battleUnitRestore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Restaurer l\'unité'**
+  String get battleUnitRestore;
+
+  /// No description provided for @battleUnitModifiersTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bonus / malus'**
+  String get battleUnitModifiersTitle;
+
+  /// No description provided for @battleUnitAddModifier.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un bonus/malus'**
+  String get battleUnitAddModifier;
+
+  /// No description provided for @battleUnitModifierLabelHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Raison (optionnel)'**
+  String get battleUnitModifierLabelHint;
+
+  /// No description provided for @battleUnitModifierValueHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valeur (ex. 1 ou -1)'**
+  String get battleUnitModifierValueHint;
+
+  /// No description provided for @battleUnitViewFullSheet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir la fiche complète'**
+  String get battleUnitViewFullSheet;
+
+  /// No description provided for @battleUnitNoModifiers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun bonus/malus actif'**
+  String get battleUnitNoModifiers;
+
   /// No description provided for @battleDashboardEvents.
   ///
   /// In fr, this message translates to:

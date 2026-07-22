@@ -1251,6 +1251,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get battleDashboardRoster => 'Roster';
 
   @override
+  String get battleUnitDestroyed => 'Destroyed';
+
+  @override
+  String get battleUnitMarkDestroyed => 'Mark as destroyed';
+
+  @override
+  String get battleUnitRestore => 'Restore unit';
+
+  @override
+  String get battleUnitModifiersTitle => 'Bonuses / penalties';
+
+  @override
+  String get battleUnitAddModifier => 'Add a bonus/penalty';
+
+  @override
+  String get battleUnitModifierLabelHint => 'Reason (optional)';
+
+  @override
+  String get battleUnitModifierValueHint => 'Value (e.g. 1 or -1)';
+
+  @override
+  String get battleUnitViewFullSheet => 'View full datasheet';
+
+  @override
+  String get battleUnitNoModifiers => 'No active bonus/penalty';
+
+  @override
   String get battleDashboardEvents => 'Battle log';
 
   @override

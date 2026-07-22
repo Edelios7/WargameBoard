@@ -4,8 +4,12 @@ import 'package:uuid/uuid.dart';
 import '../app_database.dart';
 import '../models/battle_details.dart';
 import '../models/battle_event_details.dart';
+import '../models/battle_unit_modifier_details.dart';
+import '../models/battle_unit_state_details.dart';
 import '../tables/armies_table.dart';
 import '../tables/battle_events_table.dart';
+import '../tables/battle_unit_modifiers_table.dart';
+import '../tables/battle_unit_states_table.dart';
 import '../tables/battles_table.dart';
 import '../tables/factions_table.dart';
 
@@ -22,7 +26,16 @@ const _battlePhaseOrder = [
   BattlePhase.morale,
 ];
 
-@DriftAccessor(tables: [Battles, BattleEvents, Armies, Factions])
+@DriftAccessor(
+  tables: [
+    Battles,
+    BattleEvents,
+    BattleUnitStates,
+    BattleUnitModifiers,
+    Armies,
+    Factions,
+  ],
+)
 class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   BattleDao(AppDatabase db) : super(db);
 
@@ -332,5 +345,113 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
         notes: Value(notes),
       ),
     );
+  }
+
+  // =========================
+  // État des unités en direct
+  // =========================
+
+  /// Marque une unité comme détruite ou de nouveau vivante. Une ligne
+  /// n'existe en base que pour les unités touchées au moins une fois
+  /// (voir [BattleUnitStates]) : upsert manuel plutôt qu'un simple
+  /// update, faute de contrainte d'unicité (battleId, armyUnitId) sur
+  /// laquelle s'appuyer côté SQL.
+  Future<void> setUnitDestroyed(
+    String battleId,
+    String armyUnitId, {
+    required bool destroyed,
+  }) async {
+    final existing =
+        await (select(battleUnitStates)..where(
+              (t) =>
+                  t.battleId.equals(battleId) &
+                  t.armyUnitId.equals(armyUnitId),
+            ))
+            .getSingleOrNull();
+
+    if (existing != null) {
+      await (update(
+        battleUnitStates,
+      )..where((t) => t.id.equals(existing.id))).write(
+        BattleUnitStatesCompanion(destroyed: Value(destroyed)),
+      );
+      return;
+    }
+
+    await into(battleUnitStates).insert(
+      BattleUnitStatesCompanion.insert(
+        id: _uuid.v4(),
+        battleId: battleId,
+        armyUnitId: armyUnitId,
+        destroyed: Value(destroyed),
+      ),
+    );
+  }
+
+  /// Unités marquées détruites pour cette partie — les unités absentes de
+  /// la liste sont considérées vivantes par défaut.
+  Future<List<BattleUnitStateDetails>> getUnitStates(String battleId) async {
+    final rows = await (select(
+      battleUnitStates,
+    )..where((t) => t.battleId.equals(battleId) & t.destroyed.equals(true)))
+        .get();
+    return rows
+        .map(
+          (row) => BattleUnitStateDetails(
+            armyUnitId: row.armyUnitId,
+            destroyed: row.destroyed,
+          ),
+        )
+        .toList();
+  }
+
+  Future<String> addUnitModifier(
+    String battleId,
+    String armyUnitId, {
+    required BattleStatKey statKey,
+    required int delta,
+    String? label,
+  }) async {
+    final id = _uuid.v4();
+    await into(battleUnitModifiers).insert(
+      BattleUnitModifiersCompanion.insert(
+        id: id,
+        battleId: battleId,
+        armyUnitId: armyUnitId,
+        statKey: statKey,
+        delta: delta,
+        label: Value(label),
+      ),
+    );
+    return id;
+  }
+
+  Future<void> removeUnitModifier(String modifierId) {
+    return (delete(
+      battleUnitModifiers,
+    )..where((t) => t.id.equals(modifierId))).go();
+  }
+
+  /// Modificateurs actifs pour cette partie, toutes unités confondues —
+  /// à filtrer côté appelant par `armyUnitId`.
+  Future<List<BattleUnitModifierDetails>> getUnitModifiers(
+    String battleId,
+  ) async {
+    final rows = await (select(battleUnitModifiers)
+          ..where((t) => t.battleId.equals(battleId))
+          ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
+        .get();
+    return rows
+        .map(
+          (row) => BattleUnitModifierDetails(
+            id: row.id,
+            armyUnitId: row.armyUnitId,
+            statKey: row.statKey,
+            delta: row.delta,
+            label: row.label,
+            createdAt: row.createdAt,
+          ),
+        )
+        .toList();
   }
 }

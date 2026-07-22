@@ -6,6 +6,10 @@ part of 'battle_dao.dart';
 mixin _$BattleDaoMixin on DatabaseAccessor<AppDatabase> {
   $BattlesTable get battles => attachedDatabase.battles;
   $BattleEventsTable get battleEvents => attachedDatabase.battleEvents;
+  $BattleUnitStatesTable get battleUnitStates =>
+      attachedDatabase.battleUnitStates;
+  $BattleUnitModifiersTable get battleUnitModifiers =>
+      attachedDatabase.battleUnitModifiers;
   $ArmiesTable get armies => attachedDatabase.armies;
   $FactionsTable get factions => attachedDatabase.factions;
   BattleDaoManager get managers => BattleDaoManager(this);
@@ -18,6 +22,16 @@ class BattleDaoManager {
       $$BattlesTableTableManager(_db.attachedDatabase, _db.battles);
   $$BattleEventsTableTableManager get battleEvents =>
       $$BattleEventsTableTableManager(_db.attachedDatabase, _db.battleEvents);
+  $$BattleUnitStatesTableTableManager get battleUnitStates =>
+      $$BattleUnitStatesTableTableManager(
+        _db.attachedDatabase,
+        _db.battleUnitStates,
+      );
+  $$BattleUnitModifiersTableTableManager get battleUnitModifiers =>
+      $$BattleUnitModifiersTableTableManager(
+        _db.attachedDatabase,
+        _db.battleUnitModifiers,
+      );
   $$ArmiesTableTableManager get armies =>
       $$ArmiesTableTableManager(_db.attachedDatabase, _db.armies);
   $$FactionsTableTableManager get factions =>

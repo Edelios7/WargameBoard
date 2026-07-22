@@ -3,6 +3,7 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wargameboard/database/app_database.dart';
 import 'package:wargameboard/database/seed/faction_seed.dart';
+import 'package:wargameboard/database/tables/battle_unit_modifiers_table.dart';
 import 'package:wargameboard/database/tables/battles_table.dart';
 
 void main() {
@@ -154,6 +155,73 @@ void main() {
       await database.battleDao.deleteBattle(id);
 
       expect(await database.battleDao.getEvents(id), isEmpty);
+    });
+  });
+
+  group('live unit tracking', () {
+    Future<String> seedArmyUnit(AppDatabase database) async {
+      final armyId = await database.armyDao.createArmy(
+        name: 'Ma liste',
+        factionId: seedFactionId,
+      );
+      final results = await database.datasheetDao.search('Captain');
+      return database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: results.single.id,
+        modelCount: 1,
+      );
+    }
+
+    test(
+      'setUnitDestroyed toggles a unit in and out of getUnitStates',
+      () async {
+        final battleId = await database.battleDao.startBattle(
+          opponentName: 'Marc',
+        );
+        final armyUnitId = await seedArmyUnit(database);
+
+        await database.battleDao.setUnitDestroyed(
+          battleId,
+          armyUnitId,
+          destroyed: true,
+        );
+        var states = await database.battleDao.getUnitStates(battleId);
+        expect(states.single.armyUnitId, armyUnitId);
+        expect(states.single.destroyed, isTrue);
+
+        await database.battleDao.setUnitDestroyed(
+          battleId,
+          armyUnitId,
+          destroyed: false,
+        );
+        states = await database.battleDao.getUnitStates(battleId);
+        expect(states, isEmpty);
+      },
+    );
+
+    test('addUnitModifier and removeUnitModifier round-trip', () async {
+      final battleId = await database.battleDao.startBattle(
+        opponentName: 'Marc',
+      );
+      final armyUnitId = await seedArmyUnit(database);
+
+      final modifierId = await database.battleDao.addUnitModifier(
+        battleId,
+        armyUnitId,
+        statKey: BattleStatKey.toughness,
+        delta: 1,
+        label: 'Rite de guerre',
+      );
+
+      var modifiers = await database.battleDao.getUnitModifiers(battleId);
+      expect(modifiers, hasLength(1));
+      expect(modifiers.single.armyUnitId, armyUnitId);
+      expect(modifiers.single.statKey, BattleStatKey.toughness);
+      expect(modifiers.single.delta, 1);
+
+      await database.battleDao.removeUnitModifier(modifierId);
+      modifiers = await database.battleDao.getUnitModifiers(battleId);
+      expect(modifiers, isEmpty);
     });
   });
 }

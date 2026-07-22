@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../database/models/battle_details.dart';
 import '../database/models/battle_event_details.dart';
 import '../database/models/battle_stats.dart';
+import '../database/models/battle_unit_modifier_details.dart';
+import '../database/models/battle_unit_state_details.dart';
 import '../repositories/battle_repository.dart';
 import 'database_provider.dart';
 import 'xp_provider.dart';
@@ -45,4 +47,26 @@ final battleEventsProvider =
     FutureProvider.family<List<BattleEventDetails>, String>((ref, battleId) {
       final repository = ref.watch(battleRepositoryProvider);
       return repository.getEvents(battleId);
+    });
+
+/// Unités marquées détruites pour cette partie (id d'ArmyUnit) — voir
+/// [BattleRepository.getUnitStates].
+final battleUnitStatesProvider =
+    FutureProvider.family<List<BattleUnitStateDetails>, String>((
+      ref,
+      battleId,
+    ) {
+      final repository = ref.watch(battleRepositoryProvider);
+      return repository.getUnitStates(battleId);
+    });
+
+/// Bonus/malus actifs pour cette partie, toutes unités confondues — voir
+/// [BattleRepository.getUnitModifiers].
+final battleUnitModifiersProvider =
+    FutureProvider.family<List<BattleUnitModifierDetails>, String>((
+      ref,
+      battleId,
+    ) {
+      final repository = ref.watch(battleRepositoryProvider);
+      return repository.getUnitModifiers(battleId);
     });
