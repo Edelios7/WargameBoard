@@ -7,6 +7,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../domain/rules/rule_document.dart';
 import '../../../domain/rules/rules_data.dart';
 import '../../../l10n/app_localizations.dart';
+import 'rule_document_detail_page.dart';
 
 class RulesPage extends StatefulWidget {
   const RulesPage({super.key});
@@ -22,19 +23,33 @@ class _RulesPageState extends State<RulesPage> {
 
   List<RuleDocument> get _filtered {
     return kRuleDocuments.where((doc) {
-      final matchesQuery =
-          doc.title.toLowerCase().contains(_query.toLowerCase());
+      final matchesQuery = doc.title.toLowerCase().contains(
+        _query.toLowerCase(),
+      );
       final matchesCategory = _category == null || doc.category == _category;
       return matchesQuery && matchesCategory;
     }).toList();
   }
 
-  void _openBook(BuildContext context, AppLocalizations l10n, RuleDocument doc) {
+  void _openBook(
+    BuildContext context,
+    AppLocalizations l10n,
+    RuleDocument doc,
+  ) {
     final message = doc.localAssetId != null
         ? l10n.rulesOpenBookSnackbar(
-            'local_assets/rules/${doc.localAssetId}.pdf')
+            'local_assets/rules/${doc.localAssetId}.pdf',
+          )
         : l10n.rulesOpenBookMissing;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _openDocument(BuildContext context, RuleDocument doc) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => RuleDocumentDetailPage(document: doc)),
+    );
   }
 
   @override
@@ -43,7 +58,8 @@ class _RulesPageState extends State<RulesPage> {
     final hero = kRuleDocuments.firstWhere((d) => d.isCurrent);
     final documents = _filtered;
     final recent = documents.take(5).toList();
-    final popular = [...documents]..sort((a, b) => b.downloads.compareTo(a.downloads));
+    final popular = [...documents]
+      ..sort((a, b) => b.downloads.compareTo(a.downloads));
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -54,9 +70,9 @@ class _RulesPageState extends State<RulesPage> {
           children: [
             _RulesHeader(
               onSearch: (value) => setState(() => _query = value),
-              onAdd: () => ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.rulesAddButton)),
-              ),
+              onAdd: () => ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(l10n.rulesAddButton))),
             ),
             const SizedBox(height: 16),
             Row(
@@ -79,12 +95,13 @@ class _RulesPageState extends State<RulesPage> {
               document: hero,
               l10n: l10n,
               onOpenBook: () => _openBook(context, l10n, hero),
-              onViewErrata: () => ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.rulesViewErrata(hero.errataCount))),
-              ),
+              onViewErrata: () => _openDocument(context, hero),
             ),
             const SizedBox(height: 24),
-            Text(l10n.rulesCategoryAll.toUpperCase(), style: AppTextStyles.eyebrow),
+            Text(
+              l10n.rulesCategoryAll.toUpperCase(),
+              style: AppTextStyles.eyebrow,
+            ),
             const SizedBox(height: 12),
             _CategoriesGrid(
               selected: _category,
@@ -97,10 +114,12 @@ class _RulesPageState extends State<RulesPage> {
                 final recentCard = _RecentDocumentsCard(
                   documents: recent,
                   l10n: l10n,
+                  onOpen: (doc) => _openDocument(context, doc),
                 );
                 final popularCard = _PopularRulesCard(
                   documents: popular.take(5).toList(),
                   l10n: l10n,
+                  onOpen: (doc) => _openDocument(context, doc),
                 );
                 if (!wide) {
                   return Column(
@@ -158,7 +177,10 @@ class _RulesHeaderState extends State<_RulesHeader> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final wide = constraints.maxWidth > 760;
-        final title = Text(l10n.navRules.toUpperCase(), style: AppTextStyles.heading);
+        final title = Text(
+          l10n.navRules.toUpperCase(),
+          style: AppTextStyles.heading,
+        );
 
         final actions = Row(
           mainAxisSize: MainAxisSize.min,
@@ -200,8 +222,11 @@ class _RulesHeaderState extends State<_RulesHeader> {
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: AppColors.border),
               ),
-              child: const Icon(Icons.tune_rounded,
-                  size: 18, color: AppColors.textSecondary),
+              child: const Icon(
+                Icons.tune_rounded,
+                size: 18,
+                color: AppColors.textSecondary,
+              ),
             ),
             const SizedBox(width: 10),
             FilledButton.icon(
@@ -216,11 +241,7 @@ class _RulesHeaderState extends State<_RulesHeader> {
         if (!wide) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              title,
-              const SizedBox(height: 16),
-              actions,
-            ],
+            children: [title, const SizedBox(height: 16), actions],
           );
         }
 
@@ -238,7 +259,11 @@ class _TabChip extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  const _TabChip({required this.label, required this.selected, required this.onTap});
+  const _TabChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -303,8 +328,11 @@ class _HeroCard extends StatelessWidget {
               ),
             ),
             child: const Center(
-              child: Icon(Icons.shield_moon_rounded,
-                  size: 56, color: AppColors.primaryLight),
+              child: Icon(
+                Icons.shield_moon_rounded,
+                size: 56,
+                color: AppColors.primaryLight,
+              ),
             ),
           );
 
@@ -333,12 +361,18 @@ class _HeroCard extends StatelessWidget {
                 spacing: 16,
                 runSpacing: 6,
                 children: [
-                  _MetaItem(icon: Icons.business_rounded, label: document.publisher),
+                  _MetaItem(
+                    icon: Icons.business_rounded,
+                    label: document.publisher,
+                  ),
                   _MetaItem(
                     icon: Icons.event_rounded,
                     label: dateFormat.format(document.releaseDate),
                   ),
-                  _MetaItem(icon: Icons.language_rounded, label: document.language),
+                  _MetaItem(
+                    icon: Icons.language_rounded,
+                    label: document.language,
+                  ),
                   if (document.isUpToDate)
                     _MetaItem(
                       icon: Icons.check_circle_rounded,
@@ -368,7 +402,10 @@ class _HeroCard extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(l10n.rulesVersionLabel, style: AppTextStyles.eyebrow),
+                        Text(
+                          l10n.rulesVersionLabel,
+                          style: AppTextStyles.eyebrow,
+                        ),
                         const SizedBox(height: 4),
                         Text(document.version, style: AppTextStyles.title),
                       ],
@@ -383,12 +420,17 @@ class _HeroCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 Text(l10n.rulesLastUpdateLabel, style: AppTextStyles.caption),
                 const SizedBox(height: 2),
-                Text(dateFormat.format(document.lastUpdate), style: AppTextStyles.body),
+                Text(
+                  dateFormat.format(document.lastUpdate),
+                  style: AppTextStyles.body,
+                ),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
-                    style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                    ),
                     onPressed: onOpenBook,
                     icon: const Icon(Icons.menu_book_rounded, size: 18),
                     label: Text(l10n.rulesOpenBook),
@@ -455,10 +497,7 @@ class _StatusBadge extends StatelessWidget {
         color: color.withValues(alpha: .16),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(
-        label,
-        style: AppTextStyles.eyebrow.copyWith(color: color),
-      ),
+      child: Text(label, style: AppTextStyles.eyebrow.copyWith(color: color)),
     );
   }
 }
@@ -479,7 +518,9 @@ class _MetaItem extends StatelessWidget {
         const SizedBox(width: 5),
         Text(
           label,
-          style: AppTextStyles.caption.copyWith(color: color ?? AppColors.textSecondary),
+          style: AppTextStyles.caption.copyWith(
+            color: color ?? AppColors.textSecondary,
+          ),
         ),
       ],
     );
@@ -503,10 +544,22 @@ class _CategoriesGrid extends StatelessWidget {
     final entries = <(RuleCategory?, IconData, String)>[
       (null, Icons.bookmark_rounded, l10n.rulesCategoryAll),
       (RuleCategory.mainRules, Icons.menu_book_rounded, l10n.rulesCategoryMain),
-      (RuleCategory.missions, Icons.track_changes_rounded, l10n.rulesCategoryMissions),
+      (
+        RuleCategory.missions,
+        Icons.track_changes_rounded,
+        l10n.rulesCategoryMissions,
+      ),
       (RuleCategory.faqs, Icons.help_outline_rounded, l10n.rulesCategoryFaqs),
-      (RuleCategory.errata, Icons.description_rounded, l10n.rulesCategoryErrata),
-      (RuleCategory.pointsAndProfiles, Icons.shield_rounded, l10n.rulesCategoryProfiles),
+      (
+        RuleCategory.errata,
+        Icons.description_rounded,
+        l10n.rulesCategoryErrata,
+      ),
+      (
+        RuleCategory.pointsAndProfiles,
+        Icons.shield_rounded,
+        l10n.rulesCategoryProfiles,
+      ),
     ];
 
     return LayoutBuilder(
@@ -514,8 +567,8 @@ class _CategoriesGrid extends StatelessWidget {
         final columns = constraints.maxWidth > 980
             ? 6
             : constraints.maxWidth > 640
-                ? 3
-                : 2;
+            ? 3
+            : 2;
         return GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -528,21 +581,28 @@ class _CategoriesGrid extends StatelessWidget {
               AppCard(
                 selected: selected == entry.$1,
                 onTap: () => onSelect(selected == entry.$1 ? null : entry.$1),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(entry.$2,
-                        size: 18,
-                        color: selected == entry.$1
-                            ? AppColors.primary
-                            : AppColors.textSecondary),
+                    Icon(
+                      entry.$2,
+                      size: 18,
+                      color: selected == entry.$1
+                          ? AppColors.primary
+                          : AppColors.textSecondary,
+                    ),
                     const SizedBox(height: 8),
                     Text(
                       entry.$3,
-                      style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+                      style: AppTextStyles.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -564,8 +624,13 @@ class _CategoriesGrid extends StatelessWidget {
 class _RecentDocumentsCard extends StatelessWidget {
   final List<RuleDocument> documents;
   final AppLocalizations l10n;
+  final ValueChanged<RuleDocument> onOpen;
 
-  const _RecentDocumentsCard({required this.documents, required this.l10n});
+  const _RecentDocumentsCard({
+    required this.documents,
+    required this.l10n,
+    required this.onOpen,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -579,12 +644,17 @@ class _RecentDocumentsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(l10n.rulesRecentDocuments.toUpperCase(), style: AppTextStyles.eyebrow),
+              Text(
+                l10n.rulesRecentDocuments.toUpperCase(),
+                style: AppTextStyles.eyebrow,
+              ),
               TextButton(
                 onPressed: () {},
                 child: Text(
                   l10n.rulesSeeAll,
-                  style: AppTextStyles.caption.copyWith(color: AppColors.primary),
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
             ],
@@ -597,44 +667,51 @@ class _RecentDocumentsCard extends StatelessWidget {
             )
           else
             ...documents.map(
-              (doc) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: AppColors.surface,
+              (doc) => InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () => onOpen(doc),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: AppColors.surface,
+                        ),
+                        child: const Icon(
+                          Icons.description_rounded,
+                          size: 18,
+                          color: AppColors.primaryLight,
+                        ),
                       ),
-                      child: const Icon(Icons.description_rounded,
-                          size: 18, color: AppColors.primaryLight),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            doc.title,
-                            style: AppTextStyles.body,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            'v${doc.version} • ${dateFormat.format(doc.lastUpdate)} • ${doc.language}',
-                            style: AppTextStyles.caption,
-                          ),
-                        ],
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              doc.title,
+                              style: AppTextStyles.body,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              'v${doc.version} • ${dateFormat.format(doc.lastUpdate)} • ${doc.language}',
+                              style: AppTextStyles.caption,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const Icon(Icons.bookmark_border_rounded,
-                        size: 18, color: AppColors.textSecondary),
-                    const SizedBox(width: 12),
-                    const Icon(Icons.more_vert_rounded,
-                        size: 18, color: AppColors.textSecondary),
-                  ],
+                      const Icon(
+                        Icons.chevron_right_rounded,
+                        size: 20,
+                        color: AppColors.textSecondary,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -647,8 +724,13 @@ class _RecentDocumentsCard extends StatelessWidget {
 class _PopularRulesCard extends StatelessWidget {
   final List<RuleDocument> documents;
   final AppLocalizations l10n;
+  final ValueChanged<RuleDocument> onOpen;
 
-  const _PopularRulesCard({required this.documents, required this.l10n});
+  const _PopularRulesCard({
+    required this.documents,
+    required this.l10n,
+    required this.onOpen,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -660,12 +742,17 @@ class _PopularRulesCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(l10n.rulesPopularRules.toUpperCase(), style: AppTextStyles.eyebrow),
+              Text(
+                l10n.rulesPopularRules.toUpperCase(),
+                style: AppTextStyles.eyebrow,
+              ),
               TextButton(
                 onPressed: () {},
                 child: Text(
                   l10n.rulesSeeAll,
-                  style: AppTextStyles.caption.copyWith(color: AppColors.primary),
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
             ],
@@ -680,49 +767,61 @@ class _PopularRulesCard extends StatelessWidget {
             ...documents.asMap().entries.map((entry) {
               final rank = entry.key + 1;
               final doc = entry.value;
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 20,
-                      child: Text(
-                        '$rank',
-                        style: AppTextStyles.title.copyWith(color: AppColors.primary),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: AppColors.surface,
-                      ),
-                      child: const Icon(Icons.description_rounded,
-                          size: 16, color: AppColors.primaryLight),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            doc.title,
-                            style: AppTextStyles.body,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+              return InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () => onOpen(doc),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 20,
+                        child: Text(
+                          '$rank',
+                          style: AppTextStyles.title.copyWith(
+                            color: AppColors.primary,
                           ),
-                          Text(
-                            '${(doc.downloads / 1000).toStringAsFixed(1)}k • v${doc.version}',
-                            style: AppTextStyles.caption,
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                    const Icon(Icons.download_rounded,
-                        size: 18, color: AppColors.textSecondary),
-                  ],
+                      const SizedBox(width: 10),
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: AppColors.surface,
+                        ),
+                        child: const Icon(
+                          Icons.description_rounded,
+                          size: 16,
+                          color: AppColors.primaryLight,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              doc.title,
+                              style: AppTextStyles.body,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              '${(doc.downloads / 1000).toStringAsFixed(1)}k • v${doc.version}',
+                              style: AppTextStyles.caption,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        Icons.download_rounded,
+                        size: 18,
+                        color: AppColors.textSecondary,
+                      ),
+                    ],
+                  ),
                 ),
               );
             }),
@@ -740,10 +839,26 @@ class _HelpRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = <(IconData, String, String)>[
-      (Icons.help_outline_rounded, l10n.rulesHelpHowToPlay, l10n.rulesHelpHowToPlaySub),
-      (Icons.play_circle_outline_rounded, l10n.rulesHelpVideos, l10n.rulesHelpVideosSub),
-      (Icons.balance_rounded, l10n.rulesHelpApplication, l10n.rulesHelpApplicationSub),
-      (Icons.menu_book_outlined, l10n.rulesHelpGlossary, l10n.rulesHelpGlossarySub),
+      (
+        Icons.help_outline_rounded,
+        l10n.rulesHelpHowToPlay,
+        l10n.rulesHelpHowToPlaySub,
+      ),
+      (
+        Icons.play_circle_outline_rounded,
+        l10n.rulesHelpVideos,
+        l10n.rulesHelpVideosSub,
+      ),
+      (
+        Icons.balance_rounded,
+        l10n.rulesHelpApplication,
+        l10n.rulesHelpApplicationSub,
+      ),
+      (
+        Icons.menu_book_outlined,
+        l10n.rulesHelpGlossary,
+        l10n.rulesHelpGlossarySub,
+      ),
     ];
 
     return AppCard(
@@ -758,8 +873,8 @@ class _HelpRow extends StatelessWidget {
               final columns = constraints.maxWidth > 900
                   ? 4
                   : constraints.maxWidth > 560
-                      ? 2
-                      : 1;
+                  ? 2
+                  : 1;
               return GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -770,7 +885,10 @@ class _HelpRow extends StatelessWidget {
                 children: [
                   for (final item in items)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(10),
@@ -778,27 +896,39 @@ class _HelpRow extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          Icon(item.$1, size: 18, color: AppColors.textSecondary),
+                          Icon(
+                            item.$1,
+                            size: 18,
+                            color: AppColors.textSecondary,
+                          ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(item.$2,
-                                    style: AppTextStyles.body
-                                        .copyWith(fontWeight: FontWeight.w600),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis),
-                                Text(item.$3,
-                                    style: AppTextStyles.caption,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis),
+                                Text(
+                                  item.$2,
+                                  style: AppTextStyles.body.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  item.$3,
+                                  style: AppTextStyles.caption,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ],
                             ),
                           ),
-                          const Icon(Icons.arrow_forward_rounded,
-                              size: 16, color: AppColors.textSecondary),
+                          const Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 16,
+                            color: AppColors.textSecondary,
+                          ),
                         ],
                       ),
                     ),

@@ -553,6 +553,8 @@
   "rulesHelpGlossary": "Glossary",
   "rulesHelpGlossarySub": "All the terms",
   "rulesEmpty": "No document found",
+  "rulesNoDigitizedContent": "This document has no digitized content in the app yet.",
+  "rulesBackToList": "Back to rules",
 
   "profileCommandant": "Commander",
   "profileLevelShort": "Level {level}",

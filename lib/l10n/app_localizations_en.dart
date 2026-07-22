@@ -1132,6 +1132,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rulesEmpty => 'No document found';
 
   @override
+  String get rulesNoDigitizedContent =>
+      'This document has no digitized content in the app yet.';
+
+  @override
+  String get rulesBackToList => 'Back to rules';
+
+  @override
   String get profileCommandant => 'Commander';
 
   @override

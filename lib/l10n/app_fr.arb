@@ -553,6 +553,8 @@
   "rulesHelpGlossary": "Glossaire",
   "rulesHelpGlossarySub": "Tous les termes",
   "rulesEmpty": "Aucun document trouvé",
+  "rulesNoDigitizedContent": "Ce document n'a pas encore de contenu numérisé dans l'application.",
+  "rulesBackToList": "Retour aux règles",
 
   "profileCommandant": "Commandant",
   "profileLevelShort": "Niveau {level}",

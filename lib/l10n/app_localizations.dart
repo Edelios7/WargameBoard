@@ -2180,6 +2180,18 @@ abstract class AppLocalizations {
   /// **'Aucun document trouvé'**
   String get rulesEmpty;
 
+  /// No description provided for @rulesNoDigitizedContent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce document n\'a pas encore de contenu numérisé dans l\'application.'**
+  String get rulesNoDigitizedContent;
+
+  /// No description provided for @rulesBackToList.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retour aux règles'**
+  String get rulesBackToList;
+
   /// No description provided for @profileCommandant.
   ///
   /// In fr, this message translates to:
