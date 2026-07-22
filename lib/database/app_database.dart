@@ -204,7 +204,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 16;
+  int get schemaVersion => 17;
 
   // =========================
   // Migrations
@@ -362,6 +362,11 @@ class AppDatabase extends _$AppDatabase {
       if (from < 16) {
         if (!await _hasColumn('battles', 'opponent_army_id')) {
           await m.addColumn(battles, battles.opponentArmyId);
+        }
+      }
+      if (from < 17) {
+        if (!await _hasColumn('battle_events', 'opponent_cp_delta')) {
+          await m.addColumn(battleEvents, battleEvents.opponentCpDelta);
         }
       }
     },

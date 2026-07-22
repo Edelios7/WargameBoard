@@ -135,6 +135,7 @@ class BattleRepository {
     String battleId, {
     required String label,
     int? cpDelta,
+    int? opponentCpDelta,
     int? round,
     BattlePhase? phase,
   }) {
@@ -142,6 +143,7 @@ class BattleRepository {
       battleId,
       label: label,
       cpDelta: cpDelta,
+      opponentCpDelta: opponentCpDelta,
       round: round,
       phase: phase,
     );
@@ -149,6 +151,11 @@ class BattleRepository {
 
   Future<List<BattleEventDetails>> getEvents(String battleId) {
     return database.battleDao.getEvents(battleId);
+  }
+
+  /// Annule un événement du journal — voir [BattleDao.deleteEvent].
+  Future<void> deleteEvent(String eventId) {
+    return database.battleDao.deleteEvent(eventId);
   }
 
   /// Finalise une partie suivie en direct et crédite l'XP correspondante

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -127,6 +129,8 @@ class BattleDashboard extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      DiceRollerBlock(battleId: battle.id),
+                      const SizedBox(height: 16),
                       EventsBlock(battleId: battle.id),
                       const SizedBox(height: 16),
                       NotesBlock(battleId: battle.id, notes: battle.notes),
@@ -147,6 +151,8 @@ class BattleDashboard extends ConsumerWidget {
                           roster,
                           const SizedBox(height: 16),
                         ],
+                        DiceRollerBlock(battleId: battle.id),
+                        const SizedBox(height: 16),
                         EventsBlock(battleId: battle.id),
                         const SizedBox(height: 16),
                         NotesBlock(battleId: battle.id, notes: battle.notes),
@@ -716,6 +722,7 @@ class _CommandPointsBlock extends ConsumerWidget {
           ? 'CP ${delta > 0 ? '+1' : '-1'}'
           : 'Opponent CP ${delta > 0 ? '+1' : '-1'}',
       cpDelta: mine ? delta : null,
+      opponentCpDelta: mine ? null : delta,
       round: battle.currentRound,
       phase: battle.currentPhase,
     );
@@ -1197,6 +1204,145 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
   }
 }
 
+/// Lanceur de D6 rapide, pensé pour éviter de sortir de l'app pendant une
+/// partie (jets de touche/blessure/sauvegarde...). Peut logguer le
+/// résultat dans le journal d'événements, mais reste utilisable même
+/// hors partie suivie en direct.
+class DiceRollerBlock extends ConsumerStatefulWidget {
+  final String battleId;
+
+  const DiceRollerBlock({super.key, required this.battleId});
+
+  @override
+  ConsumerState<DiceRollerBlock> createState() => _DiceRollerBlockState();
+}
+
+class _DiceRollerBlockState extends ConsumerState<DiceRollerBlock> {
+  final _random = Random();
+  int _diceCount = 2;
+  List<int>? _results;
+
+  void _roll() {
+    setState(() {
+      _results = List.generate(_diceCount, (_) => _random.nextInt(6) + 1);
+    });
+  }
+
+  Future<void> _logRoll() async {
+    final results = _results;
+    if (results == null) return;
+    final total = results.fold<int>(0, (sum, value) => sum + value);
+    await ref.read(battleRepositoryProvider).logEvent(
+      widget.battleId,
+      label: '${results.length}D6 : ${results.join(', ')} (total $total)',
+    );
+    ref.invalidate(battleEventsProvider(widget.battleId));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final results = _results;
+    final total = results?.fold<int>(0, (sum, value) => sum + value);
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.battleDiceTitle.toUpperCase(), style: AppTextStyles.eyebrow),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Text(l10n.battleDiceCount, style: AppTextStyles.caption),
+              const SizedBox(width: 4),
+              IconButton(
+                icon: const Icon(Icons.remove_circle_outline, size: 20),
+                color: AppColors.textSecondary,
+                onPressed: _diceCount > 1
+                    ? () => setState(() => _diceCount--)
+                    : null,
+              ),
+              SizedBox(
+                width: 24,
+                child: Text(
+                  '$_diceCount',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add_circle_outline, size: 20),
+                color: AppColors.textSecondary,
+                onPressed: _diceCount < 20
+                    ? () => setState(() => _diceCount++)
+                    : null,
+              ),
+              const Spacer(),
+              FilledButton.icon(
+                onPressed: _roll,
+                icon: const Icon(Icons.casino_rounded, size: 18),
+                label: Text(l10n.battleDiceRoll),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (results == null)
+            Text(l10n.battleDiceEmpty, style: AppTextStyles.caption)
+          else ...[
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [for (final value in results) _DiceFace(value: value)],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Text(
+                  '${l10n.battleDiceTotal} : $total',
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const Spacer(),
+                TextButton(
+                  onPressed: _logRoll,
+                  child: Text(l10n.battleDiceLogRoll),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _DiceFace extends StatelessWidget {
+  final int value;
+
+  const _DiceFace({required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.border),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        '$value',
+        style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w800),
+      ),
+    );
+  }
+}
+
 class EventsBlock extends ConsumerStatefulWidget {
   final String battleId;
   final bool readOnly;
@@ -1223,6 +1369,12 @@ class EventsBlockState extends ConsumerState<EventsBlock> {
         .read(battleRepositoryProvider)
         .logEvent(widget.battleId, label: text);
     _controller.clear();
+    ref.invalidate(battleEventsProvider(widget.battleId));
+  }
+
+  Future<void> _delete(String eventId) async {
+    await ref.read(battleRepositoryProvider).deleteEvent(eventId);
+    ref.invalidate(activeBattleProvider);
     ref.invalidate(battleEventsProvider(widget.battleId));
   }
 
@@ -1283,7 +1435,13 @@ class EventsBlockState extends ConsumerState<EventsBlock> {
                   )
                 : Column(
                     children: [
-                      for (final event in events) EventRow(event: event),
+                      for (final event in events)
+                        EventRow(
+                          event: event,
+                          onDelete: widget.readOnly
+                              ? null
+                              : () => _delete(event.id),
+                        ),
                     ],
                   ),
           ),
@@ -1295,12 +1453,15 @@ class EventsBlockState extends ConsumerState<EventsBlock> {
 
 class EventRow extends StatelessWidget {
   final BattleEventDetails event;
+  final VoidCallback? onDelete;
 
-  const EventRow({super.key, required this.event});
+  const EventRow({super.key, required this.event, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final timeFormat = DateFormat.Hm();
+    final delta = event.cpDelta ?? event.opponentCpDelta;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -1311,13 +1472,22 @@ class EventRow extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(child: Text(event.label, style: AppTextStyles.body)),
-          if (event.cpDelta != null)
+          if (delta != null)
             Text(
-              '${event.cpDelta! > 0 ? '+' : ''}${event.cpDelta} CP',
+              '${delta > 0 ? '+' : ''}$delta CP',
               style: AppTextStyles.caption.copyWith(
-                color: event.cpDelta! > 0 ? AppColors.success : AppColors.error,
+                color: delta > 0 ? AppColors.success : AppColors.error,
                 fontWeight: FontWeight.w600,
               ),
+            ),
+          if (onDelete != null)
+            IconButton(
+              icon: const Icon(Icons.undo_rounded, size: 18),
+              color: AppColors.textSecondary,
+              tooltip: l10n.battleDashboardUndoEvent,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              onPressed: onDelete,
             ),
         ],
       ),

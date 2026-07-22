@@ -18,6 +18,11 @@ class BattleEvents extends Table {
 
   IntColumn get cpDelta => integer().nullable()();
 
+  /// Variation de CP adverse — distincte de [cpDelta] (mes CP) pour que
+  /// les deux sens de dépense/gain soient réversibles indépendamment
+  /// (voir [BattleDao.deleteEvent]).
+  IntColumn get opponentCpDelta => integer().nullable()();
+
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 
   @override

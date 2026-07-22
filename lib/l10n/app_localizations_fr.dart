@@ -551,6 +551,32 @@ class AppLocalizationsFr extends AppLocalizations {
   String get collectionExportJson => 'Copier en JSON';
 
   @override
+  String get collectionSortTooltip => 'Trier';
+
+  @override
+  String get collectionSortName => 'Nom (A-Z)';
+
+  @override
+  String get collectionSortDateAdded => 'Date d\'ajout (plus récent d\'abord)';
+
+  @override
+  String get collectionSortPainted => '% peint';
+
+  @override
+  String get collectionSelectionStart => 'Sélection multiple';
+
+  @override
+  String get collectionSelectionCancel => 'Annuler la sélection';
+
+  @override
+  String collectionSelectionCount(int count) {
+    return '$count sélectionnée(s)';
+  }
+
+  @override
+  String get collectionSelectionMarkPainted => 'Marquer entièrement peint';
+
+  @override
   String get collectionExportedToClipboard =>
       'Collection copiée dans le presse-papier';
 
@@ -1377,6 +1403,27 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get battleDashboardEventsEmpty =>
       'Aucun événement enregistré pour l\'instant';
+
+  @override
+  String get battleDashboardUndoEvent => 'Annuler cet événement';
+
+  @override
+  String get battleDiceTitle => 'Lanceur de dés';
+
+  @override
+  String get battleDiceCount => 'Dés';
+
+  @override
+  String get battleDiceRoll => 'Lancer';
+
+  @override
+  String get battleDiceEmpty => 'Lance pour voir les résultats';
+
+  @override
+  String get battleDiceTotal => 'Total';
+
+  @override
+  String get battleDiceLogRoll => 'Ajouter au journal';
 
   @override
   String get battleDashboardNotesTitle => 'Notes';

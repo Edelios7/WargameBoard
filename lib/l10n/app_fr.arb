@@ -282,6 +282,19 @@
   "collectionExportTooltip": "Exporter",
   "collectionExportCsv": "Copier en CSV",
   "collectionExportJson": "Copier en JSON",
+  "collectionSortTooltip": "Trier",
+  "collectionSortName": "Nom (A-Z)",
+  "collectionSortDateAdded": "Date d'ajout (plus récent d'abord)",
+  "collectionSortPainted": "% peint",
+  "collectionSelectionStart": "Sélection multiple",
+  "collectionSelectionCancel": "Annuler la sélection",
+  "collectionSelectionCount": "{count} sélectionnée(s)",
+  "@collectionSelectionCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "collectionSelectionMarkPainted": "Marquer entièrement peint",
   "collectionExportedToClipboard": "Collection copiée dans le presse-papier",
   "collectionEmpty": "Ta collection est vide",
   "collectionQuantityLabel": "{count} possédées",
@@ -650,6 +663,13 @@
   "battleDashboardAddEvent": "Ajouter un événement",
   "battleDashboardEventHint": "Que s'est-il passé ?",
   "battleDashboardEventsEmpty": "Aucun événement enregistré pour l'instant",
+  "battleDashboardUndoEvent": "Annuler cet événement",
+  "battleDiceTitle": "Lanceur de dés",
+  "battleDiceCount": "Dés",
+  "battleDiceRoll": "Lancer",
+  "battleDiceEmpty": "Lance pour voir les résultats",
+  "battleDiceTotal": "Total",
+  "battleDiceLogRoll": "Ajouter au journal",
   "battleDashboardNotesTitle": "Notes",
   "battleDashboardNotesHint": "Note tout ce qui vaut la peine d'être retenu...",
   "battleDetailTitle": "Récapitulatif de la partie",

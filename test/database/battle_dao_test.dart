@@ -154,6 +154,41 @@ void main() {
       expect(events.single.cpDelta, -1);
     });
 
+    test('deleteEvent removes it and reverses its CP delta', () async {
+      final id = await database.battleDao.startBattle(opponentName: 'Marc');
+      await database.battleDao.updateLiveState(
+        id,
+        myCommandPoints: const Value(1),
+        opponentCommandPoints: const Value(2),
+      );
+
+      await database.battleDao.logEvent(
+        id,
+        label: 'Rapid Ingress',
+        cpDelta: -1,
+      );
+      await database.battleDao.logEvent(
+        id,
+        label: 'Opponent CP -1',
+        opponentCpDelta: -1,
+      );
+      final events = await database.battleDao.getEvents(id);
+      final mineEvent = events.singleWhere((e) => e.label == 'Rapid Ingress');
+      final opponentEvent = events.singleWhere(
+        (e) => e.label == 'Opponent CP -1',
+      );
+
+      await database.battleDao.deleteEvent(mineEvent.id);
+      var active = await database.battleDao.getActiveBattle();
+      expect(active!.myCommandPoints, 2);
+      expect(await database.battleDao.getEvents(id), hasLength(1));
+
+      await database.battleDao.deleteEvent(opponentEvent.id);
+      active = await database.battleDao.getActiveBattle();
+      expect(active!.opponentCommandPoints, 3);
+      expect(await database.battleDao.getEvents(id), isEmpty);
+    });
+
     test('updateLiveState can set and clear notes', () async {
       final id = await database.battleDao.startBattle(opponentName: 'Marc');
 

@@ -547,6 +547,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get collectionExportJson => 'Copy as JSON';
 
   @override
+  String get collectionSortTooltip => 'Sort';
+
+  @override
+  String get collectionSortName => 'Name (A-Z)';
+
+  @override
+  String get collectionSortDateAdded => 'Date added (newest first)';
+
+  @override
+  String get collectionSortPainted => 'Painted %';
+
+  @override
+  String get collectionSelectionStart => 'Select multiple';
+
+  @override
+  String get collectionSelectionCancel => 'Cancel selection';
+
+  @override
+  String collectionSelectionCount(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get collectionSelectionMarkPainted => 'Mark as fully painted';
+
+  @override
   String get collectionExportedToClipboard => 'Collection copied to clipboard';
 
   @override
@@ -1366,6 +1392,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get battleDashboardEventsEmpty => 'No events logged yet';
+
+  @override
+  String get battleDashboardUndoEvent => 'Undo this event';
+
+  @override
+  String get battleDiceTitle => 'Dice roller';
+
+  @override
+  String get battleDiceCount => 'Dice';
+
+  @override
+  String get battleDiceRoll => 'Roll';
+
+  @override
+  String get battleDiceEmpty => 'Roll to see results';
+
+  @override
+  String get battleDiceTotal => 'Total';
+
+  @override
+  String get battleDiceLogRoll => 'Log this roll';
 
   @override
   String get battleDashboardNotesTitle => 'Notes';

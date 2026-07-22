@@ -27,6 +27,8 @@ import '../widgets/add_collection_entry_dialog.dart';
 
 enum _PaintState { unbuilt, assembled, primed, painted }
 
+enum _CollectionSort { nameAsc, dateAddedDesc, paintedPctDesc }
+
 int _stateCount(CollectionItemDetails entry, _PaintState state) {
   switch (state) {
     case _PaintState.unbuilt:
@@ -239,6 +241,9 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
   String? _factionFilter;
   String? _chapterFilter;
   final Set<_PaintState> _stateFilter = {};
+  _CollectionSort _sort = _CollectionSort.nameAsc;
+  bool _selectionMode = false;
+  final Set<String> _selectedIds = {};
 
   void _setFactionFilter(String? value) {
     setState(() {
@@ -247,6 +252,64 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
         _chapterFilter = null;
       }
     });
+  }
+
+  void _toggleSelectionMode() {
+    setState(() {
+      _selectionMode = !_selectionMode;
+      _selectedIds.clear();
+    });
+  }
+
+  void _toggleSelected(String id) {
+    setState(() {
+      if (_selectedIds.contains(id)) {
+        _selectedIds.remove(id);
+      } else {
+        _selectedIds.add(id);
+      }
+    });
+  }
+
+  Future<void> _markSelectedPainted(List<CollectionItemDetails> entries) async {
+    final repository = ref.read(collectionRepositoryProvider);
+    final selected = entries.where((e) => _selectedIds.contains(e.id));
+    await Future.wait([
+      for (final entry in selected)
+        repository.updateCounts(
+          entry.id,
+          assembled: entry.quantity,
+          primed: entry.quantity,
+          painted: entry.quantity,
+        ),
+    ]);
+    ref.invalidate(collectionEntriesProvider);
+    ref.invalidate(collectionSummaryProvider);
+    ref.invalidate(xpSummaryProvider);
+    if (mounted) {
+      setState(() {
+        _selectionMode = false;
+        _selectedIds.clear();
+      });
+    }
+  }
+
+  List<CollectionItemDetails> _sorted(List<CollectionItemDetails> entries) {
+    final sorted = [...entries];
+    switch (_sort) {
+      case _CollectionSort.nameAsc:
+        sorted.sort(
+          (a, b) =>
+              a.datasheetName.toLowerCase().compareTo(b.datasheetName.toLowerCase()),
+        );
+      case _CollectionSort.dateAddedDesc:
+        sorted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      case _CollectionSort.paintedPctDesc:
+        double ratio(CollectionItemDetails e) =>
+            e.quantity == 0 ? 0 : e.painted / e.quantity;
+        sorted.sort((a, b) => ratio(b).compareTo(ratio(a)));
+    }
+    return sorted;
   }
 
   bool _matches(CollectionItemDetails entry) {
@@ -320,7 +383,7 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
       );
     }
 
-    final filtered = entries.where(_matches).toList();
+    final filtered = _sorted(entries.where(_matches).toList());
 
     return SingleChildScrollView(
       padding: const EdgeInsets.only(top: 16, bottom: 24),
@@ -393,45 +456,133 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          l10n.collectionAllItemsTitle,
-                          style: AppTextStyles.title,
-                        ),
-                        PopupMenuButton<void>(
-                          tooltip: l10n.collectionExportTooltip,
-                          icon: const Icon(
-                            Icons.ios_share_rounded,
-                            color: AppColors.textSecondary,
-                            size: 20,
+                        Expanded(
+                          child: Text(
+                            l10n.collectionAllItemsTitle,
+                            style: AppTextStyles.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          color: AppColors.surface,
-                          itemBuilder: (context) => [
-                            PopupMenuItem(
-                              onTap: () => _copyExport(
-                                context,
-                                l10n,
-                                CollectionExportFormatter.toCsv(entries),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            PopupMenuButton<_CollectionSort>(
+                              tooltip: l10n.collectionSortTooltip,
+                              icon: const Icon(
+                                Icons.sort_rounded,
+                                color: AppColors.textSecondary,
+                                size: 20,
                               ),
-                              child: Text(
-                                l10n.collectionExportCsv,
-                                style: AppTextStyles.body,
+                              color: AppColors.surface,
+                              initialValue: _sort,
+                              onSelected: (value) =>
+                                  setState(() => _sort = value),
+                              itemBuilder: (context) => [
+                                PopupMenuItem(
+                                  value: _CollectionSort.nameAsc,
+                                  child: Text(
+                                    l10n.collectionSortName,
+                                    style: AppTextStyles.body,
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: _CollectionSort.dateAddedDesc,
+                                  child: Text(
+                                    l10n.collectionSortDateAdded,
+                                    style: AppTextStyles.body,
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: _CollectionSort.paintedPctDesc,
+                                  child: Text(
+                                    l10n.collectionSortPainted,
+                                    style: AppTextStyles.body,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Tooltip(
+                              message: _selectionMode
+                                  ? l10n.collectionSelectionCancel
+                                  : l10n.collectionSelectionStart,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(6),
+                                onTap: _toggleSelectionMode,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Icon(
+                                    _selectionMode
+                                        ? Icons.close_rounded
+                                        : Icons.checklist_rounded,
+                                    color: _selectionMode
+                                        ? AppColors.primary
+                                        : AppColors.textSecondary,
+                                    size: 20,
+                                  ),
+                                ),
                               ),
                             ),
-                            PopupMenuItem(
-                              onTap: () => _copyExport(
-                                context,
-                                l10n,
-                                CollectionExportFormatter.toJson(entries),
+                            PopupMenuButton<void>(
+                              tooltip: l10n.collectionExportTooltip,
+                              icon: const Icon(
+                                Icons.ios_share_rounded,
+                                color: AppColors.textSecondary,
+                                size: 20,
                               ),
-                              child: Text(
-                                l10n.collectionExportJson,
-                                style: AppTextStyles.body,
-                              ),
+                              color: AppColors.surface,
+                              itemBuilder: (context) => [
+                                PopupMenuItem(
+                                  onTap: () => _copyExport(
+                                    context,
+                                    l10n,
+                                    CollectionExportFormatter.toCsv(entries),
+                                  ),
+                                  child: Text(
+                                    l10n.collectionExportCsv,
+                                    style: AppTextStyles.body,
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  onTap: () => _copyExport(
+                                    context,
+                                    l10n,
+                                    CollectionExportFormatter.toJson(entries),
+                                  ),
+                                  child: Text(
+                                    l10n.collectionExportJson,
+                                    style: AppTextStyles.body,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
                       ],
                     ),
+                    if (_selectionMode) ...[
+                      const SizedBox(height: 8),
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 12,
+                        runSpacing: 4,
+                        children: [
+                          Text(
+                            l10n.collectionSelectionCount(
+                              _selectedIds.length,
+                            ),
+                            style: AppTextStyles.caption,
+                          ),
+                          TextButton.icon(
+                            onPressed: _selectedIds.isEmpty
+                                ? null
+                                : () => _markSelectedPainted(entries),
+                            icon: const Icon(Icons.brush_rounded, size: 16),
+                            label: Text(l10n.collectionSelectionMarkPainted),
+                          ),
+                        ],
+                      ),
+                    ],
                     const SizedBox(height: 12),
                     if (filtered.isEmpty)
                       Padding(
@@ -467,7 +618,13 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
                             ),
                         itemCount: filtered.length,
                         itemBuilder: (context, index) {
-                          return _CollectionCard(entry: filtered[index]);
+                          final entry = filtered[index];
+                          return _CollectionCard(
+                            entry: entry,
+                            selectionMode: _selectionMode,
+                            selected: _selectedIds.contains(entry.id),
+                            onToggleSelected: () => _toggleSelected(entry.id),
+                          );
                         },
                       ),
                   ],
@@ -1296,8 +1453,16 @@ Future<bool> _confirmRemoveEntry(
 
 class _CollectionCard extends ConsumerWidget {
   final CollectionItemDetails entry;
+  final bool selectionMode;
+  final bool selected;
+  final VoidCallback? onToggleSelected;
 
-  const _CollectionCard({required this.entry});
+  const _CollectionCard({
+    required this.entry,
+    this.selectionMode = false,
+    this.selected = false,
+    this.onToggleSelected,
+  });
 
   Future<void> _updateCount(WidgetRef ref, String field, int value) async {
     await ref
@@ -1356,12 +1521,15 @@ class _CollectionCard extends ConsumerWidget {
         ? 0.0
         : (entry.painted / entry.quantity).clamp(0, 1);
 
-    return Container(
+    final card = Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(
+          color: selectionMode && selected ? AppColors.primary : AppColors.border,
+          width: selectionMode && selected ? 2 : 1,
+        ),
       ),
       child: SingleChildScrollView(
         physics: const NeverScrollableScrollPhysics(),
@@ -1460,6 +1628,38 @@ class _CollectionCard extends ConsumerWidget {
           ],
         ),
       ),
+    );
+
+    if (!selectionMode) return card;
+
+    return Stack(
+      children: [
+        AbsorbPointer(child: card),
+        Positioned.fill(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(18),
+              onTap: onToggleSelected,
+              child: Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Icon(
+                    selected
+                        ? Icons.check_circle_rounded
+                        : Icons.circle_outlined,
+                    color: selected
+                        ? AppColors.primary
+                        : AppColors.textSecondary,
+                    size: 22,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

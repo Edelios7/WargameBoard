@@ -17312,6 +17312,17 @@ class $BattleEventsTable extends BattleEvents
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _opponentCpDeltaMeta = const VerificationMeta(
+    'opponentCpDelta',
+  );
+  @override
+  late final GeneratedColumn<int> opponentCpDelta = GeneratedColumn<int>(
+    'opponent_cp_delta',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -17332,6 +17343,7 @@ class $BattleEventsTable extends BattleEvents
     phase,
     label,
     cpDelta,
+    opponentCpDelta,
     createdAt,
   ];
   @override
@@ -17379,6 +17391,15 @@ class $BattleEventsTable extends BattleEvents
         cpDelta.isAcceptableOrUnknown(data['cp_delta']!, _cpDeltaMeta),
       );
     }
+    if (data.containsKey('opponent_cp_delta')) {
+      context.handle(
+        _opponentCpDeltaMeta,
+        opponentCpDelta.isAcceptableOrUnknown(
+          data['opponent_cp_delta']!,
+          _opponentCpDeltaMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -17420,6 +17441,10 @@ class $BattleEventsTable extends BattleEvents
         DriftSqlType.int,
         data['${effectivePrefix}cp_delta'],
       ),
+      opponentCpDelta: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}opponent_cp_delta'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -17445,6 +17470,11 @@ class BattleEvent extends DataClass implements Insertable<BattleEvent> {
   final BattlePhase? phase;
   final String label;
   final int? cpDelta;
+
+  /// Variation de CP adverse — distincte de [cpDelta] (mes CP) pour que
+  /// les deux sens de dépense/gain soient réversibles indépendamment
+  /// (voir [BattleDao.deleteEvent]).
+  final int? opponentCpDelta;
   final DateTime createdAt;
   const BattleEvent({
     required this.id,
@@ -17453,6 +17483,7 @@ class BattleEvent extends DataClass implements Insertable<BattleEvent> {
     this.phase,
     required this.label,
     this.cpDelta,
+    this.opponentCpDelta,
     required this.createdAt,
   });
   @override
@@ -17472,6 +17503,9 @@ class BattleEvent extends DataClass implements Insertable<BattleEvent> {
     if (!nullToAbsent || cpDelta != null) {
       map['cp_delta'] = Variable<int>(cpDelta);
     }
+    if (!nullToAbsent || opponentCpDelta != null) {
+      map['opponent_cp_delta'] = Variable<int>(opponentCpDelta);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -17490,6 +17524,9 @@ class BattleEvent extends DataClass implements Insertable<BattleEvent> {
       cpDelta: cpDelta == null && nullToAbsent
           ? const Value.absent()
           : Value(cpDelta),
+      opponentCpDelta: opponentCpDelta == null && nullToAbsent
+          ? const Value.absent()
+          : Value(opponentCpDelta),
       createdAt: Value(createdAt),
     );
   }
@@ -17508,6 +17545,7 @@ class BattleEvent extends DataClass implements Insertable<BattleEvent> {
       ),
       label: serializer.fromJson<String>(json['label']),
       cpDelta: serializer.fromJson<int?>(json['cpDelta']),
+      opponentCpDelta: serializer.fromJson<int?>(json['opponentCpDelta']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -17523,6 +17561,7 @@ class BattleEvent extends DataClass implements Insertable<BattleEvent> {
       ),
       'label': serializer.toJson<String>(label),
       'cpDelta': serializer.toJson<int?>(cpDelta),
+      'opponentCpDelta': serializer.toJson<int?>(opponentCpDelta),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -17534,6 +17573,7 @@ class BattleEvent extends DataClass implements Insertable<BattleEvent> {
     Value<BattlePhase?> phase = const Value.absent(),
     String? label,
     Value<int?> cpDelta = const Value.absent(),
+    Value<int?> opponentCpDelta = const Value.absent(),
     DateTime? createdAt,
   }) => BattleEvent(
     id: id ?? this.id,
@@ -17542,6 +17582,9 @@ class BattleEvent extends DataClass implements Insertable<BattleEvent> {
     phase: phase.present ? phase.value : this.phase,
     label: label ?? this.label,
     cpDelta: cpDelta.present ? cpDelta.value : this.cpDelta,
+    opponentCpDelta: opponentCpDelta.present
+        ? opponentCpDelta.value
+        : this.opponentCpDelta,
     createdAt: createdAt ?? this.createdAt,
   );
   BattleEvent copyWithCompanion(BattleEventsCompanion data) {
@@ -17552,6 +17595,9 @@ class BattleEvent extends DataClass implements Insertable<BattleEvent> {
       phase: data.phase.present ? data.phase.value : this.phase,
       label: data.label.present ? data.label.value : this.label,
       cpDelta: data.cpDelta.present ? data.cpDelta.value : this.cpDelta,
+      opponentCpDelta: data.opponentCpDelta.present
+          ? data.opponentCpDelta.value
+          : this.opponentCpDelta,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -17565,14 +17611,23 @@ class BattleEvent extends DataClass implements Insertable<BattleEvent> {
           ..write('phase: $phase, ')
           ..write('label: $label, ')
           ..write('cpDelta: $cpDelta, ')
+          ..write('opponentCpDelta: $opponentCpDelta, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, battleId, round, phase, label, cpDelta, createdAt);
+  int get hashCode => Object.hash(
+    id,
+    battleId,
+    round,
+    phase,
+    label,
+    cpDelta,
+    opponentCpDelta,
+    createdAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -17583,6 +17638,7 @@ class BattleEvent extends DataClass implements Insertable<BattleEvent> {
           other.phase == this.phase &&
           other.label == this.label &&
           other.cpDelta == this.cpDelta &&
+          other.opponentCpDelta == this.opponentCpDelta &&
           other.createdAt == this.createdAt);
 }
 
@@ -17593,6 +17649,7 @@ class BattleEventsCompanion extends UpdateCompanion<BattleEvent> {
   final Value<BattlePhase?> phase;
   final Value<String> label;
   final Value<int?> cpDelta;
+  final Value<int?> opponentCpDelta;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
   const BattleEventsCompanion({
@@ -17602,6 +17659,7 @@ class BattleEventsCompanion extends UpdateCompanion<BattleEvent> {
     this.phase = const Value.absent(),
     this.label = const Value.absent(),
     this.cpDelta = const Value.absent(),
+    this.opponentCpDelta = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -17612,6 +17670,7 @@ class BattleEventsCompanion extends UpdateCompanion<BattleEvent> {
     this.phase = const Value.absent(),
     required String label,
     this.cpDelta = const Value.absent(),
+    this.opponentCpDelta = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -17624,6 +17683,7 @@ class BattleEventsCompanion extends UpdateCompanion<BattleEvent> {
     Expression<String>? phase,
     Expression<String>? label,
     Expression<int>? cpDelta,
+    Expression<int>? opponentCpDelta,
     Expression<DateTime>? createdAt,
     Expression<int>? rowid,
   }) {
@@ -17634,6 +17694,7 @@ class BattleEventsCompanion extends UpdateCompanion<BattleEvent> {
       if (phase != null) 'phase': phase,
       if (label != null) 'label': label,
       if (cpDelta != null) 'cp_delta': cpDelta,
+      if (opponentCpDelta != null) 'opponent_cp_delta': opponentCpDelta,
       if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -17646,6 +17707,7 @@ class BattleEventsCompanion extends UpdateCompanion<BattleEvent> {
     Value<BattlePhase?>? phase,
     Value<String>? label,
     Value<int?>? cpDelta,
+    Value<int?>? opponentCpDelta,
     Value<DateTime>? createdAt,
     Value<int>? rowid,
   }) {
@@ -17656,6 +17718,7 @@ class BattleEventsCompanion extends UpdateCompanion<BattleEvent> {
       phase: phase ?? this.phase,
       label: label ?? this.label,
       cpDelta: cpDelta ?? this.cpDelta,
+      opponentCpDelta: opponentCpDelta ?? this.opponentCpDelta,
       createdAt: createdAt ?? this.createdAt,
       rowid: rowid ?? this.rowid,
     );
@@ -17684,6 +17747,9 @@ class BattleEventsCompanion extends UpdateCompanion<BattleEvent> {
     if (cpDelta.present) {
       map['cp_delta'] = Variable<int>(cpDelta.value);
     }
+    if (opponentCpDelta.present) {
+      map['opponent_cp_delta'] = Variable<int>(opponentCpDelta.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -17702,6 +17768,7 @@ class BattleEventsCompanion extends UpdateCompanion<BattleEvent> {
           ..write('phase: $phase, ')
           ..write('label: $label, ')
           ..write('cpDelta: $cpDelta, ')
+          ..write('opponentCpDelta: $opponentCpDelta, ')
           ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -28361,6 +28428,7 @@ typedef $$BattleEventsTableCreateCompanionBuilder =
       Value<BattlePhase?> phase,
       required String label,
       Value<int?> cpDelta,
+      Value<int?> opponentCpDelta,
       Value<DateTime> createdAt,
       Value<int> rowid,
     });
@@ -28372,6 +28440,7 @@ typedef $$BattleEventsTableUpdateCompanionBuilder =
       Value<BattlePhase?> phase,
       Value<String> label,
       Value<int?> cpDelta,
+      Value<int?> opponentCpDelta,
       Value<DateTime> createdAt,
       Value<int> rowid,
     });
@@ -28413,6 +28482,11 @@ class $$BattleEventsTableFilterComposer
 
   ColumnFilters<int> get cpDelta => $composableBuilder(
     column: $table.cpDelta,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get opponentCpDelta => $composableBuilder(
+    column: $table.opponentCpDelta,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -28461,6 +28535,11 @@ class $$BattleEventsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get opponentCpDelta => $composableBuilder(
+    column: $table.opponentCpDelta,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -28493,6 +28572,11 @@ class $$BattleEventsTableAnnotationComposer
 
   GeneratedColumn<int> get cpDelta =>
       $composableBuilder(column: $table.cpDelta, builder: (column) => column);
+
+  GeneratedColumn<int> get opponentCpDelta => $composableBuilder(
+    column: $table.opponentCpDelta,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -28535,6 +28619,7 @@ class $$BattleEventsTableTableManager
                 Value<BattlePhase?> phase = const Value.absent(),
                 Value<String> label = const Value.absent(),
                 Value<int?> cpDelta = const Value.absent(),
+                Value<int?> opponentCpDelta = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => BattleEventsCompanion(
@@ -28544,6 +28629,7 @@ class $$BattleEventsTableTableManager
                 phase: phase,
                 label: label,
                 cpDelta: cpDelta,
+                opponentCpDelta: opponentCpDelta,
                 createdAt: createdAt,
                 rowid: rowid,
               ),
@@ -28555,6 +28641,7 @@ class $$BattleEventsTableTableManager
                 Value<BattlePhase?> phase = const Value.absent(),
                 required String label,
                 Value<int?> cpDelta = const Value.absent(),
+                Value<int?> opponentCpDelta = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => BattleEventsCompanion.insert(
@@ -28564,6 +28651,7 @@ class $$BattleEventsTableTableManager
                 phase: phase,
                 label: label,
                 cpDelta: cpDelta,
+                opponentCpDelta: opponentCpDelta,
                 createdAt: createdAt,
                 rowid: rowid,
               ),

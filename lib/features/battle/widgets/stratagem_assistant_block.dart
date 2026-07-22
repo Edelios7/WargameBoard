@@ -155,6 +155,7 @@ class _StratagemTile extends ConsumerWidget {
       battle.id,
       label: stratagem.name,
       cpDelta: mine ? -stratagem.commandPoints : null,
+      opponentCpDelta: mine ? null : -stratagem.commandPoints,
       round: battle.currentRound,
       phase: battle.currentPhase,
     );

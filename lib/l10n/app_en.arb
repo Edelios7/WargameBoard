@@ -282,6 +282,19 @@
   "collectionExportTooltip": "Export",
   "collectionExportCsv": "Copy as CSV",
   "collectionExportJson": "Copy as JSON",
+  "collectionSortTooltip": "Sort",
+  "collectionSortName": "Name (A-Z)",
+  "collectionSortDateAdded": "Date added (newest first)",
+  "collectionSortPainted": "Painted %",
+  "collectionSelectionStart": "Select multiple",
+  "collectionSelectionCancel": "Cancel selection",
+  "collectionSelectionCount": "{count} selected",
+  "@collectionSelectionCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "collectionSelectionMarkPainted": "Mark as fully painted",
   "collectionExportedToClipboard": "Collection copied to clipboard",
   "collectionEmpty": "Your collection is empty",
   "collectionQuantityLabel": "{count} owned",
@@ -650,6 +663,13 @@
   "battleDashboardAddEvent": "Add event",
   "battleDashboardEventHint": "What happened?",
   "battleDashboardEventsEmpty": "No events logged yet",
+  "battleDashboardUndoEvent": "Undo this event",
+  "battleDiceTitle": "Dice roller",
+  "battleDiceCount": "Dice",
+  "battleDiceRoll": "Roll",
+  "battleDiceEmpty": "Roll to see results",
+  "battleDiceTotal": "Total",
+  "battleDiceLogRoll": "Log this roll",
   "battleDashboardNotesTitle": "Notes",
   "battleDashboardNotesHint": "Write anything worth remembering...",
   "battleDetailTitle": "Battle recap",

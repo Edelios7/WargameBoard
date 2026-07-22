@@ -1088,6 +1088,54 @@ abstract class AppLocalizations {
   /// **'Copier en JSON'**
   String get collectionExportJson;
 
+  /// No description provided for @collectionSortTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Trier'**
+  String get collectionSortTooltip;
+
+  /// No description provided for @collectionSortName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom (A-Z)'**
+  String get collectionSortName;
+
+  /// No description provided for @collectionSortDateAdded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date d\'ajout (plus récent d\'abord)'**
+  String get collectionSortDateAdded;
+
+  /// No description provided for @collectionSortPainted.
+  ///
+  /// In fr, this message translates to:
+  /// **'% peint'**
+  String get collectionSortPainted;
+
+  /// No description provided for @collectionSelectionStart.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélection multiple'**
+  String get collectionSelectionStart;
+
+  /// No description provided for @collectionSelectionCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler la sélection'**
+  String get collectionSelectionCancel;
+
+  /// No description provided for @collectionSelectionCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} sélectionnée(s)'**
+  String collectionSelectionCount(int count);
+
+  /// No description provided for @collectionSelectionMarkPainted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Marquer entièrement peint'**
+  String get collectionSelectionMarkPainted;
+
   /// No description provided for @collectionExportedToClipboard.
   ///
   /// In fr, this message translates to:
@@ -2611,6 +2659,48 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Aucun événement enregistré pour l\'instant'**
   String get battleDashboardEventsEmpty;
+
+  /// No description provided for @battleDashboardUndoEvent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler cet événement'**
+  String get battleDashboardUndoEvent;
+
+  /// No description provided for @battleDiceTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lanceur de dés'**
+  String get battleDiceTitle;
+
+  /// No description provided for @battleDiceCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dés'**
+  String get battleDiceCount;
+
+  /// No description provided for @battleDiceRoll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lancer'**
+  String get battleDiceRoll;
+
+  /// No description provided for @battleDiceEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lance pour voir les résultats'**
+  String get battleDiceEmpty;
+
+  /// No description provided for @battleDiceTotal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total'**
+  String get battleDiceTotal;
+
+  /// No description provided for @battleDiceLogRoll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter au journal'**
+  String get battleDiceLogRoll;
 
   /// No description provided for @battleDashboardNotesTitle.
   ///

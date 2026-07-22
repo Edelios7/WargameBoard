@@ -287,6 +287,7 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
     String battleId, {
     required String label,
     int? cpDelta,
+    int? opponentCpDelta,
     int? round,
     BattlePhase? phase,
   }) async {
@@ -296,6 +297,7 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
         battleId: battleId,
         label: label,
         cpDelta: Value(cpDelta),
+        opponentCpDelta: Value(opponentCpDelta),
         round: Value(round),
         phase: Value(phase),
       ),
@@ -317,10 +319,48 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
             phase: row.phase,
             label: row.label,
             cpDelta: row.cpDelta,
+            opponentCpDelta: row.opponentCpDelta,
             createdAt: row.createdAt,
           ),
         )
         .toList();
+  }
+
+  /// Supprime un événement du journal ("annuler") — si l'événement portait
+  /// une variation de CP (mienne et/ou adverse), la variation est
+  /// annulée en sens inverse sur la partie en cours, bornée à 0.
+  Future<void> deleteEvent(String eventId) async {
+    final event = await (select(
+      battleEvents,
+    )..where((t) => t.id.equals(eventId))).getSingleOrNull();
+    if (event == null) return;
+
+    await (delete(battleEvents)..where((t) => t.id.equals(eventId))).go();
+
+    if (event.cpDelta == null && event.opponentCpDelta == null) return;
+
+    final battle = await (select(
+      battles,
+    )..where((t) => t.id.equals(event.battleId))).getSingleOrNull();
+    if (battle == null) return;
+
+    await updateLiveState(
+      event.battleId,
+      myCommandPoints: event.cpDelta == null
+          ? const Value.absent()
+          : Value(
+              ((battle.myCommandPoints ?? 0) - event.cpDelta!).clamp(
+                0,
+                1 << 30,
+              ),
+            ),
+      opponentCommandPoints: event.opponentCpDelta == null
+          ? const Value.absent()
+          : Value(
+              ((battle.opponentCommandPoints ?? 0) - event.opponentCpDelta!)
+                  .clamp(0, 1 << 30),
+            ),
+    );
   }
 
   /// Finalise une partie suivie en direct — bascule son statut à

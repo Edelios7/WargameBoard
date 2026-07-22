@@ -7,6 +7,7 @@ class BattleEventDetails {
   final BattlePhase? phase;
   final String label;
   final int? cpDelta;
+  final int? opponentCpDelta;
   final DateTime createdAt;
 
   const BattleEventDetails({
@@ -16,6 +17,7 @@ class BattleEventDetails {
     this.phase,
     required this.label,
     this.cpDelta,
+    this.opponentCpDelta,
     required this.createdAt,
   });
 }

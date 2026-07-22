@@ -168,4 +168,51 @@ void main() {
 
     expect(await database.collectionDao.listEntries(), isEmpty);
   });
+
+  testWidgets(
+      'selecting entries in bulk mode and marking them painted updates all of them',
+      (tester) async {
+    await database.collectionDao.addEntry(
+      datasheetId: 'ds-captain',
+      quantity: 3,
+    );
+    await database.collectionDao.addEntry(
+      datasheetId: 'ds-death-company-marines',
+      quantity: 5,
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    final selectionToggle = find.byIcon(Icons.checklist_rounded);
+    await tester.ensureVisible(selectionToggle);
+    await tester.pumpAndSettle();
+    await tester.tap(selectionToggle);
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.circle_outlined), findsNWidgets(2));
+    for (var i = 0; i < 2; i++) {
+      final checkbox = find.byIcon(Icons.circle_outlined).first;
+      await tester.ensureVisible(checkbox);
+      await tester.pumpAndSettle();
+      await tester.tap(checkbox);
+      await tester.pumpAndSettle();
+    }
+
+    final markPaintedButton = find.text('Marquer entièrement peint');
+    await tester.ensureVisible(markPaintedButton);
+    await tester.pumpAndSettle();
+    await tester.tap(markPaintedButton);
+    await tester.pumpAndSettle();
+
+    final entries = await database.collectionDao.listEntries();
+    for (final entry in entries) {
+      expect(entry.painted, entry.quantity);
+      expect(entry.assembled, entry.quantity);
+      expect(entry.primed, entry.quantity);
+    }
+
+    // Le mode sélection se referme automatiquement après l'action groupée.
+    expect(find.byIcon(Icons.checklist_rounded), findsOneWidget);
+  });
 }
