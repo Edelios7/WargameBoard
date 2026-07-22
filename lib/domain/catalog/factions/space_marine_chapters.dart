@@ -16,9 +16,14 @@ const spaceMarineChapterFactionNames = <String>{
 /// Vrai si [name] désigne la faction générique "Space Marines". Les
 /// données réelles importées la nomment "Space Marines (Adeptus
 /// Astartes)", d'où un test par sous-chaîne plutôt qu'une égalité
-/// stricte sur "Space Marines".
-bool isGenericSpaceMarinesFactionName(String name) =>
-    name.toLowerCase().contains('space marines');
+/// stricte sur "Space Marines" — mais "Chaos Space Marines" contient
+/// aussi cette sous-chaîne (Renégats, pas des loyalistes) : on l'exclut
+/// explicitement, sinon un filtre sur "Blood Angels" ou toute autre
+/// chapitre remonte aussi des unités Chaos Space Marines.
+bool isGenericSpaceMarinesFactionName(String name) {
+  final normalized = name.toLowerCase();
+  return normalized.contains('space marines') && !normalized.contains('chaos');
+}
 
 /// Vrai si [name] est un chapitre de Space Marines OU la faction
 /// générique "Space Marines" elle-même.
