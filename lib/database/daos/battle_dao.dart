@@ -41,6 +41,19 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
 
   static const _uuid = Uuid();
 
+  /// La table `armies` est jointe deux fois (mon armée, armée adverse) —
+  /// un alias est nécessaire pour la seconde occurrence.
+  late final $ArmiesTable _opponentArmies = alias(armies, 'opponentArmies');
+
+  List<Join> _baseJoins() => [
+    leftOuterJoin(armies, armies.id.equalsExp(battles.armyId)),
+    leftOuterJoin(
+      _opponentArmies,
+      _opponentArmies.id.equalsExp(battles.opponentArmyId),
+    ),
+    leftOuterJoin(factions, factions.id.equalsExp(battles.opponentFactionId)),
+  ];
+
   Future<String> addBattle({
     String? armyId,
     String? opponentName,
@@ -82,11 +95,14 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   BattleDetails _fromRow(TypedResult row) {
     final battle = row.readTable(battles);
     final army = row.readTableOrNull(armies);
+    final opponentArmy = row.readTableOrNull(_opponentArmies);
     final opponentFaction = row.readTableOrNull(factions);
     return BattleDetails(
       id: battle.id,
       armyId: army?.id,
       armyName: army?.name,
+      opponentArmyId: opponentArmy?.id,
+      opponentArmyName: opponentArmy?.name,
       opponentName: battle.opponentName,
       opponentFactionId: opponentFaction?.id,
       opponentFactionName: opponentFaction?.name,
@@ -115,13 +131,7 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   /// finalisée polluerait l'historique et les statistiques.
   Future<List<BattleDetails>> listBattles() async {
     final query =
-        select(battles).join([
-            leftOuterJoin(armies, armies.id.equalsExp(battles.armyId)),
-            leftOuterJoin(
-              factions,
-              factions.id.equalsExp(battles.opponentFactionId),
-            ),
-          ])
+        select(battles).join(_baseJoins())
           ..where(
             battles.status.isNull() |
                 battles.status.equalsValue(BattleStatus.completed),
@@ -135,13 +145,7 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   /// Prochaine partie programmée (date future, sans résultat renseigné).
   Future<BattleDetails?> getNextUpcoming() async {
     final query =
-        select(battles).join([
-            leftOuterJoin(armies, armies.id.equalsExp(battles.armyId)),
-            leftOuterJoin(
-              factions,
-              factions.id.equalsExp(battles.opponentFactionId),
-            ),
-          ])
+        select(battles).join(_baseJoins())
           ..where(
             battles.playedAt.isBiggerThanValue(DateTime.now()) &
                 battles.result.isNull(),
@@ -156,13 +160,7 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   /// Dernière partie jouée (résultat renseigné), la plus récente.
   Future<BattleDetails?> getLastPlayed() async {
     final query =
-        select(battles).join([
-            leftOuterJoin(armies, armies.id.equalsExp(battles.armyId)),
-            leftOuterJoin(
-              factions,
-              factions.id.equalsExp(battles.opponentFactionId),
-            ),
-          ])
+        select(battles).join(_baseJoins())
           ..where(battles.result.isNotNull())
           ..orderBy([OrderingTerm.desc(battles.playedAt)])
           ..limit(1);
@@ -179,6 +177,7 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   /// round 1, phase Commandement, CP à 0.
   Future<String> startBattle({
     String? armyId,
+    String? opponentArmyId,
     String? opponentName,
     String? opponentFactionId,
     int? pointsLimit,
@@ -192,6 +191,7 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
       BattlesCompanion.insert(
         id: id,
         armyId: Value(armyId),
+        opponentArmyId: Value(opponentArmyId),
         opponentName: Value(opponentName),
         opponentFactionId: Value(opponentFactionId),
         missionName: Value(missionName),
@@ -215,13 +215,7 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   /// de l'app.
   Future<BattleDetails?> getActiveBattle() async {
     final query =
-        select(battles).join([
-            leftOuterJoin(armies, armies.id.equalsExp(battles.armyId)),
-            leftOuterJoin(
-              factions,
-              factions.id.equalsExp(battles.opponentFactionId),
-            ),
-          ])
+        select(battles).join(_baseJoins())
           ..where(
             battles.status.equalsValue(BattleStatus.setup) |
                 battles.status.equalsValue(BattleStatus.active),

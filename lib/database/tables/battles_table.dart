@@ -21,6 +21,14 @@ class Battles extends Table {
 
   TextColumn get armyId => text().nullable().references(Armies, #id)();
 
+  /// Armée existante (parmi les miennes) utilisée pour représenter la
+  /// liste de l'adversaire, quand elle est connue/enregistrée — permet
+  /// de suivre son roster (unités détruites, bonus/malus) comme pour
+  /// [armyId]. Optionnel : [opponentName]/[opponentFactionId] restent le
+  /// mode "texte libre" par défaut.
+  TextColumn get opponentArmyId =>
+      text().nullable().references(Armies, #id)();
+
   TextColumn get opponentName => text().nullable()();
 
   TextColumn get opponentFactionId =>

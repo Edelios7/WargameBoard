@@ -75,6 +75,7 @@ class BattleRepository {
 
   Future<String> startBattle({
     String? armyId,
+    String? opponentArmyId,
     String? opponentName,
     String? opponentFactionId,
     int? pointsLimit,
@@ -85,6 +86,7 @@ class BattleRepository {
   }) {
     return database.battleDao.startBattle(
       armyId: armyId,
+      opponentArmyId: opponentArmyId,
       opponentName: opponentName,
       opponentFactionId: opponentFactionId,
       pointsLimit: pointsLimit,

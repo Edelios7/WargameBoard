@@ -4,6 +4,8 @@ class BattleDetails {
   final String id;
   final String? armyId;
   final String? armyName;
+  final String? opponentArmyId;
+  final String? opponentArmyName;
   final String? opponentName;
   final String? opponentFactionId;
   final String? opponentFactionName;
@@ -32,6 +34,8 @@ class BattleDetails {
     required this.id,
     this.armyId,
     this.armyName,
+    this.opponentArmyId,
+    this.opponentArmyName,
     this.opponentName,
     this.opponentFactionId,
     this.opponentFactionName,

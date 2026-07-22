@@ -87,6 +87,30 @@ void main() {
       expect(history, isEmpty);
     });
 
+    test(
+      'startBattle resolves both my army and the opponent army name',
+      () async {
+        final myArmyId = await database.armyDao.createArmy(
+          name: 'Ma liste',
+          factionId: seedFactionId,
+        );
+        final opponentArmyId = await database.armyDao.createArmy(
+          name: 'Liste de Marc',
+          factionId: seedFactionId,
+        );
+
+        await database.battleDao.startBattle(
+          armyId: myArmyId,
+          opponentArmyId: opponentArmyId,
+        );
+
+        final active = await database.battleDao.getActiveBattle();
+        expect(active!.armyName, 'Ma liste');
+        expect(active.opponentArmyId, opponentArmyId);
+        expect(active.opponentArmyName, 'Liste de Marc');
+      },
+    );
+
     test('advancePhase walks through phases then bumps the round', () async {
       final id = await database.battleDao.startBattle(opponentName: 'Marc');
 

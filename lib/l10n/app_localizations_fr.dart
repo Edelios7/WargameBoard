@@ -1251,13 +1251,26 @@ class AppLocalizationsFr extends AppLocalizations {
   String get battleDashboardNextPhase => 'Phase suivante';
 
   @override
+  String get battleDashboardScoreTitle => 'Score';
+
+  @override
+  String get battleDashboardCpTitle => 'Command points';
+
+  @override
   String get battleDashboardMyCp => 'Mes PC';
 
   @override
   String get battleDashboardOpponentCp => 'PC adverses';
 
   @override
-  String get battleDashboardRoster => 'Roster';
+  String get battleOpponentArmyLabel =>
+      'Armée adverse (optionnel, parmi tes armées enregistrées)';
+
+  @override
+  String get battleDashboardRoster => 'Mon roster';
+
+  @override
+  String get battleDashboardOpponentRoster => 'Roster adverse';
 
   @override
   String get battleUnitDestroyed => 'Détruite';

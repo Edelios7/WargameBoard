@@ -55,6 +55,23 @@ class BattleDashboard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final round = battle.currentRound ?? 1;
 
+    final rosters = [
+      if (battle.armyId != null)
+        _RosterBlock(
+          battleId: battle.id,
+          armyId: battle.armyId!,
+          title: AppLocalizations.of(context)!.battleDashboardRoster,
+          accentColor: AppColors.primary,
+        ),
+      if (battle.opponentArmyId != null)
+        _RosterBlock(
+          battleId: battle.id,
+          armyId: battle.opponentArmyId!,
+          title: AppLocalizations.of(context)!.battleDashboardOpponentRoster,
+          accentColor: AppColors.info,
+        ),
+    ];
+
     return Padding(
       padding: const EdgeInsets.all(28),
       child: Column(
@@ -62,24 +79,52 @@ class BattleDashboard extends ConsumerWidget {
         children: [
           _Header(battle: battle, round: round),
           const SizedBox(height: 20),
+          _TopStatsRow(battle: battle),
+          const SizedBox(height: 16),
+          _PhaseBlock(battle: battle),
+          const SizedBox(height: 16),
           Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _ScoreBlock(battle: battle),
-                  const SizedBox(height: 16),
-                  _PhaseBlock(battle: battle),
-                  const SizedBox(height: 16),
-                  _CommandPointsBlock(battle: battle),
-                  if (battle.armyId != null) ...[
-                    const SizedBox(height: 16),
-                    _RosterBlock(battleId: battle.id, armyId: battle.armyId!),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final leftColumn = SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (final roster in rosters) ...[
+                        roster,
+                        const SizedBox(height: 16),
+                      ],
+                    ],
+                  ),
+                );
+                final rightColumn = SingleChildScrollView(
+                  child: _EventsBlock(battleId: battle.id),
+                );
+
+                if (constraints.maxWidth < 900 || rosters.isEmpty) {
+                  return SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (final roster in rosters) ...[
+                          roster,
+                          const SizedBox(height: 16),
+                        ],
+                        _EventsBlock(battleId: battle.id),
+                      ],
+                    ),
+                  );
+                }
+
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 3, child: leftColumn),
+                    const SizedBox(width: 20),
+                    Expanded(flex: 2, child: rightColumn),
                   ],
-                  const SizedBox(height: 16),
-                  _EventsBlock(battleId: battle.id),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],
@@ -97,56 +142,173 @@ class _Header extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final infoLine = [
+      if (battle.missionName != null) battle.missionName!,
+      if (battle.missionPack != null) battle.missionPack!,
+      if (battle.terrain != null) battle.terrain!,
+      if (battle.pointsLimit != null) l10n.pointsSuffix(battle.pointsLimit!),
+    ].join(' · ');
 
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                battle.opponentName ?? l10n.battleOpponentLabel,
-                style: AppTextStyles.heading,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: _SideLabel(
+                title: battle.armyName ?? l10n.battleArmyLabel,
+                color: AppColors.primary,
+                alignEnd: false,
               ),
-              const SizedBox(height: 4),
-              Text(
-                [
-                  if (battle.opponentFactionName != null)
-                    battle.opponentFactionName!,
-                  if (battle.missionName != null) battle.missionName!,
-                ].join(' · '),
-                style: AppTextStyles.caption,
-              ),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: .16),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Text(
-            l10n.battleDashboardRound(round),
-            style: AppTextStyles.body.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w700,
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                'VS',
+                style: AppTextStyles.caption.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+            Expanded(
+              child: _SideLabel(
+                title:
+                    battle.opponentArmyName ??
+                    battle.opponentName ??
+                    l10n.battleOpponentLabel,
+                subtitle: battle.opponentFactionName,
+                color: AppColors.info,
+                alignEnd: true,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 12),
-        FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.surfaceElevated,
-          ),
-          onPressed: () => showDialog(
-            context: context,
-            builder: (_) => _FinishBattleDialog(battle: battle),
-          ),
-          child: Text(AppLocalizations.of(context)!.battleDashboardFinish),
+        if (infoLine.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Center(child: Text(infoLine, style: AppTextStyles.caption)),
+        ],
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: .16),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                l10n.battleDashboardRound(round),
+                style: AppTextStyles.body.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            const Spacer(),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.surfaceElevated,
+              ),
+              onPressed: () => showDialog(
+                context: context,
+                builder: (_) => _FinishBattleDialog(battle: battle),
+              ),
+              child: Text(l10n.battleDashboardFinish),
+            ),
+          ],
         ),
       ],
+    );
+  }
+}
+
+class _SideLabel extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+  final Color color;
+  final bool alignEnd;
+
+  const _SideLabel({
+    required this.title,
+    this.subtitle,
+    required this.color,
+    required this.alignEnd,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: alignEnd
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: alignEnd
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.start,
+          children: [
+            if (!alignEnd) _dot(),
+            if (!alignEnd) const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                title,
+                style: AppTextStyles.heading,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (alignEnd) const SizedBox(width: 6),
+            if (alignEnd) _dot(),
+          ],
+        ),
+        if (subtitle != null)
+          Text(
+            subtitle!,
+            style: AppTextStyles.caption,
+            overflow: TextOverflow.ellipsis,
+          ),
+      ],
+    );
+  }
+
+  Widget _dot() => Container(
+    width: 8,
+    height: 8,
+    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+  );
+}
+
+/// Score et command points l'un à côté de l'autre — les deux chiffres
+/// qu'on ajuste le plus souvent pendant la partie, regroupés pour rester
+/// scannables d'un coup d'œil au lieu d'empiler deux cartes pleine
+/// largeur.
+class _TopStatsRow extends StatelessWidget {
+  final BattleDetails battle;
+
+  const _TopStatsRow({required this.battle});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final wide = constraints.maxWidth > 560;
+        final score = _ScoreBlock(battle: battle);
+        final cp = _CommandPointsBlock(battle: battle);
+        if (!wide) {
+          return Column(children: [score, const SizedBox(height: 16), cp]);
+        }
+        return IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: score),
+              const SizedBox(width: 16),
+              Expanded(child: cp),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -177,24 +339,34 @@ class _ScoreBlock extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     return AppCard(
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: _ScoreColumn(
-              label: l10n.battleMyScoreLabel,
-              value: battle.myScore ?? 0,
-              onIncrement: () => _adjust(ref, mine: true, delta: 1),
-              onDecrement: () => _adjust(ref, mine: true, delta: -1),
-            ),
+          Text(
+            l10n.battleDashboardScoreTitle.toUpperCase(),
+            style: AppTextStyles.eyebrow,
           ),
-          Container(width: 1, height: 48, color: AppColors.border),
-          Expanded(
-            child: _ScoreColumn(
-              label: l10n.battleOpponentScoreLabel,
-              value: battle.opponentScore ?? 0,
-              onIncrement: () => _adjust(ref, mine: false, delta: 1),
-              onDecrement: () => _adjust(ref, mine: false, delta: -1),
-            ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _ScoreColumn(
+                  label: l10n.battleMyScoreLabel,
+                  value: battle.myScore ?? 0,
+                  onIncrement: () => _adjust(ref, mine: true, delta: 1),
+                  onDecrement: () => _adjust(ref, mine: true, delta: -1),
+                ),
+              ),
+              Container(width: 1, height: 48, color: AppColors.border),
+              Expanded(
+                child: _ScoreColumn(
+                  label: l10n.battleOpponentScoreLabel,
+                  value: battle.opponentScore ?? 0,
+                  onIncrement: () => _adjust(ref, mine: false, delta: 1),
+                  onDecrement: () => _adjust(ref, mine: false, delta: -1),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -386,24 +558,34 @@ class _CommandPointsBlock extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     return AppCard(
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: _ScoreColumn(
-              label: l10n.battleDashboardMyCp,
-              value: battle.myCommandPoints ?? 0,
-              onIncrement: () => _adjust(ref, mine: true, delta: 1),
-              onDecrement: () => _adjust(ref, mine: true, delta: -1),
-            ),
+          Text(
+            l10n.battleDashboardCpTitle.toUpperCase(),
+            style: AppTextStyles.eyebrow,
           ),
-          Container(width: 1, height: 48, color: AppColors.border),
-          Expanded(
-            child: _ScoreColumn(
-              label: l10n.battleDashboardOpponentCp,
-              value: battle.opponentCommandPoints ?? 0,
-              onIncrement: () => _adjust(ref, mine: false, delta: 1),
-              onDecrement: () => _adjust(ref, mine: false, delta: -1),
-            ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _ScoreColumn(
+                  label: l10n.battleDashboardMyCp,
+                  value: battle.myCommandPoints ?? 0,
+                  onIncrement: () => _adjust(ref, mine: true, delta: 1),
+                  onDecrement: () => _adjust(ref, mine: true, delta: -1),
+                ),
+              ),
+              Container(width: 1, height: 48, color: AppColors.border),
+              Expanded(
+                child: _ScoreColumn(
+                  label: l10n.battleDashboardOpponentCp,
+                  value: battle.opponentCommandPoints ?? 0,
+                  onIncrement: () => _adjust(ref, mine: false, delta: 1),
+                  onDecrement: () => _adjust(ref, mine: false, delta: -1),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -434,12 +616,18 @@ String _statLabel(AppLocalizations l10n, BattleStatKey key) {
 class _RosterBlock extends ConsumerWidget {
   final String battleId;
   final String armyId;
+  final String title;
+  final Color accentColor;
 
-  const _RosterBlock({required this.battleId, required this.armyId});
+  const _RosterBlock({
+    required this.battleId,
+    required this.armyId,
+    required this.title,
+    required this.accentColor,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
     final armyAsync = ref.watch(armyByIdProvider(armyId));
     final statesAsync = ref.watch(battleUnitStatesProvider(battleId));
     final modifiersAsync = ref.watch(battleUnitModifiersProvider(battleId));
@@ -448,9 +636,19 @@ class _RosterBlock extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.battleDashboardRoster.toUpperCase(),
-            style: AppTextStyles.eyebrow,
+          Row(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: accentColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(title.toUpperCase(), style: AppTextStyles.eyebrow),
+            ],
           ),
           const SizedBox(height: 12),
           armyAsync.when(
@@ -481,6 +679,7 @@ class _RosterBlock extends ConsumerWidget {
                       modelCount: unit.modelCount,
                       destroyed: destroyedIds.contains(unit.id),
                       modifierCount: modifierCounts[unit.id] ?? 0,
+                      accentColor: accentColor,
                       onTap: () => showDialog(
                         context: context,
                         builder: (_) => _UnitManageDialog(
@@ -505,6 +704,7 @@ class _RosterChip extends StatelessWidget {
   final int modelCount;
   final bool destroyed;
   final int modifierCount;
+  final Color accentColor;
   final VoidCallback onTap;
 
   const _RosterChip({
@@ -512,6 +712,7 @@ class _RosterChip extends StatelessWidget {
     required this.modelCount,
     required this.destroyed,
     required this.modifierCount,
+    required this.accentColor,
     required this.onTap,
   });
 
@@ -561,13 +762,13 @@ class _RosterChip extends StatelessWidget {
                       vertical: 1,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: .18),
+                      color: accentColor.withValues(alpha: .18),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
                       '$modifierCount',
                       style: AppTextStyles.caption.copyWith(
-                        color: AppColors.primary,
+                        color: accentColor,
                         fontWeight: FontWeight.w700,
                       ),
                     ),

@@ -15918,6 +15918,17 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _opponentArmyIdMeta = const VerificationMeta(
+    'opponentArmyId',
+  );
+  @override
+  late final GeneratedColumn<String> opponentArmyId = GeneratedColumn<String>(
+    'opponent_army_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _opponentNameMeta = const VerificationMeta(
     'opponentName',
   );
@@ -16138,6 +16149,7 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
   List<GeneratedColumn> get $columns => [
     id,
     armyId,
+    opponentArmyId,
     opponentName,
     opponentFactionId,
     location,
@@ -16180,6 +16192,15 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
       context.handle(
         _armyIdMeta,
         armyId.isAcceptableOrUnknown(data['army_id']!, _armyIdMeta),
+      );
+    }
+    if (data.containsKey('opponent_army_id')) {
+      context.handle(
+        _opponentArmyIdMeta,
+        opponentArmyId.isAcceptableOrUnknown(
+          data['opponent_army_id']!,
+          _opponentArmyIdMeta,
+        ),
       );
     }
     if (data.containsKey('opponent_name')) {
@@ -16325,6 +16346,10 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
         DriftSqlType.string,
         data['${effectivePrefix}army_id'],
       ),
+      opponentArmyId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}opponent_army_id'],
+      ),
       opponentName: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}opponent_name'],
@@ -16444,6 +16469,13 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
 class Battle extends DataClass implements Insertable<Battle> {
   final String id;
   final String? armyId;
+
+  /// Armée existante (parmi les miennes) utilisée pour représenter la
+  /// liste de l'adversaire, quand elle est connue/enregistrée — permet
+  /// de suivre son roster (unités détruites, bonus/malus) comme pour
+  /// [armyId]. Optionnel : [opponentName]/[opponentFactionId] restent le
+  /// mode "texte libre" par défaut.
+  final String? opponentArmyId;
   final String? opponentName;
   final String? opponentFactionId;
   final String? location;
@@ -16469,6 +16501,7 @@ class Battle extends DataClass implements Insertable<Battle> {
   const Battle({
     required this.id,
     this.armyId,
+    this.opponentArmyId,
     this.opponentName,
     this.opponentFactionId,
     this.location,
@@ -16496,6 +16529,9 @@ class Battle extends DataClass implements Insertable<Battle> {
     map['id'] = Variable<String>(id);
     if (!nullToAbsent || armyId != null) {
       map['army_id'] = Variable<String>(armyId);
+    }
+    if (!nullToAbsent || opponentArmyId != null) {
+      map['opponent_army_id'] = Variable<String>(opponentArmyId);
     }
     if (!nullToAbsent || opponentName != null) {
       map['opponent_name'] = Variable<String>(opponentName);
@@ -16568,6 +16604,9 @@ class Battle extends DataClass implements Insertable<Battle> {
       armyId: armyId == null && nullToAbsent
           ? const Value.absent()
           : Value(armyId),
+      opponentArmyId: opponentArmyId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(opponentArmyId),
       opponentName: opponentName == null && nullToAbsent
           ? const Value.absent()
           : Value(opponentName),
@@ -16633,6 +16672,7 @@ class Battle extends DataClass implements Insertable<Battle> {
     return Battle(
       id: serializer.fromJson<String>(json['id']),
       armyId: serializer.fromJson<String?>(json['armyId']),
+      opponentArmyId: serializer.fromJson<String?>(json['opponentArmyId']),
       opponentName: serializer.fromJson<String?>(json['opponentName']),
       opponentFactionId: serializer.fromJson<String?>(
         json['opponentFactionId'],
@@ -16673,6 +16713,7 @@ class Battle extends DataClass implements Insertable<Battle> {
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'armyId': serializer.toJson<String?>(armyId),
+      'opponentArmyId': serializer.toJson<String?>(opponentArmyId),
       'opponentName': serializer.toJson<String?>(opponentName),
       'opponentFactionId': serializer.toJson<String?>(opponentFactionId),
       'location': serializer.toJson<String?>(location),
@@ -16707,6 +16748,7 @@ class Battle extends DataClass implements Insertable<Battle> {
   Battle copyWith({
     String? id,
     Value<String?> armyId = const Value.absent(),
+    Value<String?> opponentArmyId = const Value.absent(),
     Value<String?> opponentName = const Value.absent(),
     Value<String?> opponentFactionId = const Value.absent(),
     Value<String?> location = const Value.absent(),
@@ -16730,6 +16772,9 @@ class Battle extends DataClass implements Insertable<Battle> {
   }) => Battle(
     id: id ?? this.id,
     armyId: armyId.present ? armyId.value : this.armyId,
+    opponentArmyId: opponentArmyId.present
+        ? opponentArmyId.value
+        : this.opponentArmyId,
     opponentName: opponentName.present ? opponentName.value : this.opponentName,
     opponentFactionId: opponentFactionId.present
         ? opponentFactionId.value
@@ -16763,6 +16808,9 @@ class Battle extends DataClass implements Insertable<Battle> {
     return Battle(
       id: data.id.present ? data.id.value : this.id,
       armyId: data.armyId.present ? data.armyId.value : this.armyId,
+      opponentArmyId: data.opponentArmyId.present
+          ? data.opponentArmyId.value
+          : this.opponentArmyId,
       opponentName: data.opponentName.present
           ? data.opponentName.value
           : this.opponentName,
@@ -16813,6 +16861,7 @@ class Battle extends DataClass implements Insertable<Battle> {
     return (StringBuffer('Battle(')
           ..write('id: $id, ')
           ..write('armyId: $armyId, ')
+          ..write('opponentArmyId: $opponentArmyId, ')
           ..write('opponentName: $opponentName, ')
           ..write('opponentFactionId: $opponentFactionId, ')
           ..write('location: $location, ')
@@ -16841,6 +16890,7 @@ class Battle extends DataClass implements Insertable<Battle> {
   int get hashCode => Object.hashAll([
     id,
     armyId,
+    opponentArmyId,
     opponentName,
     opponentFactionId,
     location,
@@ -16868,6 +16918,7 @@ class Battle extends DataClass implements Insertable<Battle> {
       (other is Battle &&
           other.id == this.id &&
           other.armyId == this.armyId &&
+          other.opponentArmyId == this.opponentArmyId &&
           other.opponentName == this.opponentName &&
           other.opponentFactionId == this.opponentFactionId &&
           other.location == this.location &&
@@ -16893,6 +16944,7 @@ class Battle extends DataClass implements Insertable<Battle> {
 class BattlesCompanion extends UpdateCompanion<Battle> {
   final Value<String> id;
   final Value<String?> armyId;
+  final Value<String?> opponentArmyId;
   final Value<String?> opponentName;
   final Value<String?> opponentFactionId;
   final Value<String?> location;
@@ -16917,6 +16969,7 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
   const BattlesCompanion({
     this.id = const Value.absent(),
     this.armyId = const Value.absent(),
+    this.opponentArmyId = const Value.absent(),
     this.opponentName = const Value.absent(),
     this.opponentFactionId = const Value.absent(),
     this.location = const Value.absent(),
@@ -16942,6 +16995,7 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
   BattlesCompanion.insert({
     required String id,
     this.armyId = const Value.absent(),
+    this.opponentArmyId = const Value.absent(),
     this.opponentName = const Value.absent(),
     this.opponentFactionId = const Value.absent(),
     this.location = const Value.absent(),
@@ -16967,6 +17021,7 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
   static Insertable<Battle> custom({
     Expression<String>? id,
     Expression<String>? armyId,
+    Expression<String>? opponentArmyId,
     Expression<String>? opponentName,
     Expression<String>? opponentFactionId,
     Expression<String>? location,
@@ -16992,6 +17047,7 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (armyId != null) 'army_id': armyId,
+      if (opponentArmyId != null) 'opponent_army_id': opponentArmyId,
       if (opponentName != null) 'opponent_name': opponentName,
       if (opponentFactionId != null) 'opponent_faction_id': opponentFactionId,
       if (location != null) 'location': location,
@@ -17020,6 +17076,7 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
   BattlesCompanion copyWith({
     Value<String>? id,
     Value<String?>? armyId,
+    Value<String?>? opponentArmyId,
     Value<String?>? opponentName,
     Value<String?>? opponentFactionId,
     Value<String?>? location,
@@ -17045,6 +17102,7 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     return BattlesCompanion(
       id: id ?? this.id,
       armyId: armyId ?? this.armyId,
+      opponentArmyId: opponentArmyId ?? this.opponentArmyId,
       opponentName: opponentName ?? this.opponentName,
       opponentFactionId: opponentFactionId ?? this.opponentFactionId,
       location: location ?? this.location,
@@ -17078,6 +17136,9 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     }
     if (armyId.present) {
       map['army_id'] = Variable<String>(armyId.value);
+    }
+    if (opponentArmyId.present) {
+      map['opponent_army_id'] = Variable<String>(opponentArmyId.value);
     }
     if (opponentName.present) {
       map['opponent_name'] = Variable<String>(opponentName.value);
@@ -17160,6 +17221,7 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     return (StringBuffer('BattlesCompanion(')
           ..write('id: $id, ')
           ..write('armyId: $armyId, ')
+          ..write('opponentArmyId: $opponentArmyId, ')
           ..write('opponentName: $opponentName, ')
           ..write('opponentFactionId: $opponentFactionId, ')
           ..write('location: $location, ')
@@ -27730,6 +27792,7 @@ typedef $$BattlesTableCreateCompanionBuilder =
     BattlesCompanion Function({
       required String id,
       Value<String?> armyId,
+      Value<String?> opponentArmyId,
       Value<String?> opponentName,
       Value<String?> opponentFactionId,
       Value<String?> location,
@@ -27756,6 +27819,7 @@ typedef $$BattlesTableUpdateCompanionBuilder =
     BattlesCompanion Function({
       Value<String> id,
       Value<String?> armyId,
+      Value<String?> opponentArmyId,
       Value<String?> opponentName,
       Value<String?> opponentFactionId,
       Value<String?> location,
@@ -27795,6 +27859,11 @@ class $$BattlesTableFilterComposer
 
   ColumnFilters<String> get armyId => $composableBuilder(
     column: $table.armyId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get opponentArmyId => $composableBuilder(
+    column: $table.opponentArmyId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -27922,6 +27991,11 @@ class $$BattlesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get opponentArmyId => $composableBuilder(
+    column: $table.opponentArmyId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get opponentName => $composableBuilder(
     column: $table.opponentName,
     builder: (column) => ColumnOrderings(column),
@@ -28038,6 +28112,11 @@ class $$BattlesTableAnnotationComposer
   GeneratedColumn<String> get armyId =>
       $composableBuilder(column: $table.armyId, builder: (column) => column);
 
+  GeneratedColumn<String> get opponentArmyId => $composableBuilder(
+    column: $table.opponentArmyId,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get opponentName => $composableBuilder(
     column: $table.opponentName,
     builder: (column) => column,
@@ -28152,6 +28231,7 @@ class $$BattlesTableTableManager
               ({
                 Value<String> id = const Value.absent(),
                 Value<String?> armyId = const Value.absent(),
+                Value<String?> opponentArmyId = const Value.absent(),
                 Value<String?> opponentName = const Value.absent(),
                 Value<String?> opponentFactionId = const Value.absent(),
                 Value<String?> location = const Value.absent(),
@@ -28176,6 +28256,7 @@ class $$BattlesTableTableManager
               }) => BattlesCompanion(
                 id: id,
                 armyId: armyId,
+                opponentArmyId: opponentArmyId,
                 opponentName: opponentName,
                 opponentFactionId: opponentFactionId,
                 location: location,
@@ -28202,6 +28283,7 @@ class $$BattlesTableTableManager
               ({
                 required String id,
                 Value<String?> armyId = const Value.absent(),
+                Value<String?> opponentArmyId = const Value.absent(),
                 Value<String?> opponentName = const Value.absent(),
                 Value<String?> opponentFactionId = const Value.absent(),
                 Value<String?> location = const Value.absent(),
@@ -28226,6 +28308,7 @@ class $$BattlesTableTableManager
               }) => BattlesCompanion.insert(
                 id: id,
                 armyId: armyId,
+                opponentArmyId: opponentArmyId,
                 opponentName: opponentName,
                 opponentFactionId: opponentFactionId,
                 location: location,

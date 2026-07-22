@@ -30,6 +30,7 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
   final _missionPackController = TextEditingController();
   final _terrainController = TextEditingController();
   String? _armyId;
+  String? _opponentArmyId;
   String? _opponentFactionId;
   BattleType _type = BattleType.matched;
 
@@ -58,6 +59,7 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
         .read(battleRepositoryProvider)
         .startBattle(
           armyId: _armyId,
+          opponentArmyId: _opponentArmyId,
           opponentName: _opponentController.text.trim().isEmpty
               ? null
               : _opponentController.text.trim(),
@@ -151,6 +153,37 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
                     style: AppTextStyles.body,
                     onSubmitted: (_) => _start(),
                     decoration: _decoration(l10n.battleOpponentLabel),
+                  ),
+                  const SizedBox(height: 12),
+                  armiesAsync.when(
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, __) => const SizedBox.shrink(),
+                    data: (armies) => DropdownButtonFormField<String?>(
+                      initialValue: _opponentArmyId,
+                      isExpanded: true,
+                      dropdownColor: AppColors.surface,
+                      style: AppTextStyles.body,
+                      decoration: _decoration(l10n.battleOpponentArmyLabel),
+                      items: [
+                        DropdownMenuItem<String?>(
+                          value: null,
+                          child: Text(l10n.battleArmyNone),
+                        ),
+                        ...armies
+                            .where((army) => army.id != _armyId)
+                            .map(
+                              (army) => DropdownMenuItem<String?>(
+                                value: army.id,
+                                child: Text(
+                                  army.name,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                      ],
+                      onChanged: (value) =>
+                          setState(() => _opponentArmyId = value),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   factionsAsync.when(

@@ -2384,6 +2384,18 @@ abstract class AppLocalizations {
   /// **'Phase suivante'**
   String get battleDashboardNextPhase;
 
+  /// No description provided for @battleDashboardScoreTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Score'**
+  String get battleDashboardScoreTitle;
+
+  /// No description provided for @battleDashboardCpTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Command points'**
+  String get battleDashboardCpTitle;
+
   /// No description provided for @battleDashboardMyCp.
   ///
   /// In fr, this message translates to:
@@ -2396,11 +2408,23 @@ abstract class AppLocalizations {
   /// **'PC adverses'**
   String get battleDashboardOpponentCp;
 
+  /// No description provided for @battleOpponentArmyLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Armée adverse (optionnel, parmi tes armées enregistrées)'**
+  String get battleOpponentArmyLabel;
+
   /// No description provided for @battleDashboardRoster.
   ///
   /// In fr, this message translates to:
-  /// **'Roster'**
+  /// **'Mon roster'**
   String get battleDashboardRoster;
+
+  /// No description provided for @battleDashboardOpponentRoster.
+  ///
+  /// In fr, this message translates to:
+  /// **'Roster adverse'**
+  String get battleDashboardOpponentRoster;
 
   /// No description provided for @battleUnitDestroyed.
   ///

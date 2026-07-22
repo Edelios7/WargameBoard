@@ -94,8 +94,16 @@ class _BattleHistoryView extends ConsumerWidget {
                 );
               }
               return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [title, controls],
+                children: [
+                  Expanded(child: title),
+                  const SizedBox(width: 12),
+                  Flexible(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: controls,
+                    ),
+                  ),
+                ],
               );
             },
           ),
