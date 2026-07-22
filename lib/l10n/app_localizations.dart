@@ -2450,6 +2450,24 @@ abstract class AppLocalizations {
   /// **'Phase suivante'**
   String get battleDashboardNextPhase;
 
+  /// No description provided for @battleEndOfRoundTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fin de round'**
+  String get battleEndOfRoundTitle;
+
+  /// No description provided for @battleEndOfRoundReminder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Avant de continuer, pense à :\n• Marquer tes points d\'objectifs primaire/secondaires\n• Vérifier le Choc des bataillons pour les unités affaiblies\n• Retirer les effets temporaires qui expirent ce round\n• Noter les pertes de ce round'**
+  String get battleEndOfRoundReminder;
+
+  /// No description provided for @battleEndOfRoundDismiss.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compris'**
+  String get battleEndOfRoundDismiss;
+
   /// No description provided for @battleDashboardScoreTitle.
   ///
   /// In fr, this message translates to:

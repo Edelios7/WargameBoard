@@ -1295,6 +1295,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get battleDashboardNextPhase => 'Phase suivante';
 
   @override
+  String get battleEndOfRoundTitle => 'Fin de round';
+
+  @override
+  String get battleEndOfRoundReminder =>
+      'Avant de continuer, pense à :\n• Marquer tes points d\'objectifs primaire/secondaires\n• Vérifier le Choc des bataillons pour les unités affaiblies\n• Retirer les effets temporaires qui expirent ce round\n• Noter les pertes de ce round';
+
+  @override
+  String get battleEndOfRoundDismiss => 'Compris';
+
+  @override
   String get battleDashboardScoreTitle => 'Score';
 
   @override

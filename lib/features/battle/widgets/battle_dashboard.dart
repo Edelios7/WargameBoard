@@ -574,10 +574,17 @@ class _PhaseBlockState extends ConsumerState<_PhaseBlock> {
             child: FilledButton.icon(
               style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
               onPressed: () async {
+                final isEndOfRound = currentIndex == _phaseOrder.length - 1;
                 await ref
                     .read(battleRepositoryProvider)
                     .advancePhase(battle.id);
                 ref.invalidate(activeBattleProvider);
+                if (isEndOfRound && context.mounted) {
+                  await showDialog(
+                    context: context,
+                    builder: (_) => _EndOfRoundReminderDialog(l10n: l10n),
+                  );
+                }
               },
               icon: const Icon(Icons.arrow_forward_rounded),
               label: Text(l10n.battleDashboardNextPhase),
@@ -632,6 +639,52 @@ class _PhaseChip extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Rappel non bloquant affiché en passant de la phase de Moral au round
+/// suivant — check-list générique (mes propres mots), pas de texte tiré
+/// du livre de règles.
+class _EndOfRoundReminderDialog extends StatelessWidget {
+  final AppLocalizations l10n;
+
+  const _EndOfRoundReminderDialog({required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: AppColors.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.flag_rounded, color: AppColors.primary),
+                const SizedBox(width: 10),
+                Text(l10n.battleEndOfRoundTitle, style: AppTextStyles.title),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(l10n.battleEndOfRoundReminder, style: AppTextStyles.body),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(l10n.battleEndOfRoundDismiss),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

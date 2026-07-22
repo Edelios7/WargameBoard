@@ -137,6 +137,35 @@ void main() {
     },
   );
 
+  testWidgets(
+    'advancing past the last phase of a round shows the end-of-round reminder',
+    (tester) async {
+      final battleId = await database.battleDao.startBattle(
+        opponentName: 'Marc',
+      );
+      // command -> movement -> shooting -> charge -> fight -> morale.
+      for (var i = 0; i < 5; i++) {
+        await database.battleDao.advancePhase(battleId);
+      }
+
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Fin de round'), findsNothing);
+
+      await tester.tap(find.text('Phase suivante'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Fin de round'), findsOneWidget);
+      expect(find.text('Round 2'), findsOneWidget);
+
+      await tester.tap(find.text('Compris'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Fin de round'), findsNothing);
+    },
+  );
+
   testWidgets('deleting a battle removes it from the history', (tester) async {
     await database.battleDao.addBattle(opponentName: 'Julie');
 
