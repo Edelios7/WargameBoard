@@ -1239,6 +1239,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get battlePhaseMorale => 'Morale';
 
   @override
+  String get battleBeginnerModeLabel => 'Beginner mode (show phase rules)';
+
+  @override
+  String get battlePhaseHelpCommand =>
+      'Resolve Command phase abilities and stratagems, take a Battle-shock test for any unit under half its starting models/wounds, then gain Command Points.';
+
+  @override
+  String get battlePhaseHelpMovement =>
+      'Move your units — a Normal move, an Advance (roll a die, add to Movement, can\'t shoot or charge after with most weapons), or a Fall Back from combat. Units in Reserves may arrive now if the rules allow it.';
+
+  @override
+  String get battlePhaseHelpShooting =>
+      'Pick eligible targets in range and line of sight for each unit that hasn\'t fired, then roll to hit, to wound, and let the opponent make saving throws. Remove destroyed models.';
+
+  @override
+  String get battlePhaseHelpCharge =>
+      'Declare a charge against one or more enemy units within 12\", roll 2D6 for the charge distance, then move the charging unit so it ends within Engagement Range of every unit it charged.';
+
+  @override
+  String get battlePhaseHelpFight =>
+      'Units pile in, then fight — resolve melee attacks (to hit, to wound, saves), then consolidate. Order and eligibility can vary by rule — check the rulebook if unsure.';
+
+  @override
+  String get battlePhaseHelpMorale =>
+      'Battle-shock/Morale effects for weakened units — exact rules vary by edition, check the rulebook for the precise trigger and consequences.';
+
+  @override
   String get battleDashboardNextPhase => 'Next phase';
 
   @override

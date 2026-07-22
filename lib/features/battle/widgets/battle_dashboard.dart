@@ -421,37 +421,114 @@ class _ScoreColumn extends StatelessWidget {
   }
 }
 
-class _PhaseBlock extends ConsumerWidget {
+String _phaseHelp(AppLocalizations l10n, BattlePhase phase) {
+  switch (phase) {
+    case BattlePhase.command:
+      return l10n.battlePhaseHelpCommand;
+    case BattlePhase.movement:
+      return l10n.battlePhaseHelpMovement;
+    case BattlePhase.shooting:
+      return l10n.battlePhaseHelpShooting;
+    case BattlePhase.charge:
+      return l10n.battlePhaseHelpCharge;
+    case BattlePhase.fight:
+      return l10n.battlePhaseHelpFight;
+    case BattlePhase.morale:
+      return l10n.battlePhaseHelpMorale;
+  }
+}
+
+class _PhaseBlock extends ConsumerStatefulWidget {
   final BattleDetails battle;
 
   const _PhaseBlock({required this.battle});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_PhaseBlock> createState() => _PhaseBlockState();
+}
+
+class _PhaseBlockState extends ConsumerState<_PhaseBlock> {
+  bool _beginnerMode = false;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final currentIndex = battle.currentPhase == null
-        ? 0
-        : _phaseOrder.indexOf(battle.currentPhase!);
+    final battle = widget.battle;
+    final currentPhase = battle.currentPhase ?? _phaseOrder.first;
+    final currentIndex = _phaseOrder.indexOf(currentPhase);
 
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
+          Row(
             children: [
-              for (var i = 0; i < _phaseOrder.length; i++)
-                _PhaseChip(
-                  label: _phaseLabel(l10n, _phaseOrder[i]),
-                  state: i < currentIndex
-                      ? _PhaseState.done
-                      : i == currentIndex
-                      ? _PhaseState.active
-                      : _PhaseState.pending,
+              Expanded(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (var i = 0; i < _phaseOrder.length; i++)
+                      _PhaseChip(
+                        label: _phaseLabel(l10n, _phaseOrder[i]),
+                        state: i < currentIndex
+                            ? _PhaseState.done
+                            : i == currentIndex
+                            ? _PhaseState.active
+                            : _PhaseState.pending,
+                      ),
+                  ],
                 ),
+              ),
+              const SizedBox(width: 8),
+              Tooltip(
+                message: l10n.battleBeginnerModeLabel,
+                child: IconButton(
+                  icon: Icon(
+                    _beginnerMode
+                        ? Icons.school_rounded
+                        : Icons.school_outlined,
+                  ),
+                  color: _beginnerMode
+                      ? AppColors.primary
+                      : AppColors.textSecondary,
+                  onPressed: () =>
+                      setState(() => _beginnerMode = !_beginnerMode),
+                ),
+              ),
             ],
           ),
+          if (_beginnerMode) ...[
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: .08),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: .3),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(
+                    Icons.lightbulb_outline_rounded,
+                    size: 18,
+                    color: AppColors.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _phaseHelp(l10n, currentPhase),
+                      style: AppTextStyles.caption,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,

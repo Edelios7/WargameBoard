@@ -1248,6 +1248,34 @@ class AppLocalizationsFr extends AppLocalizations {
   String get battlePhaseMorale => 'Moral';
 
   @override
+  String get battleBeginnerModeLabel =>
+      'Mode débutant (afficher les règles de la phase)';
+
+  @override
+  String get battlePhaseHelpCommand =>
+      'Résous les capacités et stratagèmes de phase de Commandement, fais un test de Choc des bataillons pour toute unité en dessous de la moitié de son effectif/ses PV de départ, puis gagne tes Command Points.';
+
+  @override
+  String get battlePhaseHelpMovement =>
+      'Déplace tes unités : mouvement Normal, Avancer (lance un dé, ajoute-le au Mouvement, empêche généralement de tirer/charger ensuite), ou Repli hors d\'un combat. Les unités en réserve peuvent arriver maintenant si les règles le permettent.';
+
+  @override
+  String get battlePhaseHelpShooting =>
+      'Choisis pour chaque unité qui n\'a pas encore tiré des cibles à portée et en ligne de vue, lance les jets Pour Toucher, Pour Blesser, laisse l\'adversaire faire ses sauvegardes, puis retire les pertes.';
+
+  @override
+  String get battlePhaseHelpCharge =>
+      'Déclare une charge contre une ou plusieurs unités ennemies à moins de 12\", lance 2D6 pour la distance de charge, puis déplace l\'unité chargeante pour qu\'elle termine à portée d\'engagement de toutes les unités ciblées.';
+
+  @override
+  String get battlePhaseHelpFight =>
+      'Les unités se rapprochent (Pile in), puis combattent : jets Pour Toucher, Pour Blesser, sauvegardes, puis regroupement (Consolidate). L\'ordre et l\'éligibilité peuvent varier selon les règles — vérifie le livre de règles en cas de doute.';
+
+  @override
+  String get battlePhaseHelpMorale =>
+      'Effets de Choc des bataillons/Moral pour les unités affaiblies — les règles exactes varient selon l\'édition, vérifie le livre de règles pour le déclencheur et les conséquences précises.';
+
+  @override
   String get battleDashboardNextPhase => 'Phase suivante';
 
   @override

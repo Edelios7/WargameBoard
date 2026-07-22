@@ -2378,6 +2378,48 @@ abstract class AppLocalizations {
   /// **'Moral'**
   String get battlePhaseMorale;
 
+  /// No description provided for @battleBeginnerModeLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode débutant (afficher les règles de la phase)'**
+  String get battleBeginnerModeLabel;
+
+  /// No description provided for @battlePhaseHelpCommand.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résous les capacités et stratagèmes de phase de Commandement, fais un test de Choc des bataillons pour toute unité en dessous de la moitié de son effectif/ses PV de départ, puis gagne tes Command Points.'**
+  String get battlePhaseHelpCommand;
+
+  /// No description provided for @battlePhaseHelpMovement.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déplace tes unités : mouvement Normal, Avancer (lance un dé, ajoute-le au Mouvement, empêche généralement de tirer/charger ensuite), ou Repli hors d\'un combat. Les unités en réserve peuvent arriver maintenant si les règles le permettent.'**
+  String get battlePhaseHelpMovement;
+
+  /// No description provided for @battlePhaseHelpShooting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisis pour chaque unité qui n\'a pas encore tiré des cibles à portée et en ligne de vue, lance les jets Pour Toucher, Pour Blesser, laisse l\'adversaire faire ses sauvegardes, puis retire les pertes.'**
+  String get battlePhaseHelpShooting;
+
+  /// No description provided for @battlePhaseHelpCharge.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déclare une charge contre une ou plusieurs unités ennemies à moins de 12\", lance 2D6 pour la distance de charge, puis déplace l\'unité chargeante pour qu\'elle termine à portée d\'engagement de toutes les unités ciblées.'**
+  String get battlePhaseHelpCharge;
+
+  /// No description provided for @battlePhaseHelpFight.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les unités se rapprochent (Pile in), puis combattent : jets Pour Toucher, Pour Blesser, sauvegardes, puis regroupement (Consolidate). L\'ordre et l\'éligibilité peuvent varier selon les règles — vérifie le livre de règles en cas de doute.'**
+  String get battlePhaseHelpFight;
+
+  /// No description provided for @battlePhaseHelpMorale.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effets de Choc des bataillons/Moral pour les unités affaiblies — les règles exactes varient selon l\'édition, vérifie le livre de règles pour le déclencheur et les conséquences précises.'**
+  String get battlePhaseHelpMorale;
+
   /// No description provided for @battleDashboardNextPhase.
   ///
   /// In fr, this message translates to:
