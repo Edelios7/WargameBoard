@@ -8,6 +8,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../core/widgets/donut_chart.dart';
+import '../../../core/widgets/textured_button.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/battle_details.dart';
 import '../../../database/models/collection_item_details.dart';
@@ -832,19 +833,12 @@ class _YourArmiesCard extends StatelessWidget {
               ),
             ),
           const SizedBox(height: 4),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () => showDialog(
-                context: context,
-                builder: (_) => const CreateArmyDialog(),
-              ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                side: const BorderSide(color: AppColors.primary),
-              ),
-              icon: const Icon(Icons.add_rounded, size: 18),
-              label: Text(l10n.dashboardCreateArmyShort),
+          TexturedButton(
+            label: l10n.dashboardCreateArmyShort,
+            icon: Icons.add_rounded,
+            onPressed: () => showDialog(
+              context: context,
+              builder: (_) => const CreateArmyDialog(),
             ),
           ),
         ],
