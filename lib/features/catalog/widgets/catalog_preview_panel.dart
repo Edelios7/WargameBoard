@@ -97,11 +97,6 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
                   ),
                 ),
                 _iconButton(
-                  Icons.add_rounded,
-                  tooltip: l10n.collectionAddEntry,
-                  onTap: () => _addToCollection(context, sheet),
-                ),
-                _iconButton(
                   Icons.open_in_full_rounded,
                   tooltip: l10n.catalogViewFullSheet,
                   onTap: () => _openFullSheet(context, sheet.id),
@@ -114,6 +109,25 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
               child: _costDisplay(l10n, sheet),
             ),
             const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () => _addToCollection(context, sheet),
+                icon: const Icon(Icons.add_rounded),
+                label: Text(
+                  l10n.collectionAddEntry,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
             if (imageFile != null) ...[
               Material(
                 color: Colors.transparent,
