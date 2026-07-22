@@ -45,6 +45,18 @@ class LocalCatalogImages {
   static File? unitPhoto(String datasheetId) =>
       userPhoto(datasheetId) ?? datasheet(datasheetId);
 
+  /// Photo perso d'une entrée précise de la collection (une escouade en
+  /// particulier), voir local_assets/user_photos/README.md — prioritaire
+  /// sur [userPhoto] partout où [collectionPhoto] est utilisé.
+  static File? entryPhoto(String entryId) =>
+      _find('user_photos/entries', entryId);
+
+  /// Meilleure image disponible pour une entrée de la Collection : sa
+  /// propre photo si elle existe, sinon la photo par défaut du type
+  /// d'unité, sinon le visuel catalogue générique.
+  static File? collectionPhoto(String datasheetId, String entryId) =>
+      entryPhoto(entryId) ?? unitPhoto(datasheetId);
+
   static File? faction(String factionId) => _find('factions', factionId);
 
   /// Bannière large illustrant une faction (voir local_assets/banners/),

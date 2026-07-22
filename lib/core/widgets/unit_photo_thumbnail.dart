@@ -10,14 +10,20 @@ import '../utils/local_catalog_images.dart';
 /// choisir/retirer une photo personnelle des figurines du joueur — voir
 /// local_assets/user_photos/README.md. Affiche la photo perso si elle
 /// existe, sinon le visuel catalogue générique, sinon une icône neutre.
+///
+/// Si [entryId] est fourni (contexte Collection), la photo choisie est
+/// propre à cette entrée précise en plus de devenir la photo par défaut
+/// du type d'unité — voir [UserPhotoService.pickAndSave].
 class UnitPhotoThumbnail extends ConsumerStatefulWidget {
   final String datasheetId;
+  final String? entryId;
   final double size;
   final BorderRadius borderRadius;
 
   const UnitPhotoThumbnail({
     super.key,
     required this.datasheetId,
+    this.entryId,
     this.size = 56,
     this.borderRadius = const BorderRadius.all(Radius.circular(10)),
   });
@@ -32,7 +38,9 @@ class _UnitPhotoThumbnailState extends ConsumerState<UnitPhotoThumbnail> {
   Future<void> _choosePhoto() async {
     setState(() => _busy = true);
     try {
-      await ref.read(userPhotoServiceProvider).pickAndSave(widget.datasheetId);
+      await ref
+          .read(userPhotoServiceProvider)
+          .pickAndSave(widget.datasheetId, entryId: widget.entryId);
     } catch (_) {
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
@@ -46,16 +54,26 @@ class _UnitPhotoThumbnailState extends ConsumerState<UnitPhotoThumbnail> {
   }
 
   Future<void> _removePhoto() async {
-    await ref.read(userPhotoServiceProvider).remove(widget.datasheetId);
+    final service = ref.read(userPhotoServiceProvider);
+    final entryId = widget.entryId;
+    if (entryId != null) {
+      await service.removeEntry(entryId);
+    } else {
+      await service.remove(widget.datasheetId);
+    }
     if (mounted) setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final userFile = LocalCatalogImages.userPhoto(widget.datasheetId);
-    final displayFile =
-        userFile ?? LocalCatalogImages.datasheet(widget.datasheetId);
+    final entryId = widget.entryId;
+    final userFile = entryId != null
+        ? LocalCatalogImages.entryPhoto(entryId)
+        : LocalCatalogImages.userPhoto(widget.datasheetId);
+    final displayFile = entryId != null
+        ? LocalCatalogImages.collectionPhoto(widget.datasheetId, entryId)
+        : LocalCatalogImages.unitPhoto(widget.datasheetId);
 
     return SizedBox(
       width: widget.size,

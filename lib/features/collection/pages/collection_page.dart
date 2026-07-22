@@ -1111,7 +1111,10 @@ class _RecentAdditionsRow extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           final entry = entries[index];
-          final imageFile = LocalCatalogImages.unitPhoto(entry.datasheetId);
+          final imageFile = LocalCatalogImages.collectionPhoto(
+            entry.datasheetId,
+            entry.id,
+          );
 
           return SizedBox(
             width: 110,
@@ -1369,7 +1372,11 @@ class _CollectionCard extends ConsumerWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                UnitPhotoThumbnail(datasheetId: entry.datasheetId, size: 44),
+                UnitPhotoThumbnail(
+                  datasheetId: entry.datasheetId,
+                  entryId: entry.id,
+                  size: 44,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
