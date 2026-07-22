@@ -1994,6 +1994,18 @@ abstract class AppLocalizations {
   /// **'Ajouter une règle'**
   String get rulesAddButton;
 
+  /// No description provided for @rulesAddComingSoon.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'ajout d\'un document de règles personnalisé n\'est pas encore disponible'**
+  String get rulesAddComingSoon;
+
+  /// No description provided for @rulesComingSoon.
+  ///
+  /// In fr, this message translates to:
+  /// **'{feature} : pas encore disponible'**
+  String rulesComingSoon(String feature);
+
   /// No description provided for @rulesTabMain.
   ///
   /// In fr, this message translates to:

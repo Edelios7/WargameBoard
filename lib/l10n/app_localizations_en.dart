@@ -1033,6 +1033,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rulesAddButton => 'Add a rule';
 
   @override
+  String get rulesAddComingSoon =>
+      'Adding a custom rule document isn\'t available yet';
+
+  @override
+  String rulesComingSoon(String feature) {
+    return '$feature: not available yet';
+  }
+
+  @override
   String get rulesTabMain => 'Main rules';
 
   @override

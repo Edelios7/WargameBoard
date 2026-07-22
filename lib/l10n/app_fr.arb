@@ -507,6 +507,13 @@
 
   "rulesSearchHint": "Rechercher une règle, une faction...",
   "rulesAddButton": "Ajouter une règle",
+  "rulesAddComingSoon": "L'ajout d'un document de règles personnalisé n'est pas encore disponible",
+  "rulesComingSoon": "{feature} : pas encore disponible",
+  "@rulesComingSoon": {
+    "placeholders": {
+      "feature": { "type": "String" }
+    }
+  },
   "rulesTabMain": "Règles principales",
   "rulesTabAdditional": "Règles additionnelles",
   "rulesCategoryAll": "Toutes",

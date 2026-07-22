@@ -507,6 +507,13 @@
 
   "rulesSearchHint": "Search for a rule, a faction...",
   "rulesAddButton": "Add a rule",
+  "rulesAddComingSoon": "Adding a custom rule document isn't available yet",
+  "rulesComingSoon": "{feature}: not available yet",
+  "@rulesComingSoon": {
+    "placeholders": {
+      "feature": { "type": "String" }
+    }
+  },
   "rulesTabMain": "Main rules",
   "rulesTabAdditional": "Additional rules",
   "rulesCategoryAll": "All",

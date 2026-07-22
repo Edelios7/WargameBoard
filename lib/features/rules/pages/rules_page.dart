@@ -20,6 +20,7 @@ class _RulesPageState extends State<RulesPage> {
   int _tab = 0;
   String _query = '';
   RuleCategory? _category;
+  bool _showFilters = true;
 
   List<RuleDocument> get _filtered {
     return kRuleDocuments.where((doc) {
@@ -57,7 +58,7 @@ class _RulesPageState extends State<RulesPage> {
     final l10n = AppLocalizations.of(context)!;
     final hero = kRuleDocuments.firstWhere((d) => d.isCurrent);
     final documents = _filtered;
-    final recent = documents.take(5).toList();
+    final recent = documents;
     final popular = [...documents]
       ..sort((a, b) => b.downloads.compareTo(a.downloads));
 
@@ -72,7 +73,10 @@ class _RulesPageState extends State<RulesPage> {
               onSearch: (value) => setState(() => _query = value),
               onAdd: () => ScaffoldMessenger.of(
                 context,
-              ).showSnackBar(SnackBar(content: Text(l10n.rulesAddButton))),
+              ).showSnackBar(SnackBar(content: Text(l10n.rulesAddComingSoon))),
+              filtersActive: _showFilters,
+              onToggleFilters: () =>
+                  setState(() => _showFilters = !_showFilters),
             ),
             const SizedBox(height: 16),
             Row(
@@ -97,16 +101,18 @@ class _RulesPageState extends State<RulesPage> {
               onOpenBook: () => _openBook(context, l10n, hero),
               onViewErrata: () => _openDocument(context, hero),
             ),
-            const SizedBox(height: 24),
-            Text(
-              l10n.rulesCategoryAll.toUpperCase(),
-              style: AppTextStyles.eyebrow,
-            ),
-            const SizedBox(height: 12),
-            _CategoriesGrid(
-              selected: _category,
-              onSelect: (category) => setState(() => _category = category),
-            ),
+            if (_showFilters) ...[
+              const SizedBox(height: 24),
+              Text(
+                l10n.rulesCategoryAll.toUpperCase(),
+                style: AppTextStyles.eyebrow,
+              ),
+              const SizedBox(height: 12),
+              _CategoriesGrid(
+                selected: _category,
+                onSelect: (category) => setState(() => _category = category),
+              ),
+            ],
             const SizedBox(height: 24),
             LayoutBuilder(
               builder: (context, constraints) {
@@ -117,7 +123,7 @@ class _RulesPageState extends State<RulesPage> {
                   onOpen: (doc) => _openDocument(context, doc),
                 );
                 final popularCard = _PopularRulesCard(
-                  documents: popular.take(5).toList(),
+                  documents: popular,
                   l10n: l10n,
                   onOpen: (doc) => _openDocument(context, doc),
                 );
@@ -143,7 +149,14 @@ class _RulesPageState extends State<RulesPage> {
               },
             ),
             const SizedBox(height: 24),
-            _HelpRow(l10n: l10n),
+            _HelpRow(
+              l10n: l10n,
+              onOpenHowToPlay: () => _openDocument(context, hero),
+              onComingSoon: (label) =>
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.rulesComingSoon(label))),
+                  ),
+            ),
           ],
         ),
       ),
@@ -154,8 +167,15 @@ class _RulesPageState extends State<RulesPage> {
 class _RulesHeader extends StatefulWidget {
   final ValueChanged<String> onSearch;
   final VoidCallback onAdd;
+  final bool filtersActive;
+  final VoidCallback onToggleFilters;
 
-  const _RulesHeader({required this.onSearch, required this.onAdd});
+  const _RulesHeader({
+    required this.onSearch,
+    required this.onAdd,
+    required this.filtersActive,
+    required this.onToggleFilters,
+  });
 
   @override
   State<_RulesHeader> createState() => _RulesHeaderState();
@@ -214,18 +234,27 @@ class _RulesHeaderState extends State<_RulesHeader> {
               ),
             ),
             const SizedBox(width: 10),
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: const Icon(
-                Icons.tune_rounded,
-                size: 18,
-                color: AppColors.textSecondary,
+            Tooltip(
+              message: l10n.catalogFilterTitle,
+              child: IconButton(
+                style: IconButton.styleFrom(
+                  fixedSize: const Size(42, 42),
+                  backgroundColor: widget.filtersActive
+                      ? AppColors.primary.withValues(alpha: .16)
+                      : AppColors.surface,
+                  side: BorderSide(color: AppColors.border),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: widget.onToggleFilters,
+                icon: Icon(
+                  Icons.tune_rounded,
+                  size: 18,
+                  color: widget.filtersActive
+                      ? AppColors.primary
+                      : AppColors.textSecondary,
+                ),
               ),
             ),
             const SizedBox(width: 10),
@@ -621,7 +650,7 @@ class _CategoriesGrid extends StatelessWidget {
   }
 }
 
-class _RecentDocumentsCard extends StatelessWidget {
+class _RecentDocumentsCard extends StatefulWidget {
   final List<RuleDocument> documents;
   final AppLocalizations l10n;
   final ValueChanged<RuleDocument> onOpen;
@@ -633,8 +662,21 @@ class _RecentDocumentsCard extends StatelessWidget {
   });
 
   @override
+  State<_RecentDocumentsCard> createState() => _RecentDocumentsCardState();
+}
+
+class _RecentDocumentsCardState extends State<_RecentDocumentsCard> {
+  static const _collapsedCount = 5;
+  bool _expanded = false;
+
+  @override
   Widget build(BuildContext context) {
+    final l10n = widget.l10n;
     final dateFormat = DateFormat('dd/MM/yyyy');
+    final documents = _expanded
+        ? widget.documents
+        : widget.documents.take(_collapsedCount).toList();
+    final canExpand = widget.documents.length > _collapsedCount;
 
     return AppCard(
       child: Column(
@@ -648,15 +690,16 @@ class _RecentDocumentsCard extends StatelessWidget {
                 l10n.rulesRecentDocuments.toUpperCase(),
                 style: AppTextStyles.eyebrow,
               ),
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  l10n.rulesSeeAll,
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.primary,
+              if (canExpand)
+                TextButton(
+                  onPressed: () => setState(() => _expanded = !_expanded),
+                  child: Text(
+                    _expanded ? l10n.catalogSeeLess : l10n.rulesSeeAll,
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
           const SizedBox(height: 4),
@@ -669,7 +712,7 @@ class _RecentDocumentsCard extends StatelessWidget {
             ...documents.map(
               (doc) => InkWell(
                 borderRadius: BorderRadius.circular(8),
-                onTap: () => onOpen(doc),
+                onTap: () => widget.onOpen(doc),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Row(
@@ -721,7 +764,7 @@ class _RecentDocumentsCard extends StatelessWidget {
   }
 }
 
-class _PopularRulesCard extends StatelessWidget {
+class _PopularRulesCard extends StatefulWidget {
   final List<RuleDocument> documents;
   final AppLocalizations l10n;
   final ValueChanged<RuleDocument> onOpen;
@@ -733,7 +776,21 @@ class _PopularRulesCard extends StatelessWidget {
   });
 
   @override
+  State<_PopularRulesCard> createState() => _PopularRulesCardState();
+}
+
+class _PopularRulesCardState extends State<_PopularRulesCard> {
+  static const _collapsedCount = 5;
+  bool _expanded = false;
+
+  @override
   Widget build(BuildContext context) {
+    final l10n = widget.l10n;
+    final documents = _expanded
+        ? widget.documents
+        : widget.documents.take(_collapsedCount).toList();
+    final canExpand = widget.documents.length > _collapsedCount;
+
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -746,15 +803,16 @@ class _PopularRulesCard extends StatelessWidget {
                 l10n.rulesPopularRules.toUpperCase(),
                 style: AppTextStyles.eyebrow,
               ),
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  l10n.rulesSeeAll,
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.primary,
+              if (canExpand)
+                TextButton(
+                  onPressed: () => setState(() => _expanded = !_expanded),
+                  child: Text(
+                    _expanded ? l10n.catalogSeeLess : l10n.rulesSeeAll,
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
           const SizedBox(height: 4),
@@ -769,7 +827,7 @@ class _PopularRulesCard extends StatelessWidget {
               final doc = entry.value;
               return InkWell(
                 borderRadius: BorderRadius.circular(8),
-                onTap: () => onOpen(doc),
+                onTap: () => widget.onOpen(doc),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Row(
@@ -833,31 +891,41 @@ class _PopularRulesCard extends StatelessWidget {
 
 class _HelpRow extends StatelessWidget {
   final AppLocalizations l10n;
+  final VoidCallback onOpenHowToPlay;
+  final ValueChanged<String> onComingSoon;
 
-  const _HelpRow({required this.l10n});
+  const _HelpRow({
+    required this.l10n,
+    required this.onOpenHowToPlay,
+    required this.onComingSoon,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final items = <(IconData, String, String)>[
+    final items = <(IconData, String, String, VoidCallback)>[
       (
         Icons.help_outline_rounded,
         l10n.rulesHelpHowToPlay,
         l10n.rulesHelpHowToPlaySub,
+        onOpenHowToPlay,
       ),
       (
         Icons.play_circle_outline_rounded,
         l10n.rulesHelpVideos,
         l10n.rulesHelpVideosSub,
+        () => onComingSoon(l10n.rulesHelpVideos),
       ),
       (
         Icons.balance_rounded,
         l10n.rulesHelpApplication,
         l10n.rulesHelpApplicationSub,
+        () => onComingSoon(l10n.rulesHelpApplication),
       ),
       (
         Icons.menu_book_outlined,
         l10n.rulesHelpGlossary,
         l10n.rulesHelpGlossarySub,
+        () => onComingSoon(l10n.rulesHelpGlossary),
       ),
     ];
 
@@ -884,52 +952,59 @@ class _HelpRow extends StatelessWidget {
                 childAspectRatio: 3.2,
                 children: [
                   for (final item in items)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
+                    Material(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(10),
+                      child: InkWell(
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            item.$1,
-                            size: 18,
-                            color: AppColors.textSecondary,
+                        onTap: item.$4,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  item.$2,
-                                  style: AppTextStyles.body.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: AppColors.border),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                item.$1,
+                                size: 18,
+                                color: AppColors.textSecondary,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      item.$2,
+                                      style: AppTextStyles.body.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Text(
+                                      item.$3,
+                                      style: AppTextStyles.caption,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  item.$3,
-                                  style: AppTextStyles.caption,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
+                              ),
+                              const Icon(
+                                Icons.arrow_forward_rounded,
+                                size: 16,
+                                color: AppColors.textSecondary,
+                              ),
+                            ],
                           ),
-                          const Icon(
-                            Icons.arrow_forward_rounded,
-                            size: 16,
-                            color: AppColors.textSecondary,
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                 ],

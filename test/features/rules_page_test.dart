@@ -46,4 +46,52 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('Voir tout expands the recent documents list', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1400, 2200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Voir tout'), findsWidgets);
+
+    await tester.tap(find.text('Voir tout').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Voir moins'), findsWidgets);
+  });
+
+  testWidgets('the filters toggle hides and shows the categories grid',
+      (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1400, 2200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    expect(find.text('TOUTES'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.tune_rounded));
+    await tester.pumpAndSettle();
+
+    expect(find.text('TOUTES'), findsNothing);
+  });
+
+  testWidgets('a help row item without real content shows a coming-soon message',
+      (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1400, 2200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Vidéos explicatives'));
+    await tester.pump();
+
+    expect(
+      find.text('Vidéos explicatives : pas encore disponible'),
+      findsOneWidget,
+    );
+  });
 }

@@ -1041,6 +1041,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get rulesAddButton => 'Ajouter une règle';
 
   @override
+  String get rulesAddComingSoon =>
+      'L\'ajout d\'un document de règles personnalisé n\'est pas encore disponible';
+
+  @override
+  String rulesComingSoon(String feature) {
+    return '$feature : pas encore disponible';
+  }
+
+  @override
   String get rulesTabMain => 'Règles principales';
 
   @override
