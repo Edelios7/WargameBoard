@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -1074,8 +1075,10 @@ class _BuilderSidebarState extends ConsumerState<_BuilderSidebar> {
                 ? null
                 : () => showDialog(
                     context: context,
-                    builder: (_) =>
-                        _StratagemsDialog(detachmentId: army.detachmentId!),
+                    builder: (_) => _StratagemsDialog(
+                      detachmentId: army.detachmentId!,
+                      factionId: army.factionId,
+                    ),
                   ),
             child: Text(
               l10n.armyBuilderViewAllRules,
@@ -2382,14 +2385,24 @@ class _DuplicateArmyDialogState extends ConsumerState<_DuplicateArmyDialog> {
 
 class _StratagemsDialog extends ConsumerWidget {
   final String detachmentId;
+  final String factionId;
 
-  const _StratagemsDialog({required this.detachmentId});
+  const _StratagemsDialog({
+    required this.detachmentId,
+    required this.factionId,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final stratagemsAsync = ref.watch(
       stratagemsForDetachmentProvider(detachmentId),
+    );
+    final detachmentsAsync = ref.watch(
+      detachmentsForFactionProvider(factionId),
+    );
+    final detachment = detachmentsAsync.value?.firstWhereOrNull(
+      (d) => d.id == detachmentId,
     );
 
     return AppDialogShortcuts(
@@ -2398,14 +2411,26 @@ class _StratagemsDialog extends ConsumerWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         child: SizedBox(
           width: 460,
-          height: 480,
+          height: 520,
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.armyBuilderStratagems, style: AppTextStyles.title),
+                Text(
+                  detachment?.name ?? l10n.armyBuilderStratagems,
+                  style: AppTextStyles.title,
+                ),
+                if (detachment?.description != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    detachment!.description!,
+                    style: AppTextStyles.caption,
+                  ),
+                ],
                 const SizedBox(height: 16),
+                Text(l10n.armyBuilderStratagems, style: AppTextStyles.eyebrow),
+                const SizedBox(height: 8),
                 Expanded(
                   child: stratagemsAsync.when(
                     loading: () => const Center(
