@@ -130,7 +130,7 @@ final factionHeroImageIdProvider =
   final repository = ref.watch(catalogRepositoryProvider);
   final results = await repository.search('', factionId: factionId);
   for (final result in results) {
-    if (LocalCatalogImages.datasheet(result.id) != null) return result.id;
+    if (LocalCatalogImages.unitPhoto(result.id) != null) return result.id;
   }
   return null;
 });

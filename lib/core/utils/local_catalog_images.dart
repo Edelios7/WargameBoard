@@ -34,6 +34,17 @@ class LocalCatalogImages {
   static File? datasheet(String datasheetId) =>
       _find('datasheets', datasheetId);
 
+  /// Photo perso de la propre unité du joueur (ses figurines peintes),
+  /// voir local_assets/user_photos/README.md — prioritaire sur
+  /// [datasheet] partout où [unitPhoto] est utilisé.
+  static File? userPhoto(String datasheetId) =>
+      _find('user_photos', datasheetId);
+
+  /// Meilleure image disponible pour une fiche : la photo perso du
+  /// joueur si elle existe, sinon le visuel catalogue générique.
+  static File? unitPhoto(String datasheetId) =>
+      userPhoto(datasheetId) ?? datasheet(datasheetId);
+
   static File? faction(String factionId) => _find('factions', factionId);
 
   /// Bannière large illustrant une faction (voir local_assets/banners/),

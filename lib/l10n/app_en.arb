@@ -298,6 +298,10 @@
   "collectionStepFieldTooltip": "Amount to add or remove",
   "collectionQuickAccessFactions": "Quick access to factions",
   "collectionDeleteEntryTooltip": "Remove from collection",
+  "collectionChoosePhoto": "Choose a photo",
+  "collectionRemovePhoto": "Remove photo",
+  "collectionPhotoTooltip": "Unit photo",
+  "collectionPhotoSaveError": "Couldn't save the photo",
   "collectionDeleteConfirmTitle": "Remove this entry?",
   "collectionDeleteConfirmMessage": "This will remove {name} and its assembly/painting progress from your collection.",
   "@collectionDeleteConfirmMessage": {

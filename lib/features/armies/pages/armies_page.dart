@@ -1208,7 +1208,7 @@ class _UnitRosterRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final imageFile = LocalCatalogImages.datasheet(unit.datasheetId);
+    final imageFile = LocalCatalogImages.unitPhoto(unit.datasheetId);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -1380,7 +1380,7 @@ class _UnitCard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final selectedUnitId = ref.watch(selectedUnitIdProvider);
     final selected = unit.id == selectedUnitId;
-    final imageFile = LocalCatalogImages.datasheet(unit.datasheetId);
+    final imageFile = LocalCatalogImages.unitPhoto(unit.datasheetId);
 
     return Material(
       color: AppColors.surfaceElevated,
@@ -1523,7 +1523,7 @@ class _UnitDetailsPanel extends ConsumerWidget {
     final sheet = datasheetAsync.value;
     final selections = selectionsAsync.value ?? const {};
     if (sheet == null) return const SizedBox.shrink();
-    final imageFile = LocalCatalogImages.datasheet(sheet.id);
+    final imageFile = LocalCatalogImages.unitPhoto(sheet.id);
     final effectiveWeapons = _effectiveWeapons(sheet, selections);
 
     return SingleChildScrollView(

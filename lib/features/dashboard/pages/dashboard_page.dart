@@ -367,7 +367,7 @@ class _DashboardHeaderState extends ConsumerState<_DashboardHeader> {
         : ref.watch(factionHeroImageIdProvider(widget.heroFactionId!)).value;
     final heroFile = heroImageId == null
         ? null
-        : LocalCatalogImages.datasheet(heroImageId);
+        : LocalCatalogImages.unitPhoto(heroImageId);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -692,7 +692,7 @@ class _LastBattleTile extends ConsumerWidget {
         : ref.watch(factionHeroImageIdProvider(opponentFactionId)).value;
     final heroFile = heroImageId == null
         ? null
-        : LocalCatalogImages.datasheet(heroImageId);
+        : LocalCatalogImages.unitPhoto(heroImageId);
 
     return Material(
       color: AppColors.surfaceElevated,
@@ -1577,7 +1577,7 @@ class _ProjectRow extends ConsumerWidget {
 }
 
 Widget _thumbnail(String datasheetId, double size) {
-  final imageFile = LocalCatalogImages.datasheet(datasheetId);
+  final imageFile = LocalCatalogImages.unitPhoto(datasheetId);
   if (imageFile != null) {
     return Image.file(imageFile, width: size, height: size, fit: BoxFit.cover);
   }

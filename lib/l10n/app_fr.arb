@@ -298,6 +298,10 @@
   "collectionStepFieldTooltip": "Nombre à ajouter ou retirer",
   "collectionQuickAccessFactions": "Accès rapide aux factions",
   "collectionDeleteEntryTooltip": "Retirer de la collection",
+  "collectionChoosePhoto": "Choisir une photo",
+  "collectionRemovePhoto": "Retirer la photo",
+  "collectionPhotoTooltip": "Photo de l'unité",
+  "collectionPhotoSaveError": "Impossible d'enregistrer la photo",
   "collectionDeleteConfirmTitle": "Retirer cette entrée ?",
   "collectionDeleteConfirmMessage": "Cela retirera {name} et sa progression de montage/peinture de votre collection.",
   "@collectionDeleteConfirmMessage": {

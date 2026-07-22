@@ -1154,6 +1154,30 @@ abstract class AppLocalizations {
   /// **'Retirer de la collection'**
   String get collectionDeleteEntryTooltip;
 
+  /// No description provided for @collectionChoosePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir une photo'**
+  String get collectionChoosePhoto;
+
+  /// No description provided for @collectionRemovePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer la photo'**
+  String get collectionRemovePhoto;
+
+  /// No description provided for @collectionPhotoTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo de l\'unité'**
+  String get collectionPhotoTooltip;
+
+  /// No description provided for @collectionPhotoSaveError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'enregistrer la photo'**
+  String get collectionPhotoSaveError;
+
   /// No description provided for @collectionDeleteConfirmTitle.
   ///
   /// In fr, this message translates to:

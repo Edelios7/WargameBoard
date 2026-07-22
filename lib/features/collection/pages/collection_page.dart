@@ -9,6 +9,7 @@ import '../../../core/utils/faction_iconography.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
+import '../../../core/widgets/unit_photo_thumbnail.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../database/models/army_details.dart';
@@ -90,7 +91,10 @@ class _CollectionPageState extends ConsumerState<CollectionPage>
             LayoutBuilder(
               builder: (context, constraints) {
                 final wide = constraints.maxWidth > 760;
-                final title = Text(l10n.navCollection, style: AppTextStyles.heading);
+                final title = Text(
+                  l10n.navCollection,
+                  style: AppTextStyles.heading,
+                );
                 final controls = Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -112,8 +116,9 @@ class _CollectionPageState extends ConsumerState<CollectionPage>
                               size: 18,
                               color: AppColors.textSecondary,
                             ),
-                            contentPadding:
-                                const EdgeInsets.symmetric(vertical: 0),
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 0,
+                            ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: BorderSide(color: AppColors.border),
@@ -146,7 +151,8 @@ class _CollectionPageState extends ConsumerState<CollectionPage>
                     const SizedBox(width: 10),
                     FilledButton.icon(
                       style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.primary),
+                        backgroundColor: AppColors.primary,
+                      ),
                       onPressed: () => showDialog(
                         context: context,
                         builder: (_) =>
@@ -165,11 +171,7 @@ class _CollectionPageState extends ConsumerState<CollectionPage>
                 if (!wide) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      title,
-                      const SizedBox(height: 12),
-                      controls,
-                    ],
+                    children: [title, const SizedBox(height: 12), controls],
                   );
                 }
                 return Row(
@@ -215,9 +217,9 @@ class _CollectionPageState extends ConsumerState<CollectionPage>
 
 void _copyExport(BuildContext context, AppLocalizations l10n, String text) {
   Clipboard.setData(ClipboardData(text: text));
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(l10n.collectionExportedToClipboard)),
-  );
+  ScaffoldMessenger.of(
+    context,
+  ).showSnackBar(SnackBar(content: Text(l10n.collectionExportedToClipboard)));
 }
 
 class _CollectionTab extends ConsumerStatefulWidget {
@@ -249,9 +251,9 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
 
   bool _matches(CollectionItemDetails entry) {
     if (widget.searchQuery.isNotEmpty &&
-        !entry.datasheetName
-            .toLowerCase()
-            .contains(widget.searchQuery.toLowerCase())) {
+        !entry.datasheetName.toLowerCase().contains(
+          widget.searchQuery.toLowerCase(),
+        )) {
       return false;
     }
     if (_factionFilter != null) {
@@ -337,138 +339,143 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
             factionFilter: _factionFilter,
             chapterFilter: _chapterFilter,
             onFactionChanged: _setFactionFilter,
-            onChapterChanged: (value) =>
-                setState(() => _chapterFilter = value),
+            onChapterChanged: (value) => setState(() => _chapterFilter = value),
           ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (widget.filtersVisible) ...[
-                  SizedBox(
-                    width: 220,
-                    child: _FiltersSidebar(
-                      entries: entries,
-                      factionFilter: _factionFilter,
-                      stateFilter: _stateFilter,
-                      onFactionChanged: _setFactionFilter,
-                      onStateToggled: (state, value) => setState(() {
-                        if (value) {
-                          _stateFilter.add(state);
-                        } else {
-                          _stateFilter.remove(state);
-                        }
-                      }),
-                      onReset: () => setState(() {
-                        _factionFilter = null;
-                        _chapterFilter = null;
-                        _stateFilter.clear();
-                      }),
-                    ),
+                SizedBox(
+                  width: 220,
+                  child: _FiltersSidebar(
+                    entries: entries,
+                    factionFilter: _factionFilter,
+                    stateFilter: _stateFilter,
+                    onFactionChanged: _setFactionFilter,
+                    onStateToggled: (state, value) => setState(() {
+                      if (value) {
+                        _stateFilter.add(state);
+                      } else {
+                        _stateFilter.remove(state);
+                      }
+                    }),
+                    onReset: () => setState(() {
+                      _factionFilter = null;
+                      _chapterFilter = null;
+                      _stateFilter.clear();
+                    }),
                   ),
-                  const SizedBox(width: 16),
-                ],
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (armies.isNotEmpty) ...[
-                        Text(l10n.collectionMyArmiesTitle,
-                            style: AppTextStyles.title),
-                        const SizedBox(height: 12),
-                        _MyArmiesRow(armies: armies, entries: entries),
-                        const SizedBox(height: 24),
-                      ],
-                      if (recent.isNotEmpty) ...[
-                        Text(l10n.collectionRecentAdditionsTitle,
-                            style: AppTextStyles.title),
-                        const SizedBox(height: 12),
-                        _RecentAdditionsRow(entries: recent),
-                        const SizedBox(height: 24),
-                      ],
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(l10n.collectionAllItemsTitle,
-                              style: AppTextStyles.title),
-                          PopupMenuButton<void>(
-                            tooltip: l10n.collectionExportTooltip,
-                            icon: const Icon(
-                              Icons.ios_share_rounded,
-                              color: AppColors.textSecondary,
-                              size: 20,
-                            ),
-                            color: AppColors.surface,
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                onTap: () => _copyExport(
-                                  context,
-                                  l10n,
-                                  CollectionExportFormatter.toCsv(entries),
-                                ),
-                                child: Text(
-                                  l10n.collectionExportCsv,
-                                  style: AppTextStyles.body,
-                                ),
+                ),
+                const SizedBox(width: 16),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (armies.isNotEmpty) ...[
+                      Text(
+                        l10n.collectionMyArmiesTitle,
+                        style: AppTextStyles.title,
+                      ),
+                      const SizedBox(height: 12),
+                      _MyArmiesRow(armies: armies, entries: entries),
+                      const SizedBox(height: 24),
+                    ],
+                    if (recent.isNotEmpty) ...[
+                      Text(
+                        l10n.collectionRecentAdditionsTitle,
+                        style: AppTextStyles.title,
+                      ),
+                      const SizedBox(height: 12),
+                      _RecentAdditionsRow(entries: recent),
+                      const SizedBox(height: 24),
+                    ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          l10n.collectionAllItemsTitle,
+                          style: AppTextStyles.title,
+                        ),
+                        PopupMenuButton<void>(
+                          tooltip: l10n.collectionExportTooltip,
+                          icon: const Icon(
+                            Icons.ios_share_rounded,
+                            color: AppColors.textSecondary,
+                            size: 20,
+                          ),
+                          color: AppColors.surface,
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              onTap: () => _copyExport(
+                                context,
+                                l10n,
+                                CollectionExportFormatter.toCsv(entries),
                               ),
-                              PopupMenuItem(
-                                onTap: () => _copyExport(
-                                  context,
-                                  l10n,
-                                  CollectionExportFormatter.toJson(entries),
-                                ),
-                                child: Text(
-                                  l10n.collectionExportJson,
-                                  style: AppTextStyles.body,
-                                ),
+                              child: Text(
+                                l10n.collectionExportCsv,
+                                style: AppTextStyles.body,
+                              ),
+                            ),
+                            PopupMenuItem(
+                              onTap: () => _copyExport(
+                                context,
+                                l10n,
+                                CollectionExportFormatter.toJson(entries),
+                              ),
+                              child: Text(
+                                l10n.collectionExportJson,
+                                style: AppTextStyles.body,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    if (filtered.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 32),
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.search_off_rounded,
+                                size: 36,
+                                color: AppColors.textSecondary,
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                l10n.collectionNoResultsForFilters,
+                                style: AppTextStyles.caption,
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      if (filtered.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 32),
-                          child: Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.search_off_rounded,
-                                  size: 36,
-                                  color: AppColors.textSecondary,
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  l10n.collectionNoResultsForFilters,
-                                  style: AppTextStyles.caption,
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      else
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 340,
-                            mainAxisExtent: 260,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                          ),
-                          itemCount: filtered.length,
-                          itemBuilder: (context, index) {
-                            return _CollectionCard(entry: filtered[index]);
-                          },
                         ),
-                    ],
-                  ),
+                      )
+                    else
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithMaxCrossAxisExtent(
+                              maxCrossAxisExtent: 340,
+                              mainAxisExtent: 260,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                            ),
+                        itemCount: filtered.length,
+                        itemBuilder: (context, index) {
+                          return _CollectionCard(entry: filtered[index]);
+                        },
+                      ),
+                  ],
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -556,8 +563,8 @@ class _OverviewStatsRow extends StatelessWidget {
               value: lastBattle == null
                   ? '—'
                   : (lastBattle!.opponentName ??
-                      lastBattle!.opponentFactionName ??
-                      '—'),
+                        lastBattle!.opponentFactionName ??
+                        '—'),
               sublabel: resultLabel ?? l10n.dashboardLastBattleEmpty,
             ),
           ],
@@ -695,8 +702,9 @@ class _FactionQuickAccessRow extends StatelessWidget {
                     child: _FactionChip(
                       label: faction,
                       selected: factionFilter == faction,
-                      onTap: () =>
-                          onFactionChanged(factionFilter == faction ? null : faction),
+                      onTap: () => onFactionChanged(
+                        factionFilter == faction ? null : faction,
+                      ),
                     ),
                   ),
               ],
@@ -758,9 +766,7 @@ class _FactionChip extends StatelessWidget {
             vertical: compact ? 6 : 8,
           ),
           decoration: BoxDecoration(
-            color: selected
-                ? color.withValues(alpha: .18)
-                : AppColors.surface,
+            color: selected ? color.withValues(alpha: .18) : AppColors.surface,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: selected ? color : AppColors.border,
@@ -848,8 +854,9 @@ class _FiltersSidebar extends StatelessWidget {
                 onTap: onReset,
                 child: Text(
                   l10n.catalogResetFilters,
-                  style: AppTextStyles.caption
-                      .copyWith(color: AppColors.primary),
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
             ),
@@ -1028,8 +1035,12 @@ class _MyArmiesRow extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: imageFile != null
-                          ? Image.file(imageFile,
-                              width: 28, height: 28, fit: BoxFit.cover)
+                          ? Image.file(
+                              imageFile,
+                              width: 28,
+                              height: 28,
+                              fit: BoxFit.cover,
+                            )
                           : Container(
                               width: 28,
                               height: 28,
@@ -1045,8 +1056,9 @@ class _MyArmiesRow extends StatelessWidget {
                     Expanded(
                       child: Text(
                         army.name,
-                        style: AppTextStyles.body
-                            .copyWith(fontWeight: FontWeight.w600),
+                        style: AppTextStyles.body.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -1056,8 +1068,9 @@ class _MyArmiesRow extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   l10n.pointsSuffix(army.totalPoints),
-                  style:
-                      AppTextStyles.caption.copyWith(color: AppColors.primary),
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.primary,
+                  ),
                 ),
                 const Spacer(),
                 ClipRRect(
@@ -1066,8 +1079,7 @@ class _MyArmiesRow extends StatelessWidget {
                     value: ratio.toDouble(),
                     minHeight: 5,
                     backgroundColor: AppColors.background,
-                    valueColor:
-                        const AlwaysStoppedAnimation(AppColors.success),
+                    valueColor: const AlwaysStoppedAnimation(AppColors.success),
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -1099,7 +1111,7 @@ class _RecentAdditionsRow extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           final entry = entries[index];
-          final imageFile = LocalCatalogImages.datasheet(entry.datasheetId);
+          final imageFile = LocalCatalogImages.unitPhoto(entry.datasheetId);
 
           return SizedBox(
             width: 110,
@@ -1109,8 +1121,12 @@ class _RecentAdditionsRow extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: imageFile != null
-                      ? Image.file(imageFile,
-                          width: 110, height: 72, fit: BoxFit.cover)
+                      ? Image.file(
+                          imageFile,
+                          width: 110,
+                          height: 72,
+                          fit: BoxFit.cover,
+                        )
                       : Container(
                           width: 110,
                           height: 72,
@@ -1151,9 +1167,8 @@ class _WishlistTab extends ConsumerWidget {
         loading: () => const Center(
           child: CircularProgressIndicator(color: AppColors.primary),
         ),
-        error: (error, _) => Center(
-          child: Text('$error', style: AppTextStyles.caption),
-        ),
+        error: (error, _) =>
+            Center(child: Text('$error', style: AppTextStyles.caption)),
         data: (items) {
           if (items.isEmpty) {
             return Center(
@@ -1167,8 +1182,10 @@ class _WishlistTab extends ConsumerWidget {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(14),
@@ -1186,7 +1203,8 @@ class _WishlistTab extends ConsumerWidget {
                               '${item.factionName} · ${l10n.collectionQuantityLabel(item.quantity)}',
                               style: AppTextStyles.caption,
                             ),
-                            if (item.notes != null && item.notes!.isNotEmpty) ...[
+                            if (item.notes != null &&
+                                item.notes!.isNotEmpty) ...[
                               const SizedBox(height: 4),
                               Text(
                                 item.notes!,
@@ -1278,12 +1296,10 @@ class _CollectionCard extends ConsumerWidget {
 
   const _CollectionCard({required this.entry});
 
-  Future<void> _updateCount(
-    WidgetRef ref,
-    String field,
-    int value,
-  ) async {
-    await ref.read(collectionRepositoryProvider).updateCounts(
+  Future<void> _updateCount(WidgetRef ref, String field, int value) async {
+    await ref
+        .read(collectionRepositoryProvider)
+        .updateCounts(
           entry.id,
           assembled: field == 'assembled' ? value : null,
           primed: field == 'primed' ? value : null,
@@ -1313,8 +1329,11 @@ class _CollectionCard extends ConsumerWidget {
     final newQuantity = entry.quantity + delta;
     if (newQuantity <= 0) {
       final l10n = AppLocalizations.of(context)!;
-      final confirmed =
-          await _confirmRemoveEntry(context, l10n, entry.datasheetName);
+      final confirmed = await _confirmRemoveEntry(
+        context,
+        l10n,
+        entry.datasheetName,
+      );
       if (!confirmed) return;
       await _removeEntry(ref);
       return;
@@ -1330,8 +1349,9 @@ class _CollectionCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final paintedRatio =
-        entry.quantity == 0 ? 0.0 : (entry.painted / entry.quantity).clamp(0, 1);
+    final paintedRatio = entry.quantity == 0
+        ? 0.0
+        : (entry.painted / entry.quantity).clamp(0, 1);
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -1349,6 +1369,8 @@ class _CollectionCard extends ConsumerWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                UnitPhotoThumbnail(datasheetId: entry.datasheetId, size: 44),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1505,7 +1527,9 @@ class _QuantityAdjustRowState extends State<_QuantityAdjustRow> {
     final l10n = AppLocalizations.of(context)!;
     final label = l10n.collectionQuantityLabel(widget.quantity);
     final firstSpace = label.indexOf(' ');
-    final numberPart = firstSpace == -1 ? label : label.substring(0, firstSpace);
+    final numberPart = firstSpace == -1
+        ? label
+        : label.substring(0, firstSpace);
     final unitPart = firstSpace == -1 ? '' : label.substring(firstSpace + 1);
     return Row(
       children: [
@@ -1514,10 +1538,7 @@ class _QuantityAdjustRowState extends State<_QuantityAdjustRow> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 2,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: .18),
                   borderRadius: BorderRadius.circular(8),
@@ -1554,8 +1575,7 @@ class _QuantityAdjustRowState extends State<_QuantityAdjustRow> {
             constraints: const BoxConstraints(),
             icon: const Icon(Icons.remove_rounded, size: 18),
             color: AppColors.primary,
-            onPressed: () =>
-                widget.onAdjust(-_readStep(_stepController)),
+            onPressed: () => widget.onAdjust(-_readStep(_stepController)),
           ),
         ),
         _StepField(
@@ -1622,7 +1642,9 @@ class _CountRowState extends State<_CountRow> {
           color: AppColors.textSecondary,
           onPressed: widget.value <= 0
               ? null
-              : () => widget.onChanged((widget.value - step).clamp(0, widget.max)),
+              : () => widget.onChanged(
+                  (widget.value - step).clamp(0, widget.max),
+                ),
         ),
         _StepField(controller: _stepController),
         IconButton(
@@ -1632,7 +1654,9 @@ class _CountRowState extends State<_CountRow> {
           color: AppColors.textSecondary,
           onPressed: widget.value >= widget.max
               ? null
-              : () => widget.onChanged((widget.value + step).clamp(0, widget.max)),
+              : () => widget.onChanged(
+                  (widget.value + step).clamp(0, widget.max),
+                ),
         ),
       ],
     );

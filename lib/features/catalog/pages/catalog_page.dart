@@ -1126,7 +1126,7 @@ class _DatasheetListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final imageFile = LocalCatalogImages.datasheet(result.id);
+    final imageFile = LocalCatalogImages.unitPhoto(result.id);
     final factionColor = result.factionId != null
         ? FactionColors.of(result.factionId!)
         : AppColors.textSecondary;

@@ -37,7 +37,7 @@ class DatasheetDetailPanel extends StatelessWidget {
       );
     }
 
-    final imageFile = LocalCatalogImages.datasheet(sheet.id);
+    final imageFile = LocalCatalogImages.unitPhoto(sheet.id);
     final factionIcon = LocalCatalogImages.faction(sheet.factionId);
     final factionBanner = imageFile == null
         ? LocalCatalogImages.factionBanner(sheet.factionId)

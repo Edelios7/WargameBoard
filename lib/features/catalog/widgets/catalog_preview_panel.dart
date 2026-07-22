@@ -55,7 +55,7 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
       );
     }
 
-    final imageFile = LocalCatalogImages.datasheet(sheet.id);
+    final imageFile = LocalCatalogImages.unitPhoto(sheet.id);
     final model = sheet.models.isNotEmpty ? sheet.models.first : null;
     final visibleKeywords = _expandKeywords
         ? sheet.keywords

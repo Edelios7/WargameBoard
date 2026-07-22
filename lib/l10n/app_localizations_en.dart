@@ -582,6 +582,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get collectionDeleteEntryTooltip => 'Remove from collection';
 
   @override
+  String get collectionChoosePhoto => 'Choose a photo';
+
+  @override
+  String get collectionRemovePhoto => 'Remove photo';
+
+  @override
+  String get collectionPhotoTooltip => 'Unit photo';
+
+  @override
+  String get collectionPhotoSaveError => 'Couldn\'t save the photo';
+
+  @override
   String get collectionDeleteConfirmTitle => 'Remove this entry?';
 
   @override
