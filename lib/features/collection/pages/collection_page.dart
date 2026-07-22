@@ -8,6 +8,7 @@ import '../../../core/utils/collection_export_formatter.dart';
 import '../../../core/utils/faction_iconography.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/battle_details.dart';
@@ -176,7 +177,11 @@ class _CollectionPageState extends ConsumerState<CollectionPage>
                 );
               },
             ),
-            const SizedBox(height: 16),
+            const DecorSeparator(
+              style: DecorSeparatorStyle.horizontal,
+              maxWidth: 320,
+              padding: EdgeInsets.symmetric(vertical: 12),
+            ),
             TabBar(
               controller: _tabController,
               isScrollable: true,

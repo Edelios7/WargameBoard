@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/decor_separator.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/dashboard_provider.dart';
 import '../../../providers/locale_provider.dart';
@@ -68,7 +69,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(l10n.navSettings, style: AppTextStyles.heading),
-            const SizedBox(height: 24),
+            const DecorSeparator(maxWidth: 200, padding: EdgeInsets.only(top: 8, bottom: 20)),
             SizedBox(
               width: 420,
               child: AppCard(

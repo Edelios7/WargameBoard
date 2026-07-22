@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/decor_separator.dart';
 import '../../../database/models/xp_summary.dart';
 import '../../../domain/xp/xp_category.dart';
 import '../../../l10n/app_localizations.dart';
@@ -112,29 +113,15 @@ class _ProfileContent extends StatelessWidget {
   }
 }
 
-/// Séparateur décoratif entre deux sections de la page (voir
-/// local_assets/decor/README.md) — retombe sur un simple espacement si
-/// l'image n'est pas présente localement.
+/// Séparateur décoratif entre deux sections de la page — thème doré,
+/// cohérent avec l'accent XP/niveau de cette page (voir
+/// [DecorSeparator] pour le patron générique repris ailleurs).
 class _DecorativeDivider extends StatelessWidget {
   const _DecorativeDivider();
 
   @override
   Widget build(BuildContext context) {
-    final file = LocalCatalogImages.decor('separator-fine-gold-imperial');
-    if (file == null) return const SizedBox(height: 28);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: Opacity(
-            opacity: 0.7,
-            child: Image.file(file, height: 18, fit: BoxFit.contain),
-          ),
-        ),
-      ),
-    );
+    return const DecorSeparator(color: 'gold-imperial');
   }
 }
 

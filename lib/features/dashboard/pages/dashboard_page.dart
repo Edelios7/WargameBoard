@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../core/widgets/donut_chart.dart';
 import '../../../database/models/army_details.dart';
@@ -161,7 +162,7 @@ class DashboardPage extends ConsumerWidget {
                     );
                   },
                 ),
-                const SizedBox(height: 28),
+                const DecorSeparator(),
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final wide = constraints.maxWidth > 980;
@@ -288,10 +289,39 @@ class DashboardPage extends ConsumerWidget {
                     );
                   },
                 ),
+                const _DashboardFooterBanner(),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Bandeau décoratif discret en pied de Dashboard (voir
+/// local_assets/decor/README.md) — absent si l'asset n'est pas présent
+/// en local.
+class _DashboardFooterBanner extends StatelessWidget {
+  const _DashboardFooterBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final file = LocalCatalogImages.decor('footer-banner');
+    if (file == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 32),
+      child: Opacity(
+        opacity: 0.5,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.file(
+            file,
+            height: 64,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
+        ),
       ),
     );
   }

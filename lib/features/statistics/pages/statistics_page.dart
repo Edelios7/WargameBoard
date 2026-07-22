@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/decor_separator.dart';
 import '../../../database/models/army_details.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/army_provider.dart';
@@ -130,7 +131,7 @@ class StatisticsPage extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 32),
+            const DecorSeparator(padding: EdgeInsets.symmetric(vertical: 14)),
             Text(l10n.statsPointsByArmy, style: AppTextStyles.title),
             const SizedBox(height: 16),
             Expanded(

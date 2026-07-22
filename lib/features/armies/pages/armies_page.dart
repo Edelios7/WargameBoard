@@ -7,6 +7,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/army_list_formatter.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/datasheet_details.dart';
@@ -1051,7 +1052,7 @@ class _BuilderSidebarState extends ConsumerState<_BuilderSidebar> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const DecorSeparator(maxWidth: 280, padding: EdgeInsets.symmetric(vertical: 10)),
           Text(
             l10n.armyBuilderRulesSection.toUpperCase(),
             style: AppTextStyles.eyebrow,
