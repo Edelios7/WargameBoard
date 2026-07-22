@@ -100,8 +100,23 @@ def convert(ref_path: Path, out_path: Path, warnings: list) -> dict:
         # profils de TOUTES les autres fiches partageant ce nom.
         wid = f"wp-{faction_slug}-{unit_slug}-{slugify(name)}"
         weapon = weapons.setdefault(
-            wid, {"id": wid, "name": name, "isMelee": is_melee, "profiles": []}
+            wid,
+            {
+                "id": wid,
+                "name": name,
+                "isMelee": False,
+                "isRanged": False,
+                "profiles": [],
+            },
         )
+        # Une meme arme peut apparaitre a la fois dans la liste des armes de
+        # tir et de melee d'une fiche (regle "Assault" du 10e edition) : on
+        # cumule les deux modes au lieu d'ecraser, sinon l'un des deux se
+        # perd et l'arme est mal etiquetee cote appli.
+        if is_melee:
+            weapon["isMelee"] = True
+        else:
+            weapon["isRanged"] = True
 
         rng = parse_range(entry.get("range"))
         strength = parse_int(entry.get("strength"))
@@ -119,6 +134,7 @@ def convert(ref_path: Path, out_path: Path, warnings: list) -> dict:
             return wid
 
         profile = {
+            "name": "Mêlée" if is_melee else "Tir",
             "range": rng,
             "attacks": attacks,
             "strength": strength,

@@ -186,12 +186,13 @@ class CatalogImportService {
     for (final item in items) {
       final weaponId = _require<String>(item, 'id', 'weapons');
       final isMelee = item['isMelee'] as bool? ?? false;
+      final isRanged = item['isRanged'] as bool? ?? !isMelee;
       await database.into(database.weapons).insertOnConflictUpdate(
             WeaponsCompanion.insert(
               id: weaponId,
               name: _require<String>(item, 'name', 'weapons'),
               isMelee: Value(isMelee),
-              isRanged: Value(!isMelee),
+              isRanged: Value(isRanged),
             ),
           );
 
