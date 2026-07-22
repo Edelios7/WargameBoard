@@ -80,6 +80,7 @@ class TexturedButton extends StatelessWidget {
           onTap: onPressed,
           child: Ink(
             height: 46,
+            width: double.infinity,
             decoration: BoxDecoration(
               image: DecorationImage(image: FileImage(file), fit: BoxFit.fill),
             ),
