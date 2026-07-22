@@ -2564,6 +2564,36 @@ abstract class AppLocalizations {
   /// **'Que s\'est-il passé ?'**
   String get battleDashboardEventHint;
 
+  /// No description provided for @battleDashboardEventsEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun événement enregistré pour l\'instant'**
+  String get battleDashboardEventsEmpty;
+
+  /// No description provided for @battleDashboardNotesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notes'**
+  String get battleDashboardNotesTitle;
+
+  /// No description provided for @battleDashboardNotesHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Note tout ce qui vaut la peine d\'être retenu...'**
+  String get battleDashboardNotesHint;
+
+  /// No description provided for @battleDetailTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Récapitulatif de la partie'**
+  String get battleDetailTitle;
+
+  /// No description provided for @battleDetailBack.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retour à l\'historique'**
+  String get battleDetailBack;
+
   /// No description provided for @battleDashboardFinish.
   ///
   /// In fr, this message translates to:

@@ -1343,5 +1343,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get battleDashboardEventHint => 'What happened?';
 
   @override
+  String get battleDashboardEventsEmpty => 'No events logged yet';
+
+  @override
+  String get battleDashboardNotesTitle => 'Notes';
+
+  @override
+  String get battleDashboardNotesHint => 'Write anything worth remembering...';
+
+  @override
+  String get battleDetailTitle => 'Battle recap';
+
+  @override
+  String get battleDetailBack => 'Back to history';
+
+  @override
   String get battleDashboardFinish => 'Finish battle';
 }

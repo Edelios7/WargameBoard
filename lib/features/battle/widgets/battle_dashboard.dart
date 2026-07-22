@@ -26,7 +26,7 @@ const _phaseOrder = [
   BattlePhase.morale,
 ];
 
-String _phaseLabel(AppLocalizations l10n, BattlePhase phase) {
+String phaseLabel(AppLocalizations l10n, BattlePhase phase) {
   switch (phase) {
     case BattlePhase.command:
       return l10n.battlePhaseCommand;
@@ -57,14 +57,14 @@ class BattleDashboard extends ConsumerWidget {
 
     final rosters = [
       if (battle.armyId != null)
-        _RosterBlock(
+        RosterBlock(
           battleId: battle.id,
           armyId: battle.armyId!,
           title: AppLocalizations.of(context)!.battleDashboardRoster,
           accentColor: AppColors.primary,
         ),
       if (battle.opponentArmyId != null)
-        _RosterBlock(
+        RosterBlock(
           battleId: battle.id,
           armyId: battle.opponentArmyId!,
           title: AppLocalizations.of(context)!.battleDashboardOpponentRoster,
@@ -98,7 +98,14 @@ class BattleDashboard extends ConsumerWidget {
                   ),
                 );
                 final rightColumn = SingleChildScrollView(
-                  child: _EventsBlock(battleId: battle.id),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      EventsBlock(battleId: battle.id),
+                      const SizedBox(height: 16),
+                      NotesBlock(battleId: battle.id, notes: battle.notes),
+                    ],
+                  ),
                 );
 
                 if (constraints.maxWidth < 900 || rosters.isEmpty) {
@@ -110,7 +117,9 @@ class BattleDashboard extends ConsumerWidget {
                           roster,
                           const SizedBox(height: 16),
                         ],
-                        _EventsBlock(battleId: battle.id),
+                        EventsBlock(battleId: battle.id),
+                        const SizedBox(height: 16),
+                        NotesBlock(battleId: battle.id, notes: battle.notes),
                       ],
                     ),
                   );
@@ -470,7 +479,7 @@ class _PhaseBlockState extends ConsumerState<_PhaseBlock> {
                   children: [
                     for (var i = 0; i < _phaseOrder.length; i++)
                       _PhaseChip(
-                        label: _phaseLabel(l10n, _phaseOrder[i]),
+                        label: phaseLabel(l10n, _phaseOrder[i]),
                         state: i < currentIndex
                             ? _PhaseState.done
                             : i == currentIndex
@@ -670,7 +679,7 @@ class _CommandPointsBlock extends ConsumerWidget {
   }
 }
 
-String _statLabel(AppLocalizations l10n, BattleStatKey key) {
+String statLabel(AppLocalizations l10n, BattleStatKey key) {
   switch (key) {
     case BattleStatKey.movement:
       return l10n.statMovement;
@@ -690,17 +699,20 @@ String _statLabel(AppLocalizations l10n, BattleStatKey key) {
 /// Roster de l'armée engagée — consultation instantanée d'une fiche
 /// complète, marquage détruit/vivant et bonus-malus de caractéristiques
 /// sans quitter la partie (voir vision "Assistant de règles").
-class _RosterBlock extends ConsumerWidget {
+class RosterBlock extends ConsumerWidget {
   final String battleId;
   final String armyId;
   final String title;
   final Color accentColor;
+  final bool readOnly;
 
-  const _RosterBlock({
+  const RosterBlock({
+    super.key,
     required this.battleId,
     required this.armyId,
     required this.title,
     required this.accentColor,
+    this.readOnly = false,
   });
 
   @override
@@ -751,20 +763,28 @@ class _RosterBlock extends ConsumerWidget {
                 runSpacing: 8,
                 children: [
                   for (final unit in army.units)
-                    _RosterChip(
+                    RosterChip(
                       label: unit.datasheetName,
                       modelCount: unit.modelCount,
                       destroyed: destroyedIds.contains(unit.id),
                       modifierCount: modifierCounts[unit.id] ?? 0,
                       accentColor: accentColor,
-                      onTap: () => showDialog(
-                        context: context,
-                        builder: (_) => _UnitManageDialog(
-                          battleId: battleId,
-                          unit: unit,
-                          destroyed: destroyedIds.contains(unit.id),
-                        ),
-                      ),
+                      onTap: readOnly
+                          ? () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => DatasheetFullPage(
+                                  datasheetId: unit.datasheetId,
+                                ),
+                              ),
+                            )
+                          : () => showDialog(
+                              context: context,
+                              builder: (_) => _UnitManageDialog(
+                                battleId: battleId,
+                                unit: unit,
+                                destroyed: destroyedIds.contains(unit.id),
+                              ),
+                            ),
                     ),
                 ],
               );
@@ -776,7 +796,7 @@ class _RosterBlock extends ConsumerWidget {
   }
 }
 
-class _RosterChip extends StatelessWidget {
+class RosterChip extends StatelessWidget {
   final String label;
   final int modelCount;
   final bool destroyed;
@@ -784,7 +804,8 @@ class _RosterChip extends StatelessWidget {
   final Color accentColor;
   final VoidCallback onTap;
 
-  const _RosterChip({
+  const RosterChip({
+    super.key,
     required this.label,
     required this.modelCount,
     required this.destroyed,
@@ -1000,7 +1021,7 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
                       child: Row(
                         children: [
                           Text(
-                            '${modifier.delta > 0 ? '+' : ''}${modifier.delta} ${_statLabel(l10n, modifier.statKey)}',
+                            '${modifier.delta > 0 ? '+' : ''}${modifier.delta} ${statLabel(l10n, modifier.statKey)}',
                             style: AppTextStyles.body.copyWith(
                               fontWeight: FontWeight.w600,
                               color: modifier.delta > 0
@@ -1043,7 +1064,7 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
                           for (final key in BattleStatKey.values)
                             DropdownMenuItem(
                               value: key,
-                              child: Text(_statLabel(l10n, key)),
+                              child: Text(statLabel(l10n, key)),
                             ),
                         ],
                         onChanged: (value) =>
@@ -1093,16 +1114,17 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
   }
 }
 
-class _EventsBlock extends ConsumerStatefulWidget {
+class EventsBlock extends ConsumerStatefulWidget {
   final String battleId;
+  final bool readOnly;
 
-  const _EventsBlock({required this.battleId});
+  const EventsBlock({super.key, required this.battleId, this.readOnly = false});
 
   @override
-  ConsumerState<_EventsBlock> createState() => _EventsBlockState();
+  ConsumerState<EventsBlock> createState() => EventsBlockState();
 }
 
-class _EventsBlockState extends ConsumerState<_EventsBlock> {
+class EventsBlockState extends ConsumerState<EventsBlock> {
   final _controller = TextEditingController();
 
   @override
@@ -1135,40 +1157,52 @@ class _EventsBlockState extends ConsumerState<_EventsBlock> {
             style: AppTextStyles.eyebrow,
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  style: AppTextStyles.body,
-                  onSubmitted: (_) => _add(),
-                  decoration: InputDecoration(
-                    hintText: l10n.battleDashboardEventHint,
-                    hintStyle: AppTextStyles.caption,
-                    filled: true,
-                    fillColor: AppColors.background,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
+          if (!widget.readOnly) ...[
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    style: AppTextStyles.body,
+                    onSubmitted: (_) => _add(),
+                    decoration: InputDecoration(
+                      hintText: l10n.battleDashboardEventHint,
+                      hintStyle: AppTextStyles.caption,
+                      filled: true,
+                      fillColor: AppColors.background,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: const Icon(Icons.add_rounded),
-                color: AppColors.primary,
-                onPressed: _add,
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.add_rounded),
+                  color: AppColors.primary,
+                  onPressed: _add,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
           eventsAsync.when(
             loading: () => const SizedBox.shrink(),
             error: (_, __) => const SizedBox.shrink(),
-            data: (events) => Column(
-              children: [for (final event in events) _EventRow(event: event)],
-            ),
+            data: (events) => events.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Text(
+                      l10n.battleDashboardEventsEmpty,
+                      style: AppTextStyles.caption,
+                    ),
+                  )
+                : Column(
+                    children: [
+                      for (final event in events) EventRow(event: event),
+                    ],
+                  ),
           ),
         ],
       ),
@@ -1176,10 +1210,10 @@ class _EventsBlockState extends ConsumerState<_EventsBlock> {
   }
 }
 
-class _EventRow extends StatelessWidget {
+class EventRow extends StatelessWidget {
   final BattleEventDetails event;
 
-  const _EventRow({required this.event});
+  const EventRow({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
@@ -1200,6 +1234,96 @@ class _EventRow extends StatelessWidget {
               style: AppTextStyles.caption.copyWith(
                 color: event.cpDelta! > 0 ? AppColors.success : AppColors.error,
                 fontWeight: FontWeight.w600,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Bloc de notes libres pour la partie — éditable en direct (sauvegardé à
+/// la perte de focus/validation), ou en lecture seule pour le récap d'une
+/// partie terminée (voir [BattleDetailPage]).
+class NotesBlock extends ConsumerStatefulWidget {
+  final String battleId;
+  final String? notes;
+  final bool readOnly;
+
+  const NotesBlock({
+    super.key,
+    required this.battleId,
+    required this.notes,
+    this.readOnly = false,
+  });
+
+  @override
+  ConsumerState<NotesBlock> createState() => _NotesBlockState();
+}
+
+class _NotesBlockState extends ConsumerState<NotesBlock> {
+  late final _controller = TextEditingController(text: widget.notes);
+  late final _focusNode = FocusNode()..addListener(_onFocusChange);
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (_focusNode.hasFocus) return;
+    _save();
+  }
+
+  Future<void> _save() async {
+    final text = _controller.text.trim();
+    if (text == (widget.notes ?? '')) return;
+    await ref
+        .read(battleRepositoryProvider)
+        .updateLiveState(
+          widget.battleId,
+          notes: Value(text.isEmpty ? null : text),
+        );
+    ref.invalidate(activeBattleProvider);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.battleDashboardNotesTitle.toUpperCase(),
+            style: AppTextStyles.eyebrow,
+          ),
+          const SizedBox(height: 12),
+          if (widget.readOnly)
+            Text(
+              (widget.notes ?? '').isEmpty ? '—' : widget.notes!,
+              style: AppTextStyles.body,
+            )
+          else
+            TextField(
+              controller: _controller,
+              focusNode: _focusNode,
+              maxLines: 4,
+              minLines: 2,
+              style: AppTextStyles.body,
+              onSubmitted: (_) => _save(),
+              decoration: InputDecoration(
+                hintText: l10n.battleDashboardNotesHint,
+                hintStyle: AppTextStyles.caption,
+                filled: true,
+                fillColor: AppColors.background,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
         ],

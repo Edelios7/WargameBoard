@@ -111,6 +111,7 @@ class BattleRepository {
     Value<int?> myScore = const Value.absent(),
     Value<int?> opponentScore = const Value.absent(),
     Value<bool?> myTurnActive = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
   }) {
     return database.battleDao.updateLiveState(
       battleId,
@@ -122,6 +123,7 @@ class BattleRepository {
       myScore: myScore,
       opponentScore: opponentScore,
       myTurnActive: myTurnActive,
+      notes: notes,
     );
   }
 

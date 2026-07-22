@@ -154,6 +154,21 @@ void main() {
       expect(events.single.cpDelta, -1);
     });
 
+    test('updateLiveState can set and clear notes', () async {
+      final id = await database.battleDao.startBattle(opponentName: 'Marc');
+
+      await database.battleDao.updateLiveState(
+        id,
+        notes: const Value('Le Land Raider a perdu 4 PV.'),
+      );
+      var active = await database.battleDao.getActiveBattle();
+      expect(active!.notes, 'Le Land Raider a perdu 4 PV.');
+
+      await database.battleDao.updateLiveState(id, notes: const Value(null));
+      active = await database.battleDao.getActiveBattle();
+      expect(active!.notes, isNull);
+    });
+
     test('finishBattle moves the battle into history', () async {
       final id = await database.battleDao.startBattle(opponentName: 'Marc');
 

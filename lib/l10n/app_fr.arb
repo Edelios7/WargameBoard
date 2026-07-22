@@ -642,5 +642,10 @@
   "battleDashboardEvents": "Journal de bataille",
   "battleDashboardAddEvent": "Ajouter un événement",
   "battleDashboardEventHint": "Que s'est-il passé ?",
+  "battleDashboardEventsEmpty": "Aucun événement enregistré pour l'instant",
+  "battleDashboardNotesTitle": "Notes",
+  "battleDashboardNotesHint": "Note tout ce qui vaut la peine d'être retenu...",
+  "battleDetailTitle": "Récapitulatif de la partie",
+  "battleDetailBack": "Retour à l'historique",
   "battleDashboardFinish": "Terminer la partie"
 }

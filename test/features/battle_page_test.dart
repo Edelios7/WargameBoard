@@ -79,6 +79,24 @@ void main() {
     expect(find.text('Aucune partie enregistrée'), findsNothing);
   });
 
+  testWidgets('tapping a past battle opens its read-only recap', (
+    tester,
+  ) async {
+    await database.battleDao.addBattle(
+      opponentName: 'Julie',
+      notes: 'Le Land Raider a perdu 4 PV.',
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Julie'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Récapitulatif de la partie'), findsOneWidget);
+    expect(find.text('Le Land Raider a perdu 4 PV.'), findsOneWidget);
+  });
+
   testWidgets('deleting a battle removes it from the history', (tester) async {
     await database.battleDao.addBattle(opponentName: 'Julie');
 

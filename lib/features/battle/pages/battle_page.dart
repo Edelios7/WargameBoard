@@ -9,6 +9,7 @@ import '../../../database/models/battle_details.dart';
 import '../../../database/tables/battles_table.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/battle_provider.dart';
+import 'battle_detail_page.dart';
 import '../widgets/battle_dashboard.dart';
 import '../widgets/battle_setup_dialog.dart';
 import '../widgets/log_battle_dialog.dart';
@@ -179,6 +180,9 @@ class _BattleCard extends ConsumerWidget {
     );
 
     return AppCard(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => BattleDetailPage(battle: battle)),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

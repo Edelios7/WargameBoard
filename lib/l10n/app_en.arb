@@ -642,5 +642,10 @@
   "battleDashboardEvents": "Battle log",
   "battleDashboardAddEvent": "Add event",
   "battleDashboardEventHint": "What happened?",
+  "battleDashboardEventsEmpty": "No events logged yet",
+  "battleDashboardNotesTitle": "Notes",
+  "battleDashboardNotesHint": "Write anything worth remembering...",
+  "battleDetailTitle": "Battle recap",
+  "battleDetailBack": "Back to history",
   "battleDashboardFinish": "Finish battle"
 }

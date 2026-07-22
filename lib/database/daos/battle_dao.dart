@@ -239,6 +239,7 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
     Value<int?> myScore = const Value.absent(),
     Value<int?> opponentScore = const Value.absent(),
     Value<bool?> myTurnActive = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
   }) {
     return (update(battles)..where((t) => t.id.equals(battleId))).write(
       BattlesCompanion(
@@ -250,6 +251,7 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
         myScore: myScore,
         opponentScore: opponentScore,
         myTurnActive: myTurnActive,
+        notes: notes,
       ),
     );
   }
