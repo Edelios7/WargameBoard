@@ -27,7 +27,25 @@ frame-<couleur>.png                  cadre carré complet (4 couleurs seulement 
                                       silver-skull, red-chaos, green-ork,
                                       purple-corrupted)
 footer-banner.png                    bandeau décoratif pleine largeur (bas de page)
+button-bg-<couleur>.png              fond de bouton pilule ornementé, texte effacé
+                                      (3 couleurs seulement : purple-corrupted,
+                                      red-chaos, silver-skull — voir plus bas)
 ```
+
+## `button-bg-*`
+
+Recadrés depuis les plaques `JOUER`/`COMBATTRE`/etc. de
+`Element de navigation.png`, avec le texte gravé dans l'image
+(« COLLECTION », « COMBATTRE », « OPTIONS ») effacé et remplacé par un
+clone étiré du fond environnant (script ponctuel, pas de source
+conservée — recadrer à nouveau depuis le PDF si besoin d'affiner).
+Le texte réel du bouton est à afficher par-dessus en Flutter (jamais
+gravé dans l'image, pour rester traduisible EN/FR) : voir
+`TexturedButton` dans `lib/core/widgets/textured_button.dart`.
+
+- `button-bg-purple-corrupted.png` — accent, aligné sur `AppColors.primary`
+- `button-bg-red-chaos.png` — action destructive/danger
+- `button-bg-silver-skull.png` — action neutre/secondaire
 
 ## Utilisation
 

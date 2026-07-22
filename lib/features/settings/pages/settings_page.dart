@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/decor_separator.dart';
+import '../../../core/widgets/textured_button.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/dashboard_provider.dart';
 import '../../../providers/locale_provider.dart';
@@ -140,16 +141,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       style: AppTextStyles.caption,
                     ),
                     const SizedBox(height: 12),
-                    FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                      ),
+                    TexturedButton(
+                      label: l10n.settingsImportButton,
+                      icon: Icons.file_download_outlined,
                       onPressed: () => showDialog(
                         context: context,
                         builder: (_) => const ImportJsonDialog(),
                       ),
-                      icon: const Icon(Icons.file_download_outlined),
-                      label: Text(l10n.settingsImportButton),
                     ),
                   ],
                 ),
