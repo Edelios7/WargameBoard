@@ -41,10 +41,18 @@ class TexturedButton extends StatelessWidget {
         TexturedButtonVariant.neutral => AppColors.surfaceElevated,
       };
 
+  static const _height = 46.0;
+
   @override
   Widget build(BuildContext context) {
-    final file = LocalCatalogImages.decor('button-bg-$_colorName');
-    if (file == null) {
+    // Le fond est assemblé en 3 morceaux (coins ornés + bande centrale
+    // répétée) plutôt qu'une seule image étirée : le motif du cadre a des
+    // détails fins qui deviennent flous en BoxFit.fill sur un bouton large,
+    // voir local_assets/decor/README.md (section `button-bg-*`).
+    final leftCap = LocalCatalogImages.decor('button-cap-left-$_colorName');
+    final rightCap = LocalCatalogImages.decor('button-cap-right-$_colorName');
+    final tile = LocalCatalogImages.decor('button-tile-$_colorName');
+    if (leftCap == null || rightCap == null || tile == null) {
       return FilledButton.icon(
         style: FilledButton.styleFrom(backgroundColor: _fallbackColor),
         onPressed: onPressed,
@@ -78,13 +86,32 @@ class TexturedButton extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onPressed,
-          child: Ink(
-            height: 46,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              image: DecorationImage(image: FileImage(file), fit: BoxFit.fill),
+          child: SizedBox(
+            height: _height,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Image.file(leftCap, height: _height),
+                    Expanded(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: FileImage(tile),
+                            repeat: ImageRepeat.repeatX,
+                            fit: BoxFit.fitHeight,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Image.file(rightCap, height: _height),
+                  ],
+                ),
+                content,
+              ],
             ),
-            child: Center(child: content),
           ),
         ),
       ),
