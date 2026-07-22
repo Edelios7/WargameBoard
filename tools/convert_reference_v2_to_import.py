@@ -85,11 +85,20 @@ def convert(ref_path: Path, out_path: Path, warnings: list) -> dict:
             existing["description"] = description
         return aid
 
-    def weapon_id_and_profile(entry: dict, is_melee: bool, unit_name: str):
+    def weapon_id_and_profile(entry: dict, is_melee: bool, unit_name: str, unit_slug: str):
         name = entry["name"].strip()
         if not name:
             return None
-        wid = f"wp-{slugify(name)}"
+        # L'id est scope par fiche (faction + unite), pas juste par nom
+        # d'arme : beaucoup d'armes generiquement nommees ("Griffes et
+        # dents de xeno", "Arme energetique"...) ont des stats DIFFERENTES
+        # selon l'unite qui les porte (un monstre frappe plus fort qu'une
+        # petite creature). Un id purement base sur le nom faisait
+        # collisionner toutes ces variantes sur la meme arme, empilant
+        # leurs profils incompatibles les uns sur les autres — n'importe
+        # quelle fiche utilisant ce nom d'arme affichait alors TOUS les
+        # profils de TOUTES les autres fiches partageant ce nom.
+        wid = f"wp-{faction_slug}-{unit_slug}-{slugify(name)}"
         weapon = weapons.setdefault(
             wid, {"id": wid, "name": name, "isMelee": is_melee, "profiles": []}
         )
@@ -121,8 +130,10 @@ def convert(ref_path: Path, out_path: Path, warnings: list) -> dict:
         else:
             profile["ballisticSkill"] = skill
 
-        # Évite les doublons de profil identique si la même arme
-        # réapparaît sur plusieurs fiches avec les mêmes valeurs.
+        # Évite les doublons de profil identique si la même entrée
+        # d'arme réapparaît plusieurs fois sur la même fiche (l'id est
+        # maintenant scopé par fiche, donc ceci ne dédoublonne plus
+        # entre fiches différentes — c'est voulu, voir plus haut).
         if profile not in weapon["profiles"]:
             weapon["profiles"].append(profile)
         return wid
@@ -149,17 +160,22 @@ def convert(ref_path: Path, out_path: Path, warnings: list) -> dict:
             if aname and "�" not in aname and "�" not in adesc:
                 ability_ids.append(ability_id(aname, adesc))
 
+        unit_slug = slugify(name)
         weapon_ids = []
         for entry in unit.get("ranged_weapons") or []:
             if "�" in entry.get("name", ""):
                 continue
-            wid = weapon_id_and_profile(entry, is_melee=False, unit_name=name)
+            wid = weapon_id_and_profile(
+                entry, is_melee=False, unit_name=name, unit_slug=unit_slug
+            )
             if wid:
                 weapon_ids.append(wid)
         for entry in unit.get("melee_weapons") or []:
             if "�" in entry.get("name", ""):
                 continue
-            wid = weapon_id_and_profile(entry, is_melee=True, unit_name=name)
+            wid = weapon_id_and_profile(
+                entry, is_melee=True, unit_name=name, unit_slug=unit_slug
+            )
             if wid:
                 weapon_ids.append(wid)
 
