@@ -6,7 +6,9 @@ plugins {
 
 android {
     namespace = "com.example.wargameboard"
-    compileSdk = flutter.compileSdkVersion
+    // file_picker's Android dependency (flutter_plugin_android_lifecycle)
+    // requires compileSdk >= 36 — Flutter's own default lagged behind it.
+    compileSdk = maxOf(flutter.compileSdkVersion, 36)
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

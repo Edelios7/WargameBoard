@@ -30,7 +30,7 @@ class BackupService {
   /// en journal — une simple copie du fichier .sqlite pourrait les
   /// manquer). Retourne le chemin du fichier créé, `null` si annulé.
   Future<String?> exportBackup() async {
-    final directory = await FilePicker.platform.getDirectoryPath(
+    final directory = await FilePicker.getDirectoryPath(
       dialogTitle: 'Choisir où enregistrer la sauvegarde',
     );
     if (directory == null) return null;
@@ -54,7 +54,7 @@ class BackupService {
   /// et la met en attente de restauration — voir [_pendingRestoreSuffix].
   /// Retourne `true` si une restauration a bien été programmée.
   Future<bool> stageRestore() async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       dialogTitle: 'Choisir une sauvegarde à restaurer',
       type: FileType.custom,
       allowedExtensions: ['sqlite'],

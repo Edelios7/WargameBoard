@@ -34,7 +34,7 @@ class UserPhotoService {
   /// Retourne le nouveau fichier de la fiche, `null` si l'utilisateur
   /// annule.
   Future<File?> pickAndSave(String datasheetId, {String? entryId}) async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       type: FileType.image,
       dialogTitle: 'Choisir une photo',
     );
