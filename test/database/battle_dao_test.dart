@@ -297,5 +297,54 @@ void main() {
       modifiers = await database.battleDao.getUnitModifiers(battleId);
       expect(modifiers, isEmpty);
     });
+
+    test(
+      'setModelWounds tracks per-model wounds and clears the row at max',
+      () async {
+        final battleId = await database.battleDao.startBattle(
+          opponentName: 'Marc',
+        );
+        final armyUnitId = await seedArmyUnit(database);
+
+        await database.battleDao.setModelWounds(
+          battleId,
+          armyUnitId,
+          1,
+          currentWounds: 1,
+          maxWounds: 3,
+        );
+        await database.battleDao.setModelWounds(
+          battleId,
+          armyUnitId,
+          2,
+          currentWounds: -5,
+          maxWounds: 3,
+        );
+
+        var wounds = await database.battleDao.getUnitWounds(battleId);
+        expect(wounds, hasLength(2));
+        expect(
+          wounds.firstWhere((w) => w.modelIndex == 1).currentWounds,
+          1,
+        );
+        // Clampée à 0, jamais négative.
+        expect(
+          wounds.firstWhere((w) => w.modelIndex == 2).currentWounds,
+          0,
+        );
+
+        // Revenir au maximum efface la ligne (absence = plein PV).
+        await database.battleDao.setModelWounds(
+          battleId,
+          armyUnitId,
+          1,
+          currentWounds: 3,
+          maxWounds: 3,
+        );
+        wounds = await database.battleDao.getUnitWounds(battleId);
+        expect(wounds, hasLength(1));
+        expect(wounds.single.modelIndex, 2);
+      },
+    );
   });
 }

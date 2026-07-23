@@ -662,6 +662,14 @@
     }
   },
   "battleUnitViewTooltip": "Toucher pour voir la fiche",
+  "battleUnitWoundsTitle": "PV",
+  "battleUnitWoundsSingleLabel": "PV",
+  "battleUnitWoundsModelLabel": "Modèle {index}",
+  "@battleUnitWoundsModelLabel": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
   "battleUnitModifiersTitle": "Bonus / malus",
   "battleUnitAddModifier": "Ajouter un bonus/malus",
   "battleUnitModifierLabelHint": "Raison (optionnel)",

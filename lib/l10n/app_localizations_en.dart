@@ -1380,6 +1380,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get battleUnitViewTooltip => 'Tap to view the datasheet';
 
   @override
+  String get battleUnitWoundsTitle => 'Wounds';
+
+  @override
+  String get battleUnitWoundsSingleLabel => 'Wounds';
+
+  @override
+  String battleUnitWoundsModelLabel(int index) {
+    return 'Model $index';
+  }
+
+  @override
   String get battleUnitModifiersTitle => 'Bonuses / penalties';
 
   @override

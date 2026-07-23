@@ -1390,6 +1390,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get battleUnitViewTooltip => 'Toucher pour voir la fiche';
 
   @override
+  String get battleUnitWoundsTitle => 'PV';
+
+  @override
+  String get battleUnitWoundsSingleLabel => 'PV';
+
+  @override
+  String battleUnitWoundsModelLabel(int index) {
+    return 'Modèle $index';
+  }
+
+  @override
   String get battleUnitModifiersTitle => 'Bonus / malus';
 
   @override

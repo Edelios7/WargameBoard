@@ -56,6 +56,7 @@ import 'tables/battles_table.dart';
 import 'tables/battle_events_table.dart';
 import 'tables/battle_unit_states_table.dart';
 import 'tables/battle_unit_modifiers_table.dart';
+import 'tables/battle_unit_wounds_table.dart';
 
 import 'tables/projects_table.dart';
 
@@ -146,6 +147,7 @@ part 'app_database.g.dart';
     BattleEvents,
     BattleUnitStates,
     BattleUnitModifiers,
+    BattleUnitWounds,
 
     // ===== PROJECTS =====
     Projects,
@@ -204,7 +206,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 17;
+  int get schemaVersion => 18;
 
   // =========================
   // Migrations
@@ -367,6 +369,11 @@ class AppDatabase extends _$AppDatabase {
       if (from < 17) {
         if (!await _hasColumn('battle_events', 'opponent_cp_delta')) {
           await m.addColumn(battleEvents, battleEvents.opponentCpDelta);
+        }
+      }
+      if (from < 18) {
+        if (!await _hasTable('battle_unit_wounds')) {
+          await m.createTable(battleUnitWounds);
         }
       }
     },

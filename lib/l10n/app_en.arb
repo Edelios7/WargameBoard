@@ -662,6 +662,14 @@
     }
   },
   "battleUnitViewTooltip": "Tap to view the datasheet",
+  "battleUnitWoundsTitle": "Wounds",
+  "battleUnitWoundsSingleLabel": "Wounds",
+  "battleUnitWoundsModelLabel": "Model {index}",
+  "@battleUnitWoundsModelLabel": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
   "battleUnitModifiersTitle": "Bonuses / penalties",
   "battleUnitAddModifier": "Add a bonus/penalty",
   "battleUnitModifierLabelHint": "Reason (optional)",

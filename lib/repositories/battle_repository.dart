@@ -5,6 +5,7 @@ import '../database/models/battle_details.dart';
 import '../database/models/battle_event_details.dart';
 import '../database/models/battle_unit_modifier_details.dart';
 import '../database/models/battle_unit_state_details.dart';
+import '../database/models/battle_unit_wound_details.dart';
 import '../database/tables/battle_unit_modifiers_table.dart';
 import '../database/tables/battles_table.dart';
 import '../services/xp_service.dart';
@@ -228,5 +229,25 @@ class BattleRepository {
 
   Future<List<BattleUnitModifierDetails>> getUnitModifiers(String battleId) {
     return database.battleDao.getUnitModifiers(battleId);
+  }
+
+  Future<void> setModelWounds(
+    String battleId,
+    String armyUnitId,
+    int modelIndex, {
+    required int currentWounds,
+    required int maxWounds,
+  }) {
+    return database.battleDao.setModelWounds(
+      battleId,
+      armyUnitId,
+      modelIndex,
+      currentWounds: currentWounds,
+      maxWounds: maxWounds,
+    );
+  }
+
+  Future<List<BattleUnitWoundDetails>> getUnitWounds(String battleId) {
+    return database.battleDao.getUnitWounds(battleId);
   }
 }

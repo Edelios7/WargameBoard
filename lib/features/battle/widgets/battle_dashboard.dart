@@ -16,6 +16,7 @@ import '../../../database/tables/battles_table.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/army_provider.dart';
 import '../../../providers/battle_provider.dart';
+import '../../../providers/catalog_provider.dart';
 import '../../../providers/xp_provider.dart';
 import '../../catalog/pages/datasheet_full_page.dart';
 import 'stratagem_assistant_block.dart';
@@ -1053,9 +1054,40 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
     ref.invalidate(battleUnitModifiersProvider(widget.battleId));
   }
 
+  Future<void> _adjustWounds(
+    int modelIndex,
+    int maxWounds,
+    int current,
+    int delta,
+  ) async {
+    await ref
+        .read(battleRepositoryProvider)
+        .setModelWounds(
+          widget.battleId,
+          widget.unit.id,
+          modelIndex,
+          currentWounds: current + delta,
+          maxWounds: maxWounds,
+        );
+    ref.invalidate(battleUnitWoundsProvider(widget.battleId));
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final datasheetAsync = ref.watch(
+      datasheetByIdProvider(widget.unit.datasheetId),
+    );
+    final models = datasheetAsync.value?.models ?? const [];
+    final maxWounds = models.isEmpty
+        ? 1
+        : models.map((m) => m.wounds).reduce((a, b) => a > b ? a : b);
+    final woundsAsync = ref.watch(battleUnitWoundsProvider(widget.battleId));
+    final currentWoundsByModel = <int, int>{
+      for (final wound in woundsAsync.value ?? const [])
+        if (wound.armyUnitId == widget.unit.id)
+          wound.modelIndex: wound.currentWounds,
+    };
     final modifiersAsync = ref.watch(
       battleUnitModifiersProvider(widget.battleId),
     );
@@ -1109,6 +1141,64 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                Text(
+                  l10n.battleUnitWoundsTitle.toUpperCase(),
+                  style: AppTextStyles.eyebrow,
+                ),
+                const SizedBox(height: 8),
+                for (var i = 1; i <= widget.unit.modelCount; i++)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            widget.unit.modelCount == 1
+                                ? l10n.battleUnitWoundsSingleLabel
+                                : l10n.battleUnitWoundsModelLabel(i),
+                            style: AppTextStyles.body,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.remove_circle_outline_rounded,
+                            size: 20,
+                          ),
+                          color: AppColors.error,
+                          onPressed: () => _adjustWounds(
+                            i,
+                            maxWounds,
+                            currentWoundsByModel[i] ?? maxWounds,
+                            -1,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 52,
+                          child: Text(
+                            '${currentWoundsByModel[i] ?? maxWounds}/$maxWounds',
+                            textAlign: TextAlign.center,
+                            style: AppTextStyles.body.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.add_circle_outline_rounded,
+                            size: 20,
+                          ),
+                          color: AppColors.success,
+                          onPressed: () => _adjustWounds(
+                            i,
+                            maxWounds,
+                            currentWoundsByModel[i] ?? maxWounds,
+                            1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                const SizedBox(height: 12),
                 Text(
                   l10n.battleUnitModifiersTitle.toUpperCase(),
                   style: AppTextStyles.eyebrow,

@@ -6,10 +6,12 @@ import '../models/battle_details.dart';
 import '../models/battle_event_details.dart';
 import '../models/battle_unit_modifier_details.dart';
 import '../models/battle_unit_state_details.dart';
+import '../models/battle_unit_wound_details.dart';
 import '../tables/armies_table.dart';
 import '../tables/battle_events_table.dart';
 import '../tables/battle_unit_modifiers_table.dart';
 import '../tables/battle_unit_states_table.dart';
+import '../tables/battle_unit_wounds_table.dart';
 import '../tables/battles_table.dart';
 import '../tables/factions_table.dart';
 
@@ -32,6 +34,7 @@ const _battlePhaseOrder = [
     BattleEvents,
     BattleUnitStates,
     BattleUnitModifiers,
+    BattleUnitWounds,
     Armies,
     Factions,
   ],
@@ -486,6 +489,80 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
             delta: row.delta,
             label: row.label,
             createdAt: row.createdAt,
+          ),
+        )
+        .toList();
+  }
+
+  // =========================
+  // PV des modèles en direct
+  // =========================
+
+  /// Fixe les PV restants d'un modèle précis d'une unité (son numéro dans
+  /// l'escouade, 1 à modelCount). Une fois revenu à son [maxWounds] (ou
+  /// au-delà), la ligne est supprimée plutôt que gardée à sa valeur max —
+  /// cohérent avec le reste du suivi en direct (absence = valeur par
+  /// défaut).
+  Future<void> setModelWounds(
+    String battleId,
+    String armyUnitId,
+    int modelIndex, {
+    required int currentWounds,
+    required int maxWounds,
+  }) async {
+    final clamped = currentWounds.clamp(0, maxWounds);
+    final existing = await (select(battleUnitWounds)..where(
+          (t) =>
+              t.battleId.equals(battleId) &
+              t.armyUnitId.equals(armyUnitId) &
+              t.modelIndex.equals(modelIndex),
+        ))
+        .getSingleOrNull();
+
+    if (clamped >= maxWounds) {
+      if (existing != null) {
+        await (delete(
+          battleUnitWounds,
+        )..where((t) => t.id.equals(existing.id))).go();
+      }
+      return;
+    }
+
+    if (existing != null) {
+      await (update(
+        battleUnitWounds,
+      )..where((t) => t.id.equals(existing.id))).write(
+        BattleUnitWoundsCompanion(
+          currentWounds: Value(clamped),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+      return;
+    }
+
+    await into(battleUnitWounds).insert(
+      BattleUnitWoundsCompanion.insert(
+        id: _uuid.v4(),
+        battleId: battleId,
+        armyUnitId: armyUnitId,
+        modelIndex: modelIndex,
+        currentWounds: clamped,
+      ),
+    );
+  }
+
+  /// Modèles blessés pour cette partie, toutes unités confondues — les
+  /// modèles absents de la liste sont à leur maximum de PV par défaut.
+  Future<List<BattleUnitWoundDetails>> getUnitWounds(String battleId) async {
+    final rows = await (select(
+      battleUnitWounds,
+    )..where((t) => t.battleId.equals(battleId))).get();
+    return rows
+        .map(
+          (row) => BattleUnitWoundDetails(
+            armyUnitId: row.armyUnitId,
+            modelIndex: row.modelIndex,
+            currentWounds: row.currentWounds,
           ),
         )
         .toList();

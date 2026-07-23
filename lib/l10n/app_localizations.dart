@@ -2624,6 +2624,24 @@ abstract class AppLocalizations {
   /// **'Toucher pour voir la fiche'**
   String get battleUnitViewTooltip;
 
+  /// No description provided for @battleUnitWoundsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'PV'**
+  String get battleUnitWoundsTitle;
+
+  /// No description provided for @battleUnitWoundsSingleLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'PV'**
+  String get battleUnitWoundsSingleLabel;
+
+  /// No description provided for @battleUnitWoundsModelLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modèle {index}'**
+  String battleUnitWoundsModelLabel(int index);
+
   /// No description provided for @battleUnitModifiersTitle.
   ///
   /// In fr, this message translates to:

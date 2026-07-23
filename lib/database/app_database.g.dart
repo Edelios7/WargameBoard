@@ -18557,6 +18557,435 @@ class BattleUnitModifiersCompanion extends UpdateCompanion<BattleUnitModifier> {
   }
 }
 
+class $BattleUnitWoundsTable extends BattleUnitWounds
+    with TableInfo<$BattleUnitWoundsTable, BattleUnitWound> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BattleUnitWoundsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _battleIdMeta = const VerificationMeta(
+    'battleId',
+  );
+  @override
+  late final GeneratedColumn<String> battleId = GeneratedColumn<String>(
+    'battle_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _armyUnitIdMeta = const VerificationMeta(
+    'armyUnitId',
+  );
+  @override
+  late final GeneratedColumn<String> armyUnitId = GeneratedColumn<String>(
+    'army_unit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _modelIndexMeta = const VerificationMeta(
+    'modelIndex',
+  );
+  @override
+  late final GeneratedColumn<int> modelIndex = GeneratedColumn<int>(
+    'model_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _currentWoundsMeta = const VerificationMeta(
+    'currentWounds',
+  );
+  @override
+  late final GeneratedColumn<int> currentWounds = GeneratedColumn<int>(
+    'current_wounds',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    battleId,
+    armyUnitId,
+    modelIndex,
+    currentWounds,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'battle_unit_wounds';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BattleUnitWound> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('battle_id')) {
+      context.handle(
+        _battleIdMeta,
+        battleId.isAcceptableOrUnknown(data['battle_id']!, _battleIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_battleIdMeta);
+    }
+    if (data.containsKey('army_unit_id')) {
+      context.handle(
+        _armyUnitIdMeta,
+        armyUnitId.isAcceptableOrUnknown(
+          data['army_unit_id']!,
+          _armyUnitIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_armyUnitIdMeta);
+    }
+    if (data.containsKey('model_index')) {
+      context.handle(
+        _modelIndexMeta,
+        modelIndex.isAcceptableOrUnknown(data['model_index']!, _modelIndexMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_modelIndexMeta);
+    }
+    if (data.containsKey('current_wounds')) {
+      context.handle(
+        _currentWoundsMeta,
+        currentWounds.isAcceptableOrUnknown(
+          data['current_wounds']!,
+          _currentWoundsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_currentWoundsMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BattleUnitWound map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BattleUnitWound(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      battleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}battle_id'],
+      )!,
+      armyUnitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}army_unit_id'],
+      )!,
+      modelIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}model_index'],
+      )!,
+      currentWounds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}current_wounds'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BattleUnitWoundsTable createAlias(String alias) {
+    return $BattleUnitWoundsTable(attachedDatabase, alias);
+  }
+}
+
+class BattleUnitWound extends DataClass implements Insertable<BattleUnitWound> {
+  final String id;
+  final String battleId;
+  final String armyUnitId;
+
+  /// Position du modèle au sein de l'unité (1 à modelCount) — une escouade
+  /// de 5 Intercessors a des modèles 1 à 5, chacun suivi indépendamment.
+  final int modelIndex;
+  final int currentWounds;
+  final DateTime updatedAt;
+  const BattleUnitWound({
+    required this.id,
+    required this.battleId,
+    required this.armyUnitId,
+    required this.modelIndex,
+    required this.currentWounds,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['battle_id'] = Variable<String>(battleId);
+    map['army_unit_id'] = Variable<String>(armyUnitId);
+    map['model_index'] = Variable<int>(modelIndex);
+    map['current_wounds'] = Variable<int>(currentWounds);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  BattleUnitWoundsCompanion toCompanion(bool nullToAbsent) {
+    return BattleUnitWoundsCompanion(
+      id: Value(id),
+      battleId: Value(battleId),
+      armyUnitId: Value(armyUnitId),
+      modelIndex: Value(modelIndex),
+      currentWounds: Value(currentWounds),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory BattleUnitWound.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BattleUnitWound(
+      id: serializer.fromJson<String>(json['id']),
+      battleId: serializer.fromJson<String>(json['battleId']),
+      armyUnitId: serializer.fromJson<String>(json['armyUnitId']),
+      modelIndex: serializer.fromJson<int>(json['modelIndex']),
+      currentWounds: serializer.fromJson<int>(json['currentWounds']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'battleId': serializer.toJson<String>(battleId),
+      'armyUnitId': serializer.toJson<String>(armyUnitId),
+      'modelIndex': serializer.toJson<int>(modelIndex),
+      'currentWounds': serializer.toJson<int>(currentWounds),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  BattleUnitWound copyWith({
+    String? id,
+    String? battleId,
+    String? armyUnitId,
+    int? modelIndex,
+    int? currentWounds,
+    DateTime? updatedAt,
+  }) => BattleUnitWound(
+    id: id ?? this.id,
+    battleId: battleId ?? this.battleId,
+    armyUnitId: armyUnitId ?? this.armyUnitId,
+    modelIndex: modelIndex ?? this.modelIndex,
+    currentWounds: currentWounds ?? this.currentWounds,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  BattleUnitWound copyWithCompanion(BattleUnitWoundsCompanion data) {
+    return BattleUnitWound(
+      id: data.id.present ? data.id.value : this.id,
+      battleId: data.battleId.present ? data.battleId.value : this.battleId,
+      armyUnitId: data.armyUnitId.present
+          ? data.armyUnitId.value
+          : this.armyUnitId,
+      modelIndex: data.modelIndex.present
+          ? data.modelIndex.value
+          : this.modelIndex,
+      currentWounds: data.currentWounds.present
+          ? data.currentWounds.value
+          : this.currentWounds,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BattleUnitWound(')
+          ..write('id: $id, ')
+          ..write('battleId: $battleId, ')
+          ..write('armyUnitId: $armyUnitId, ')
+          ..write('modelIndex: $modelIndex, ')
+          ..write('currentWounds: $currentWounds, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    battleId,
+    armyUnitId,
+    modelIndex,
+    currentWounds,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BattleUnitWound &&
+          other.id == this.id &&
+          other.battleId == this.battleId &&
+          other.armyUnitId == this.armyUnitId &&
+          other.modelIndex == this.modelIndex &&
+          other.currentWounds == this.currentWounds &&
+          other.updatedAt == this.updatedAt);
+}
+
+class BattleUnitWoundsCompanion extends UpdateCompanion<BattleUnitWound> {
+  final Value<String> id;
+  final Value<String> battleId;
+  final Value<String> armyUnitId;
+  final Value<int> modelIndex;
+  final Value<int> currentWounds;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const BattleUnitWoundsCompanion({
+    this.id = const Value.absent(),
+    this.battleId = const Value.absent(),
+    this.armyUnitId = const Value.absent(),
+    this.modelIndex = const Value.absent(),
+    this.currentWounds = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BattleUnitWoundsCompanion.insert({
+    required String id,
+    required String battleId,
+    required String armyUnitId,
+    required int modelIndex,
+    required int currentWounds,
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       battleId = Value(battleId),
+       armyUnitId = Value(armyUnitId),
+       modelIndex = Value(modelIndex),
+       currentWounds = Value(currentWounds);
+  static Insertable<BattleUnitWound> custom({
+    Expression<String>? id,
+    Expression<String>? battleId,
+    Expression<String>? armyUnitId,
+    Expression<int>? modelIndex,
+    Expression<int>? currentWounds,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (battleId != null) 'battle_id': battleId,
+      if (armyUnitId != null) 'army_unit_id': armyUnitId,
+      if (modelIndex != null) 'model_index': modelIndex,
+      if (currentWounds != null) 'current_wounds': currentWounds,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BattleUnitWoundsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? battleId,
+    Value<String>? armyUnitId,
+    Value<int>? modelIndex,
+    Value<int>? currentWounds,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return BattleUnitWoundsCompanion(
+      id: id ?? this.id,
+      battleId: battleId ?? this.battleId,
+      armyUnitId: armyUnitId ?? this.armyUnitId,
+      modelIndex: modelIndex ?? this.modelIndex,
+      currentWounds: currentWounds ?? this.currentWounds,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (battleId.present) {
+      map['battle_id'] = Variable<String>(battleId.value);
+    }
+    if (armyUnitId.present) {
+      map['army_unit_id'] = Variable<String>(armyUnitId.value);
+    }
+    if (modelIndex.present) {
+      map['model_index'] = Variable<int>(modelIndex.value);
+    }
+    if (currentWounds.present) {
+      map['current_wounds'] = Variable<int>(currentWounds.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BattleUnitWoundsCompanion(')
+          ..write('id: $id, ')
+          ..write('battleId: $battleId, ')
+          ..write('armyUnitId: $armyUnitId, ')
+          ..write('modelIndex: $modelIndex, ')
+          ..write('currentWounds: $currentWounds, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $ProjectsTable extends Projects with TableInfo<$ProjectsTable, Project> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -19449,6 +19878,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $BattleUnitModifiersTable battleUnitModifiers =
       $BattleUnitModifiersTable(this);
+  late final $BattleUnitWoundsTable battleUnitWounds = $BattleUnitWoundsTable(
+    this,
+  );
   late final $ProjectsTable projects = $ProjectsTable(this);
   late final $XpCategoryTotalsTable xpCategoryTotals = $XpCategoryTotalsTable(
     this,
@@ -19510,6 +19942,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     battleEvents,
     battleUnitStates,
     battleUnitModifiers,
+    battleUnitWounds,
     projects,
     xpCategoryTotals,
     xpFactionTotals,
@@ -29126,6 +29559,237 @@ typedef $$BattleUnitModifiersTableProcessedTableManager =
       BattleUnitModifier,
       PrefetchHooks Function()
     >;
+typedef $$BattleUnitWoundsTableCreateCompanionBuilder =
+    BattleUnitWoundsCompanion Function({
+      required String id,
+      required String battleId,
+      required String armyUnitId,
+      required int modelIndex,
+      required int currentWounds,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+typedef $$BattleUnitWoundsTableUpdateCompanionBuilder =
+    BattleUnitWoundsCompanion Function({
+      Value<String> id,
+      Value<String> battleId,
+      Value<String> armyUnitId,
+      Value<int> modelIndex,
+      Value<int> currentWounds,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$BattleUnitWoundsTableFilterComposer
+    extends Composer<_$AppDatabase, $BattleUnitWoundsTable> {
+  $$BattleUnitWoundsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get battleId => $composableBuilder(
+    column: $table.battleId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get armyUnitId => $composableBuilder(
+    column: $table.armyUnitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get modelIndex => $composableBuilder(
+    column: $table.modelIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get currentWounds => $composableBuilder(
+    column: $table.currentWounds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BattleUnitWoundsTableOrderingComposer
+    extends Composer<_$AppDatabase, $BattleUnitWoundsTable> {
+  $$BattleUnitWoundsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get battleId => $composableBuilder(
+    column: $table.battleId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get armyUnitId => $composableBuilder(
+    column: $table.armyUnitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get modelIndex => $composableBuilder(
+    column: $table.modelIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get currentWounds => $composableBuilder(
+    column: $table.currentWounds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BattleUnitWoundsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BattleUnitWoundsTable> {
+  $$BattleUnitWoundsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get battleId =>
+      $composableBuilder(column: $table.battleId, builder: (column) => column);
+
+  GeneratedColumn<String> get armyUnitId => $composableBuilder(
+    column: $table.armyUnitId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get modelIndex => $composableBuilder(
+    column: $table.modelIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get currentWounds => $composableBuilder(
+    column: $table.currentWounds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$BattleUnitWoundsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BattleUnitWoundsTable,
+          BattleUnitWound,
+          $$BattleUnitWoundsTableFilterComposer,
+          $$BattleUnitWoundsTableOrderingComposer,
+          $$BattleUnitWoundsTableAnnotationComposer,
+          $$BattleUnitWoundsTableCreateCompanionBuilder,
+          $$BattleUnitWoundsTableUpdateCompanionBuilder,
+          (
+            BattleUnitWound,
+            BaseReferences<
+              _$AppDatabase,
+              $BattleUnitWoundsTable,
+              BattleUnitWound
+            >,
+          ),
+          BattleUnitWound,
+          PrefetchHooks Function()
+        > {
+  $$BattleUnitWoundsTableTableManager(
+    _$AppDatabase db,
+    $BattleUnitWoundsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BattleUnitWoundsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BattleUnitWoundsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BattleUnitWoundsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> battleId = const Value.absent(),
+                Value<String> armyUnitId = const Value.absent(),
+                Value<int> modelIndex = const Value.absent(),
+                Value<int> currentWounds = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BattleUnitWoundsCompanion(
+                id: id,
+                battleId: battleId,
+                armyUnitId: armyUnitId,
+                modelIndex: modelIndex,
+                currentWounds: currentWounds,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String battleId,
+                required String armyUnitId,
+                required int modelIndex,
+                required int currentWounds,
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BattleUnitWoundsCompanion.insert(
+                id: id,
+                battleId: battleId,
+                armyUnitId: armyUnitId,
+                modelIndex: modelIndex,
+                currentWounds: currentWounds,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BattleUnitWoundsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BattleUnitWoundsTable,
+      BattleUnitWound,
+      $$BattleUnitWoundsTableFilterComposer,
+      $$BattleUnitWoundsTableOrderingComposer,
+      $$BattleUnitWoundsTableAnnotationComposer,
+      $$BattleUnitWoundsTableCreateCompanionBuilder,
+      $$BattleUnitWoundsTableUpdateCompanionBuilder,
+      (
+        BattleUnitWound,
+        BaseReferences<_$AppDatabase, $BattleUnitWoundsTable, BattleUnitWound>,
+      ),
+      BattleUnitWound,
+      PrefetchHooks Function()
+    >;
 typedef $$ProjectsTableCreateCompanionBuilder =
     ProjectsCompanion Function({
       required String id,
@@ -29725,6 +30389,8 @@ class $AppDatabaseManager {
       $$BattleUnitStatesTableTableManager(_db, _db.battleUnitStates);
   $$BattleUnitModifiersTableTableManager get battleUnitModifiers =>
       $$BattleUnitModifiersTableTableManager(_db, _db.battleUnitModifiers);
+  $$BattleUnitWoundsTableTableManager get battleUnitWounds =>
+      $$BattleUnitWoundsTableTableManager(_db, _db.battleUnitWounds);
   $$ProjectsTableTableManager get projects =>
       $$ProjectsTableTableManager(_db, _db.projects);
   $$XpCategoryTotalsTableTableManager get xpCategoryTotals =>

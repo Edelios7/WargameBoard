@@ -5,6 +5,7 @@ import '../database/models/battle_event_details.dart';
 import '../database/models/battle_stats.dart';
 import '../database/models/battle_unit_modifier_details.dart';
 import '../database/models/battle_unit_state_details.dart';
+import '../database/models/battle_unit_wound_details.dart';
 import '../repositories/battle_repository.dart';
 import 'database_provider.dart';
 import 'xp_provider.dart';
@@ -69,4 +70,15 @@ final battleUnitModifiersProvider =
     ) {
       final repository = ref.watch(battleRepositoryProvider);
       return repository.getUnitModifiers(battleId);
+    });
+
+/// Modèles blessés pour cette partie (tous, toutes unités confondues) —
+/// voir [BattleRepository.getUnitWounds].
+final battleUnitWoundsProvider =
+    FutureProvider.family<List<BattleUnitWoundDetails>, String>((
+      ref,
+      battleId,
+    ) {
+      final repository = ref.watch(battleRepositoryProvider);
+      return repository.getUnitWounds(battleId);
     });
