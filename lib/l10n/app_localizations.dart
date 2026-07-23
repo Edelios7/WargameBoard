@@ -2792,6 +2792,18 @@ abstract class AppLocalizations {
   /// **'Voir la fiche complète'**
   String get battleUnitViewFullSheet;
 
+  /// No description provided for @battleUnitStatsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Caractéristiques'**
+  String get battleUnitStatsTitle;
+
+  /// No description provided for @battleUnitWeaponsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Armes'**
+  String get battleUnitWeaponsTitle;
+
   /// No description provided for @battleUnitNoModifiers.
   ///
   /// In fr, this message translates to:

@@ -700,6 +700,8 @@
   "battleUnitModifierLabelHint": "Raison (optionnel)",
   "battleUnitModifierValueHint": "Valeur (ex. 1 ou -1)",
   "battleUnitViewFullSheet": "Voir la fiche complète",
+  "battleUnitStatsTitle": "Caractéristiques",
+  "battleUnitWeaponsTitle": "Armes",
   "battleUnitNoModifiers": "Aucun bonus/malus actif",
   "battleDashboardEvents": "Journal de bataille",
   "battleDashboardAddEvent": "Ajouter un événement",

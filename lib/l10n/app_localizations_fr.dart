@@ -1485,6 +1485,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get battleUnitViewFullSheet => 'Voir la fiche complète';
 
   @override
+  String get battleUnitStatsTitle => 'Caractéristiques';
+
+  @override
+  String get battleUnitWeaponsTitle => 'Armes';
+
+  @override
   String get battleUnitNoModifiers => 'Aucun bonus/malus actif';
 
   @override

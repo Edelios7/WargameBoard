@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/battle_details.dart';
@@ -1100,6 +1101,12 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
     final unitModifiers = (modifiersAsync.value ?? const [])
         .where((m) => m.armyUnitId == widget.unit.id)
         .toList();
+    final weapons = datasheetAsync.value?.weapons ?? const [];
+    final imageFile = LocalCatalogImages.unitPhoto(widget.unit.datasheetId);
+
+    int sumDelta(BattleStatKey key) => unitModifiers
+        .where((m) => m.statKey == key)
+        .fold(0, (sum, m) => sum + m.delta);
 
     return Dialog(
       backgroundColor: AppColors.surface,
@@ -1109,15 +1116,46 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
           maxHeight: MediaQuery.of(context).size.height * 0.85,
         ),
         child: SizedBox(
-          width: 400,
+          width: min(400, MediaQuery.of(context).size.width - 48),
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(widget.unit.datasheetName, style: AppTextStyles.title),
-                const SizedBox(height: 16),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: imageFile != null
+                          ? Image.file(
+                              imageFile,
+                              width: 52,
+                              height: 52,
+                              fit: BoxFit.cover,
+                            )
+                          : Container(
+                              width: 52,
+                              height: 52,
+                              color: AppColors.surfaceElevated,
+                              child: Icon(
+                                Icons.shield_outlined,
+                                color: AppColors.textSecondary,
+                                size: 24,
+                              ),
+                            ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        widget.unit.datasheetName,
+                        style: AppTextStyles.title,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
                 TextButton.icon(
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -1132,6 +1170,97 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
                   icon: const Icon(Icons.open_in_new_rounded, size: 16),
                   label: Text(l10n.battleUnitViewFullSheet),
                 ),
+                if (models.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.battleUnitStatsTitle.toUpperCase(),
+                    style: AppTextStyles.eyebrow,
+                  ),
+                  const SizedBox(height: 8),
+                  for (final model in models)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (models.length > 1) ...[
+                            Text(
+                              model.name,
+                              style: AppTextStyles.body.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                          ],
+                          Row(
+                            children: [
+                              _StatChip(
+                                label: l10n.statMovement,
+                                base: model.movement,
+                                delta: sumDelta(BattleStatKey.movement),
+                                suffix: '"',
+                              ),
+                              _StatChip(
+                                label: l10n.statToughness,
+                                base: model.toughness,
+                                delta: sumDelta(BattleStatKey.toughness),
+                              ),
+                              _StatChip(
+                                label: l10n.statSave,
+                                base: model.save,
+                                delta: sumDelta(BattleStatKey.save),
+                                suffix: '+',
+                              ),
+                              _StatChip(
+                                label: l10n.statWounds,
+                                base: model.wounds,
+                                delta: sumDelta(BattleStatKey.wounds),
+                              ),
+                              _StatChip(
+                                label: l10n.statLeadership,
+                                base: model.leadership,
+                                delta: sumDelta(BattleStatKey.leadership),
+                                suffix: '+',
+                              ),
+                              _StatChip(
+                                label: l10n.statObjectiveControl,
+                                base: model.objectiveControl,
+                                delta: sumDelta(BattleStatKey.objectiveControl),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+                if (weapons.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.battleUnitWeaponsTitle.toUpperCase(),
+                    style: AppTextStyles.eyebrow,
+                  ),
+                  const SizedBox(height: 8),
+                  for (final weapon in weapons)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            weapon.name,
+                            style: AppTextStyles.body.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          for (final profile in weapon.profiles)
+                            Text(
+                              profile.summary,
+                              style: AppTextStyles.caption,
+                            ),
+                        ],
+                      ),
+                    ),
+                ],
                 const SizedBox(height: 12),
                 FilledButton(
                   style: FilledButton.styleFrom(
@@ -1306,6 +1435,64 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Caractéristique de fiche affichée avec les bonus/malus actifs déjà
+/// appliqués (plutôt que de les laisser dans une simple liste séparée à
+/// recalculer soi-même) — la valeur change de couleur quand elle diffère
+/// de la base.
+class _StatChip extends StatelessWidget {
+  final String label;
+  final int base;
+  final int delta;
+  final String suffix;
+
+  const _StatChip({
+    required this.label,
+    required this.base,
+    required this.delta,
+    this.suffix = '',
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final value = base + delta;
+    final modified = delta != 0;
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceElevated,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: modified ? AppColors.primary : AppColors.border,
+          ),
+        ),
+        child: Column(
+          children: [
+            Text(
+              '$value$suffix',
+              style: AppTextStyles.body.copyWith(
+                fontWeight: FontWeight.w700,
+                color: modified
+                    ? (delta > 0 ? AppColors.success : AppColors.error)
+                    : AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: AppTextStyles.eyebrow,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
     );
