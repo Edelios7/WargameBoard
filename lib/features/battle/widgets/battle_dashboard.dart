@@ -253,15 +253,21 @@ class _Header extends ConsumerWidget {
               ),
             ),
             const Spacer(),
-            FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.surfaceElevated,
+            Flexible(
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.surfaceElevated,
+                ),
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (_) => _FinishBattleDialog(battle: battle),
+                ),
+                child: Text(
+                  l10n.battleDashboardFinish,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              onPressed: () => showDialog(
-                context: context,
-                builder: (_) => _FinishBattleDialog(battle: battle),
-              ),
-              child: Text(l10n.battleDashboardFinish),
             ),
           ],
         ),
@@ -1356,10 +1362,14 @@ class _DiceRollerBlockState extends ConsumerState<DiceRollerBlock> {
           Row(
             children: [
               Text(l10n.battleDiceCount, style: AppTextStyles.caption),
-              const SizedBox(width: 4),
               IconButton(
                 icon: const Icon(Icons.remove_circle_outline, size: 20),
                 color: AppColors.textSecondary,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(
+                  minWidth: 32,
+                  minHeight: 32,
+                ),
                 onPressed: _diceCount > 1
                     ? () => setState(() => _diceCount--)
                     : null,
@@ -1377,15 +1387,26 @@ class _DiceRollerBlockState extends ConsumerState<DiceRollerBlock> {
               IconButton(
                 icon: const Icon(Icons.add_circle_outline, size: 20),
                 color: AppColors.textSecondary,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(
+                  minWidth: 32,
+                  minHeight: 32,
+                ),
                 onPressed: _diceCount < 20
                     ? () => setState(() => _diceCount++)
                     : null,
               ),
               const Spacer(),
-              FilledButton.icon(
-                onPressed: _roll,
-                icon: const Icon(Icons.casino_rounded, size: 18),
-                label: Text(l10n.battleDiceRoll),
+              Flexible(
+                child: FilledButton.icon(
+                  onPressed: _roll,
+                  icon: const Icon(Icons.casino_rounded, size: 18),
+                  label: Text(
+                    l10n.battleDiceRoll,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ),
             ],
           ),
