@@ -24,6 +24,7 @@ import '../../../providers/project_provider.dart';
 import '../../../shell/navigation.dart';
 import '../../armies/widgets/create_army_dialog.dart';
 import '../../battle/widgets/log_battle_dialog.dart';
+import '../../catalog/pages/datasheet_full_page.dart';
 import '../../collection/widgets/add_collection_entry_dialog.dart';
 
 class DashboardPage extends ConsumerWidget {
@@ -174,6 +175,10 @@ class DashboardPage extends ConsumerWidget {
                       _YourArmiesCard(
                         armies: armies,
                         onSeeAll: () => goTo(AppTab.armies),
+                        onOpenArmy: (id) {
+                          ref.read(selectedArmyIdProvider.notifier).state = id;
+                          goTo(AppTab.armies);
+                        },
                       ),
                       _PaintingDonutCard(entries: entries),
                       _FactionBreakdownCard(entries: entries),
@@ -210,6 +215,13 @@ class DashboardPage extends ConsumerWidget {
                       _RecentAdditionsCard(
                         entriesAsync: recentlyAddedAsync,
                         onSeeAll: () => goTo(AppTab.collection),
+                        onOpenEntry: (datasheetId) =>
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    DatasheetFullPage(datasheetId: datasheetId),
+                              ),
+                            ),
                       ),
                       _RecentlyViewedCard(
                         resultsAsync: recentlyViewedAsync,
@@ -790,8 +802,13 @@ class _LastBattleTile extends ConsumerWidget {
 class _YourArmiesCard extends StatelessWidget {
   final List<ArmyListItem> armies;
   final VoidCallback onSeeAll;
+  final ValueChanged<String> onOpenArmy;
 
-  const _YourArmiesCard({required this.armies, required this.onSeeAll});
+  const _YourArmiesCard({
+    required this.armies,
+    required this.onSeeAll,
+    required this.onOpenArmy,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -839,7 +856,7 @@ class _YourArmiesCard extends StatelessWidget {
             ...shown.map(
               (army) => Padding(
                 padding: const EdgeInsets.only(bottom: 10),
-                child: _ArmyRow(army: army),
+                child: _ArmyRow(army: army, onTap: () => onOpenArmy(army.id)),
               ),
             ),
           const SizedBox(height: 4),
@@ -859,60 +876,71 @@ class _YourArmiesCard extends StatelessWidget {
 
 class _ArmyRow extends StatelessWidget {
   final ArmyListItem army;
+  final VoidCallback onTap;
 
-  const _ArmyRow({required this.army});
+  const _ArmyRow({required this.army, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(10),
+      child: InkWell(
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          FactionBadgeIcon(
-            factionName: army.factionName,
-            factionId: army.factionId,
-            size: 36,
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: AppColors.border),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  army.name,
-                  style: AppTextStyles.body,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(army.factionName, style: AppTextStyles.caption),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(
-              color: (army.isOverLimit ? AppColors.error : AppColors.success)
-                  .withValues(alpha: .14),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              army.isOverLimit
-                  ? l10n.dashboardArmyStatusWarning
-                  : l10n.dashboardArmyStatusOk,
-              style: AppTextStyles.eyebrow.copyWith(
-                color: army.isOverLimit ? AppColors.error : AppColors.success,
+          child: Row(
+            children: [
+              FactionBadgeIcon(
+                factionName: army.factionName,
+                factionId: army.factionId,
+                size: 36,
               ),
-            ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      army.name,
+                      style: AppTextStyles.body,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(army.factionName, style: AppTextStyles.caption),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color:
+                      (army.isOverLimit ? AppColors.error : AppColors.success)
+                          .withValues(alpha: .14),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  army.isOverLimit
+                      ? l10n.dashboardArmyStatusWarning
+                      : l10n.dashboardArmyStatusOk,
+                  style: AppTextStyles.eyebrow.copyWith(
+                    color: army.isOverLimit
+                        ? AppColors.error
+                        : AppColors.success,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -1031,10 +1059,12 @@ class _FactionBreakdownCard extends StatelessWidget {
 class _RecentAdditionsCard extends StatelessWidget {
   final AsyncValue<List<CollectionItemDetails>> entriesAsync;
   final VoidCallback onSeeAll;
+  final ValueChanged<String> onOpenEntry;
 
   const _RecentAdditionsCard({
     required this.entriesAsync,
     required this.onSeeAll,
+    required this.onOpenEntry,
   });
 
   @override
@@ -1085,38 +1115,45 @@ class _RecentAdditionsCard extends StatelessWidget {
                 .map(
                   (entry) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
-                    child: Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: _thumbnail(entry.datasheetId, 40),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                entry.datasheetName,
-                                style: AppTextStyles.body,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () => onOpenEntry(entry.datasheetId),
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: _thumbnail(entry.datasheetId, 40),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    entry.datasheetName,
+                                    style: AppTextStyles.body,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    entry.factionName,
+                                    style: AppTextStyles.caption,
+                                  ),
+                                ],
                               ),
-                              Text(
-                                entry.factionName,
-                                style: AppTextStyles.caption,
+                            ),
+                            Text(
+                              l10n.collectionQuantityLabel(entry.quantity),
+                              style: AppTextStyles.caption.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primary,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          l10n.collectionQuantityLabel(entry.quantity),
-                          style: AppTextStyles.caption.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
