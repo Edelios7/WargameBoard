@@ -61,5 +61,10 @@ local_assets/wh40k_reference/
 # jamais commités
 local_assets/rules/*.pdf
 
+# Base de données pré-remplie embarquée dans les builds mobiles perso
+# (contenu dérivé de règles officielles GW) - usage privé uniquement,
+# jamais commitée. Voir lib/database/database_connection.dart.
+assets/seed_data/
+
 # Sortie de l'outil manuel test/features/catalog_screenshot_test.dart
 catalog_screenshot.png
