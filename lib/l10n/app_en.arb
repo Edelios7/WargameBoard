@@ -34,6 +34,10 @@
 
   "catalogSearchHint": "Search for a unit...",
   "catalogEmptyResults": "No unit found",
+  "catalogAddFavoriteTooltip": "Add to favorites",
+  "catalogRemoveFavoriteTooltip": "Remove from favorites",
+  "catalogFavoritesOnlyOn": "Show favorites only",
+  "catalogFavoritesOnlyOff": "Show all datasheets",
   "catalogSelectPrompt": "Select a unit to see its datasheet",
   "catalogLoadError": "Error loading catalog: {error}",
   "@catalogLoadError": {

@@ -119,4 +119,49 @@ void main() {
 
     expect(find.byIcon(Icons.close_rounded), findsNothing);
   });
+
+  testWidgets(
+      'starring a datasheet and toggling favorites-only narrows the list to it',
+      (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(database),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+        ],
+        child: MaterialApp(
+          locale: const Locale('fr'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const CatalogPage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).first, 'Sanguinary');
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.star_outline_rounded).first);
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.star_rounded), findsOneWidget);
+
+    // Une autre fiche, jamais mise en favori, ne l'est pas devenue par
+    // accident (l'état est bien par fiche, pas global).
+    await tester.enterText(find.byType(TextField).first, 'Captain');
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.star_rounded), findsNothing);
+    expect(find.byIcon(Icons.star_outline_rounded), findsOneWidget);
+
+    // Basculer "favoris uniquement" réduit la liste à la fiche mise en
+    // favori, même avec une recherche ne la ciblant pas.
+    await tester.enterText(find.byType(TextField).first, '');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.filter_alt_outlined));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sanguinary Guard'), findsOneWidget);
+    expect(find.text('Captain'), findsNothing);
+  });
 }

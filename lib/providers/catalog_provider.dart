@@ -38,6 +38,15 @@ final catalogMaxPointsProvider = FutureProvider<int>((ref) {
 
 final catalogPointsRangeProvider = StateProvider<RangeValues?>((ref) => null);
 
+/// Fiches épinglées par le joueur (voir bouton étoile sur chaque résultat).
+final catalogFavoritesProvider = FutureProvider<Set<String>>((ref) {
+  final repository = ref.watch(catalogRepositoryProvider);
+  return repository.listFavoriteIds();
+});
+
+/// Filtre "Favoris uniquement" sur la liste de résultats du Catalogue.
+final catalogFavoritesOnlyProvider = StateProvider<bool>((ref) => false);
+
 final catalogSearchResultsProvider =
     FutureProvider<List<SearchResult>>((ref) {
   final repository = ref.watch(catalogRepositoryProvider);

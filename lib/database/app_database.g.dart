@@ -7853,6 +7853,228 @@ class DatasheetSourcesCompanion extends UpdateCompanion<DatasheetSource> {
   }
 }
 
+class $FavoriteDatasheetsTable extends FavoriteDatasheets
+    with TableInfo<$FavoriteDatasheetsTable, FavoriteDatasheet> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FavoriteDatasheetsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _datasheetIdMeta = const VerificationMeta(
+    'datasheetId',
+  );
+  @override
+  late final GeneratedColumn<String> datasheetId = GeneratedColumn<String>(
+    'datasheet_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [datasheetId, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'favorite_datasheets';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FavoriteDatasheet> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('datasheet_id')) {
+      context.handle(
+        _datasheetIdMeta,
+        datasheetId.isAcceptableOrUnknown(
+          data['datasheet_id']!,
+          _datasheetIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_datasheetIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {datasheetId};
+  @override
+  FavoriteDatasheet map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FavoriteDatasheet(
+      datasheetId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}datasheet_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FavoriteDatasheetsTable createAlias(String alias) {
+    return $FavoriteDatasheetsTable(attachedDatabase, alias);
+  }
+}
+
+class FavoriteDatasheet extends DataClass
+    implements Insertable<FavoriteDatasheet> {
+  final String datasheetId;
+  final DateTime createdAt;
+  const FavoriteDatasheet({required this.datasheetId, required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['datasheet_id'] = Variable<String>(datasheetId);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  FavoriteDatasheetsCompanion toCompanion(bool nullToAbsent) {
+    return FavoriteDatasheetsCompanion(
+      datasheetId: Value(datasheetId),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory FavoriteDatasheet.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FavoriteDatasheet(
+      datasheetId: serializer.fromJson<String>(json['datasheetId']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'datasheetId': serializer.toJson<String>(datasheetId),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  FavoriteDatasheet copyWith({String? datasheetId, DateTime? createdAt}) =>
+      FavoriteDatasheet(
+        datasheetId: datasheetId ?? this.datasheetId,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  FavoriteDatasheet copyWithCompanion(FavoriteDatasheetsCompanion data) {
+    return FavoriteDatasheet(
+      datasheetId: data.datasheetId.present
+          ? data.datasheetId.value
+          : this.datasheetId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FavoriteDatasheet(')
+          ..write('datasheetId: $datasheetId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(datasheetId, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FavoriteDatasheet &&
+          other.datasheetId == this.datasheetId &&
+          other.createdAt == this.createdAt);
+}
+
+class FavoriteDatasheetsCompanion extends UpdateCompanion<FavoriteDatasheet> {
+  final Value<String> datasheetId;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const FavoriteDatasheetsCompanion({
+    this.datasheetId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FavoriteDatasheetsCompanion.insert({
+    required String datasheetId,
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : datasheetId = Value(datasheetId);
+  static Insertable<FavoriteDatasheet> custom({
+    Expression<String>? datasheetId,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (datasheetId != null) 'datasheet_id': datasheetId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FavoriteDatasheetsCompanion copyWith({
+    Value<String>? datasheetId,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return FavoriteDatasheetsCompanion(
+      datasheetId: datasheetId ?? this.datasheetId,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (datasheetId.present) {
+      map['datasheet_id'] = Variable<String>(datasheetId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FavoriteDatasheetsCompanion(')
+          ..write('datasheetId: $datasheetId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $EquipmentGroupsTable extends EquipmentGroups
     with TableInfo<$EquipmentGroupsTable, EquipmentGroup> {
   @override
@@ -19836,6 +20058,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DatasheetSourcesTable datasheetSources = $DatasheetSourcesTable(
     this,
   );
+  late final $FavoriteDatasheetsTable favoriteDatasheets =
+      $FavoriteDatasheetsTable(this);
   late final $EquipmentGroupsTable equipmentGroups = $EquipmentGroupsTable(
     this,
   );
@@ -19919,6 +20143,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     datasheetCosts,
     datasheetVersions,
     datasheetSources,
+    favoriteDatasheets,
     equipmentGroups,
     equipmentOptions,
     equipmentChoices,
@@ -23910,6 +24135,164 @@ typedef $$DatasheetSourcesTableProcessedTableManager =
         BaseReferences<_$AppDatabase, $DatasheetSourcesTable, DatasheetSource>,
       ),
       DatasheetSource,
+      PrefetchHooks Function()
+    >;
+typedef $$FavoriteDatasheetsTableCreateCompanionBuilder =
+    FavoriteDatasheetsCompanion Function({
+      required String datasheetId,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+typedef $$FavoriteDatasheetsTableUpdateCompanionBuilder =
+    FavoriteDatasheetsCompanion Function({
+      Value<String> datasheetId,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$FavoriteDatasheetsTableFilterComposer
+    extends Composer<_$AppDatabase, $FavoriteDatasheetsTable> {
+  $$FavoriteDatasheetsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get datasheetId => $composableBuilder(
+    column: $table.datasheetId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$FavoriteDatasheetsTableOrderingComposer
+    extends Composer<_$AppDatabase, $FavoriteDatasheetsTable> {
+  $$FavoriteDatasheetsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get datasheetId => $composableBuilder(
+    column: $table.datasheetId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$FavoriteDatasheetsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FavoriteDatasheetsTable> {
+  $$FavoriteDatasheetsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get datasheetId => $composableBuilder(
+    column: $table.datasheetId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$FavoriteDatasheetsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FavoriteDatasheetsTable,
+          FavoriteDatasheet,
+          $$FavoriteDatasheetsTableFilterComposer,
+          $$FavoriteDatasheetsTableOrderingComposer,
+          $$FavoriteDatasheetsTableAnnotationComposer,
+          $$FavoriteDatasheetsTableCreateCompanionBuilder,
+          $$FavoriteDatasheetsTableUpdateCompanionBuilder,
+          (
+            FavoriteDatasheet,
+            BaseReferences<
+              _$AppDatabase,
+              $FavoriteDatasheetsTable,
+              FavoriteDatasheet
+            >,
+          ),
+          FavoriteDatasheet,
+          PrefetchHooks Function()
+        > {
+  $$FavoriteDatasheetsTableTableManager(
+    _$AppDatabase db,
+    $FavoriteDatasheetsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FavoriteDatasheetsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FavoriteDatasheetsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FavoriteDatasheetsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> datasheetId = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FavoriteDatasheetsCompanion(
+                datasheetId: datasheetId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String datasheetId,
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FavoriteDatasheetsCompanion.insert(
+                datasheetId: datasheetId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$FavoriteDatasheetsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FavoriteDatasheetsTable,
+      FavoriteDatasheet,
+      $$FavoriteDatasheetsTableFilterComposer,
+      $$FavoriteDatasheetsTableOrderingComposer,
+      $$FavoriteDatasheetsTableAnnotationComposer,
+      $$FavoriteDatasheetsTableCreateCompanionBuilder,
+      $$FavoriteDatasheetsTableUpdateCompanionBuilder,
+      (
+        FavoriteDatasheet,
+        BaseReferences<
+          _$AppDatabase,
+          $FavoriteDatasheetsTable,
+          FavoriteDatasheet
+        >,
+      ),
+      FavoriteDatasheet,
       PrefetchHooks Function()
     >;
 typedef $$EquipmentGroupsTableCreateCompanionBuilder =
@@ -30339,6 +30722,8 @@ class $AppDatabaseManager {
       $$DatasheetVersionsTableTableManager(_db, _db.datasheetVersions);
   $$DatasheetSourcesTableTableManager get datasheetSources =>
       $$DatasheetSourcesTableTableManager(_db, _db.datasheetSources);
+  $$FavoriteDatasheetsTableTableManager get favoriteDatasheets =>
+      $$FavoriteDatasheetsTableTableManager(_db, _db.favoriteDatasheets);
   $$EquipmentGroupsTableTableManager get equipmentGroups =>
       $$EquipmentGroupsTableTableManager(_db, _db.equipmentGroups);
   $$EquipmentOptionsTableTableManager get equipmentOptions =>

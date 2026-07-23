@@ -25,6 +25,7 @@ import '../tables/equipment_choices_table.dart';
 import '../tables/equipment_groups_table.dart';
 import '../tables/equipment_options_table.dart';
 import '../tables/factions_table.dart';
+import '../tables/favorite_datasheets_table.dart';
 import '../tables/keywords_table.dart';
 import '../tables/model_profiles_table.dart';
 import '../tables/unit_sizes_table.dart';
@@ -57,6 +58,7 @@ part 'datasheet_dao.g.dart';
     EquipmentChoices,
     UnitSizes,
     ArmyUnits,
+    FavoriteDatasheets,
   ],
 )
 class DatasheetDao extends DatabaseAccessor<AppDatabase>
@@ -609,5 +611,33 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
       maximumSize: size.maximumModels,
       defaultSize: size.defaultModels,
     );
+  }
+
+  // =========================
+  // Favoris
+  // =========================
+
+  /// Épingle ou désépingle une fiche — la présence d'une ligne vaut
+  /// favori, pas besoin de lire l'état actuel côté appelant.
+  Future<void> toggleFavorite(String datasheetId) async {
+    final existing = await (select(favoriteDatasheets)
+          ..where((t) => t.datasheetId.equals(datasheetId)))
+        .getSingleOrNull();
+
+    if (existing != null) {
+      await (delete(favoriteDatasheets)
+            ..where((t) => t.datasheetId.equals(datasheetId)))
+          .go();
+      return;
+    }
+
+    await into(favoriteDatasheets).insert(
+      FavoriteDatasheetsCompanion.insert(datasheetId: datasheetId),
+    );
+  }
+
+  Future<Set<String>> listFavoriteIds() async {
+    final rows = await select(favoriteDatasheets).get();
+    return rows.map((row) => row.datasheetId).toSet();
   }
 }

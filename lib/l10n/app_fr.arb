@@ -34,6 +34,10 @@
 
   "catalogSearchHint": "Rechercher une unité...",
   "catalogEmptyResults": "Aucune unité trouvée",
+  "catalogAddFavoriteTooltip": "Ajouter aux favoris",
+  "catalogRemoveFavoriteTooltip": "Retirer des favoris",
+  "catalogFavoritesOnlyOn": "Afficher uniquement les favoris",
+  "catalogFavoritesOnlyOff": "Afficher toutes les fiches",
   "catalogSelectPrompt": "Sélectionnez une unité pour voir sa fiche",
   "catalogLoadError": "Erreur de chargement du catalogue : {error}",
   "@catalogLoadError": {

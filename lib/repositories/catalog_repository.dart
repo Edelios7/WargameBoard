@@ -35,6 +35,14 @@ class CatalogRepository {
     );
   }
 
+  Future<void> toggleFavorite(String datasheetId) {
+    return database.datasheetDao.toggleFavorite(datasheetId);
+  }
+
+  Future<Set<String>> listFavoriteIds() {
+    return database.datasheetDao.listFavoriteIds();
+  }
+
   Future<DatasheetDetails?> getDatasheet(String id) {
     return database.datasheetDao.getDatasheet(id);
   }

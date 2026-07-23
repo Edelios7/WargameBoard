@@ -602,6 +602,8 @@ class _ResultsList extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final sortBy = ref.watch(catalogSortProvider);
     final ownedQuantities = ref.watch(catalogOwnedQuantitiesProvider);
+    final favoritesOnly = ref.watch(catalogFavoritesOnlyProvider);
+    final favoriteIds = ref.watch(catalogFavoritesProvider).value ?? const {};
 
     return resultsAsync.when(
       loading: () => const Center(
@@ -616,7 +618,10 @@ class _ResultsList extends ConsumerWidget {
           ),
         ),
       ),
-      data: (results) {
+      data: (allResults) {
+        final results = favoritesOnly
+            ? allResults.where((r) => favoriteIds.contains(r.id)).toList()
+            : allResults;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -633,7 +638,27 @@ class _ResultsList extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 4),
+                  Tooltip(
+                    message: favoritesOnly
+                        ? l10n.catalogFavoritesOnlyOff
+                        : l10n.catalogFavoritesOnlyOn,
+                    child: IconButton(
+                      icon: Icon(
+                        favoritesOnly
+                            ? Icons.filter_alt_rounded
+                            : Icons.filter_alt_outlined,
+                        size: 20,
+                      ),
+                      color: favoritesOnly
+                          ? AppColors.warning
+                          : AppColors.textSecondary,
+                      onPressed: () => ref
+                          .read(catalogFavoritesOnlyProvider.notifier)
+                          .state = !favoritesOnly,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
                   Flexible(
                     child: _SortDropdown(
                       value: sortBy,
@@ -1110,7 +1135,7 @@ class _FilterDropdown extends StatelessWidget {
   }
 }
 
-class _DatasheetListItem extends StatelessWidget {
+class _DatasheetListItem extends ConsumerWidget {
   final SearchResult result;
   final bool selected;
   final int ownedQuantity;
@@ -1124,9 +1149,11 @@ class _DatasheetListItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final imageFile = LocalCatalogImages.unitPhoto(result.id);
+    final favoriteIds = ref.watch(catalogFavoritesProvider).value ?? const {};
+    final isFavorite = favoriteIds.contains(result.id);
     final factionColor = result.factionId != null
         ? FactionColors.of(result.factionId!)
         : AppColors.textSecondary;
@@ -1235,16 +1262,49 @@ class _DatasheetListItem extends StatelessWidget {
                               ],
                             ),
                           ),
-                          if (result.points != null) ...[
-                            const SizedBox(width: 8),
-                            Text(
-                              l10n.pointsSuffix(result.points!),
-                              style: AppTextStyles.caption.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
+                          const SizedBox(width: 8),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Tooltip(
+                                message: isFavorite
+                                    ? l10n.catalogRemoveFavoriteTooltip
+                                    : l10n.catalogAddFavoriteTooltip,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(6),
+                                  onTap: () async {
+                                    await ref
+                                        .read(catalogRepositoryProvider)
+                                        .toggleFavorite(result.id);
+                                    ref.invalidate(catalogFavoritesProvider);
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(2),
+                                    child: Icon(
+                                      isFavorite
+                                          ? Icons.star_rounded
+                                          : Icons.star_outline_rounded,
+                                      size: 18,
+                                      color: isFavorite
+                                          ? AppColors.warning
+                                          : AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
+                              if (result.points != null) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  l10n.pointsSuffix(result.points!),
+                                  style: AppTextStyles.caption.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
                         ],
                       ),
                     ),

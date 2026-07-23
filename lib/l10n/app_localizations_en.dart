@@ -84,6 +84,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get catalogEmptyResults => 'No unit found';
 
   @override
+  String get catalogAddFavoriteTooltip => 'Add to favorites';
+
+  @override
+  String get catalogRemoveFavoriteTooltip => 'Remove from favorites';
+
+  @override
+  String get catalogFavoritesOnlyOn => 'Show favorites only';
+
+  @override
+  String get catalogFavoritesOnlyOff => 'Show all datasheets';
+
+  @override
   String get catalogSelectPrompt => 'Select a unit to see its datasheet';
 
   @override

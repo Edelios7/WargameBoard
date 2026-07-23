@@ -84,6 +84,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get catalogEmptyResults => 'Aucune unité trouvée';
 
   @override
+  String get catalogAddFavoriteTooltip => 'Ajouter aux favoris';
+
+  @override
+  String get catalogRemoveFavoriteTooltip => 'Retirer des favoris';
+
+  @override
+  String get catalogFavoritesOnlyOn => 'Afficher uniquement les favoris';
+
+  @override
+  String get catalogFavoritesOnlyOff => 'Afficher toutes les fiches';
+
+  @override
   String get catalogSelectPrompt => 'Sélectionnez une unité pour voir sa fiche';
 
   @override

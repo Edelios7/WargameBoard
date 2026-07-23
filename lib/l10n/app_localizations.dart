@@ -242,6 +242,30 @@ abstract class AppLocalizations {
   /// **'Aucune unité trouvée'**
   String get catalogEmptyResults;
 
+  /// No description provided for @catalogAddFavoriteTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter aux favoris'**
+  String get catalogAddFavoriteTooltip;
+
+  /// No description provided for @catalogRemoveFavoriteTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer des favoris'**
+  String get catalogRemoveFavoriteTooltip;
+
+  /// No description provided for @catalogFavoritesOnlyOn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Afficher uniquement les favoris'**
+  String get catalogFavoritesOnlyOn;
+
+  /// No description provided for @catalogFavoritesOnlyOff.
+  ///
+  /// In fr, this message translates to:
+  /// **'Afficher toutes les fiches'**
+  String get catalogFavoritesOnlyOff;
+
   /// No description provided for @catalogSelectPrompt.
   ///
   /// In fr, this message translates to:
