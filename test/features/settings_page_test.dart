@@ -61,4 +61,37 @@ void main() {
     expect(find.text('Langue'), findsOneWidget);
     expect(prefs.getString(localePreferenceKey), 'fr');
   });
+
+  testWidgets(
+      'the settings page renders without overflow on a phone-sized screen',
+      (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(database),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+        ],
+        child: MaterialApp(
+          locale: const Locale('fr'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const AppShell(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Paramètres').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sauvegarde'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }

@@ -94,4 +94,15 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('the rules page renders without overflow on a phone-sized screen',
+      (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+  });
 }

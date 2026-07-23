@@ -26,8 +26,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    _nameController =
-        TextEditingController(text: ref.read(displayNameProvider) ?? '');
+    _nameController = TextEditingController(
+      text: ref.read(displayNameProvider) ?? '',
+    );
   }
 
   @override
@@ -57,9 +58,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       );
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.settingsBackupExportError)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.settingsBackupExportError)));
       }
     }
   }
@@ -96,9 +97,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final staged = await ref.read(backupServiceProvider).stageRestore();
     if (!mounted || !staged) return;
     ref.invalidate(pendingRestoreProvider);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.settingsBackupRestoreStaged)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.settingsBackupRestoreStaged)));
   }
 
   Future<void> _cancelPendingRestore() async {
@@ -127,173 +128,197 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       backgroundColor: AppColors.background,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.navSettings, style: AppTextStyles.heading),
-            const DecorSeparator(maxWidth: 200, padding: EdgeInsets.only(top: 8, bottom: 20)),
-            SizedBox(
-              width: 420,
-              child: AppCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(l10n.settingsProfileTitle, style: AppTextStyles.body),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: _nameController,
-                      style: AppTextStyles.body,
-                      decoration: InputDecoration(
-                        labelText: l10n.settingsDisplayNameLabel,
-                        labelStyle: AppTextStyles.caption,
-                        filled: true,
-                        fillColor: AppColors.background,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      onSubmitted: (_) => _saveName(),
-                      onEditingComplete: _saveName,
-                    ),
-                  ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Largeur de carte confortable sur desktop, mais jamais plus
+            // que ce qu'un écran de téléphone peut réellement offrir.
+            final cardWidth = constraints.maxWidth < 420
+                ? constraints.maxWidth
+                : 420.0;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.navSettings, style: AppTextStyles.heading),
+                const DecorSeparator(
+                  maxWidth: 200,
+                  padding: EdgeInsets.only(top: 8, bottom: 20),
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: 420,
-              child: AppCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(l10n.settingsLanguageTitle, style: AppTextStyles.body),
-                    const SizedBox(height: 12),
-                    _LanguageOption(
-                      label: l10n.settingsLanguageSystem,
-                      selected: localeOverride == null,
-                      onTap: () => _setLocale(ref, null),
-                    ),
-                    _LanguageOption(
-                      label: l10n.settingsLanguageFrench,
-                      selected: localeOverride == const Locale('fr'),
-                      onTap: () => _setLocale(ref, const Locale('fr')),
-                    ),
-                    _LanguageOption(
-                      label: l10n.settingsLanguageEnglish,
-                      selected: localeOverride == const Locale('en'),
-                      onTap: () => _setLocale(ref, const Locale('en')),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: 420,
-              child: AppCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(l10n.settingsImportTitle, style: AppTextStyles.body),
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n.settingsImportDescription,
-                      style: AppTextStyles.caption,
-                    ),
-                    const SizedBox(height: 12),
-                    TexturedButton(
-                      label: l10n.settingsImportButton,
-                      icon: Icons.file_download_outlined,
-                      onPressed: () => showDialog(
-                        context: context,
-                        builder: (_) => const ImportJsonDialog(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: 420,
-              child: AppCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(l10n.settingsBackupTitle, style: AppTextStyles.body),
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n.settingsBackupDescription,
-                      style: AppTextStyles.caption,
-                    ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                SizedBox(
+                  width: cardWidth,
+                  child: AppCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        TexturedButton(
-                          label: l10n.settingsBackupExportButton,
-                          icon: Icons.file_upload_outlined,
-                          onPressed: _exportBackup,
+                        Text(
+                          l10n.settingsProfileTitle,
+                          style: AppTextStyles.body,
                         ),
-                        TexturedButton(
-                          label: l10n.settingsBackupRestoreButton,
-                          icon: Icons.settings_backup_restore_rounded,
-                          onPressed: _restoreBackup,
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _nameController,
+                          style: AppTextStyles.body,
+                          decoration: InputDecoration(
+                            labelText: l10n.settingsDisplayNameLabel,
+                            labelStyle: AppTextStyles.caption,
+                            filled: true,
+                            fillColor: AppColors.background,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          onSubmitted: (_) => _saveName(),
+                          onEditingComplete: _saveName,
                         ),
                       ],
                     ),
-                    if (pendingRestore) ...[
-                      const SizedBox(height: 12),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.warning.withValues(alpha: .12),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: AppColors.warning.withValues(alpha: .4),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: cardWidth,
+                  child: AppCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.settingsLanguageTitle,
+                          style: AppTextStyles.body,
+                        ),
+                        const SizedBox(height: 12),
+                        _LanguageOption(
+                          label: l10n.settingsLanguageSystem,
+                          selected: localeOverride == null,
+                          onTap: () => _setLocale(ref, null),
+                        ),
+                        _LanguageOption(
+                          label: l10n.settingsLanguageFrench,
+                          selected: localeOverride == const Locale('fr'),
+                          onTap: () => _setLocale(ref, const Locale('fr')),
+                        ),
+                        _LanguageOption(
+                          label: l10n.settingsLanguageEnglish,
+                          selected: localeOverride == const Locale('en'),
+                          onTap: () => _setLocale(ref, const Locale('en')),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: cardWidth,
+                  child: AppCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.settingsImportTitle,
+                          style: AppTextStyles.body,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n.settingsImportDescription,
+                          style: AppTextStyles.caption,
+                        ),
+                        const SizedBox(height: 12),
+                        TexturedButton(
+                          label: l10n.settingsImportButton,
+                          icon: Icons.file_download_outlined,
+                          onPressed: () => showDialog(
+                            context: context,
+                            builder: (_) => const ImportJsonDialog(),
                           ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: cardWidth,
+                  child: AppCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.settingsBackupTitle,
+                          style: AppTextStyles.body,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n.settingsBackupDescription,
+                          style: AppTextStyles.caption,
+                        ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
                           children: [
-                            Row(
+                            TexturedButton(
+                              label: l10n.settingsBackupExportButton,
+                              icon: Icons.file_upload_outlined,
+                              onPressed: _exportBackup,
+                            ),
+                            TexturedButton(
+                              label: l10n.settingsBackupRestoreButton,
+                              icon: Icons.settings_backup_restore_rounded,
+                              onPressed: _restoreBackup,
+                            ),
+                          ],
+                        ),
+                        if (pendingRestore) ...[
+                          const SizedBox(height: 12),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppColors.warning.withValues(alpha: .12),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: AppColors.warning.withValues(alpha: .4),
+                              ),
+                            ),
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
-                                  Icons.info_outline_rounded,
-                                  size: 16,
-                                  color: AppColors.warning,
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Icon(
+                                      Icons.info_outline_rounded,
+                                      size: 16,
+                                      color: AppColors.warning,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        l10n.settingsBackupRestoreStaged,
+                                        style: AppTextStyles.caption,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(
+                                TextButton(
+                                  onPressed: _cancelPendingRestore,
                                   child: Text(
-                                    l10n.settingsBackupRestoreStaged,
-                                    style: AppTextStyles.caption,
+                                    l10n.settingsBackupRestoreCancel,
+                                    style: AppTextStyles.caption.copyWith(
+                                      color: AppColors.textSecondary,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                            TextButton(
-                              onPressed: _cancelPendingRestore,
-                              child: Text(
-                                l10n.settingsBackupRestoreCancel,
-                                style: AppTextStyles.caption.copyWith(
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
       ),
     );

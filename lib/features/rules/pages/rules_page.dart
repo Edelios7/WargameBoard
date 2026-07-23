@@ -79,14 +79,15 @@ class _RulesPageState extends State<RulesPage> {
                   setState(() => _showFilters = !_showFilters),
             ),
             const SizedBox(height: 16),
-            Row(
+            Wrap(
+              spacing: 20,
+              runSpacing: 8,
               children: [
                 _TabChip(
                   label: l10n.rulesTabMain,
                   selected: _tab == 0,
                   onTap: () => setState(() => _tab = 0),
                 ),
-                const SizedBox(width: 20),
                 _TabChip(
                   label: l10n.rulesTabAdditional,
                   selected: _tab == 1,
@@ -258,11 +259,19 @@ class _RulesHeaderState extends State<_RulesHeader> {
               ),
             ),
             const SizedBox(width: 10),
-            FilledButton.icon(
-              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
-              onPressed: widget.onAdd,
-              icon: const Icon(Icons.add_rounded),
-              label: Text(l10n.rulesAddButton),
+            Flexible(
+              child: FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                ),
+                onPressed: widget.onAdd,
+                icon: const Icon(Icons.add_rounded),
+                label: Text(
+                  l10n.rulesAddButton,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ),
           ],
         );
@@ -604,7 +613,10 @@ class _CategoriesGrid extends StatelessWidget {
           crossAxisCount: columns,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          childAspectRatio: 1.7,
+          // Des tuiles à 2 colonnes sont plus étroites, donc
+          // proportionnellement plus hautes pour garder assez de place au
+          // texte (même correctif que sur le Dashboard/la Collection).
+          childAspectRatio: columns == 2 ? 1.3 : 1.7,
           children: [
             for (final entry in entries)
               AppCard(
@@ -686,9 +698,13 @@ class _RecentDocumentsCardState extends State<_RecentDocumentsCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                l10n.rulesRecentDocuments.toUpperCase(),
-                style: AppTextStyles.eyebrow,
+              Expanded(
+                child: Text(
+                  l10n.rulesRecentDocuments.toUpperCase(),
+                  style: AppTextStyles.eyebrow,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               if (canExpand)
                 TextButton(
@@ -799,9 +815,13 @@ class _PopularRulesCardState extends State<_PopularRulesCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                l10n.rulesPopularRules.toUpperCase(),
-                style: AppTextStyles.eyebrow,
+              Expanded(
+                child: Text(
+                  l10n.rulesPopularRules.toUpperCase(),
+                  style: AppTextStyles.eyebrow,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               if (canExpand)
                 TextButton(

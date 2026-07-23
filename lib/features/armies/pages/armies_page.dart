@@ -670,28 +670,59 @@ class _ArmyBuilderPage extends ConsumerWidget {
         ),
         Container(height: 1, color: AppColors.border),
         Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(width: 300, child: _BuilderSidebar(army: army)),
-              Container(width: 1, color: AppColors.border),
-              Expanded(
-                flex: 2,
-                child: army.units.isEmpty
-                    ? Center(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final unitGrid = army.units.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Center(
                         child: Text(
                           AppLocalizations.of(context)!.armyBuilderEmptyUnits,
                           style: AppTextStyles.caption,
                         ),
-                      )
-                    : _GroupedUnitGrid(army: army, selectedUnit: selectedUnit),
-              ),
-              Container(width: 1, color: AppColors.border),
-              SizedBox(
-                width: 340,
-                child: _UnitDetailsPanel(army: army, unit: selectedUnit),
-              ),
-            ],
+                      ),
+                    )
+                  : _GroupedUnitGrid(army: army, selectedUnit: selectedUnit);
+
+              // Trois colonnes fixes (300 + grille + 340) ne laissent plus
+              // de place à rien sur un écran de téléphone — on empile
+              // sidebar, grille puis détails de l'unité sélectionnée dans
+              // une seule colonne défilante.
+              if (constraints.maxWidth < 900) {
+                return SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Hauteur bornée : la sidebar contient une liste
+                      // interne (Expanded) qui a besoin d'une hauteur
+                      // finie pour se disposer une fois placée dans un
+                      // parent défilant (hauteur non bornée autrement).
+                      SizedBox(height: 420, child: _BuilderSidebar(army: army)),
+                      Container(height: 1, color: AppColors.border),
+                      unitGrid,
+                      if (selectedUnit != null) ...[
+                        Container(height: 1, color: AppColors.border),
+                        _UnitDetailsPanel(army: army, unit: selectedUnit),
+                      ],
+                    ],
+                  ),
+                );
+              }
+
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(width: 300, child: _BuilderSidebar(army: army)),
+                  Container(width: 1, color: AppColors.border),
+                  Expanded(flex: 2, child: unitGrid),
+                  Container(width: 1, color: AppColors.border),
+                  SizedBox(
+                    width: 340,
+                    child: _UnitDetailsPanel(army: army, unit: selectedUnit),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ],
@@ -751,184 +782,195 @@ class _BuilderTopBar extends ConsumerWidget {
         .where((u) => u.enhancementId != null)
         .length;
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    final statsWrap = Wrap(
+      alignment: WrapAlignment.start,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 20,
+      runSpacing: 8,
       children: [
-        IconButton(
-          tooltip: l10n.armyBuilderBack,
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () {
-            ref.read(selectedArmyIdProvider.notifier).state = null;
-            ref.read(selectedUnitIdProvider.notifier).state = null;
-          },
+        _StatColumn(
+          label: l10n.armyBuilderStatPoints,
+          value: army.pointsLimit != null
+              ? l10n.armyBuilderPointsWithLimit(
+                  army.totalPoints,
+                  army.pointsLimit!,
+                )
+              : l10n.pointsSuffix(army.totalPoints),
+          color: army.isOverLimit ? AppColors.error : AppColors.primary,
         ),
-        const SizedBox(width: 8),
-        FactionBadgeIcon(
-          factionName: army.factionName,
-          factionId: army.factionId,
-          size: 32,
+        _StatColumn(
+          label: l10n.armyBuilderStatUnits,
+          value: '${army.units.length}',
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        _StatColumn(
+          label: l10n.armyBuilderStatBattleline,
+          value: '$battlelineCount',
+        ),
+        _StatColumn(
+          label: l10n.armyBuilderStatEnhancements,
+          value: '$enhancementsCount/$_maxEnhancements',
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: (isValid ? AppColors.success : AppColors.error).withValues(
+              alpha: .14,
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Icon(
+                isValid ? Icons.check_circle_rounded : Icons.error_rounded,
+                size: 14,
+                color: isValid ? AppColors.success : AppColors.error,
+              ),
+              const SizedBox(width: 4),
               Text(
-                army.name,
-                style: AppTextStyles.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 2),
-              Text(
-                army.detachmentName != null
-                    ? '${army.factionName} · ${army.detachmentName}'
-                    : army.factionName,
-                style: AppTextStyles.caption,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 16),
-        Flexible(
-          child: Wrap(
-            alignment: WrapAlignment.end,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 20,
-            runSpacing: 8,
-            children: [
-              _StatColumn(
-                label: l10n.armyBuilderStatPoints,
-                value: army.pointsLimit != null
-                    ? l10n.armyBuilderPointsWithLimit(
-                        army.totalPoints,
-                        army.pointsLimit!,
-                      )
-                    : l10n.pointsSuffix(army.totalPoints),
-                color: army.isOverLimit ? AppColors.error : AppColors.primary,
-              ),
-              _StatColumn(
-                label: l10n.armyBuilderStatUnits,
-                value: '${army.units.length}',
-              ),
-              _StatColumn(
-                label: l10n.armyBuilderStatBattleline,
-                value: '$battlelineCount',
-              ),
-              _StatColumn(
-                label: l10n.armyBuilderStatEnhancements,
-                value: '$enhancementsCount/$_maxEnhancements',
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: (isValid ? AppColors.success : AppColors.error)
-                      .withValues(alpha: .14),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      isValid
-                          ? Icons.check_circle_rounded
-                          : Icons.error_rounded,
-                      size: 14,
-                      color: isValid ? AppColors.success : AppColors.error,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      isValid
-                          ? l10n.armyBuilderListValid
-                          : l10n.armyBuilderListInvalid,
-                      style: AppTextStyles.eyebrow.copyWith(
-                        color: isValid ? AppColors.success : AppColors.error,
-                      ),
-                    ),
-                  ],
+                isValid
+                    ? l10n.armyBuilderListValid
+                    : l10n.armyBuilderListInvalid,
+                style: AppTextStyles.eyebrow.copyWith(
+                  color: isValid ? AppColors.success : AppColors.error,
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(width: 8),
-        PopupMenuButton<String>(
-          icon: const Icon(
-            Icons.more_vert_rounded,
-            color: AppColors.textSecondary,
-          ),
-          color: AppColors.surface,
-          onSelected: (value) async {
-            switch (value) {
-              case 'copy':
-                await Clipboard.setData(
-                  ClipboardData(text: ArmyListFormatter.format(army)),
-                );
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(l10n.armyBuilderCopiedToClipboard),
-                      backgroundColor: AppColors.surface,
-                    ),
-                  );
-                }
-                break;
-              case 'notes':
-                showDialog(
-                  context: context,
-                  builder: (_) =>
-                      _NotesDialog(armyId: army.id, initialNotes: army.notes),
-                );
-                break;
-              case 'duplicate':
-                showDialog(
-                  context: context,
-                  builder: (_) => _DuplicateArmyDialog(army: army),
-                );
-                break;
-              case 'delete':
-                final confirmed = await _confirmDelete(
-                  context,
-                  title: l10n.armyBuilderDeleteArmyConfirmTitle,
-                  message: l10n.armyBuilderDeleteArmyConfirmMessage(army.name),
-                  confirmLabel: l10n.armyBuilderDeleteArmy,
-                );
-                if (!confirmed) break;
-                await ref.read(armyRepositoryProvider).deleteArmy(army.id);
+      ],
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            IconButton(
+              tooltip: l10n.armyBuilderBack,
+              icon: const Icon(Icons.arrow_back_rounded),
+              onPressed: () {
                 ref.read(selectedArmyIdProvider.notifier).state = null;
-                ref.invalidate(armiesListProvider);
-                break;
-            }
-          },
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: 'copy',
-              child: Text(l10n.armyBuilderCopyList, style: AppTextStyles.body),
+                ref.read(selectedUnitIdProvider.notifier).state = null;
+              },
             ),
-            PopupMenuItem(
-              value: 'notes',
-              child: Text(
-                l10n.armyBuilderNotesLabel,
-                style: AppTextStyles.body,
+            const SizedBox(width: 8),
+            FactionBadgeIcon(
+              factionName: army.factionName,
+              factionId: army.factionId,
+              size: 32,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    army.name,
+                    style: AppTextStyles.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    army.detachmentName != null
+                        ? '${army.factionName} · ${army.detachmentName}'
+                        : army.factionName,
+                    style: AppTextStyles.caption,
+                  ),
+                ],
               ),
             ),
-            PopupMenuItem(
-              value: 'duplicate',
-              child: Text(l10n.armyBuilderDuplicate, style: AppTextStyles.body),
-            ),
-            PopupMenuItem(
-              value: 'delete',
-              child: Text(
-                l10n.armyBuilderDeleteArmy,
-                style: AppTextStyles.body.copyWith(color: AppColors.error),
+            const SizedBox(width: 8),
+            PopupMenuButton<String>(
+              icon: const Icon(
+                Icons.more_vert_rounded,
+                color: AppColors.textSecondary,
               ),
+              color: AppColors.surface,
+              onSelected: (value) async {
+                switch (value) {
+                  case 'copy':
+                    await Clipboard.setData(
+                      ClipboardData(text: ArmyListFormatter.format(army)),
+                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(l10n.armyBuilderCopiedToClipboard),
+                          backgroundColor: AppColors.surface,
+                        ),
+                      );
+                    }
+                    break;
+                  case 'notes':
+                    showDialog(
+                      context: context,
+                      builder: (_) => _NotesDialog(
+                        armyId: army.id,
+                        initialNotes: army.notes,
+                      ),
+                    );
+                    break;
+                  case 'duplicate':
+                    showDialog(
+                      context: context,
+                      builder: (_) => _DuplicateArmyDialog(army: army),
+                    );
+                    break;
+                  case 'delete':
+                    final confirmed = await _confirmDelete(
+                      context,
+                      title: l10n.armyBuilderDeleteArmyConfirmTitle,
+                      message: l10n.armyBuilderDeleteArmyConfirmMessage(
+                        army.name,
+                      ),
+                      confirmLabel: l10n.armyBuilderDeleteArmy,
+                    );
+                    if (!confirmed) break;
+                    await ref.read(armyRepositoryProvider).deleteArmy(army.id);
+                    ref.read(selectedArmyIdProvider.notifier).state = null;
+                    ref.invalidate(armiesListProvider);
+                    break;
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'copy',
+                  child: Text(
+                    l10n.armyBuilderCopyList,
+                    style: AppTextStyles.body,
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'notes',
+                  child: Text(
+                    l10n.armyBuilderNotesLabel,
+                    style: AppTextStyles.body,
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'duplicate',
+                  child: Text(
+                    l10n.armyBuilderDuplicate,
+                    style: AppTextStyles.body,
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Text(
+                    l10n.armyBuilderDeleteArmy,
+                    style: AppTextStyles.body.copyWith(color: AppColors.error),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
+        const SizedBox(height: 12),
+        statsWrap,
       ],
     );
   }
@@ -2423,10 +2465,7 @@ class _StratagemsDialog extends ConsumerWidget {
                 ),
                 if (detachment?.description != null) ...[
                   const SizedBox(height: 8),
-                  Text(
-                    detachment!.description!,
-                    style: AppTextStyles.caption,
-                  ),
+                  Text(detachment!.description!, style: AppTextStyles.caption),
                 ],
                 const SizedBox(height: 16),
                 Text(l10n.armyBuilderStratagems, style: AppTextStyles.eyebrow),

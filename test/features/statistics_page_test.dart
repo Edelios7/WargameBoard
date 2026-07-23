@@ -90,4 +90,35 @@ void main() {
     expect(find.textContaining('Orks'), findsWidgets);
     expect(find.byType(Tooltip), findsWidgets);
   });
+
+  testWidgets(
+      'the statistics page renders without overflow on a phone-sized screen',
+      (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final armyId = await database.armyDao.createArmy(
+      name: 'Ma liste',
+      factionId: seedFactionId,
+    );
+    final captain = await database.datasheetDao.search('Captain');
+    await database.armyDao.addUnit(
+      armyId: armyId,
+      datasheetId: captain.single.id,
+      modelCount: 1,
+    );
+    await database.battleDao.addBattle(
+      opponentName: 'Marc',
+      opponentFactionId: seedOrksFactionId,
+      result: BattleResult.victory,
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Ma liste'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
