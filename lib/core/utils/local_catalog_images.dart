@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path/path.dart' as p;
 
+import 'user_content_paths.dart';
+
 /// Résout une image de référence locale (datasheet, faction...) si elle
 /// existe.
 ///
@@ -31,6 +33,27 @@ class LocalCatalogImages {
     return null;
   }
 
+  /// Comme [_find], mais dans le dossier applicatif (voir
+  /// [UserContentPaths]) plutôt que le dossier courant du processus —
+  /// pour du contenu que l'app écrit elle-même à l'exécution (photos
+  /// perso), qui doit rester accessible sur toutes les plateformes,
+  /// contrairement au catalogue (jamais écrit par l'app).
+  static File? _findUserContent(String folder, String id) {
+    if (kIsWeb) return null;
+    for (final extension in _extensions) {
+      final file = File(
+        p.join(
+          UserContentPaths.baseDirectory,
+          'local_assets',
+          folder,
+          '$id.$extension',
+        ),
+      );
+      if (file.existsSync()) return file;
+    }
+    return null;
+  }
+
   static File? datasheet(String datasheetId) =>
       _find('datasheets', datasheetId);
 
@@ -38,7 +61,7 @@ class LocalCatalogImages {
   /// voir local_assets/user_photos/README.md — prioritaire sur
   /// [datasheet] partout où [unitPhoto] est utilisé.
   static File? userPhoto(String datasheetId) =>
-      _find('user_photos', datasheetId);
+      _findUserContent('user_photos', datasheetId);
 
   /// Meilleure image disponible pour une fiche : la photo perso du
   /// joueur si elle existe, sinon le visuel catalogue générique.
@@ -49,7 +72,7 @@ class LocalCatalogImages {
   /// particulier), voir local_assets/user_photos/README.md — prioritaire
   /// sur [userPhoto] partout où [collectionPhoto] est utilisé.
   static File? entryPhoto(String entryId) =>
-      _find('user_photos/entries', entryId);
+      _findUserContent('user_photos/entries', entryId);
 
   /// Meilleure image disponible pour une entrée de la Collection : sa
   /// propre photo si elle existe, sinon la photo par défaut du type

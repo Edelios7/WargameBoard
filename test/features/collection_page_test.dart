@@ -58,6 +58,29 @@ void main() {
     expect(find.text('possédées'), findsOneWidget);
   });
 
+  testWidgets('tapping a collection card opens its datasheet page',
+      (tester) async {
+    await database.collectionDao.addEntry(
+      datasheetId: 'ds-captain',
+      quantity: 1,
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    // "Captain" apparaît à la fois dans "Ajouts récents" (non cliquable)
+    // et dans la grille principale (la _CollectionCard, cliquable) : on
+    // vise la dernière occurrence, celle de la grille.
+    final captainFinder = find.text('Captain').last;
+    await tester.ensureVisible(captainFinder);
+    await tester.pumpAndSettle();
+    await tester.tap(captainFinder);
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
+    expect(find.text('Captain'), findsWidgets);
+  });
+
   testWidgets('incrementing assembled count is clamped to quantity',
       (tester) async {
     await database.collectionDao.addEntry(

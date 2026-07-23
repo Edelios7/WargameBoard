@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as p;
 
+import '../core/utils/user_content_paths.dart';
+
 /// Gère les photos personnelles des unités (les figurines peintes du
 /// joueur) : sélection via l'explorateur de fichiers, copie dans
 /// local_assets/user_photos/ selon la même convention de nommage que
@@ -22,8 +24,9 @@ class UserPhotoService {
 
   static const _extensions = ['png', 'jpg', 'jpeg', 'webp'];
 
-  Directory get _folder =>
-      Directory(p.join(Directory.current.path, 'local_assets', 'user_photos'));
+  Directory get _folder => Directory(
+    p.join(UserContentPaths.baseDirectory, 'local_assets', 'user_photos'),
+  );
 
   Directory get _entriesFolder =>
       Directory(p.join(_folder.path, 'entries'));

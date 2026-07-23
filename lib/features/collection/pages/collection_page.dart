@@ -12,6 +12,7 @@ import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/unit_photo_thumbnail.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
+import '../../catalog/pages/datasheet_full_page.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/battle_details.dart';
 import '../../../database/models/collection_item_details.dart';
@@ -1587,23 +1588,32 @@ class _CollectionCard extends ConsumerWidget {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        entry.datasheetName,
-                        style: AppTextStyles.body,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(6),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            DatasheetFullPage(datasheetId: entry.datasheetId),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        entry.factionName,
-                        style: AppTextStyles.caption,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          entry.datasheetName,
+                          style: AppTextStyles.body,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          entry.factionName,
+                          style: AppTextStyles.caption,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Tooltip(
