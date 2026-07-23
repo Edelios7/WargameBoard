@@ -151,20 +151,25 @@ class _CollectionPageState extends ConsumerState<CollectionPage>
                       ),
                     ),
                     const SizedBox(width: 10),
-                    FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                      ),
-                      onPressed: () => showDialog(
-                        context: context,
-                        builder: (_) =>
-                            AddCollectionEntryDialog(wishlist: isWishlistTab),
-                      ),
-                      icon: const Icon(Icons.add_rounded),
-                      label: Text(
-                        isWishlistTab
-                            ? l10n.wishlistAddItem
-                            : l10n.collectionAddEntry,
+                    Flexible(
+                      child: FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                        ),
+                        onPressed: () => showDialog(
+                          context: context,
+                          builder: (_) => AddCollectionEntryDialog(
+                            wishlist: isWishlistTab,
+                          ),
+                        ),
+                        icon: const Icon(Icons.add_rounded),
+                        label: Text(
+                          isWishlistTab
+                              ? l10n.wishlistAddItem
+                              : l10n.collectionAddEntry,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                   ],
@@ -404,236 +409,267 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
             onFactionChanged: _setFactionFilter,
             onChapterChanged: (value) => setState(() => _chapterFilter = value),
           ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (widget.filtersVisible) ...[
-                SizedBox(
-                  width: 220,
-                  child: _FiltersSidebar(
-                    entries: entries,
-                    factionFilter: _factionFilter,
-                    stateFilter: _stateFilter,
-                    onFactionChanged: _setFactionFilter,
-                    onStateToggled: (state, value) => setState(() {
-                      if (value) {
-                        _stateFilter.add(state);
-                      } else {
-                        _stateFilter.remove(state);
-                      }
-                    }),
-                    onReset: () => setState(() {
-                      _factionFilter = null;
-                      _chapterFilter = null;
-                      _stateFilter.clear();
-                    }),
-                  ),
-                ),
-                const SizedBox(width: 16),
-              ],
-              Expanded(
-                child: Column(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final narrow = constraints.maxWidth < 700;
+              final filters = widget.filtersVisible
+                  ? _FiltersSidebar(
+                      entries: entries,
+                      factionFilter: _factionFilter,
+                      stateFilter: _stateFilter,
+                      onFactionChanged: _setFactionFilter,
+                      onStateToggled: (state, value) => setState(() {
+                        if (value) {
+                          _stateFilter.add(state);
+                        } else {
+                          _stateFilter.remove(state);
+                        }
+                      }),
+                      onReset: () => setState(() {
+                        _factionFilter = null;
+                        _chapterFilter = null;
+                        _stateFilter.clear();
+                      }),
+                    )
+                  : null;
+              final content = _buildResultsColumn(
+                l10n: l10n,
+                armies: armies,
+                recent: recent,
+                filtered: filtered,
+                entries: entries,
+              );
+
+              // En dessous du seuil, les filtres se dessinent au-dessus de
+              // la grille (pleine largeur) plutôt qu'à côté — une colonne
+              // fixe de 220px ne laisserait quasiment plus de place au
+              // contenu sur un écran de téléphone.
+              if (narrow) {
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (armies.isNotEmpty) ...[
-                      Text(
-                        l10n.collectionMyArmiesTitle,
-                        style: AppTextStyles.title,
-                      ),
-                      const SizedBox(height: 12),
-                      _MyArmiesRow(armies: armies, entries: entries),
-                      const SizedBox(height: 24),
+                    if (filters != null) ...[
+                      filters,
+                      const SizedBox(height: 16),
                     ],
-                    if (recent.isNotEmpty) ...[
-                      Text(
-                        l10n.collectionRecentAdditionsTitle,
-                        style: AppTextStyles.title,
+                    content,
+                  ],
+                );
+              }
+
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (filters != null) ...[
+                    SizedBox(width: 220, child: filters),
+                    const SizedBox(width: 16),
+                  ],
+                  Expanded(child: content),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResultsColumn({
+    required AppLocalizations l10n,
+    required List<ArmyListItem> armies,
+    required List<CollectionItemDetails> recent,
+    required List<CollectionItemDetails> filtered,
+    required List<CollectionItemDetails> entries,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (armies.isNotEmpty) ...[
+          Text(l10n.collectionMyArmiesTitle, style: AppTextStyles.title),
+          const SizedBox(height: 12),
+          _MyArmiesRow(armies: armies, entries: entries),
+          const SizedBox(height: 24),
+        ],
+        if (recent.isNotEmpty) ...[
+          Text(
+            l10n.collectionRecentAdditionsTitle,
+            style: AppTextStyles.title,
+          ),
+          const SizedBox(height: 12),
+          _RecentAdditionsRow(entries: recent),
+          const SizedBox(height: 24),
+        ],
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                l10n.collectionAllItemsTitle,
+                style: AppTextStyles.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PopupMenuButton<_CollectionSort>(
+                  tooltip: l10n.collectionSortTooltip,
+                  icon: const Icon(
+                    Icons.sort_rounded,
+                    color: AppColors.textSecondary,
+                    size: 20,
+                  ),
+                  color: AppColors.surface,
+                  initialValue: _sort,
+                  onSelected: (value) => setState(() => _sort = value),
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: _CollectionSort.nameAsc,
+                      child: Text(
+                        l10n.collectionSortName,
+                        style: AppTextStyles.body,
                       ),
-                      const SizedBox(height: 12),
-                      _RecentAdditionsRow(entries: recent),
-                      const SizedBox(height: 24),
-                    ],
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            l10n.collectionAllItemsTitle,
-                            style: AppTextStyles.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            PopupMenuButton<_CollectionSort>(
-                              tooltip: l10n.collectionSortTooltip,
-                              icon: const Icon(
-                                Icons.sort_rounded,
-                                color: AppColors.textSecondary,
-                                size: 20,
-                              ),
-                              color: AppColors.surface,
-                              initialValue: _sort,
-                              onSelected: (value) =>
-                                  setState(() => _sort = value),
-                              itemBuilder: (context) => [
-                                PopupMenuItem(
-                                  value: _CollectionSort.nameAsc,
-                                  child: Text(
-                                    l10n.collectionSortName,
-                                    style: AppTextStyles.body,
-                                  ),
-                                ),
-                                PopupMenuItem(
-                                  value: _CollectionSort.dateAddedDesc,
-                                  child: Text(
-                                    l10n.collectionSortDateAdded,
-                                    style: AppTextStyles.body,
-                                  ),
-                                ),
-                                PopupMenuItem(
-                                  value: _CollectionSort.paintedPctDesc,
-                                  child: Text(
-                                    l10n.collectionSortPainted,
-                                    style: AppTextStyles.body,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Tooltip(
-                              message: _selectionMode
-                                  ? l10n.collectionSelectionCancel
-                                  : l10n.collectionSelectionStart,
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(6),
-                                onTap: _toggleSelectionMode,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: Icon(
-                                    _selectionMode
-                                        ? Icons.close_rounded
-                                        : Icons.checklist_rounded,
-                                    color: _selectionMode
-                                        ? AppColors.primary
-                                        : AppColors.textSecondary,
-                                    size: 20,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            PopupMenuButton<void>(
-                              tooltip: l10n.collectionExportTooltip,
-                              icon: const Icon(
-                                Icons.ios_share_rounded,
-                                color: AppColors.textSecondary,
-                                size: 20,
-                              ),
-                              color: AppColors.surface,
-                              itemBuilder: (context) => [
-                                PopupMenuItem(
-                                  onTap: () => _copyExport(
-                                    context,
-                                    l10n,
-                                    CollectionExportFormatter.toCsv(entries),
-                                  ),
-                                  child: Text(
-                                    l10n.collectionExportCsv,
-                                    style: AppTextStyles.body,
-                                  ),
-                                ),
-                                PopupMenuItem(
-                                  onTap: () => _copyExport(
-                                    context,
-                                    l10n,
-                                    CollectionExportFormatter.toJson(entries),
-                                  ),
-                                  child: Text(
-                                    l10n.collectionExportJson,
-                                    style: AppTextStyles.body,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
                     ),
-                    if (_selectionMode) ...[
-                      const SizedBox(height: 8),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 12,
-                        runSpacing: 4,
-                        children: [
-                          Text(
-                            l10n.collectionSelectionCount(
-                              _selectedIds.length,
-                            ),
-                            style: AppTextStyles.caption,
-                          ),
-                          TextButton.icon(
-                            onPressed: _selectedIds.isEmpty
-                                ? null
-                                : () => _markSelectedPainted(entries),
-                            icon: const Icon(Icons.brush_rounded, size: 16),
-                            label: Text(l10n.collectionSelectionMarkPainted),
-                          ),
-                        ],
+                    PopupMenuItem(
+                      value: _CollectionSort.dateAddedDesc,
+                      child: Text(
+                        l10n.collectionSortDateAdded,
+                        style: AppTextStyles.body,
                       ),
-                    ],
-                    const SizedBox(height: 12),
-                    if (filtered.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 32),
-                        child: Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.search_off_rounded,
-                                size: 36,
-                                color: AppColors.textSecondary,
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                l10n.collectionNoResultsForFilters,
-                                style: AppTextStyles.caption,
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    else
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 340,
-                              mainAxisExtent: 260,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                            ),
-                        itemCount: filtered.length,
-                        itemBuilder: (context, index) {
-                          final entry = filtered[index];
-                          return _CollectionCard(
-                            entry: entry,
-                            selectionMode: _selectionMode,
-                            selected: _selectedIds.contains(entry.id),
-                            onToggleSelected: () => _toggleSelected(entry.id),
-                          );
-                        },
+                    ),
+                    PopupMenuItem(
+                      value: _CollectionSort.paintedPctDesc,
+                      child: Text(
+                        l10n.collectionSortPainted,
+                        style: AppTextStyles.body,
                       ),
+                    ),
                   ],
                 ),
+                Tooltip(
+                  message: _selectionMode
+                      ? l10n.collectionSelectionCancel
+                      : l10n.collectionSelectionStart,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(6),
+                    onTap: _toggleSelectionMode,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        _selectionMode
+                            ? Icons.close_rounded
+                            : Icons.checklist_rounded,
+                        color: _selectionMode
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
+                PopupMenuButton<void>(
+                  tooltip: l10n.collectionExportTooltip,
+                  icon: const Icon(
+                    Icons.ios_share_rounded,
+                    color: AppColors.textSecondary,
+                    size: 20,
+                  ),
+                  color: AppColors.surface,
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      onTap: () => _copyExport(
+                        context,
+                        l10n,
+                        CollectionExportFormatter.toCsv(entries),
+                      ),
+                      child: Text(
+                        l10n.collectionExportCsv,
+                        style: AppTextStyles.body,
+                      ),
+                    ),
+                    PopupMenuItem(
+                      onTap: () => _copyExport(
+                        context,
+                        l10n,
+                        CollectionExportFormatter.toJson(entries),
+                      ),
+                      child: Text(
+                        l10n.collectionExportJson,
+                        style: AppTextStyles.body,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+        if (_selectionMode) ...[
+          const SizedBox(height: 8),
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 12,
+            runSpacing: 4,
+            children: [
+              Text(
+                l10n.collectionSelectionCount(_selectedIds.length),
+                style: AppTextStyles.caption,
+              ),
+              TextButton.icon(
+                onPressed: _selectedIds.isEmpty
+                    ? null
+                    : () => _markSelectedPainted(entries),
+                icon: const Icon(Icons.brush_rounded, size: 16),
+                label: Text(l10n.collectionSelectionMarkPainted),
               ),
             ],
           ),
         ],
-      ),
+        const SizedBox(height: 12),
+        if (filtered.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 32),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.search_off_rounded,
+                    size: 36,
+                    color: AppColors.textSecondary,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    l10n.collectionNoResultsForFilters,
+                    style: AppTextStyles.caption,
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 340,
+              mainAxisExtent: 260,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+            ),
+            itemCount: filtered.length,
+            itemBuilder: (context, index) {
+              final entry = filtered[index];
+              return _CollectionCard(
+                entry: entry,
+                selectionMode: _selectionMode,
+                selected: _selectedIds.contains(entry.id),
+                onToggleSelected: () => _toggleSelected(entry.id),
+              );
+            },
+          ),
+      ],
     );
   }
 }
@@ -691,7 +727,11 @@ class _OverviewStatsRow extends StatelessWidget {
           crossAxisCount: columns,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
-          childAspectRatio: 2.0,
+          // Des tuiles à 2 colonnes sont plus étroites, donc
+          // proportionnellement plus hautes pour garder assez de place au
+          // texte qu'elles affichent (voir le même correctif sur le
+          // Dashboard).
+          childAspectRatio: columns == 4 ? 2.0 : 1.4,
           children: [
             _StatTile(
               icon: Icons.groups_rounded,

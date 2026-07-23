@@ -215,4 +215,24 @@ void main() {
     // Le mode sélection se referme automatiquement après l'action groupée.
     expect(find.byIcon(Icons.checklist_rounded), findsOneWidget);
   });
+
+  testWidgets(
+      'the collection page renders without overflow on a phone-sized screen',
+      (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await database.collectionDao.addEntry(
+      datasheetId: 'ds-captain',
+      quantity: 3,
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Captain'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
 }
