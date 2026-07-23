@@ -212,6 +212,72 @@ abstract class AppLocalizations {
   /// **'Importer du JSON'**
   String get settingsImportButton;
 
+  /// No description provided for @settingsBackupTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sauvegarde'**
+  String get settingsBackupTitle;
+
+  /// No description provided for @settingsBackupDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tes données (armées, collection, historique de parties...) ne vivent que sur cette machine — exporte une sauvegarde de temps en temps pour ne rien perdre en cas de problème.'**
+  String get settingsBackupDescription;
+
+  /// No description provided for @settingsBackupExportButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Exporter'**
+  String get settingsBackupExportButton;
+
+  /// No description provided for @settingsBackupExportSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sauvegarde enregistrée : {path}'**
+  String settingsBackupExportSuccess(String path);
+
+  /// No description provided for @settingsBackupExportError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'enregistrer la sauvegarde'**
+  String get settingsBackupExportError;
+
+  /// No description provided for @settingsBackupRestoreButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Restaurer'**
+  String get settingsBackupRestoreButton;
+
+  /// No description provided for @settingsBackupRestoreConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Restaurer cette sauvegarde ?'**
+  String get settingsBackupRestoreConfirmTitle;
+
+  /// No description provided for @settingsBackupRestoreConfirmBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes les données actuelles (armées, collection, historique de parties...) seront remplacées par celles de la sauvegarde choisie. Cette action est irréversible. L\'application doit être relancée pour l\'appliquer.'**
+  String get settingsBackupRestoreConfirmBody;
+
+  /// No description provided for @settingsBackupRestoreConfirmAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Restaurer et relancer plus tard'**
+  String get settingsBackupRestoreConfirmAction;
+
+  /// No description provided for @settingsBackupRestoreStaged.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sauvegarde prête — ferme et relance l\'application pour l\'appliquer.'**
+  String get settingsBackupRestoreStaged;
+
+  /// No description provided for @settingsBackupRestoreCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler la restauration en attente'**
+  String get settingsBackupRestoreCancel;
+
   /// No description provided for @settingsImportPasteHint.
   ///
   /// In fr, this message translates to:

@@ -7,6 +7,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/textured_button.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../providers/backup_provider.dart';
 import '../../../providers/dashboard_provider.dart';
 import '../../../providers/locale_provider.dart';
 import '../../../providers/shared_preferences_provider.dart';
@@ -46,6 +47,65 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     }
   }
 
+  Future<void> _exportBackup() async {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      final path = await ref.read(backupServiceProvider).exportBackup();
+      if (path == null || !mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.settingsBackupExportSuccess(path))),
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.settingsBackupExportError)),
+        );
+      }
+    }
+  }
+
+  Future<void> _restoreBackup() async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text(
+          l10n.settingsBackupRestoreConfirmTitle,
+          style: AppTextStyles.title,
+        ),
+        content: Text(
+          l10n.settingsBackupRestoreConfirmBody,
+          style: AppTextStyles.body,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.armyBuilderCancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.settingsBackupRestoreConfirmAction),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final staged = await ref.read(backupServiceProvider).stageRestore();
+    if (!mounted || !staged) return;
+    ref.invalidate(pendingRestoreProvider);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l10n.settingsBackupRestoreStaged)),
+    );
+  }
+
+  Future<void> _cancelPendingRestore() async {
+    await ref.read(backupServiceProvider).cancelPendingRestore();
+    ref.invalidate(pendingRestoreProvider);
+  }
+
   void _setLocale(WidgetRef ref, Locale? locale) {
     ref.read(localeOverrideProvider.notifier).state = locale;
 
@@ -61,6 +121,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final localeOverride = ref.watch(localeOverrideProvider);
+    final pendingRestore = ref.watch(pendingRestoreProvider).value ?? false;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -149,6 +210,85 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         builder: (_) => const ImportJsonDialog(),
                       ),
                     ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: 420,
+              child: AppCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.settingsBackupTitle, style: AppTextStyles.body),
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.settingsBackupDescription,
+                      style: AppTextStyles.caption,
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        TexturedButton(
+                          label: l10n.settingsBackupExportButton,
+                          icon: Icons.file_upload_outlined,
+                          onPressed: _exportBackup,
+                        ),
+                        TexturedButton(
+                          label: l10n.settingsBackupRestoreButton,
+                          icon: Icons.settings_backup_restore_rounded,
+                          onPressed: _restoreBackup,
+                        ),
+                      ],
+                    ),
+                    if (pendingRestore) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.warning.withValues(alpha: .12),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: AppColors.warning.withValues(alpha: .4),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(
+                                  Icons.info_outline_rounded,
+                                  size: 16,
+                                  color: AppColors.warning,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    l10n.settingsBackupRestoreStaged,
+                                    style: AppTextStyles.caption,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            TextButton(
+                              onPressed: _cancelPendingRestore,
+                              child: Text(
+                                l10n.settingsBackupRestoreCancel,
+                                style: AppTextStyles.caption.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

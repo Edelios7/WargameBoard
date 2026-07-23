@@ -23,6 +23,22 @@
   "settingsImportTitle": "Data import",
   "settingsImportDescription": "Import datasheets from JSON (existing ids get updated).",
   "settingsImportButton": "Import JSON",
+  "settingsBackupTitle": "Backup",
+  "settingsBackupDescription": "Your data (armies, collection, battle history...) only lives on this machine — export a backup from time to time so you never lose it.",
+  "settingsBackupExportButton": "Export",
+  "settingsBackupExportSuccess": "Backup saved: {path}",
+  "@settingsBackupExportSuccess": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "settingsBackupExportError": "Couldn't save the backup",
+  "settingsBackupRestoreButton": "Restore",
+  "settingsBackupRestoreConfirmTitle": "Restore this backup?",
+  "settingsBackupRestoreConfirmBody": "All current data (armies, collection, battle history...) will be replaced by the chosen backup. This cannot be undone. The app needs to restart to apply it.",
+  "settingsBackupRestoreConfirmAction": "Restore and restart later",
+  "settingsBackupRestoreStaged": "Backup ready — close and reopen the app to apply it.",
+  "settingsBackupRestoreCancel": "Cancel pending restore",
   "settingsImportPasteHint": "Paste the JSON document here...",
   "settingsImportRun": "Import",
   "settingsImportSuccess": "{count} items imported",

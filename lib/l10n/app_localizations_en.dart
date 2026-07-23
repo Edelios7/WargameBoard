@@ -67,6 +67,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsImportButton => 'Import JSON';
 
   @override
+  String get settingsBackupTitle => 'Backup';
+
+  @override
+  String get settingsBackupDescription =>
+      'Your data (armies, collection, battle history...) only lives on this machine — export a backup from time to time so you never lose it.';
+
+  @override
+  String get settingsBackupExportButton => 'Export';
+
+  @override
+  String settingsBackupExportSuccess(String path) {
+    return 'Backup saved: $path';
+  }
+
+  @override
+  String get settingsBackupExportError => 'Couldn\'t save the backup';
+
+  @override
+  String get settingsBackupRestoreButton => 'Restore';
+
+  @override
+  String get settingsBackupRestoreConfirmTitle => 'Restore this backup?';
+
+  @override
+  String get settingsBackupRestoreConfirmBody =>
+      'All current data (armies, collection, battle history...) will be replaced by the chosen backup. This cannot be undone. The app needs to restart to apply it.';
+
+  @override
+  String get settingsBackupRestoreConfirmAction => 'Restore and restart later';
+
+  @override
+  String get settingsBackupRestoreStaged =>
+      'Backup ready — close and reopen the app to apply it.';
+
+  @override
+  String get settingsBackupRestoreCancel => 'Cancel pending restore';
+
+  @override
   String get settingsImportPasteHint => 'Paste the JSON document here...';
 
   @override

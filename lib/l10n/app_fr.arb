@@ -23,6 +23,22 @@
   "settingsImportTitle": "Import de données",
   "settingsImportDescription": "Importer des datasheets au format JSON (mise à jour si l'id existe déjà).",
   "settingsImportButton": "Importer du JSON",
+  "settingsBackupTitle": "Sauvegarde",
+  "settingsBackupDescription": "Tes données (armées, collection, historique de parties...) ne vivent que sur cette machine — exporte une sauvegarde de temps en temps pour ne rien perdre en cas de problème.",
+  "settingsBackupExportButton": "Exporter",
+  "settingsBackupExportSuccess": "Sauvegarde enregistrée : {path}",
+  "@settingsBackupExportSuccess": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "settingsBackupExportError": "Impossible d'enregistrer la sauvegarde",
+  "settingsBackupRestoreButton": "Restaurer",
+  "settingsBackupRestoreConfirmTitle": "Restaurer cette sauvegarde ?",
+  "settingsBackupRestoreConfirmBody": "Toutes les données actuelles (armées, collection, historique de parties...) seront remplacées par celles de la sauvegarde choisie. Cette action est irréversible. L'application doit être relancée pour l'appliquer.",
+  "settingsBackupRestoreConfirmAction": "Restaurer et relancer plus tard",
+  "settingsBackupRestoreStaged": "Sauvegarde prête — ferme et relance l'application pour l'appliquer.",
+  "settingsBackupRestoreCancel": "Annuler la restauration en attente",
   "settingsImportPasteHint": "Colle ici le document JSON...",
   "settingsImportRun": "Importer",
   "settingsImportSuccess": "{count} éléments importés",

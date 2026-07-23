@@ -67,6 +67,48 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsImportButton => 'Importer du JSON';
 
   @override
+  String get settingsBackupTitle => 'Sauvegarde';
+
+  @override
+  String get settingsBackupDescription =>
+      'Tes données (armées, collection, historique de parties...) ne vivent que sur cette machine — exporte une sauvegarde de temps en temps pour ne rien perdre en cas de problème.';
+
+  @override
+  String get settingsBackupExportButton => 'Exporter';
+
+  @override
+  String settingsBackupExportSuccess(String path) {
+    return 'Sauvegarde enregistrée : $path';
+  }
+
+  @override
+  String get settingsBackupExportError =>
+      'Impossible d\'enregistrer la sauvegarde';
+
+  @override
+  String get settingsBackupRestoreButton => 'Restaurer';
+
+  @override
+  String get settingsBackupRestoreConfirmTitle =>
+      'Restaurer cette sauvegarde ?';
+
+  @override
+  String get settingsBackupRestoreConfirmBody =>
+      'Toutes les données actuelles (armées, collection, historique de parties...) seront remplacées par celles de la sauvegarde choisie. Cette action est irréversible. L\'application doit être relancée pour l\'appliquer.';
+
+  @override
+  String get settingsBackupRestoreConfirmAction =>
+      'Restaurer et relancer plus tard';
+
+  @override
+  String get settingsBackupRestoreStaged =>
+      'Sauvegarde prête — ferme et relance l\'application pour l\'appliquer.';
+
+  @override
+  String get settingsBackupRestoreCancel =>
+      'Annuler la restauration en attente';
+
+  @override
   String get settingsImportPasteHint => 'Colle ici le document JSON...';
 
   @override
