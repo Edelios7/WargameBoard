@@ -127,7 +127,10 @@ class DashboardPage extends ConsumerWidget {
                       crossAxisCount: columns,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
-                      childAspectRatio: 2.0,
+                      // Des tuiles à 2 colonnes sont plus étroites, donc
+                      // proportionnellement plus hautes pour garder assez
+                      // de place aux 3 lignes de texte qu'elles affichent.
+                      childAspectRatio: columns == 4 ? 2.0 : 1.4,
                       children: [
                         _StatTile(
                           icon: Icons.military_tech_rounded,
@@ -803,7 +806,14 @@ class _YourArmiesCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(l10n.dashboardYourArmies, style: AppTextStyles.title),
+              Expanded(
+                child: Text(
+                  l10n.dashboardYourArmies,
+                  style: AppTextStyles.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               if (armies.isNotEmpty)
                 TextButton(
                   onPressed: onSeeAll,
@@ -1040,9 +1050,13 @@ class _RecentAdditionsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                l10n.dashboardRecentAdditionsTitle,
-                style: AppTextStyles.title,
+              Expanded(
+                child: Text(
+                  l10n.dashboardRecentAdditionsTitle,
+                  style: AppTextStyles.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               if (entries.isNotEmpty)
                 TextButton(

@@ -60,4 +60,42 @@ void main() {
 
     expect(find.text('Aucune armée pour l\'instant'), findsOneWidget);
   });
+
+  testWidgets(
+      'on a phone-sized screen, the sidebar becomes a drawer opened from the AppBar',
+      (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(_wrap(database));
+    await tester.pumpAndSettle();
+
+    // Pas de sidebar permanente à cette largeur, mais une AppBar avec le
+    // titre de l'onglet actif et le bouton menu.
+    expect(find.text('Dashboard'), findsOneWidget);
+    expect(find.byType(Drawer), findsNothing);
+    expect(find.byIcon(Icons.menu), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Drawer), findsOneWidget);
+
+    // Sélectionner un item referme le tiroir — vérifié ici sur le
+    // Dashboard lui-même (déjà audité pour ne pas déborder à cette
+    // largeur) ; les autres pages ont leur propre test de largeur étroite
+    // au fur et à mesure de leur passage en responsive.
+    await tester.tap(
+      find.descendant(
+        of: find.byType(Drawer),
+        matching: find.text('Dashboard'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Drawer), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 }

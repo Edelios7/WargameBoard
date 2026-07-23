@@ -62,12 +62,16 @@ class _TexturedButtonState extends State<TexturedButton> {
           Icon(widget.icon, size: 17, color: Colors.white),
           const SizedBox(width: 8),
         ],
-        Text(
-          widget.label.toUpperCase(),
-          style: AppTextStyles.body.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.6,
+        Flexible(
+          child: Text(
+            widget.label.toUpperCase(),
+            style: AppTextStyles.body.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.6,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
