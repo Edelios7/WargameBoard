@@ -13,6 +13,7 @@ import '../../../database/models/search_result.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/catalog_provider.dart';
 import '../widgets/catalog_preview_panel.dart';
+import 'datasheet_full_page.dart';
 import 'weapons_inventory_page.dart';
 
 class CatalogPage extends ConsumerWidget {
@@ -112,8 +113,19 @@ class CatalogPage extends ConsumerWidget {
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final filtersWidth = constraints.maxWidth < 700 ? 200.0 : 232.0;
-                final resultsWidth = constraints.maxWidth < 700 ? 260.0 : 320.0;
+                // En dessous de ce seuil, trois colonnes fixes ne laissent
+                // plus de place à rien — on repasse à un flux liste puis
+                // détail en plein écran (patron mobile), filtres derrière
+                // un bouton plutôt qu'une colonne toujours visible.
+                if (constraints.maxWidth < 900) {
+                  return _NarrowCatalogLayout(
+                    resultsAsync: resultsAsync,
+                    hasActiveFilters: hasActiveFilters,
+                  );
+                }
+
+                final filtersWidth = constraints.maxWidth < 1100 ? 200.0 : 232.0;
+                final resultsWidth = constraints.maxWidth < 1100 ? 260.0 : 320.0;
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -151,6 +163,103 @@ class CatalogPage extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Liste seule (recherche + filtres derrière un bouton) sur petit écran ;
+/// toucher un résultat ouvre sa fiche en plein écran plutôt que dans un
+/// panneau latéral qui n'aurait pas la place de s'afficher.
+class _NarrowCatalogLayout extends ConsumerWidget {
+  final AsyncValue<List<SearchResult>> resultsAsync;
+  final bool hasActiveFilters;
+
+  const _NarrowCatalogLayout({
+    required this.resultsAsync,
+    required this.hasActiveFilters,
+  });
+
+  void _openFilters(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (context) => Consumer(
+        builder: (context, ref, _) {
+          final results = ref.watch(catalogSearchResultsProvider);
+          return ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+            ),
+            child: _FiltersPanel(
+              hasActiveFilters: hasActiveFilters,
+              resultsCount: results.value?.length,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: _SearchField(
+                  hintText: l10n.catalogSearchHint,
+                  onChanged: (value) => ref
+                      .read(catalogSearchQueryProvider.notifier)
+                      .state = value,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Tooltip(
+                message: l10n.catalogFilterTitle,
+                child: IconButton(
+                  style: IconButton.styleFrom(
+                    backgroundColor: hasActiveFilters
+                        ? AppColors.primary.withValues(alpha: .16)
+                        : AppColors.surface,
+                    side: const BorderSide(color: AppColors.border),
+                  ),
+                  onPressed: () => _openFilters(context),
+                  icon: Icon(
+                    Icons.tune_rounded,
+                    color: hasActiveFilters
+                        ? AppColors.primary
+                        : AppColors.textSecondary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: _ResultsList(
+            resultsAsync: resultsAsync,
+            selectedId: null,
+            onSelect: (id) {
+              ref.read(selectedDatasheetIdProvider.notifier).state = id;
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => DatasheetFullPage(datasheetId: id),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
