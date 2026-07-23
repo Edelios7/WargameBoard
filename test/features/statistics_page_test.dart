@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wargameboard/database/app_database.dart';
 import 'package:wargameboard/database/seed/faction_seed.dart';
+import 'package:wargameboard/database/tables/battles_table.dart';
 import 'package:wargameboard/features/statistics/pages/statistics_page.dart';
 import 'package:wargameboard/l10n/app_localizations.dart';
 import 'package:wargameboard/providers/database_provider.dart';
@@ -63,5 +64,30 @@ void main() {
     expect(find.text('90 pts'), findsOneWidget);
     expect(find.text('3'), findsOneWidget); // figurines en collection
     expect(find.text('2'), findsOneWidget); // figurines peintes
+  });
+
+  testWidgets(
+      'battles feed the recent form strip and the breakdown donuts',
+      (tester) async {
+    await database.battleDao.addBattle(
+      opponentName: 'Marc',
+      opponentFactionId: seedOrksFactionId,
+      result: BattleResult.victory,
+      playedAt: DateTime(2026, 1, 1),
+    );
+    await database.battleDao.addBattle(
+      opponentName: 'Julie',
+      opponentFactionId: seedOrksFactionId,
+      result: BattleResult.defeat,
+      playedAt: DateTime(2026, 1, 5),
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    expect(find.text('VICTOIRES / DÉFAITES / NULS'), findsOneWidget);
+    expect(find.text('PARTIES PAR FACTION ADVERSE'), findsOneWidget);
+    expect(find.textContaining('Orks'), findsWidgets);
+    expect(find.byType(Tooltip), findsWidgets);
   });
 }

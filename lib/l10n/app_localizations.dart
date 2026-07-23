@@ -1448,6 +1448,36 @@ abstract class AppLocalizations {
   /// **'Pas encore de figurines en collection'**
   String get statsNoCollection;
 
+  /// No description provided for @statsProgressionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Progression'**
+  String get statsProgressionTitle;
+
+  /// No description provided for @statsRecentFormTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Forme récente'**
+  String get statsRecentFormTitle;
+
+  /// No description provided for @statsBattleOutcomesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Victoires / défaites / nuls'**
+  String get statsBattleOutcomesTitle;
+
+  /// No description provided for @statsBattlesByFactionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Parties par faction adverse'**
+  String get statsBattlesByFactionTitle;
+
+  /// No description provided for @statsUnknownFaction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Faction inconnue'**
+  String get statsUnknownFaction;
+
   /// No description provided for @statsGamesPlayed.
   ///
   /// In fr, this message translates to:

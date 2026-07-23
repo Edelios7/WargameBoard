@@ -742,6 +742,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statsNoCollection => 'No models in your collection yet';
 
   @override
+  String get statsProgressionTitle => 'Progression';
+
+  @override
+  String get statsRecentFormTitle => 'Recent form';
+
+  @override
+  String get statsBattleOutcomesTitle => 'Wins / losses / draws';
+
+  @override
+  String get statsBattlesByFactionTitle => 'Games by opponent faction';
+
+  @override
+  String get statsUnknownFaction => 'Unknown faction';
+
+  @override
   String get statsGamesPlayed => 'Games played';
 
   @override

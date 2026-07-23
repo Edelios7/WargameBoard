@@ -749,6 +749,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String get statsNoCollection => 'Pas encore de figurines en collection';
 
   @override
+  String get statsProgressionTitle => 'Progression';
+
+  @override
+  String get statsRecentFormTitle => 'Forme récente';
+
+  @override
+  String get statsBattleOutcomesTitle => 'Victoires / défaites / nuls';
+
+  @override
+  String get statsBattlesByFactionTitle => 'Parties par faction adverse';
+
+  @override
+  String get statsUnknownFaction => 'Faction inconnue';
+
+  @override
   String get statsGamesPlayed => 'Parties jouées';
 
   @override
