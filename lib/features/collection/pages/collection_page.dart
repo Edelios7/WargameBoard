@@ -1432,6 +1432,7 @@ class _WishlistTab extends ConsumerWidget {
                         },
                       ),
                       IconButton(
+                        tooltip: l10n.wishlistRemove,
                         icon: const Icon(Icons.close_rounded),
                         color: AppColors.textSecondary,
                         onPressed: () async {

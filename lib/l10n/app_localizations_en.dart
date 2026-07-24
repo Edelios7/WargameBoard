@@ -715,6 +715,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wishlistMoveToCollection => 'Mark as acquired';
 
   @override
+  String get wishlistRemove => 'Remove from wishlist';
+
+  @override
   String get wishlistNotesDialogLabel => 'Notes (optional)';
 
   @override
@@ -930,6 +933,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardFactionBreakdown => 'Breakdown by faction';
+
+  @override
+  String get dashboardFactionBreakdownEmpty =>
+      'No models in your collection yet';
 
   @override
   String get dashboardStatusPainted => 'Painted';

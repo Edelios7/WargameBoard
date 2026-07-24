@@ -1403,7 +1403,7 @@ class _DatasheetListItem extends ConsumerWidget {
                                 ),
                               ),
                               if (result.points != null) ...[
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 10),
                                 Text(
                                   l10n.pointsSuffix(result.points!),
                                   style: AppTextStyles.caption.copyWith(

@@ -1394,6 +1394,12 @@ abstract class AppLocalizations {
   /// **'Marquer comme acquis'**
   String get wishlistMoveToCollection;
 
+  /// No description provided for @wishlistRemove.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer de la liste d\'envies'**
+  String get wishlistRemove;
+
   /// No description provided for @wishlistNotesDialogLabel.
   ///
   /// In fr, this message translates to:
@@ -1801,6 +1807,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Répartition par faction'**
   String get dashboardFactionBreakdown;
+
+  /// No description provided for @dashboardFactionBreakdownEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune figurine dans ta collection pour l\'instant'**
+  String get dashboardFactionBreakdownEmpty;
 
   /// No description provided for @dashboardStatusPainted.
   ///

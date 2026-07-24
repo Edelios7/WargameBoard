@@ -366,6 +366,7 @@
   "wishlistAddItem": "Ajouter à la liste d'envies",
   "wishlistEmpty": "Ta liste d'envies est vide",
   "wishlistMoveToCollection": "Marquer comme acquis",
+  "wishlistRemove": "Retirer de la liste d'envies",
   "wishlistNotesDialogLabel": "Notes (optionnel)",
 
   "collectionSearchHint": "Rechercher dans la collection...",
@@ -462,6 +463,7 @@
   "dashboardNoArmiesYet": "Aucune armée créée pour l'instant",
   "dashboardPaintingBreakdown": "État de la collection",
   "dashboardFactionBreakdown": "Répartition par faction",
+  "dashboardFactionBreakdownEmpty": "Aucune figurine dans ta collection pour l'instant",
   "dashboardStatusPainted": "Peintes",
   "dashboardStatusAssembled": "Montées",
   "dashboardStatusUnbuilt": "Sur grappe",

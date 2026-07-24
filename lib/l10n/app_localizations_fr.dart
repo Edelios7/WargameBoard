@@ -726,6 +726,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get wishlistMoveToCollection => 'Marquer comme acquis';
 
   @override
+  String get wishlistRemove => 'Retirer de la liste d\'envies';
+
+  @override
   String get wishlistNotesDialogLabel => 'Notes (optionnel)';
 
   @override
@@ -941,6 +944,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dashboardFactionBreakdown => 'Répartition par faction';
+
+  @override
+  String get dashboardFactionBreakdownEmpty =>
+      'Aucune figurine dans ta collection pour l\'instant';
 
   @override
   String get dashboardStatusPainted => 'Peintes';

@@ -366,6 +366,7 @@
   "wishlistAddItem": "Add to wishlist",
   "wishlistEmpty": "Your wishlist is empty",
   "wishlistMoveToCollection": "Mark as acquired",
+  "wishlistRemove": "Remove from wishlist",
   "wishlistNotesDialogLabel": "Notes (optional)",
 
   "collectionSearchHint": "Search the collection...",
@@ -462,6 +463,7 @@
   "dashboardNoArmiesYet": "No army created yet",
   "dashboardPaintingBreakdown": "Collection status",
   "dashboardFactionBreakdown": "Breakdown by faction",
+  "dashboardFactionBreakdownEmpty": "No models in your collection yet",
   "dashboardStatusPainted": "Painted",
   "dashboardStatusAssembled": "Assembled",
   "dashboardStatusUnbuilt": "Unbuilt",

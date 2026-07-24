@@ -974,7 +974,7 @@ class _FactionBreakdownCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: Text(
-                l10n.dashboardNoArmiesYet,
+                l10n.dashboardFactionBreakdownEmpty,
                 style: AppTextStyles.caption,
               ),
             )
@@ -1322,24 +1322,28 @@ class _QuickActionsCard extends StatelessWidget {
             icon: Icons.groups_rounded,
             label: l10n.dashboardQuickActionNewArmy,
             onTap: onNewArmy,
+            opensDialog: true,
           ),
           const SizedBox(height: 8),
           _actionButton(
             icon: Icons.inventory_2_rounded,
             label: l10n.dashboardQuickActionAddToCollection,
             onTap: onAddToCollection,
+            opensDialog: true,
           ),
           const SizedBox(height: 8),
           _actionButton(
             icon: Icons.auto_stories_rounded,
             label: l10n.dashboardQuickActionOpenCatalog,
             onTap: onOpenCatalog,
+            opensDialog: false,
           ),
           const SizedBox(height: 8),
           _actionButton(
             icon: Icons.sports_martial_arts_rounded,
             label: l10n.dashboardQuickActionNewBattle,
             onTap: onNewBattle,
+            opensDialog: true,
           ),
         ],
       ),
@@ -1350,6 +1354,7 @@ class _QuickActionsCard extends StatelessWidget {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
+    required bool opensDialog,
   }) {
     return Material(
       color: AppColors.surface,
@@ -1375,9 +1380,14 @@ class _QuickActionsCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const Icon(
-                Icons.chevron_right_rounded,
-                size: 18,
+              // Chevron = navigue vers un autre écran ; carré = ouvre une
+              // fenêtre à remplir sans quitter le Dashboard — pour ne pas
+              // laisser croire que les quatre actions se comportent pareil.
+              Icon(
+                opensDialog
+                    ? Icons.open_in_new_rounded
+                    : Icons.chevron_right_rounded,
+                size: opensDialog ? 15 : 18,
                 color: AppColors.textSecondary,
               ),
             ],
