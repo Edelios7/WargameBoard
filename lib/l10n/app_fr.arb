@@ -114,6 +114,7 @@
   "catalogSeeLess": "Voir moins",
   "catalogViewFullSheet": "Voir la fiche complète",
   "catalogBackToCatalog": "Catalogue",
+  "commonBack": "Retour",
   "catalogWeaponsButton": "Armes",
   "catalogWeaponsTitle": "Inventaire des armes",
   "catalogWeaponsSearchHint": "Rechercher une arme...",
@@ -685,9 +686,24 @@
   "battleEndOfRoundDismiss": "Compris",
   "battleDashboardScoreTitle": "Score",
   "battleDashboardCpTitle": "Points de commandement",
+  "battleAdjustIncrease": "Augmenter : {label}",
+  "@battleAdjustIncrease": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "battleAdjustDecrease": "Diminuer : {label}",
+  "@battleAdjustDecrease": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "battleDiceCountDecrease": "Un dé de moins",
+  "battleDiceCountIncrease": "Un dé de plus",
   "battleDashboardMyCp": "Mes PC",
   "battleDashboardOpponentCp": "PC adverses",
   "battleOpponentArmyLabel": "Armée adverse (optionnel, parmi tes armées enregistrées)",
+  "battleOpponentArmyHint": "Utile si tu as aussi saisi la liste adverse dans l'appli — préremplit le nom et la faction ci-dessus/dessous.",
   "battleDashboardRoster": "Mon roster",
   "battleDashboardOpponentRoster": "Roster adverse",
   "battleUnitDestroyed": "Détruite",
@@ -717,6 +733,9 @@
   "battleUnitStatsTitle": "Caractéristiques",
   "battleUnitWeaponsTitle": "Armes",
   "battleUnitNoModifiers": "Aucun bonus/malus actif",
+  "battleUnitWoundLose": "Retirer 1 PV",
+  "battleUnitWoundRestore": "Rendre 1 PV",
+  "battleUnitRemoveModifier": "Retirer ce bonus/malus",
   "battleDashboardEvents": "Journal de bataille",
   "battleDashboardAddEvent": "Ajouter un événement",
   "battleDashboardEventHint": "Que s'est-il passé ?",

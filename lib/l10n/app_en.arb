@@ -114,6 +114,7 @@
   "catalogSeeLess": "See less",
   "catalogViewFullSheet": "View full datasheet",
   "catalogBackToCatalog": "Catalog",
+  "commonBack": "Back",
   "catalogWeaponsButton": "Weapons",
   "catalogWeaponsTitle": "Weapons inventory",
   "catalogWeaponsSearchHint": "Search for a weapon...",
@@ -685,9 +686,24 @@
   "battleEndOfRoundDismiss": "Got it",
   "battleDashboardScoreTitle": "Score",
   "battleDashboardCpTitle": "Command points",
+  "battleAdjustIncrease": "Increase: {label}",
+  "@battleAdjustIncrease": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "battleAdjustDecrease": "Decrease: {label}",
+  "@battleAdjustDecrease": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "battleDiceCountDecrease": "One fewer die",
+  "battleDiceCountIncrease": "One more die",
   "battleDashboardMyCp": "My CP",
   "battleDashboardOpponentCp": "Opponent CP",
   "battleOpponentArmyLabel": "Opponent's army (optional, from your saved armies)",
+  "battleOpponentArmyHint": "Useful if you've also entered the opponent's list in the app — fills in the name and faction above/below.",
   "battleDashboardRoster": "My roster",
   "battleDashboardOpponentRoster": "Opponent roster",
   "battleUnitDestroyed": "Destroyed",
@@ -717,6 +733,9 @@
   "battleUnitStatsTitle": "Characteristics",
   "battleUnitWeaponsTitle": "Weapons",
   "battleUnitNoModifiers": "No active bonus/penalty",
+  "battleUnitWoundLose": "Remove 1 wound",
+  "battleUnitWoundRestore": "Restore 1 wound",
+  "battleUnitRemoveModifier": "Remove this bonus/penalty",
   "battleDashboardEvents": "Battle log",
   "battleDashboardAddEvent": "Add event",
   "battleDashboardEventHint": "What happened?",

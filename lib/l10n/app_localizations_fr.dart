@@ -250,6 +250,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get catalogBackToCatalog => 'Catalogue';
 
   @override
+  String get commonBack => 'Retour';
+
+  @override
   String get catalogWeaponsButton => 'Armes';
 
   @override
@@ -1453,6 +1456,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get battleDashboardCpTitle => 'Points de commandement';
 
   @override
+  String battleAdjustIncrease(String label) {
+    return 'Augmenter : $label';
+  }
+
+  @override
+  String battleAdjustDecrease(String label) {
+    return 'Diminuer : $label';
+  }
+
+  @override
+  String get battleDiceCountDecrease => 'Un dé de moins';
+
+  @override
+  String get battleDiceCountIncrease => 'Un dé de plus';
+
+  @override
   String get battleDashboardMyCp => 'Mes PC';
 
   @override
@@ -1461,6 +1480,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get battleOpponentArmyLabel =>
       'Armée adverse (optionnel, parmi tes armées enregistrées)';
+
+  @override
+  String get battleOpponentArmyHint =>
+      'Utile si tu as aussi saisi la liste adverse dans l\'appli — préremplit le nom et la faction ci-dessus/dessous.';
 
   @override
   String get battleDashboardRoster => 'Mon roster';
@@ -1523,6 +1546,15 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get battleUnitNoModifiers => 'Aucun bonus/malus actif';
+
+  @override
+  String get battleUnitWoundLose => 'Retirer 1 PV';
+
+  @override
+  String get battleUnitWoundRestore => 'Rendre 1 PV';
+
+  @override
+  String get battleUnitRemoveModifier => 'Retirer ce bonus/malus';
 
   @override
   String get battleDashboardEvents => 'Journal de bataille';

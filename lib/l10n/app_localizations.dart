@@ -536,6 +536,12 @@ abstract class AppLocalizations {
   /// **'Catalogue'**
   String get catalogBackToCatalog;
 
+  /// No description provided for @commonBack.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retour'**
+  String get commonBack;
+
   /// No description provided for @catalogWeaponsButton.
   ///
   /// In fr, this message translates to:
@@ -2732,6 +2738,30 @@ abstract class AppLocalizations {
   /// **'Points de commandement'**
   String get battleDashboardCpTitle;
 
+  /// No description provided for @battleAdjustIncrease.
+  ///
+  /// In fr, this message translates to:
+  /// **'Augmenter : {label}'**
+  String battleAdjustIncrease(String label);
+
+  /// No description provided for @battleAdjustDecrease.
+  ///
+  /// In fr, this message translates to:
+  /// **'Diminuer : {label}'**
+  String battleAdjustDecrease(String label);
+
+  /// No description provided for @battleDiceCountDecrease.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un dé de moins'**
+  String get battleDiceCountDecrease;
+
+  /// No description provided for @battleDiceCountIncrease.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un dé de plus'**
+  String get battleDiceCountIncrease;
+
   /// No description provided for @battleDashboardMyCp.
   ///
   /// In fr, this message translates to:
@@ -2749,6 +2779,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Armée adverse (optionnel, parmi tes armées enregistrées)'**
   String get battleOpponentArmyLabel;
+
+  /// No description provided for @battleOpponentArmyHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utile si tu as aussi saisi la liste adverse dans l\'appli — préremplit le nom et la faction ci-dessus/dessous.'**
+  String get battleOpponentArmyHint;
 
   /// No description provided for @battleDashboardRoster.
   ///
@@ -2863,6 +2899,24 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Aucun bonus/malus actif'**
   String get battleUnitNoModifiers;
+
+  /// No description provided for @battleUnitWoundLose.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer 1 PV'**
+  String get battleUnitWoundLose;
+
+  /// No description provided for @battleUnitWoundRestore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rendre 1 PV'**
+  String get battleUnitWoundRestore;
+
+  /// No description provided for @battleUnitRemoveModifier.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer ce bonus/malus'**
+  String get battleUnitRemoveModifier;
 
   /// No description provided for @battleDashboardEvents.
   ///

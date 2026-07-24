@@ -33,7 +33,7 @@ class DatasheetFullPage extends ConsumerWidget {
                       size: 16, color: AppColors.textSecondary),
                   const SizedBox(width: 6),
                   Text(
-                    l10n.catalogBackToCatalog,
+                    l10n.commonBack,
                     style: AppTextStyles.caption,
                   ),
                 ],

@@ -442,6 +442,7 @@ class _ScoreColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         Text(label.toUpperCase(), style: AppTextStyles.eyebrow),
@@ -450,6 +451,7 @@ class _ScoreColumn extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             IconButton(
+              tooltip: l10n.battleAdjustDecrease(label),
               icon: const Icon(Icons.remove_circle_outline_rounded),
               color: AppColors.textSecondary,
               onPressed: onDecrement,
@@ -463,6 +465,7 @@ class _ScoreColumn extends StatelessWidget {
               ),
             ),
             IconButton(
+              tooltip: l10n.battleAdjustIncrease(label),
               icon: const Icon(Icons.add_circle_outline_rounded),
               color: AppColors.primary,
               onPressed: onIncrement,
@@ -1295,6 +1298,7 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
                           ),
                         ),
                         IconButton(
+                          tooltip: l10n.battleUnitWoundLose,
                           icon: const Icon(
                             Icons.remove_circle_outline_rounded,
                             size: 20,
@@ -1318,6 +1322,7 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
                           ),
                         ),
                         IconButton(
+                          tooltip: l10n.battleUnitWoundRestore,
                           icon: const Icon(
                             Icons.add_circle_outline_rounded,
                             size: 20,
@@ -1369,6 +1374,7 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
                           ] else
                             const Spacer(),
                           IconButton(
+                            tooltip: l10n.battleUnitRemoveModifier,
                             icon: const Icon(Icons.close_rounded, size: 16),
                             color: AppColors.textSecondary,
                             onPressed: () => _removeModifier(modifier.id),
@@ -1550,6 +1556,7 @@ class _DiceRollerBlockState extends ConsumerState<DiceRollerBlock> {
             children: [
               Text(l10n.battleDiceCount, style: AppTextStyles.caption),
               IconButton(
+                tooltip: l10n.battleDiceCountDecrease,
                 icon: const Icon(Icons.remove_circle_outline, size: 20),
                 color: AppColors.textSecondary,
                 padding: EdgeInsets.zero,
@@ -1572,6 +1579,7 @@ class _DiceRollerBlockState extends ConsumerState<DiceRollerBlock> {
                 ),
               ),
               IconButton(
+                tooltip: l10n.battleDiceCountIncrease,
                 icon: const Icon(Icons.add_circle_outline, size: 20),
                 color: AppColors.textSecondary,
                 padding: EdgeInsets.zero,
@@ -1724,6 +1732,7 @@ class EventsBlockState extends ConsumerState<EventsBlock> {
                 ),
                 const SizedBox(width: 8),
                 IconButton(
+                  tooltip: l10n.battleDashboardAddEvent,
                   icon: const Icon(Icons.add_rounded),
                   color: AppColors.primary,
                   onPressed: _add,

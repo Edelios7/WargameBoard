@@ -203,7 +203,9 @@ class _AddCollectionEntryDialogState
                           prefixIcon: IconButton(
                             icon: const Icon(Icons.remove_rounded, size: 18),
                             color: AppColors.textSecondary,
-                            onPressed: () => _setQuantity(_quantity - 1),
+                            onPressed: _quantity > 1
+                                ? () => _setQuantity(_quantity - 1)
+                                : null,
                           ),
                           suffixIcon: IconButton(
                             icon: const Icon(Icons.add_rounded, size: 18),

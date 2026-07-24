@@ -246,6 +246,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get catalogBackToCatalog => 'Catalog';
 
   @override
+  String get commonBack => 'Back';
+
+  @override
   String get catalogWeaponsButton => 'Weapons';
 
   @override
@@ -1439,6 +1442,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get battleDashboardCpTitle => 'Command points';
 
   @override
+  String battleAdjustIncrease(String label) {
+    return 'Increase: $label';
+  }
+
+  @override
+  String battleAdjustDecrease(String label) {
+    return 'Decrease: $label';
+  }
+
+  @override
+  String get battleDiceCountDecrease => 'One fewer die';
+
+  @override
+  String get battleDiceCountIncrease => 'One more die';
+
+  @override
   String get battleDashboardMyCp => 'My CP';
 
   @override
@@ -1447,6 +1466,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get battleOpponentArmyLabel =>
       'Opponent\'s army (optional, from your saved armies)';
+
+  @override
+  String get battleOpponentArmyHint =>
+      'Useful if you\'ve also entered the opponent\'s list in the app — fills in the name and faction above/below.';
 
   @override
   String get battleDashboardRoster => 'My roster';
@@ -1509,6 +1532,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get battleUnitNoModifiers => 'No active bonus/penalty';
+
+  @override
+  String get battleUnitWoundLose => 'Remove 1 wound';
+
+  @override
+  String get battleUnitWoundRestore => 'Restore 1 wound';
+
+  @override
+  String get battleUnitRemoveModifier => 'Remove this bonus/penalty';
 
   @override
   String get battleDashboardEvents => 'Battle log';

@@ -17,7 +17,6 @@ class RulesPage extends StatefulWidget {
 }
 
 class _RulesPageState extends State<RulesPage> {
-  int _tab = 0;
   String _query = '';
   RuleCategory? _category;
   bool _showFilters = true;
@@ -77,23 +76,6 @@ class _RulesPageState extends State<RulesPage> {
               filtersActive: _showFilters,
               onToggleFilters: () =>
                   setState(() => _showFilters = !_showFilters),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 20,
-              runSpacing: 8,
-              children: [
-                _TabChip(
-                  label: l10n.rulesTabMain,
-                  selected: _tab == 0,
-                  onTap: () => setState(() => _tab = 0),
-                ),
-                _TabChip(
-                  label: l10n.rulesTabAdditional,
-                  selected: _tab == 1,
-                  onTap: () => setState(() => _tab = 1),
-                ),
-              ],
             ),
             const SizedBox(height: 20),
             _HeroCard(
@@ -260,16 +242,19 @@ class _RulesHeaderState extends State<_RulesHeader> {
             ),
             const SizedBox(width: 10),
             Flexible(
-              child: FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                ),
-                onPressed: widget.onAdd,
-                icon: const Icon(Icons.add_rounded),
-                label: Text(
-                  l10n.rulesAddButton,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              child: Tooltip(
+                message: l10n.rulesAddComingSoon,
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                  ),
+                  onPressed: widget.onAdd,
+                  icon: const Icon(Icons.add_rounded),
+                  label: Text(
+                    l10n.rulesAddButton,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
             ),
@@ -288,43 +273,6 @@ class _RulesHeaderState extends State<_RulesHeader> {
           children: [title, actions],
         );
       },
-    );
-  }
-}
-
-class _TabChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _TabChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.only(bottom: 10),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: selected ? AppColors.primary : Colors.transparent,
-              width: 2,
-            ),
-          ),
-        ),
-        child: Text(
-          label,
-          style: AppTextStyles.body.copyWith(
-            color: selected ? AppColors.textPrimary : AppColors.textSecondary,
-            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-          ),
-        ),
-      ),
     );
   }
 }

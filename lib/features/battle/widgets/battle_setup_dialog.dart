@@ -54,6 +54,23 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
     });
   }
 
+  /// Sélectionner une armée adverse déjà suivie dans l'appli (le cas
+  /// habituel : deux joueurs qui utilisent tous les deux l'appli) préremplit
+  /// le nom et la faction adverses pour éviter de les ressaisir, sans
+  /// écraser une saisie déjà faite à la main.
+  void _onOpponentArmyChanged(String? armyId, List<ArmyListItem> armies) {
+    setState(() {
+      _opponentArmyId = armyId;
+      final army = armies.where((a) => a.id == armyId).firstOrNull;
+      if (army != null) {
+        if (_opponentController.text.trim().isEmpty) {
+          _opponentController.text = army.name;
+        }
+        _opponentFactionId ??= army.factionId;
+      }
+    });
+  }
+
   Future<void> _start() async {
     final id = await ref
         .read(battleRepositoryProvider)
@@ -187,8 +204,13 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
                             ),
                       ],
                       onChanged: (value) =>
-                          setState(() => _opponentArmyId = value),
+                          _onOpponentArmyChanged(value, armies),
                     ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.battleOpponentArmyHint,
+                    style: AppTextStyles.eyebrow,
                   ),
                   const SizedBox(height: 12),
                   factionsAsync.when(
