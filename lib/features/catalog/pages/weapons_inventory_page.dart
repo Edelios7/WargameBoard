@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/retry_error_state.dart';
 import '../../../database/models/weapon_summary.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/catalog_provider.dart';
@@ -78,6 +79,17 @@ class _WeaponsInventoryPageState extends ConsumerState<WeaponsInventoryPage> {
                         size: 18,
                         color: AppColors.textSecondary,
                       ),
+                      suffixIcon: _query.isEmpty
+                          ? null
+                          : IconButton(
+                              tooltip: l10n.catalogWeaponsSearchClear,
+                              icon: const Icon(Icons.close_rounded, size: 18),
+                              color: AppColors.textSecondary,
+                              onPressed: () => setState(() {
+                                _searchController.clear();
+                                _query = '';
+                              }),
+                            ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 0),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -149,8 +161,8 @@ class _WeaponsInventoryPageState extends ConsumerState<WeaponsInventoryPage> {
                 loading: () => const Center(
                   child: CircularProgressIndicator(color: AppColors.primary),
                 ),
-                error: (error, _) => Center(
-                  child: Text('$error', style: AppTextStyles.caption),
+                error: (_, __) => RetryErrorState(
+                  onRetry: () => ref.invalidate(weaponsInventoryProvider),
                 ),
                 data: (weapons) {
                   final filtered = weapons.where((weapon) {

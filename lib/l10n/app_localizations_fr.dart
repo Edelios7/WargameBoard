@@ -112,6 +112,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsImportPasteHint => 'Colle ici le document JSON...';
 
   @override
+  String get settingsImportBehaviorHint =>
+      'Chaque entrée avec un id déjà existant est mise à jour ; les autres sont ajoutées. Rien d\'autre dans le catalogue n\'est touché ou supprimé.';
+
+  @override
+  String get settingsImportConfirmTitle => 'Lancer cet import ?';
+
+  @override
+  String get settingsImportConfirmMessage =>
+      'Le catalogue va être modifié : les entrées avec un id existant seront mises à jour, les nouvelles seront ajoutées.';
+
+  @override
   String get settingsImportRun => 'Importer';
 
   @override
@@ -257,6 +268,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get commonBack => 'Retour';
 
   @override
+  String get commonLoadError =>
+      'Un problème est survenu pendant le chargement.';
+
+  @override
+  String get commonRetry => 'Réessayer';
+
+  @override
   String get catalogWeaponsButton => 'Armes';
 
   @override
@@ -264,6 +282,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get catalogWeaponsSearchHint => 'Rechercher une arme...';
+
+  @override
+  String get catalogWeaponsSearchClear => 'Effacer la recherche';
 
   @override
   String catalogWeaponsCount(int count) {
@@ -651,6 +672,21 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get collectionSelectionMarkPainted => 'Marquer entièrement peint';
+
+  @override
+  String get collectionMarkPaintedConfirmTitle =>
+      'Marquer comme entièrement peint ?';
+
+  @override
+  String collectionMarkPaintedConfirmMessage(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ces $count entrées',
+      one: 'cette entrée',
+    );
+    return 'Cela écrasera la progression de montage/peinture actuelle de $_temp0 et les passera à 100% assemblé/apprêté/peint.';
+  }
 
   @override
   String get collectionExportedToClipboard =>
@@ -1397,6 +1433,19 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get battleLogExistingGame => 'Enregistrer une partie déjà jouée';
+
+  @override
+  String get battleDiscardConfirmTitle => 'Abandonner cette saisie ?';
+
+  @override
+  String get battleDiscardConfirmMessage =>
+      'Ce que tu as déjà rempli (adversaire, mission, score, notes...) sera perdu.';
+
+  @override
+  String get battleDiscardKeepEditing => 'Continuer la saisie';
+
+  @override
+  String get battleDiscardConfirmAction => 'Abandonner';
 
   @override
   String get battleNewBattleSubtitle => 'Suivre une partie en direct';

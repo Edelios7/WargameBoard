@@ -108,6 +108,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsImportPasteHint => 'Paste the JSON document here...';
 
   @override
+  String get settingsImportBehaviorHint =>
+      'Any entry whose id already exists gets updated; new ones get added. Nothing else in the catalog is touched or removed.';
+
+  @override
+  String get settingsImportConfirmTitle => 'Run this import?';
+
+  @override
+  String get settingsImportConfirmMessage =>
+      'The catalog will be changed: entries with an existing id will be updated, new ones will be added.';
+
+  @override
   String get settingsImportRun => 'Import';
 
   @override
@@ -253,6 +264,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonBack => 'Back';
 
   @override
+  String get commonLoadError => 'Something went wrong while loading.';
+
+  @override
+  String get commonRetry => 'Retry';
+
+  @override
   String get catalogWeaponsButton => 'Weapons';
 
   @override
@@ -260,6 +277,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get catalogWeaponsSearchHint => 'Search for a weapon...';
+
+  @override
+  String get catalogWeaponsSearchClear => 'Clear search';
 
   @override
   String catalogWeaponsCount(int count) {
@@ -643,6 +663,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get collectionSelectionMarkPainted => 'Mark as fully painted';
+
+  @override
+  String get collectionMarkPaintedConfirmTitle => 'Mark as fully painted?';
+
+  @override
+  String collectionMarkPaintedConfirmMessage(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'these $count entries',
+      one: 'this entry',
+    );
+    return 'This overwrites the current assembly/painting progress of $_temp0 and sets it to 100% assembled/primed/painted.';
+  }
 
   @override
   String get collectionExportedToClipboard => 'Collection copied to clipboard';
@@ -1384,6 +1418,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get battleLogExistingGame => 'Log a game already played';
+
+  @override
+  String get battleDiscardConfirmTitle => 'Discard this entry?';
+
+  @override
+  String get battleDiscardConfirmMessage =>
+      'What you\'ve already filled in (opponent, mission, score, notes...) will be lost.';
+
+  @override
+  String get battleDiscardKeepEditing => 'Keep editing';
+
+  @override
+  String get battleDiscardConfirmAction => 'Discard';
 
   @override
   String get battleNewBattleSubtitle => 'Track a game live';

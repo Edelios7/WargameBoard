@@ -6,6 +6,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/decor_separator.dart';
+import '../../../core/widgets/retry_error_state.dart';
 import '../../../database/models/xp_summary.dart';
 import '../../../domain/xp/xp_category.dart';
 import '../../../l10n/app_localizations.dart';
@@ -37,9 +38,8 @@ class ProfilePage extends ConsumerWidget {
                   child: CircularProgressIndicator(color: AppColors.primary),
                 ),
               ),
-              error: (error, _) => Text(
-                error.toString(),
-                style: AppTextStyles.caption,
+              error: (_, __) => RetryErrorState(
+                onRetry: () => ref.invalidate(xpSummaryProvider),
               ),
               data: (summary) => _ProfileContent(summary: summary),
             ),

@@ -40,6 +40,9 @@
   "settingsBackupRestoreStaged": "Sauvegarde prête — ferme et relance l'application pour l'appliquer.",
   "settingsBackupRestoreCancel": "Annuler la restauration en attente",
   "settingsImportPasteHint": "Colle ici le document JSON...",
+  "settingsImportBehaviorHint": "Chaque entrée avec un id déjà existant est mise à jour ; les autres sont ajoutées. Rien d'autre dans le catalogue n'est touché ou supprimé.",
+  "settingsImportConfirmTitle": "Lancer cet import ?",
+  "settingsImportConfirmMessage": "Le catalogue va être modifié : les entrées avec un id existant seront mises à jour, les nouvelles seront ajoutées.",
   "settingsImportRun": "Importer",
   "settingsImportSuccess": "{count} éléments importés",
   "@settingsImportSuccess": {
@@ -116,9 +119,12 @@
   "catalogViewFullSheet": "Voir la fiche complète",
   "catalogBackToCatalog": "Catalogue",
   "commonBack": "Retour",
+  "commonLoadError": "Un problème est survenu pendant le chargement.",
+  "commonRetry": "Réessayer",
   "catalogWeaponsButton": "Armes",
   "catalogWeaponsTitle": "Inventaire des armes",
   "catalogWeaponsSearchHint": "Rechercher une arme...",
+  "catalogWeaponsSearchClear": "Effacer la recherche",
   "catalogWeaponsCount": "{count} armes",
   "@catalogWeaponsCount": {
     "placeholders": {
@@ -322,6 +328,13 @@
     }
   },
   "collectionSelectionMarkPainted": "Marquer entièrement peint",
+  "collectionMarkPaintedConfirmTitle": "Marquer comme entièrement peint ?",
+  "collectionMarkPaintedConfirmMessage": "Cela écrasera la progression de montage/peinture actuelle de {count, plural, one{cette entrée} other{ces {count} entrées}} et les passera à 100% assemblé/apprêté/peint.",
+  "@collectionMarkPaintedConfirmMessage": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "collectionExportedToClipboard": "Collection copiée dans le presse-papier",
   "collectionEmpty": "Ta collection est vide",
   "collectionQuantityLabel": "{count} possédées",
@@ -665,6 +678,10 @@
   "battleMissionPackLabel": "Pack de missions (optionnel)",
   "battleTerrainLabel": "Terrain (optionnel)",
   "battleLogExistingGame": "Enregistrer une partie déjà jouée",
+  "battleDiscardConfirmTitle": "Abandonner cette saisie ?",
+  "battleDiscardConfirmMessage": "Ce que tu as déjà rempli (adversaire, mission, score, notes...) sera perdu.",
+  "battleDiscardKeepEditing": "Continuer la saisie",
+  "battleDiscardConfirmAction": "Abandonner",
   "battleNewBattleSubtitle": "Suivre une partie en direct",
   "battleLogExistingGameSubtitle": "Ajouter une partie déjà terminée",
   "battleDeleteConfirmTitle": "Supprimer cette partie ?",

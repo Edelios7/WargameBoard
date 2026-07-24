@@ -167,6 +167,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                               borderSide: BorderSide.none,
                             ),
                           ),
+                          onChanged: (_) => _saveName(),
                           onSubmitted: (_) => _saveName(),
                           onEditingComplete: _saveName,
                         ),

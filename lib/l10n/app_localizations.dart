@@ -284,6 +284,24 @@ abstract class AppLocalizations {
   /// **'Colle ici le document JSON...'**
   String get settingsImportPasteHint;
 
+  /// No description provided for @settingsImportBehaviorHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chaque entrée avec un id déjà existant est mise à jour ; les autres sont ajoutées. Rien d\'autre dans le catalogue n\'est touché ou supprimé.'**
+  String get settingsImportBehaviorHint;
+
+  /// No description provided for @settingsImportConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lancer cet import ?'**
+  String get settingsImportConfirmTitle;
+
+  /// No description provided for @settingsImportConfirmMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le catalogue va être modifié : les entrées avec un id existant seront mises à jour, les nouvelles seront ajoutées.'**
+  String get settingsImportConfirmMessage;
+
   /// No description provided for @settingsImportRun.
   ///
   /// In fr, this message translates to:
@@ -548,6 +566,18 @@ abstract class AppLocalizations {
   /// **'Retour'**
   String get commonBack;
 
+  /// No description provided for @commonLoadError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un problème est survenu pendant le chargement.'**
+  String get commonLoadError;
+
+  /// No description provided for @commonRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get commonRetry;
+
   /// No description provided for @catalogWeaponsButton.
   ///
   /// In fr, this message translates to:
@@ -565,6 +595,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Rechercher une arme...'**
   String get catalogWeaponsSearchHint;
+
+  /// No description provided for @catalogWeaponsSearchClear.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effacer la recherche'**
+  String get catalogWeaponsSearchClear;
 
   /// No description provided for @catalogWeaponsCount.
   ///
@@ -1267,6 +1303,18 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Marquer entièrement peint'**
   String get collectionSelectionMarkPainted;
+
+  /// No description provided for @collectionMarkPaintedConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Marquer comme entièrement peint ?'**
+  String get collectionMarkPaintedConfirmTitle;
+
+  /// No description provided for @collectionMarkPaintedConfirmMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cela écrasera la progression de montage/peinture actuelle de {count, plural, one{cette entrée} other{ces {count} entrées}} et les passera à 100% assemblé/apprêté/peint.'**
+  String collectionMarkPaintedConfirmMessage(int count);
 
   /// No description provided for @collectionExportedToClipboard.
   ///
@@ -2641,6 +2689,30 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Enregistrer une partie déjà jouée'**
   String get battleLogExistingGame;
+
+  /// No description provided for @battleDiscardConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abandonner cette saisie ?'**
+  String get battleDiscardConfirmTitle;
+
+  /// No description provided for @battleDiscardConfirmMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce que tu as déjà rempli (adversaire, mission, score, notes...) sera perdu.'**
+  String get battleDiscardConfirmMessage;
+
+  /// No description provided for @battleDiscardKeepEditing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Continuer la saisie'**
+  String get battleDiscardKeepEditing;
+
+  /// No description provided for @battleDiscardConfirmAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abandonner'**
+  String get battleDiscardConfirmAction;
 
   /// No description provided for @battleNewBattleSubtitle.
   ///

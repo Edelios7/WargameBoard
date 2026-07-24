@@ -228,6 +228,10 @@ void main() {
     await tester.tap(markPaintedButton);
     await tester.pumpAndSettle();
 
+    // La confirmation partage le même libellé que le bouton déclencheur.
+    await tester.tap(find.text('Marquer entièrement peint').last);
+    await tester.pumpAndSettle();
+
     final entries = await database.collectionDao.listEntries();
     for (final entry in entries) {
       expect(entry.painted, entry.quantity);

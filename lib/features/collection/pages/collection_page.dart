@@ -299,7 +299,41 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
     });
   }
 
-  Future<void> _markSelectedPainted(List<CollectionItemDetails> entries) async {
+  Future<void> _markSelectedPainted(
+    BuildContext context,
+    AppLocalizations l10n,
+    List<CollectionItemDetails> entries,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AppDialogShortcuts(
+        onEnter: () => Navigator.of(dialogContext).pop(true),
+        child: AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text(
+            l10n.collectionMarkPaintedConfirmTitle,
+            style: AppTextStyles.title,
+          ),
+          content: Text(
+            l10n.collectionMarkPaintedConfirmMessage(_selectedIds.length),
+            style: AppTextStyles.body,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.armyBuilderCancel),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(l10n.collectionSelectionMarkPainted),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmed != true) return;
+
     final repository = ref.read(collectionRepositoryProvider);
     final selected = entries.where((e) => _selectedIds.contains(e.id));
     await Future.wait([
@@ -633,7 +667,7 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
               TextButton.icon(
                 onPressed: _selectedIds.isEmpty
                     ? null
-                    : () => _markSelectedPainted(entries),
+                    : () => _markSelectedPainted(context, l10n, entries),
                 icon: const Icon(Icons.brush_rounded, size: 16),
                 label: Text(l10n.collectionSelectionMarkPainted),
               ),

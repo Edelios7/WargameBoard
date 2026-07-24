@@ -100,6 +100,44 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
     if (mounted) Navigator.of(context).pop();
   }
 
+  bool get _hasUnsavedInput =>
+      _opponentController.text.trim().isNotEmpty ||
+      _missionController.text.trim().isNotEmpty ||
+      _locationController.text.trim().isNotEmpty ||
+      _notesController.text.trim().isNotEmpty ||
+      _myScoreController.text.trim().isNotEmpty ||
+      _opponentScoreController.text.trim().isNotEmpty;
+
+  Future<bool> _confirmDiscard(AppLocalizations l10n) async {
+    if (!_hasUnsavedInput) return true;
+    final discard = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text(
+          l10n.battleDiscardConfirmTitle,
+          style: AppTextStyles.title,
+        ),
+        content: Text(
+          l10n.battleDiscardConfirmMessage,
+          style: AppTextStyles.body,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.battleDiscardKeepEditing),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.battleDiscardConfirmAction),
+          ),
+        ],
+      ),
+    );
+    return discard ?? false;
+  }
+
   InputDecoration _decoration(String label) {
     return InputDecoration(
       labelText: label,
@@ -127,7 +165,15 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
 
     return AppDialogShortcuts(
       onEnter: _save,
-      child: Dialog(
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
+          if (await _confirmDiscard(l10n) && context.mounted) {
+            Navigator.of(context).pop();
+          }
+        },
+        child: Dialog(
         backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         child: ConstrainedBox(
@@ -334,7 +380,11 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: () async {
+                          if (await _confirmDiscard(l10n) && context.mounted) {
+                            Navigator.of(context).pop();
+                          }
+                        },
                         child: Text(
                           l10n.armyBuilderCancel,
                           style: AppTextStyles.body,
@@ -354,6 +404,7 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
               ),
             ),
           ),
+        ),
         ),
       ),
     );

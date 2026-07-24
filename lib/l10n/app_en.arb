@@ -40,6 +40,9 @@
   "settingsBackupRestoreStaged": "Backup ready — close and reopen the app to apply it.",
   "settingsBackupRestoreCancel": "Cancel pending restore",
   "settingsImportPasteHint": "Paste the JSON document here...",
+  "settingsImportBehaviorHint": "Any entry whose id already exists gets updated; new ones get added. Nothing else in the catalog is touched or removed.",
+  "settingsImportConfirmTitle": "Run this import?",
+  "settingsImportConfirmMessage": "The catalog will be changed: entries with an existing id will be updated, new ones will be added.",
   "settingsImportRun": "Import",
   "settingsImportSuccess": "{count} items imported",
   "@settingsImportSuccess": {
@@ -116,9 +119,12 @@
   "catalogViewFullSheet": "View full datasheet",
   "catalogBackToCatalog": "Catalog",
   "commonBack": "Back",
+  "commonLoadError": "Something went wrong while loading.",
+  "commonRetry": "Retry",
   "catalogWeaponsButton": "Weapons",
   "catalogWeaponsTitle": "Weapons inventory",
   "catalogWeaponsSearchHint": "Search for a weapon...",
+  "catalogWeaponsSearchClear": "Clear search",
   "catalogWeaponsCount": "{count} weapons",
   "@catalogWeaponsCount": {
     "placeholders": {
@@ -322,6 +328,13 @@
     }
   },
   "collectionSelectionMarkPainted": "Mark as fully painted",
+  "collectionMarkPaintedConfirmTitle": "Mark as fully painted?",
+  "collectionMarkPaintedConfirmMessage": "This overwrites the current assembly/painting progress of {count, plural, one{this entry} other{these {count} entries}} and sets it to 100% assembled/primed/painted.",
+  "@collectionMarkPaintedConfirmMessage": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "collectionExportedToClipboard": "Collection copied to clipboard",
   "collectionEmpty": "Your collection is empty",
   "collectionQuantityLabel": "{count} owned",
@@ -665,6 +678,10 @@
   "battleMissionPackLabel": "Mission pack (optional)",
   "battleTerrainLabel": "Terrain (optional)",
   "battleLogExistingGame": "Log a game already played",
+  "battleDiscardConfirmTitle": "Discard this entry?",
+  "battleDiscardConfirmMessage": "What you've already filled in (opponent, mission, score, notes...) will be lost.",
+  "battleDiscardKeepEditing": "Keep editing",
+  "battleDiscardConfirmAction": "Discard",
   "battleNewBattleSubtitle": "Track a game live",
   "battleLogExistingGameSubtitle": "Add a game that's already finished",
   "battleDeleteConfirmTitle": "Delete this battle?",

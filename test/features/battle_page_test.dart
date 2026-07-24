@@ -52,6 +52,45 @@ void main() {
     expect(find.text('Victoire'), findsOneWidget);
   });
 
+  testWidgets(
+    'cancelling the log-battle dialog with unsaved text asks for confirmation',
+    (tester) async {
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Enregistrer une partie déjà jouée'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField).first, 'Marc');
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Annuler'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Annuler'));
+      await tester.pumpAndSettle();
+
+      // Le formulaire contient du texte : une confirmation est demandée
+      // plutôt que de fermer directement et perdre la saisie.
+      expect(find.text('Abandonner cette saisie ?'), findsOneWidget);
+
+      await tester.tap(find.text('Continuer la saisie'));
+      await tester.pumpAndSettle();
+
+      // Toujours dans le formulaire, rien n'a été perdu.
+      expect(find.text('Marc'), findsOneWidget);
+
+      await tester.ensureVisible(find.text('Annuler'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Annuler'));
+      await tester.pumpAndSettle();
+      expect(find.text('Abandonner cette saisie ?'), findsOneWidget);
+      await tester.tap(find.text('Abandonner'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Aucune partie enregistrée'), findsOneWidget);
+    },
+  );
+
   testWidgets('starting a new battle shows the live dashboard', (tester) async {
     tester.view.physicalSize = const Size(900, 1100);
     tester.view.devicePixelRatio = 1.0;
