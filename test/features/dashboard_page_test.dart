@@ -74,4 +74,24 @@ void main() {
 
     expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
   });
+
+  testWidgets(
+      'a brand-new user with no army and no collection sees the welcome banner',
+      (tester) async {
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Bienvenue sur Wargame Board'), findsOneWidget);
+    expect(find.text('Créer ma première armée'), findsOneWidget);
+  });
+
+  testWidgets('the welcome banner is gone once the user has an army',
+      (tester) async {
+    await database.armyDao.createArmy(name: 'Ma liste', factionId: seedFactionId);
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Bienvenue sur Wargame Board'), findsNothing);
+  });
 }

@@ -118,6 +118,22 @@ class DashboardPage extends ConsumerWidget {
                     goTo(AppTab.catalog);
                   },
                 ),
+                if (armiesAsync.hasValue &&
+                    entriesAsync.hasValue &&
+                    armies.isEmpty &&
+                    entries.isEmpty) ...[
+                  const SizedBox(height: 20),
+                  _WelcomeBanner(
+                    onCreateArmy: () => showDialog(
+                      context: context,
+                      builder: (_) => const CreateArmyDialog(),
+                    ),
+                    onAddToCollection: () => showDialog(
+                      context: context,
+                      builder: (_) => const AddCollectionEntryDialog(),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 24),
                 LayoutBuilder(
                   builder: (context, constraints) {
@@ -318,6 +334,60 @@ class DashboardPage extends ConsumerWidget {
 /// Bandeau décoratif discret en pied de Dashboard (voir
 /// local_assets/decor/README.md) — absent si l'asset n'est pas présent
 /// en local.
+/// Bandeau d'accueil affiché uniquement tant que le joueur n'a ni armée
+/// ni entrée de collection — sans lui, un tout nouvel utilisateur
+/// atterrit sur un dashboard presque vide sans indication de par où
+/// commencer. Disparaît automatiquement dès qu'il crée l'un ou l'autre,
+/// pas besoin d'un état "fermé" persisté séparément.
+class _WelcomeBanner extends StatelessWidget {
+  final VoidCallback onCreateArmy;
+  final VoidCallback onAddToCollection;
+
+  const _WelcomeBanner({
+    required this.onCreateArmy,
+    required this.onAddToCollection,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(l10n.dashboardWelcomeTitle, style: AppTextStyles.title),
+          const SizedBox(height: 6),
+          Text(l10n.dashboardWelcomeBody, style: AppTextStyles.caption),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                ),
+                onPressed: onCreateArmy,
+                icon: const Icon(Icons.groups_rounded, size: 18),
+                label: Text(l10n.dashboardWelcomeCreateArmy),
+              ),
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.border),
+                ),
+                onPressed: onAddToCollection,
+                icon: const Icon(Icons.inventory_2_rounded, size: 18),
+                label: Text(l10n.dashboardWelcomeAddToCollection),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _DashboardFooterBanner extends StatelessWidget {
   const _DashboardFooterBanner();
 

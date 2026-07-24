@@ -956,6 +956,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dashboardSeeAll => 'Voir tout';
 
   @override
+  String get dashboardWelcomeTitle => 'Bienvenue sur Wargame Board';
+
+  @override
+  String get dashboardWelcomeBody =>
+      'Commence par créer ta première armée ou ajouter des figurines à ta collection — le reste de l\'appli (statistiques, suivi de partie) se remplira au fur et à mesure.';
+
+  @override
+  String get dashboardWelcomeCreateArmy => 'Créer ma première armée';
+
+  @override
+  String get dashboardWelcomeAddToCollection => 'Ajouter à ma collection';
+
+  @override
   String get dashboardNoArmiesYet => 'Aucune armée créée pour l\'instant';
 
   @override
@@ -1462,6 +1475,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get battleDashboardNextPhase => 'Phase suivante';
+
+  @override
+  String get battleDashboardPreviousPhase => 'Revenir à la phase précédente';
 
   @override
   String get battleEndOfRoundTitle => 'Fin de round';

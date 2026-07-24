@@ -132,6 +132,10 @@ class BattleRepository {
     return database.battleDao.advancePhase(battleId);
   }
 
+  Future<void> previousPhase(String battleId) {
+    return database.battleDao.previousPhase(battleId);
+  }
+
   Future<void> logEvent(
     String battleId, {
     required String label,

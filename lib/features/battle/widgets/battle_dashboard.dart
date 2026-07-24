@@ -586,26 +586,53 @@ class _PhaseBlockState extends ConsumerState<_PhaseBlock> {
             ),
           ],
           const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
-              onPressed: () async {
-                final isEndOfRound = currentIndex == _phaseOrder.length - 1;
-                await ref
-                    .read(battleRepositoryProvider)
-                    .advancePhase(battle.id);
-                ref.invalidate(activeBattleProvider);
-                if (isEndOfRound && context.mounted) {
-                  await showDialog(
-                    context: context,
-                    builder: (_) => _EndOfRoundReminderDialog(l10n: l10n),
-                  );
-                }
-              },
-              icon: const Icon(Icons.arrow_forward_rounded),
-              label: Text(l10n.battleDashboardNextPhase),
-            ),
+          Row(
+            children: [
+              Tooltip(
+                message: l10n.battleDashboardPreviousPhase,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.border),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 16,
+                    ),
+                  ),
+                  onPressed: currentIndex == 0 && (battle.currentRound ?? 1) <= 1
+                      ? null
+                      : () async {
+                          await ref
+                              .read(battleRepositoryProvider)
+                              .previousPhase(battle.id);
+                          ref.invalidate(activeBattleProvider);
+                        },
+                  child: const Icon(Icons.arrow_back_rounded),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                  ),
+                  onPressed: () async {
+                    final isEndOfRound = currentIndex == _phaseOrder.length - 1;
+                    await ref
+                        .read(battleRepositoryProvider)
+                        .advancePhase(battle.id);
+                    ref.invalidate(activeBattleProvider);
+                    if (isEndOfRound && context.mounted) {
+                      await showDialog(
+                        context: context,
+                        builder: (_) => _EndOfRoundReminderDialog(l10n: l10n),
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.arrow_forward_rounded),
+                  label: Text(l10n.battleDashboardNextPhase),
+                ),
+              ),
+            ],
           ),
         ],
       ),

@@ -166,6 +166,34 @@ void main() {
     },
   );
 
+  testWidgets(
+    'the previous-phase button steps back and is disabled at the very start',
+    (tester) async {
+      final battleId = await database.battleDao.startBattle(
+        opponentName: 'Marc',
+      );
+      await database.battleDao.advancePhase(battleId); // command -> movement
+
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Mouvement'), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.arrow_back_rounded).last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Commandement'), findsOneWidget);
+
+      final backButton = tester.widget<OutlinedButton>(
+        find.ancestor(
+          of: find.byIcon(Icons.arrow_back_rounded).last,
+          matching: find.byType(OutlinedButton),
+        ),
+      );
+      expect(backButton.onPressed, isNull);
+    },
+  );
+
   testWidgets('deleting a battle removes it from the history', (tester) async {
     await database.battleDao.addBattle(opponentName: 'Julie');
 

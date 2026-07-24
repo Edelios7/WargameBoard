@@ -286,6 +286,33 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
     );
   }
 
+  /// Revient à la phase précédente — un joueur qui a avancé par erreur
+  /// (dés en main, écran vite tapé) n'a pas à recompter manuellement où
+  /// il en était. Ne fait rien si déjà à la toute première phase du
+  /// round 1 (rien à annuler).
+  Future<void> previousPhase(String battleId) async {
+    final battle = await (select(
+      battles,
+    )..where((t) => t.id.equals(battleId))).getSingle();
+
+    final currentIndex = battle.currentPhase == null
+        ? 0
+        : _battlePhaseOrder.indexOf(battle.currentPhase!);
+    final currentRound = battle.currentRound ?? 1;
+    final isFirstPhase = currentIndex == 0;
+    if (isFirstPhase && currentRound <= 1) return;
+
+    await updateLiveState(
+      battleId,
+      currentPhase: Value(
+        isFirstPhase ? _battlePhaseOrder.last : _battlePhaseOrder[currentIndex - 1],
+      ),
+      currentRound: isFirstPhase
+          ? Value(currentRound - 1)
+          : const Value.absent(),
+    );
+  }
+
   Future<void> logEvent(
     String battleId, {
     required String label,

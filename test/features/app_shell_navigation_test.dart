@@ -55,6 +55,8 @@ void main() {
     await tester.pumpAndSettle();
 
     // La tuile "POINTS CUMULÉS" du dashboard (pas l'item de la sidebar).
+    await tester.ensureVisible(find.text('POINTS CUMULÉS'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('POINTS CUMULÉS'));
     await tester.pumpAndSettle();
 

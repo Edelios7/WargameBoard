@@ -1826,6 +1826,30 @@ abstract class AppLocalizations {
   /// **'Voir tout'**
   String get dashboardSeeAll;
 
+  /// No description provided for @dashboardWelcomeTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bienvenue sur Wargame Board'**
+  String get dashboardWelcomeTitle;
+
+  /// No description provided for @dashboardWelcomeBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commence par créer ta première armée ou ajouter des figurines à ta collection — le reste de l\'appli (statistiques, suivi de partie) se remplira au fur et à mesure.'**
+  String get dashboardWelcomeBody;
+
+  /// No description provided for @dashboardWelcomeCreateArmy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer ma première armée'**
+  String get dashboardWelcomeCreateArmy;
+
+  /// No description provided for @dashboardWelcomeAddToCollection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter à ma collection'**
+  String get dashboardWelcomeAddToCollection;
+
   /// No description provided for @dashboardNoArmiesYet.
   ///
   /// In fr, this message translates to:
@@ -2749,6 +2773,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Phase suivante'**
   String get battleDashboardNextPhase;
+
+  /// No description provided for @battleDashboardPreviousPhase.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenir à la phase précédente'**
+  String get battleDashboardPreviousPhase;
 
   /// No description provided for @battleEndOfRoundTitle.
   ///

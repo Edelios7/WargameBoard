@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
+import '../../../database/models/army_details.dart';
 import '../../../database/models/search_result.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/army_provider.dart';
@@ -69,6 +70,7 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
 
     ref.invalidate(selectedArmyProvider);
     ref.invalidate(armiesListProvider);
+    ref.invalidate(armyByIdProvider(widget.armyId));
 
     if (mounted) Navigator.of(context).pop();
   }
@@ -76,6 +78,7 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final armyAsync = ref.watch(armyByIdProvider(widget.armyId));
     final collectionAsync = ref.watch(collectionEntriesProvider);
     final ownedIds = <String>{
       for (final entry in collectionAsync.value ?? const [])
@@ -103,7 +106,18 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.armyBuilderAddUnit, style: AppTextStyles.title),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        l10n.armyBuilderAddUnit,
+                        style: AppTextStyles.title,
+                      ),
+                    ),
+                    if (armyAsync.value != null)
+                      _PointsBadge(army: armyAsync.value!),
+                  ],
+                ),
                 const SizedBox(height: 16),
                 TextField(
                   autofocus: true,
@@ -238,6 +252,38 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Total de points de l'armée visible en permanence pendant qu'on
+/// ajoute des unités, pour ne pas devoir fermer la fenêtre pour
+/// vérifier si on a dépassé la limite.
+class _PointsBadge extends StatelessWidget {
+  final ArmyDetails army;
+
+  const _PointsBadge({required this.army});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final value = army.pointsLimit != null
+        ? l10n.armyBuilderPointsWithLimit(army.totalPoints, army.pointsLimit!)
+        : l10n.pointsSuffix(army.totalPoints);
+    final color = army.isOverLimit ? AppColors.error : AppColors.primary;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: .14),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        value,
+        style: AppTextStyles.caption.copyWith(
+          color: color,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );

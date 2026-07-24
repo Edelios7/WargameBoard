@@ -945,6 +945,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardSeeAll => 'See all';
 
   @override
+  String get dashboardWelcomeTitle => 'Welcome to Wargame Board';
+
+  @override
+  String get dashboardWelcomeBody =>
+      'Start by creating your first army or adding models to your collection — the rest of the app (stats, battle tracking) fills in as you go.';
+
+  @override
+  String get dashboardWelcomeCreateArmy => 'Create my first army';
+
+  @override
+  String get dashboardWelcomeAddToCollection => 'Add to my collection';
+
+  @override
   String get dashboardNoArmiesYet => 'No army created yet';
 
   @override
@@ -1448,6 +1461,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get battleDashboardNextPhase => 'Next phase';
+
+  @override
+  String get battleDashboardPreviousPhase => 'Go back to the previous phase';
 
   @override
   String get battleEndOfRoundTitle => 'End of round';
