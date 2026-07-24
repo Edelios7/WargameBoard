@@ -3,11 +3,13 @@ import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/rule_pdf_source.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/rules/rule_document.dart';
 import '../../../domain/rules/rules_data.dart';
 import '../../../l10n/app_localizations.dart';
 import 'rule_document_detail_page.dart';
+import 'rule_pdf_viewer_page.dart';
 
 class RulesPage extends StatefulWidget {
   const RulesPage({super.key});
@@ -31,19 +33,29 @@ class _RulesPageState extends State<RulesPage> {
     }).toList();
   }
 
-  void _openBook(
+  Future<void> _openBook(
     BuildContext context,
     AppLocalizations l10n,
     RuleDocument doc,
-  ) {
-    final message = doc.localAssetId != null
-        ? l10n.rulesOpenBookSnackbar(
-            'local_assets/rules/${doc.localAssetId}.pdf',
-          )
-        : l10n.rulesOpenBookMissing;
+  ) async {
+    final localAssetId = doc.localAssetId;
+    final bytes = localAssetId == null
+        ? null
+        : await RulePdfSource.resolve(localAssetId);
+    if (!context.mounted) return;
+
+    if (bytes != null) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => RulePdfViewerPage(title: doc.title, bytes: bytes),
+        ),
+      );
+      return;
+    }
+
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ).showSnackBar(SnackBar(content: Text(l10n.rulesOpenBookMissing)));
   }
 
   void _openDocument(BuildContext context, RuleDocument doc) {

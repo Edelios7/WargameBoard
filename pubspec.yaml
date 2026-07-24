@@ -58,6 +58,7 @@ dependencies:
   collection: ^1.19.1
   shared_preferences: ^2.5.5
   file_picker: ^11.0.2
+  pdfx: ^2.9.2
 
 dev_dependencies:
   flutter_test:
@@ -77,3 +78,4 @@ flutter:
     - assets/images/
     - assets/images/dashboard/
     - assets/seed_data/
+    - assets/rulebook/

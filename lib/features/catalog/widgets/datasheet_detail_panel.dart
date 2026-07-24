@@ -460,7 +460,10 @@ class DatasheetDetailPanel extends StatelessWidget {
                       ),
                       if (ability.isCore) ...[
                         const SizedBox(width: 8),
-                        AppChip(label: 'CORE', accent: true),
+                        Tooltip(
+                          message: l10n.catalogCoreAbilityTooltip,
+                          child: AppChip(label: 'CORE', accent: true),
+                        ),
                       ] else if (ability.type != null) ...[
                         const SizedBox(width: 8),
                         AppChip(label: ability.type!.toUpperCase()),

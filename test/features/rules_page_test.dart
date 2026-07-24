@@ -30,7 +30,8 @@ void main() {
     expect(find.text('Chapter Approved 2024'), findsNothing);
   });
 
-  testWidgets('opening the hero rulebook shows the local PDF path',
+  testWidgets(
+      'opening the hero rulebook opens the in-app PDF viewer when the local file exists',
       (tester) async {
     await tester.binding.setSurfaceSize(const Size(1400, 2200));
     addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -39,12 +40,13 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Ouvrir le livre de règles'));
+    // La résolution du fichier local est asynchrone (I/O) : on laisse le
+    // temps à la promesse de se résoudre avant de vérifier la navigation,
+    // sans pumpAndSettle pour ne pas attendre le rendu natif du PDF.
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
-    expect(
-      find.textContaining('local_assets/rules/warhammer-40000-core-rules.pdf'),
-      findsOneWidget,
-    );
+    expect(find.text('Warhammer 40,000 – Édition 11'), findsWidgets);
   });
 
   testWidgets('Voir tout expands the recent documents list', (tester) async {

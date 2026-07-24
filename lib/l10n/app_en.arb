@@ -74,6 +74,7 @@
   "catalogFilterAllUnitTypes": "All types",
   "catalogFilterAllEditions": "All editions",
   "catalogFilterTitle": "Filters",
+  "catalogCoreAbilityTooltip": "Core rule — applies to any unit with this ability, not just this one",
   "catalogQuickAccessFactions": "Quick access to factions",
   "catalogFilterFaction": "Faction",
   "catalogFilterRole": "Role",
@@ -189,6 +190,10 @@
   "armyBuilderDeleteArmy": "Delete army",
   "armyBuilderMoreActions": "More actions",
   "armyBuilderCopyList": "Copy list",
+  "armyBuilderQuantityDecrease": "One fewer copy",
+  "armyBuilderQuantityIncrease": "One more copy",
+  "armyBuilderModelCountDecrease": "Remove a model",
+  "armyBuilderModelCountIncrease": "Add a model",
   "armyBuilderCopiedToClipboard": "List copied to clipboard",
   "armyBuilderDuplicate": "Duplicate army",
   "armyBuilderDuplicateUnit": "Duplicate unit",
@@ -594,6 +599,14 @@
     }
   },
   "rulesOpenBookMissing": "No local PDF for this document yet",
+  "rulesPdfPageIndicator": "Page {page} / {total}",
+  "@rulesPdfPageIndicator": {
+    "placeholders": {
+      "page": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "rulesPdfLoadError": "Couldn't open this PDF",
   "rulesRecentDocuments": "Recent documents",
   "rulesPopularRules": "Popular rules",
   "rulesSeeAll": "See all",

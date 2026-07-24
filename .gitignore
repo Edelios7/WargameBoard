@@ -66,5 +66,10 @@ local_assets/rules/*.pdf
 # jamais commitée. Voir lib/database/database_connection.dart.
 assets/seed_data/
 
+# PDF(s) de règles officiels embarqués dans les builds mobiles perso
+# (copie de local_assets/rules/, même raison) - jamais commités. Voir
+# lib/core/utils/rule_pdf_source.dart.
+assets/rulebook/
+
 # Sortie de l'outil manuel test/features/catalog_screenshot_test.dart
 catalog_screenshot.png

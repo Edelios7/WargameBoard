@@ -74,6 +74,7 @@
   "catalogFilterAllUnitTypes": "Tous les types",
   "catalogFilterAllEditions": "Toutes les éditions",
   "catalogFilterTitle": "Filtres",
+  "catalogCoreAbilityTooltip": "Règle du socle commun — s'applique à toute unité possédant cette capacité, pas seulement celle-ci",
   "catalogQuickAccessFactions": "Accès rapide aux factions",
   "catalogFilterFaction": "Faction",
   "catalogFilterRole": "Rôle",
@@ -188,6 +189,10 @@
   "armyBuilderDeleteArmy": "Supprimer l'armée",
   "armyBuilderMoreActions": "Plus d'actions",
   "armyBuilderCopyList": "Copier la liste",
+  "armyBuilderQuantityDecrease": "Une copie de moins",
+  "armyBuilderQuantityIncrease": "Une copie de plus",
+  "armyBuilderModelCountDecrease": "Retirer un modèle",
+  "armyBuilderModelCountIncrease": "Ajouter un modèle",
   "armyBuilderCopiedToClipboard": "Liste copiée dans le presse-papier",
   "armyBuilderDuplicate": "Dupliquer l'armée",
   "armyBuilderDuplicateUnit": "Dupliquer l'unité",
@@ -594,6 +599,14 @@
     }
   },
   "rulesOpenBookMissing": "Aucun PDF local pour ce document pour le moment",
+  "rulesPdfPageIndicator": "Page {page} / {total}",
+  "@rulesPdfPageIndicator": {
+    "placeholders": {
+      "page": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "rulesPdfLoadError": "Impossible d'ouvrir ce PDF",
   "rulesRecentDocuments": "Documents récents",
   "rulesPopularRules": "Règles populaires",
   "rulesSeeAll": "Voir tout",

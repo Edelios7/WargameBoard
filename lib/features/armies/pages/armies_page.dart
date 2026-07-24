@@ -2091,6 +2091,7 @@ class _EditUnitDialog extends ConsumerWidget {
                   Row(
                     children: [
                       IconButton(
+                        tooltip: l10n.armyBuilderModelCountDecrease,
                         icon: const Icon(Icons.remove_circle_outline_rounded),
                         color: AppColors.textSecondary,
                         onPressed:
@@ -2112,6 +2113,7 @@ class _EditUnitDialog extends ConsumerWidget {
                         style: AppTextStyles.title,
                       ),
                       IconButton(
+                        tooltip: l10n.armyBuilderModelCountIncrease,
                         icon: const Icon(Icons.add_circle_outline_rounded),
                         color: AppColors.textSecondary,
                         onPressed:

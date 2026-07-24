@@ -168,6 +168,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get catalogFilterTitle => 'Filters';
 
   @override
+  String get catalogCoreAbilityTooltip =>
+      'Core rule — applies to any unit with this ability, not just this one';
+
+  @override
   String get catalogQuickAccessFactions => 'Quick access to factions';
 
   @override
@@ -397,6 +401,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get armyBuilderCopyList => 'Copy list';
+
+  @override
+  String get armyBuilderQuantityDecrease => 'One fewer copy';
+
+  @override
+  String get armyBuilderQuantityIncrease => 'One more copy';
+
+  @override
+  String get armyBuilderModelCountDecrease => 'Remove a model';
+
+  @override
+  String get armyBuilderModelCountIncrease => 'Add a model';
 
   @override
   String get armyBuilderCopiedToClipboard => 'List copied to clipboard';
@@ -1219,6 +1235,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rulesOpenBookMissing => 'No local PDF for this document yet';
+
+  @override
+  String rulesPdfPageIndicator(int page, int total) {
+    return 'Page $page / $total';
+  }
+
+  @override
+  String get rulesPdfLoadError => 'Couldn\'t open this PDF';
 
   @override
   String get rulesRecentDocuments => 'Recent documents';

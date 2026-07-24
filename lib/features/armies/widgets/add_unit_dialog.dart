@@ -255,6 +255,7 @@ class _QuantityStepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: AppColors.background,
@@ -265,6 +266,7 @@ class _QuantityStepper extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _stepperButton(
+            tooltip: l10n.armyBuilderQuantityDecrease,
             icon: Icons.remove_rounded,
             onTap: quantity > 1 ? () => onChanged(quantity - 1) : null,
           ),
@@ -277,6 +279,7 @@ class _QuantityStepper extends StatelessWidget {
             ),
           ),
           _stepperButton(
+            tooltip: l10n.armyBuilderQuantityIncrease,
             icon: Icons.add_rounded,
             onTap: () => onChanged(quantity + 1),
           ),
@@ -285,18 +288,25 @@ class _QuantityStepper extends StatelessWidget {
     );
   }
 
-  Widget _stepperButton({required IconData icon, VoidCallback? onTap}) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(8),
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Icon(
-          icon,
-          size: 16,
-          color: onTap == null
-              ? AppColors.textSecondary.withValues(alpha: .4)
-              : AppColors.textSecondary,
+  Widget _stepperButton({
+    required String tooltip,
+    required IconData icon,
+    VoidCallback? onTap,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(6),
+          child: Icon(
+            icon,
+            size: 16,
+            color: onTap == null
+                ? AppColors.textSecondary.withValues(alpha: .4)
+                : AppColors.textSecondary,
+          ),
         ),
       ),
     );

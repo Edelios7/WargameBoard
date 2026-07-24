@@ -267,6 +267,28 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
     });
   }
 
+  /// Coche l'entrée du tri actif dans le menu, pour qu'on puisse voir
+  /// d'un coup d'œil quel critère est en cours sans avoir à s'en souvenir.
+  PopupMenuItem<_CollectionSort> _sortMenuItem({
+    required _CollectionSort value,
+    required String label,
+  }) {
+    return PopupMenuItem(
+      value: value,
+      child: Row(
+        children: [
+          Icon(
+            Icons.check_rounded,
+            size: 16,
+            color: _sort == value ? AppColors.primary : Colors.transparent,
+          ),
+          const SizedBox(width: 8),
+          Text(label, style: AppTextStyles.body),
+        ],
+      ),
+    );
+  }
+
   void _toggleSelected(String id) {
     setState(() {
       if (_selectedIds.contains(id)) {
@@ -525,26 +547,17 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
                   initialValue: _sort,
                   onSelected: (value) => setState(() => _sort = value),
                   itemBuilder: (context) => [
-                    PopupMenuItem(
+                    _sortMenuItem(
                       value: _CollectionSort.nameAsc,
-                      child: Text(
-                        l10n.collectionSortName,
-                        style: AppTextStyles.body,
-                      ),
+                      label: l10n.collectionSortName,
                     ),
-                    PopupMenuItem(
+                    _sortMenuItem(
                       value: _CollectionSort.dateAddedDesc,
-                      child: Text(
-                        l10n.collectionSortDateAdded,
-                        style: AppTextStyles.body,
-                      ),
+                      label: l10n.collectionSortDateAdded,
                     ),
-                    PopupMenuItem(
+                    _sortMenuItem(
                       value: _CollectionSort.paintedPctDesc,
-                      child: Text(
-                        l10n.collectionSortPainted,
-                        style: AppTextStyles.body,
-                      ),
+                      label: l10n.collectionSortPainted,
                     ),
                   ],
                 ),

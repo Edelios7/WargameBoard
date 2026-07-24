@@ -392,6 +392,12 @@ abstract class AppLocalizations {
   /// **'Filtres'**
   String get catalogFilterTitle;
 
+  /// No description provided for @catalogCoreAbilityTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Règle du socle commun — s\'applique à toute unité possédant cette capacité, pas seulement celle-ci'**
+  String get catalogCoreAbilityTooltip;
+
   /// No description provided for @catalogQuickAccessFactions.
   ///
   /// In fr, this message translates to:
@@ -823,6 +829,30 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Copier la liste'**
   String get armyBuilderCopyList;
+
+  /// No description provided for @armyBuilderQuantityDecrease.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une copie de moins'**
+  String get armyBuilderQuantityDecrease;
+
+  /// No description provided for @armyBuilderQuantityIncrease.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une copie de plus'**
+  String get armyBuilderQuantityIncrease;
+
+  /// No description provided for @armyBuilderModelCountDecrease.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer un modèle'**
+  String get armyBuilderModelCountDecrease;
+
+  /// No description provided for @armyBuilderModelCountIncrease.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un modèle'**
+  String get armyBuilderModelCountIncrease;
 
   /// No description provided for @armyBuilderCopiedToClipboard.
   ///
@@ -2335,6 +2365,18 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Aucun PDF local pour ce document pour le moment'**
   String get rulesOpenBookMissing;
+
+  /// No description provided for @rulesPdfPageIndicator.
+  ///
+  /// In fr, this message translates to:
+  /// **'Page {page} / {total}'**
+  String rulesPdfPageIndicator(int page, int total);
+
+  /// No description provided for @rulesPdfLoadError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'ouvrir ce PDF'**
+  String get rulesPdfLoadError;
 
   /// No description provided for @rulesRecentDocuments.
   ///
