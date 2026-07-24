@@ -433,36 +433,27 @@ class _DashboardHeaderState extends ConsumerState<_DashboardHeader> {
                 ),
               ),
             if (wide) const SizedBox(width: 12),
-            _BadgeIconButton(
-              icon: Icons.notifications_none_rounded,
-              badgeCount: 3,
-              onTap: widget.onOpenProfile,
-            ),
-            const SizedBox(width: 8),
-            _BadgeIconButton(
-              icon: Icons.mail_outline_rounded,
-              badgeCount: 1,
-              onTap: widget.onOpenProfile,
-            ),
-            const SizedBox(width: 12),
-            InkWell(
-              borderRadius: BorderRadius.circular(20),
-              onTap: widget.onOpenSettings,
-              child: Container(
-                width: 38,
-                height: 38,
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    (widget.displayName?.isNotEmpty ?? false)
-                        ? widget.displayName![0].toUpperCase()
-                        : '?',
-                    style: AppTextStyles.body.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
+            Tooltip(
+              message: l10n.navSettings,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: widget.onOpenSettings,
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      (widget.displayName?.isNotEmpty ?? false)
+                          ? widget.displayName![0].toUpperCase()
+                          : '?',
+                      style: AppTextStyles.body.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
@@ -511,67 +502,6 @@ class _DashboardHeaderState extends ConsumerState<_DashboardHeader> {
           ),
         );
       },
-    );
-  }
-}
-
-class _BadgeIconButton extends StatelessWidget {
-  final IconData icon;
-  final int badgeCount;
-  final VoidCallback onTap;
-
-  const _BadgeIconButton({
-    required this.icon,
-    required this.badgeCount,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: onTap,
-      child: Container(
-        width: 38,
-        height: 38,
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          shape: BoxShape.circle,
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Center(child: Icon(icon, size: 18, color: AppColors.textSecondary)),
-            if (badgeCount > 0)
-              Positioned(
-                top: -2,
-                right: -2,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  constraints: const BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
-                  ),
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '$badgeCount',
-                      style: const TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -1537,6 +1467,7 @@ class _ProjectsCardState extends ConsumerState<_ProjectsCard> {
               ),
               const SizedBox(width: 8),
               IconButton(
+                tooltip: l10n.dashboardAddProjectAction,
                 style: IconButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,

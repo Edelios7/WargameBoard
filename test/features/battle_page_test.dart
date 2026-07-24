@@ -177,8 +177,29 @@ void main() {
     await tester.tap(find.byIcon(Icons.close_rounded));
     await tester.pumpAndSettle();
 
+    // Une confirmation est demandée avant la suppression définitive.
+    await tester.tap(find.text('Supprimer'));
+    await tester.pumpAndSettle();
+
     expect(find.text('Julie'), findsNothing);
     expect(find.text('Aucune partie enregistrée'), findsOneWidget);
+  });
+
+  testWidgets(
+      'cancelling the delete confirmation keeps the battle in the history',
+      (tester) async {
+    await database.battleDao.addBattle(opponentName: 'Julie');
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.close_rounded));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Annuler'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Julie'), findsOneWidget);
   });
 
   testWidgets(

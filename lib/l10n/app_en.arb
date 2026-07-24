@@ -186,6 +186,7 @@
   "armyBuilderEmptyUnits": "No units in this army",
   "armyBuilderNoUnitsYet": "Add units to build your roster",
   "armyBuilderDeleteArmy": "Delete army",
+  "armyBuilderMoreActions": "More actions",
   "armyBuilderCopyList": "Copy list",
   "armyBuilderCopiedToClipboard": "List copied to clipboard",
   "armyBuilderDuplicate": "Duplicate army",
@@ -536,6 +537,7 @@
   "dashboardProjectsTitle": "Ongoing projects",
   "dashboardProjectsEmpty": "No project yet",
   "dashboardAddProjectHint": "New project...",
+  "dashboardAddProjectAction": "Add project",
   "dashboardSearchHint": "Search (Ctrl+K)",
   "dashboardArmyStatusOk": "Valid",
   "dashboardArmyStatusWarning": "Warning",
@@ -643,6 +645,16 @@
   "battleMissionPackLabel": "Mission pack (optional)",
   "battleTerrainLabel": "Terrain (optional)",
   "battleLogExistingGame": "Log a game already played",
+  "battleNewBattleSubtitle": "Track a game live",
+  "battleLogExistingGameSubtitle": "Add a game that's already finished",
+  "battleDeleteConfirmTitle": "Delete this battle?",
+  "battleDeleteConfirmMessage": "This will permanently delete {name} and its history (log, units, notes).",
+  "@battleDeleteConfirmMessage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "battleDeleteConfirmAction": "Delete",
 
   "battleDashboardResume": "Battle in progress",
   "battleDashboardResumeSubtitle": "Resume your ongoing battle",

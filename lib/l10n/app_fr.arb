@@ -185,6 +185,7 @@
   "armyBuilderAddUnit": "Ajouter une unité",
   "armyBuilderEmptyUnits": "Aucune unité dans cette armée",
   "armyBuilderDeleteArmy": "Supprimer l'armée",
+  "armyBuilderMoreActions": "Plus d'actions",
   "armyBuilderCopyList": "Copier la liste",
   "armyBuilderCopiedToClipboard": "Liste copiée dans le presse-papier",
   "armyBuilderDuplicate": "Dupliquer l'armée",
@@ -536,6 +537,7 @@
   "dashboardProjectsTitle": "Projets en cours",
   "dashboardProjectsEmpty": "Aucun projet pour l'instant",
   "dashboardAddProjectHint": "Nouveau projet...",
+  "dashboardAddProjectAction": "Ajouter le projet",
   "dashboardSearchHint": "Rechercher (Ctrl+K)",
   "dashboardArmyStatusOk": "Valide",
   "dashboardArmyStatusWarning": "Attention",
@@ -643,6 +645,16 @@
   "battleMissionPackLabel": "Pack de missions (optionnel)",
   "battleTerrainLabel": "Terrain (optionnel)",
   "battleLogExistingGame": "Enregistrer une partie déjà jouée",
+  "battleNewBattleSubtitle": "Suivre une partie en direct",
+  "battleLogExistingGameSubtitle": "Ajouter une partie déjà terminée",
+  "battleDeleteConfirmTitle": "Supprimer cette partie ?",
+  "battleDeleteConfirmMessage": "Cela supprimera définitivement {name} et son historique (journal, unités, notes).",
+  "@battleDeleteConfirmMessage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "battleDeleteConfirmAction": "Supprimer",
 
   "battleDashboardResume": "Partie en cours",
   "battleDashboardResumeSubtitle": "Reprendre la partie en cours",

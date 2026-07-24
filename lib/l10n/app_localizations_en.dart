@@ -390,6 +390,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get armyBuilderDeleteArmy => 'Delete army';
 
   @override
+  String get armyBuilderMoreActions => 'More actions';
+
+  @override
   String get armyBuilderCopyList => 'Copy list';
 
   @override
@@ -1100,6 +1103,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardAddProjectHint => 'New project...';
 
   @override
+  String get dashboardAddProjectAction => 'Add project';
+
+  @override
   String get dashboardSearchHint => 'Search (Ctrl+K)';
 
   @override
@@ -1331,6 +1337,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get battleLogExistingGame => 'Log a game already played';
+
+  @override
+  String get battleNewBattleSubtitle => 'Track a game live';
+
+  @override
+  String get battleLogExistingGameSubtitle =>
+      'Add a game that\'s already finished';
+
+  @override
+  String get battleDeleteConfirmTitle => 'Delete this battle?';
+
+  @override
+  String battleDeleteConfirmMessage(String name) {
+    return 'This will permanently delete $name and its history (log, units, notes).';
+  }
+
+  @override
+  String get battleDeleteConfirmAction => 'Delete';
 
   @override
   String get battleDashboardResume => 'Battle in progress';

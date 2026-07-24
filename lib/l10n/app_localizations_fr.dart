@@ -395,6 +395,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get armyBuilderDeleteArmy => 'Supprimer l\'armée';
 
   @override
+  String get armyBuilderMoreActions => 'Plus d\'actions';
+
+  @override
   String get armyBuilderCopyList => 'Copier la liste';
 
   @override
@@ -1112,6 +1115,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dashboardAddProjectHint => 'Nouveau projet...';
 
   @override
+  String get dashboardAddProjectAction => 'Ajouter le projet';
+
+  @override
   String get dashboardSearchHint => 'Rechercher (Ctrl+K)';
 
   @override
@@ -1344,6 +1350,24 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get battleLogExistingGame => 'Enregistrer une partie déjà jouée';
+
+  @override
+  String get battleNewBattleSubtitle => 'Suivre une partie en direct';
+
+  @override
+  String get battleLogExistingGameSubtitle =>
+      'Ajouter une partie déjà terminée';
+
+  @override
+  String get battleDeleteConfirmTitle => 'Supprimer cette partie ?';
+
+  @override
+  String battleDeleteConfirmMessage(String name) {
+    return 'Cela supprimera définitivement $name et son historique (journal, unités, notes).';
+  }
+
+  @override
+  String get battleDeleteConfirmAction => 'Supprimer';
 
   @override
   String get battleDashboardResume => 'Partie en cours';

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../database/models/battle_details.dart';
 import '../../../database/tables/battles_table.dart';
 import '../../../l10n/app_localizations.dart';
@@ -59,31 +60,39 @@ class _BattleHistoryView extends ConsumerWidget {
                 runSpacing: 8,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  TextButton(
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (_) => const LogBattleDialog(),
-                    ),
-                    child: Text(
-                      l10n.battleLogExistingGame,
-                      style: AppTextStyles.body.copyWith(
-                        color: AppColors.textSecondary,
+                  Tooltip(
+                    message: l10n.battleLogExistingGameSubtitle,
+                    child: TextButton(
+                      onPressed: () => showDialog(
+                        context: context,
+                        builder: (_) => const LogBattleDialog(),
+                      ),
+                      child: Text(
+                        l10n.battleLogExistingGame,
+                        style: AppTextStyles.body.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ),
                   ),
-                  FilledButton.icon(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                  Tooltip(
+                    message: l10n.battleNewBattleSubtitle,
+                    child: FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                      ),
+                      onPressed: () async {
+                        final started = await showDialog<String?>(
+                          context: context,
+                          builder: (_) => const BattleSetupDialog(),
+                        );
+                        if (started != null) {
+                          ref.invalidate(activeBattleProvider);
+                        }
+                      },
+                      icon: const Icon(Icons.add_rounded),
+                      label: Text(l10n.battleNewBattle),
                     ),
-                    onPressed: () async {
-                      final started = await showDialog<String?>(
-                        context: context,
-                        builder: (_) => const BattleSetupDialog(),
-                      );
-                      if (started != null) ref.invalidate(activeBattleProvider);
-                    },
-                    icon: const Icon(Icons.add_rounded),
-                    label: Text(l10n.battleNewBattle),
                   ),
                 ],
               );
@@ -254,18 +263,62 @@ class _BattleCard extends ConsumerWidget {
                 ),
               ),
             ),
-          IconButton(
-            icon: const Icon(Icons.close_rounded),
-            color: AppColors.textSecondary,
-            onPressed: () async {
-              await ref.read(battleRepositoryProvider).deleteBattle(battle.id);
-              ref.invalidate(battlesListProvider);
-              ref.invalidate(nextBattleProvider);
-              ref.invalidate(lastBattleProvider);
-            },
+          Tooltip(
+            message: l10n.battleDeleteConfirmAction,
+            child: IconButton(
+              icon: const Icon(Icons.close_rounded),
+              color: AppColors.textSecondary,
+              onPressed: () async {
+                final confirmed = await _confirmDeleteBattle(
+                  context,
+                  l10n,
+                  battle.opponentName ?? battle.missionName ?? '—',
+                );
+                if (!confirmed) return;
+                await ref
+                    .read(battleRepositoryProvider)
+                    .deleteBattle(battle.id);
+                ref.invalidate(battlesListProvider);
+                ref.invalidate(nextBattleProvider);
+                ref.invalidate(lastBattleProvider);
+              },
+            ),
           ),
         ],
       ),
     );
   }
+}
+
+Future<bool> _confirmDeleteBattle(
+  BuildContext context,
+  AppLocalizations l10n,
+  String name,
+) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AppDialogShortcuts(
+      onEnter: () => Navigator.of(dialogContext).pop(true),
+      child: AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text(l10n.battleDeleteConfirmTitle, style: AppTextStyles.title),
+        content: Text(
+          l10n.battleDeleteConfirmMessage(name),
+          style: AppTextStyles.body,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.armyBuilderCancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.battleDeleteConfirmAction),
+          ),
+        ],
+      ),
+    ),
+  );
+  return confirmed ?? false;
 }

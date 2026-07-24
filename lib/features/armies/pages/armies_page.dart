@@ -194,6 +194,7 @@ class _ArmyListPage extends ConsumerWidget {
                   children: [
                     Text(l10n.navArmies, style: AppTextStyles.heading),
                     IconButton(
+                      tooltip: l10n.dashboardCreateArmyShort,
                       style: IconButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
@@ -885,6 +886,7 @@ class _BuilderTopBar extends ConsumerWidget {
             ),
             const SizedBox(width: 8),
             PopupMenuButton<String>(
+              tooltip: l10n.armyBuilderMoreActions,
               icon: const Icon(
                 Icons.more_vert_rounded,
                 color: AppColors.textSecondary,
@@ -958,6 +960,7 @@ class _BuilderTopBar extends ConsumerWidget {
                     style: AppTextStyles.body,
                   ),
                 ),
+                const PopupMenuDivider(),
                 PopupMenuItem(
                   value: 'delete',
                   child: Text(

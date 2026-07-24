@@ -806,6 +806,12 @@ abstract class AppLocalizations {
   /// **'Supprimer l\'armée'**
   String get armyBuilderDeleteArmy;
 
+  /// No description provided for @armyBuilderMoreActions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plus d\'actions'**
+  String get armyBuilderMoreActions;
+
   /// No description provided for @armyBuilderCopyList.
   ///
   /// In fr, this message translates to:
@@ -2114,6 +2120,12 @@ abstract class AppLocalizations {
   /// **'Nouveau projet...'**
   String get dashboardAddProjectHint;
 
+  /// No description provided for @dashboardAddProjectAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter le projet'**
+  String get dashboardAddProjectAction;
+
   /// No description provided for @dashboardSearchHint.
   ///
   /// In fr, this message translates to:
@@ -2545,6 +2557,36 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Enregistrer une partie déjà jouée'**
   String get battleLogExistingGame;
+
+  /// No description provided for @battleNewBattleSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suivre une partie en direct'**
+  String get battleNewBattleSubtitle;
+
+  /// No description provided for @battleLogExistingGameSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une partie déjà terminée'**
+  String get battleLogExistingGameSubtitle;
+
+  /// No description provided for @battleDeleteConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer cette partie ?'**
+  String get battleDeleteConfirmTitle;
+
+  /// No description provided for @battleDeleteConfirmMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cela supprimera définitivement {name} et son historique (journal, unités, notes).'**
+  String battleDeleteConfirmMessage(String name);
+
+  /// No description provided for @battleDeleteConfirmAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer'**
+  String get battleDeleteConfirmAction;
 
   /// No description provided for @battleDashboardResume.
   ///
