@@ -60,8 +60,14 @@ class CollectionRepository {
     final before = result.before;
     final after = result.after;
 
+    // Le "juste complété" ne doit récompenser qu'une vraie progression
+    // (montage/peinture d'un modèle de plus) qui atteint la quantité — pas
+    // une simple réduction de `quantity` qui, via le clamp de
+    // `CollectionDao.updateCounts`, ferait mécaniquement rejoindre
+    // `assembled`/`painted` sans qu'aucun modèle n'ait été touché.
     final assembledDelta = after.assembled - before.assembled;
-    final assembledJustCompleted = after.assembled == after.quantity &&
+    final assembledJustCompleted = assembledDelta > 0 &&
+        after.assembled == after.quantity &&
         before.assembled != before.quantity;
     if (assembledDelta > 0 || assembledJustCompleted) {
       await xpService.awardAssembly(
@@ -72,8 +78,9 @@ class CollectionRepository {
     }
 
     final paintedDelta = after.painted - before.painted;
-    final paintedJustCompleted =
-        after.painted == after.quantity && before.painted != before.quantity;
+    final paintedJustCompleted = paintedDelta > 0 &&
+        after.painted == after.quantity &&
+        before.painted != before.quantity;
     if (paintedDelta > 0 || paintedJustCompleted) {
       await xpService.awardPainting(
         datasheetId: after.datasheetId,
@@ -103,8 +110,10 @@ class CollectionRepository {
     return database.collectionDao.deleteWishlistItem(id);
   }
 
-  Future<void> moveWishlistItemToCollection(String id) {
-    return database.collectionDao.moveWishlistItemToCollection(id);
+  Future<void> moveWishlistItemToCollection(String id) async {
+    final datasheetId =
+        await database.collectionDao.moveWishlistItemToCollection(id);
+    await xpService.awardNewBox(datasheetId);
   }
 
   Future<List<CollectionItemDetails>> listRecentPurchases({int limit = 5}) {

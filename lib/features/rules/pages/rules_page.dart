@@ -69,7 +69,8 @@ class _RulesPageState extends State<RulesPage> {
     final l10n = AppLocalizations.of(context)!;
     final hero = kRuleDocuments.firstWhere((d) => d.isCurrent);
     final documents = _filtered;
-    final recent = documents;
+    final recent = [...documents]
+      ..sort((a, b) => b.lastUpdate.compareTo(a.lastUpdate));
     final popular = [...documents]
       ..sort((a, b) => b.downloads.compareTo(a.downloads));
 

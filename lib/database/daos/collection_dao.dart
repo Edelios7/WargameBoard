@@ -261,12 +261,15 @@ class CollectionDao extends DatabaseAccessor<AppDatabase>
 
   /// Déplace un élément de la wishlist vers la collection possédée
   /// (l'ajoute comme entrée de collection puis le retire de la wishlist).
-  Future<void> moveWishlistItemToCollection(String wishlistItemId) async {
+  /// Retourne la datasheet concernée pour que l'appelant puisse créditer
+  /// l'XP "nouvelle boîte" comme pour un ajout classique.
+  Future<String> moveWishlistItemToCollection(String wishlistItemId) async {
     final item = await (select(wishlistItems)
           ..where((t) => t.id.equals(wishlistItemId)))
         .getSingle();
 
     await addEntry(datasheetId: item.datasheetId, quantity: item.quantity);
     await deleteWishlistItem(wishlistItemId);
+    return item.datasheetId;
   }
 }
