@@ -495,13 +495,16 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
         type: weapon.isMelee ? 'Melee' : 'Ranged',
         keywords: await _weaponKeywordNames(weapon.id),
         abilities: await _weaponAbilityNames(weapon.id),
-        profiles: await _weaponProfiles(weapon.id),
+        profiles: await _weaponProfiles(weapon.id, isMelee: weapon.isMelee),
       ));
     }
     return result;
   }
 
-  Future<List<WeaponProfileDetails>> _weaponProfiles(String weaponId) async {
+  Future<List<WeaponProfileDetails>> _weaponProfiles(
+    String weaponId, {
+    required bool isMelee,
+  }) async {
     final rows = await (select(weaponProfiles)
           ..where((t) => t.weaponId.equals(weaponId))
           ..orderBy([(t) => OrderingTerm.asc(t.name)]))
@@ -516,6 +519,7 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
               strength: p.strength,
               armorPenetration: p.armorPenetration,
               damage: p.damage,
+              isMelee: isMelee,
             ))
         .toList();
   }

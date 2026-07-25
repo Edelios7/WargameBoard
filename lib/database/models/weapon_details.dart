@@ -8,6 +8,13 @@ class WeaponProfileDetails {
   final int armorPenetration;
   final String damage;
 
+  /// Vient du champ `isMelee` de l'arme parente (`Weapons.isMelee`), pas
+  /// deviné depuis `range == 0` — un profil importé avec une portée
+  /// incorrecte (typo/erreur de parsing PDF) ne doit pas afficher "Mêlée"
+  /// ou une portée en contradiction avec le type d'arme affiché ailleurs
+  /// dans le même écran (ex. `WeaponDetails.type`).
+  final bool isMelee;
+
   const WeaponProfileDetails({
     required this.name,
     required this.range,
@@ -17,9 +24,8 @@ class WeaponProfileDetails {
     required this.strength,
     required this.armorPenetration,
     required this.damage,
+    required this.isMelee,
   });
-
-  bool get isMelee => range == 0;
 
   /// Ligne compacte façon datasheet, ex. `12" A1 CT2+ F7 PA-2 D1`
   /// ou `Mêlée A6 CC2+ F5 PA-2 D2`.
