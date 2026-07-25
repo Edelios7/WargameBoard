@@ -1209,6 +1209,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dashboardAddProjectAction => 'Ajouter le projet';
 
   @override
+  String get dashboardDeleteProject => 'Supprimer le projet';
+
+  @override
   String get dashboardSearchHint => 'Rechercher (Ctrl+K)';
 
   @override

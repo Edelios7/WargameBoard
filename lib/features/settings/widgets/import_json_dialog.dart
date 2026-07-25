@@ -161,20 +161,25 @@ class _ImportJsonDialogState extends ConsumerState<ImportJsonDialog> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                      ValueListenableBuilder<TextEditingValue>(
+                        valueListenable: _controller,
+                        builder: (context, value, _) => FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                          ),
+                          onPressed: _running || value.text.trim().isEmpty
+                              ? null
+                              : _run,
+                          child: _running
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(l10n.settingsImportRun),
                         ),
-                        onPressed: _running ? null : _run,
-                        child: _running
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Text(l10n.settingsImportRun),
                       ),
                     ],
                   ),

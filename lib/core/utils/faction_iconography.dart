@@ -81,6 +81,15 @@ class FactionIconography {
     MapEntry('chaos daemons', _glyph(GlyphKind.hornedSkull, Color(0xFF7A4FBF))),
   ];
 
+  /// [_entries] trié par longueur de clé décroissante — la recherche par
+  /// sous-chaîne doit tester les clés les plus spécifiques en premier
+  /// (ex. "chaos space marines" avant "space marines"), sinon une clé
+  /// plus courte mais présente ailleurs dans le nom masque toujours la
+  /// bonne entrée et la rend inatteignable.
+  static final List<MapEntry<String, FactionBadge>> _sortedEntries =
+      List<MapEntry<String, FactionBadge>>.from(_entries)
+        ..sort((a, b) => b.key.length.compareTo(a.key.length));
+
   static const List<Color> _fallbackPalette = [
     AppColors.primary,
     AppColors.info,
@@ -97,7 +106,7 @@ class FactionIconography {
   /// d'une faction à l'autre sans être aléatoire à chaque rebuild).
   static FactionBadge forFaction(String factionName) {
     final normalized = factionName.toLowerCase();
-    for (final entry in _entries) {
+    for (final entry in _sortedEntries) {
       if (normalized.contains(entry.key)) return entry.value;
     }
     final color = _fallbackPalette[factionName.hashCode.abs() % _fallbackPalette.length];

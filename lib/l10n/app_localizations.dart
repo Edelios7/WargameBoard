@@ -2270,6 +2270,12 @@ abstract class AppLocalizations {
   /// **'Ajouter le projet'**
   String get dashboardAddProjectAction;
 
+  /// No description provided for @dashboardDeleteProject.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer le projet'**
+  String get dashboardDeleteProject;
+
   /// No description provided for @dashboardSearchHint.
   ///
   /// In fr, this message translates to:

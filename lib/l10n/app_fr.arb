@@ -572,6 +572,7 @@
   "dashboardProjectsEmpty": "Aucun projet pour l'instant",
   "dashboardAddProjectHint": "Nouveau projet...",
   "dashboardAddProjectAction": "Ajouter le projet",
+  "dashboardDeleteProject": "Supprimer le projet",
   "dashboardSearchHint": "Rechercher (Ctrl+K)",
   "dashboardArmyStatusOk": "Valide",
   "dashboardArmyStatusWarning": "Attention",

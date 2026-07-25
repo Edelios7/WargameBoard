@@ -1646,6 +1646,20 @@ class _ProjectRow extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              IconButton(
+                tooltip: AppLocalizations.of(context)!.dashboardDeleteProject,
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                icon: const Icon(Icons.close_rounded, size: 16),
+                color: AppColors.textSecondary,
+                onPressed: () async {
+                  await ref
+                      .read(projectRepositoryProvider)
+                      .deleteProject(id);
+                  ref.invalidate(projectsListProvider);
+                },
+              ),
             ],
           ),
           if (!done && progressPercent != null) ...[
