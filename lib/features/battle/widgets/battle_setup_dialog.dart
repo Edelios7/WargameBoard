@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
+import '../../../core/widgets/discard_guard.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/tables/battles_table.dart';
 import '../../../l10n/app_localizations.dart';
@@ -43,6 +44,13 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
     _terrainController.dispose();
     super.dispose();
   }
+
+  bool get _hasUnsavedInput =>
+      _opponentController.text.trim().isNotEmpty ||
+      _missionController.text.trim().isNotEmpty ||
+      _missionPackController.text.trim().isNotEmpty ||
+      _terrainController.text.trim().isNotEmpty ||
+      _armyId != null;
 
   void _onArmyChanged(String? armyId, List<ArmyListItem> armies) {
     setState(() {
@@ -119,216 +127,226 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
 
     return AppDialogShortcuts(
       onEnter: _start,
-      child: Dialog(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.85,
+      child: DiscardGuardScope(
+        hasUnsavedInput: () => _hasUnsavedInput,
+        child: Dialog(
+          backgroundColor: AppColors.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
           ),
-          child: SizedBox(
-            width: 420,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(l10n.battleSetupTitle, style: AppTextStyles.title),
-                  const SizedBox(height: 4),
-                  Text(
-                    l10n.battleSetupHint,
-                    style: AppTextStyles.caption,
-                  ),
-                  const SizedBox(height: 20),
-                  armiesAsync.when(
-                    loading: () =>
-                        const LinearProgressIndicator(color: AppColors.primary),
-                    error: (_, __) => const SizedBox.shrink(),
-                    data: (armies) => DropdownButtonFormField<String?>(
-                      initialValue: _armyId,
-                      isExpanded: true,
-                      dropdownColor: AppColors.surface,
-                      style: AppTextStyles.body,
-                      decoration: _decoration(l10n.battleArmyLabel),
-                      items: [
-                        DropdownMenuItem<String?>(
-                          value: null,
-                          child: Text(l10n.battleArmyNone),
-                        ),
-                        ...armies.map(
-                          (army) => DropdownMenuItem<String?>(
-                            value: army.id,
-                            child: Text(
-                              army.name,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+            ),
+            child: SizedBox(
+              width: 420,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(l10n.battleSetupTitle, style: AppTextStyles.title),
+                    const SizedBox(height: 4),
+                    Text(l10n.battleSetupHint, style: AppTextStyles.caption),
+                    const SizedBox(height: 20),
+                    armiesAsync.when(
+                      loading: () => const LinearProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                      error: (_, __) => const SizedBox.shrink(),
+                      data: (armies) => DropdownButtonFormField<String?>(
+                        initialValue: _armyId,
+                        isExpanded: true,
+                        dropdownColor: AppColors.surface,
+                        style: AppTextStyles.body,
+                        decoration: _decoration(l10n.battleArmyLabel),
+                        items: [
+                          DropdownMenuItem<String?>(
+                            value: null,
+                            child: Text(l10n.battleArmyNone),
                           ),
-                        ),
-                      ],
-                      onChanged: (value) => _onArmyChanged(value, armies),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _opponentController,
-                    style: AppTextStyles.body,
-                    onSubmitted: (_) => _start(),
-                    decoration: _decoration(l10n.battleOpponentLabel),
-                  ),
-                  const SizedBox(height: 12),
-                  armiesAsync.when(
-                    loading: () => const SizedBox.shrink(),
-                    error: (_, __) => const SizedBox.shrink(),
-                    data: (armies) => DropdownButtonFormField<String?>(
-                      initialValue: _opponentArmyId,
-                      isExpanded: true,
-                      dropdownColor: AppColors.surface,
-                      style: AppTextStyles.body,
-                      decoration: _decoration(l10n.battleOpponentArmyLabel),
-                      items: [
-                        DropdownMenuItem<String?>(
-                          value: null,
-                          child: Text(l10n.battleArmyNone),
-                        ),
-                        ...armies
-                            .where((army) => army.id != _armyId)
-                            .map(
-                              (army) => DropdownMenuItem<String?>(
-                                value: army.id,
-                                child: Text(
-                                  army.name,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+                          ...armies.map(
+                            (army) => DropdownMenuItem<String?>(
+                              value: army.id,
+                              child: Text(
+                                army.name,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                      ],
-                      onChanged: (value) =>
-                          _onOpponentArmyChanged(value, armies),
+                          ),
+                        ],
+                        onChanged: (value) => _onArmyChanged(value, armies),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    l10n.battleOpponentArmyHint,
-                    style: AppTextStyles.eyebrow,
-                  ),
-                  const SizedBox(height: 12),
-                  factionsAsync.when(
-                    loading: () => const SizedBox.shrink(),
-                    error: (_, __) => const SizedBox.shrink(),
-                    data: (factions) => DropdownButtonFormField<String?>(
-                      initialValue: _opponentFactionId,
-                      isExpanded: true,
-                      dropdownColor: AppColors.surface,
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _opponentController,
                       style: AppTextStyles.body,
-                      decoration: _decoration(l10n.battleOpponentFactionLabel),
-                      items: [
-                        DropdownMenuItem<String?>(
-                          value: null,
-                          child: Text(l10n.battleArmyNone),
+                      onSubmitted: (_) => _start(),
+                      decoration: _decoration(l10n.battleOpponentLabel),
+                    ),
+                    const SizedBox(height: 12),
+                    armiesAsync.when(
+                      loading: () => const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
+                      data: (armies) => DropdownButtonFormField<String?>(
+                        initialValue: _opponentArmyId,
+                        isExpanded: true,
+                        dropdownColor: AppColors.surface,
+                        style: AppTextStyles.body,
+                        decoration: _decoration(l10n.battleOpponentArmyLabel),
+                        items: [
+                          DropdownMenuItem<String?>(
+                            value: null,
+                            child: Text(l10n.battleArmyNone),
+                          ),
+                          ...armies
+                              .where((army) => army.id != _armyId)
+                              .map(
+                                (army) => DropdownMenuItem<String?>(
+                                  value: army.id,
+                                  child: Text(
+                                    army.name,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                        ],
+                        onChanged: (value) =>
+                            _onOpponentArmyChanged(value, armies),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.battleOpponentArmyHint,
+                      style: AppTextStyles.eyebrow,
+                    ),
+                    const SizedBox(height: 12),
+                    factionsAsync.when(
+                      loading: () => const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
+                      data: (factions) => DropdownButtonFormField<String?>(
+                        initialValue: _opponentFactionId,
+                        isExpanded: true,
+                        dropdownColor: AppColors.surface,
+                        style: AppTextStyles.body,
+                        decoration: _decoration(
+                          l10n.battleOpponentFactionLabel,
                         ),
-                        ...factions.map(
-                          (faction) => DropdownMenuItem<String?>(
-                            value: faction.id,
-                            child: Text(
-                              faction.name,
-                              overflow: TextOverflow.ellipsis,
+                        items: [
+                          DropdownMenuItem<String?>(
+                            value: null,
+                            child: Text(l10n.battleArmyNone),
+                          ),
+                          ...factions.map(
+                            (faction) => DropdownMenuItem<String?>(
+                              value: faction.id,
+                              child: Text(
+                                faction.name,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                        ],
+                        onChanged: (value) =>
+                            setState(() => _opponentFactionId = value),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _pointsLimitController,
+                            keyboardType: TextInputType.number,
+                            style: AppTextStyles.body,
+                            decoration: _decoration(
+                              l10n.battlePointsLimitLabel,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: DropdownButtonFormField<BattleType>(
+                            initialValue: _type,
+                            isExpanded: true,
+                            dropdownColor: AppColors.surface,
+                            style: AppTextStyles.body,
+                            decoration: _decoration(l10n.battleTypeLabel),
+                            items: [
+                              DropdownMenuItem(
+                                value: BattleType.matched,
+                                child: Text(l10n.battleTypeMatched),
+                              ),
+                              DropdownMenuItem(
+                                value: BattleType.narrative,
+                                child: Text(l10n.battleTypeNarrative),
+                              ),
+                              DropdownMenuItem(
+                                value: BattleType.crusade,
+                                child: Text(l10n.battleTypeCrusade),
+                              ),
+                              DropdownMenuItem(
+                                value: BattleType.tournament,
+                                child: Text(l10n.battleTypeTournament),
+                              ),
+                            ],
+                            onChanged: (value) => setState(
+                              () => _type = value ?? BattleType.matched,
                             ),
                           ),
                         ),
                       ],
-                      onChanged: (value) =>
-                          setState(() => _opponentFactionId = value),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _pointsLimitController,
-                          keyboardType: TextInputType.number,
-                          style: AppTextStyles.body,
-                          decoration: _decoration(l10n.battlePointsLimitLabel),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: DropdownButtonFormField<BattleType>(
-                          initialValue: _type,
-                          isExpanded: true,
-                          dropdownColor: AppColors.surface,
-                          style: AppTextStyles.body,
-                          decoration: _decoration(l10n.battleTypeLabel),
-                          items: [
-                            DropdownMenuItem(
-                              value: BattleType.matched,
-                              child: Text(l10n.battleTypeMatched),
-                            ),
-                            DropdownMenuItem(
-                              value: BattleType.narrative,
-                              child: Text(l10n.battleTypeNarrative),
-                            ),
-                            DropdownMenuItem(
-                              value: BattleType.crusade,
-                              child: Text(l10n.battleTypeCrusade),
-                            ),
-                            DropdownMenuItem(
-                              value: BattleType.tournament,
-                              child: Text(l10n.battleTypeTournament),
-                            ),
-                          ],
-                          onChanged: (value) => setState(
-                            () => _type = value ?? BattleType.matched,
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _missionController,
+                      style: AppTextStyles.body,
+                      onSubmitted: (_) => _start(),
+                      decoration: _decoration(l10n.battleMissionLabel),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _missionPackController,
+                      style: AppTextStyles.body,
+                      onSubmitted: (_) => _start(),
+                      decoration: _decoration(l10n.battleMissionPackLabel),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _terrainController,
+                      style: AppTextStyles.body,
+                      onSubmitted: (_) => _start(),
+                      decoration: _decoration(l10n.battleTerrainLabel),
+                    ),
+                    const SizedBox(height: 20),
+                    Wrap(
+                      alignment: WrapAlignment.end,
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        TextButton(
+                          onPressed: () => DiscardGuard.popIfConfirmed(
+                            context,
+                            () => _hasUnsavedInput,
+                          ),
+                          child: Text(
+                            l10n.armyBuilderCancel,
+                            style: AppTextStyles.body,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _missionController,
-                    style: AppTextStyles.body,
-                    onSubmitted: (_) => _start(),
-                    decoration: _decoration(l10n.battleMissionLabel),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _missionPackController,
-                    style: AppTextStyles.body,
-                    onSubmitted: (_) => _start(),
-                    decoration: _decoration(l10n.battleMissionPackLabel),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _terrainController,
-                    style: AppTextStyles.body,
-                    onSubmitted: (_) => _start(),
-                    decoration: _decoration(l10n.battleTerrainLabel),
-                  ),
-                  const SizedBox(height: 20),
-                  Wrap(
-                    alignment: WrapAlignment.end,
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: Text(
-                          l10n.armyBuilderCancel,
-                          style: AppTextStyles.body,
+                        FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                          ),
+                          onPressed: _start,
+                          child: Text(l10n.battleSetupStart),
                         ),
-                      ),
-                      FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                        ),
-                        onPressed: _start,
-                        child: Text(l10n.battleSetupStart),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

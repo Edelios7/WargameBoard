@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
+import '../../../core/widgets/discard_guard.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/army_provider.dart';
 import '../../../providers/catalog_provider.dart';
@@ -28,6 +29,8 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
     _pointsLimitController.dispose();
     super.dispose();
   }
+
+  bool get _hasUnsavedInput => _nameController.text.trim().isNotEmpty;
 
   Future<void> _create() async {
     final factionId = _factionId;
@@ -56,170 +59,178 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
 
     return AppDialogShortcuts(
       onEnter: _create,
-      child: Dialog(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: SizedBox(
-            width: 380,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(l10n.armyBuilderNewArmy, style: AppTextStyles.title),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: _nameController,
-                  autofocus: true,
-                  style: AppTextStyles.body,
-                  onSubmitted: (_) => _create(),
-                  decoration: InputDecoration(
-                    labelText: l10n.armyBuilderArmyName,
-                    labelStyle: AppTextStyles.caption,
-                    filled: true,
-                    fillColor: AppColors.background,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
+      child: DiscardGuardScope(
+        hasUnsavedInput: () => _hasUnsavedInput,
+        child: Dialog(
+          backgroundColor: AppColors.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: SizedBox(
+              width: 380,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.armyBuilderNewArmy, style: AppTextStyles.title),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: _nameController,
+                    autofocus: true,
+                    style: AppTextStyles.body,
+                    onSubmitted: (_) => _create(),
+                    decoration: InputDecoration(
+                      labelText: l10n.armyBuilderArmyName,
+                      labelStyle: AppTextStyles.caption,
+                      filled: true,
+                      fillColor: AppColors.background,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                factionsAsync.when(
-                  loading: () =>
-                      const LinearProgressIndicator(color: AppColors.primary),
-                  error: (error, _) =>
-                      Text('$error', style: AppTextStyles.caption),
-                  data: (factions) {
-                    _factionId ??= factions.isNotEmpty
-                        ? factions.first.id
-                        : null;
-                    return DropdownButtonFormField<String>(
-                      initialValue: _factionId,
-                      isExpanded: true,
-                      dropdownColor: AppColors.surface,
-                      style: AppTextStyles.body,
-                      decoration: InputDecoration(
-                        labelText: l10n.armyBuilderFaction,
-                        labelStyle: AppTextStyles.caption,
-                        filled: true,
-                        fillColor: AppColors.background,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      items: factions
-                          .map(
-                            (faction) => DropdownMenuItem(
-                              value: faction.id,
-                              child: Text(
-                                faction.name,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) => setState(() {
-                        _factionId = value;
-                        _detachmentId = null;
-                      }),
-                    );
-                  },
-                ),
-                if (_factionId != null) ...[
                   const SizedBox(height: 16),
-                  Consumer(
-                    builder: (context, ref, _) {
-                      final detachmentsAsync = ref.watch(
-                        detachmentsForFactionProvider(_factionId!),
-                      );
-                      return detachmentsAsync.when(
-                        loading: () => const LinearProgressIndicator(
-                          color: AppColors.primary,
+                  factionsAsync.when(
+                    loading: () =>
+                        const LinearProgressIndicator(color: AppColors.primary),
+                    error: (error, _) =>
+                        Text('$error', style: AppTextStyles.caption),
+                    data: (factions) {
+                      _factionId ??= factions.isNotEmpty
+                          ? factions.first.id
+                          : null;
+                      return DropdownButtonFormField<String>(
+                        initialValue: _factionId,
+                        isExpanded: true,
+                        dropdownColor: AppColors.surface,
+                        style: AppTextStyles.body,
+                        decoration: InputDecoration(
+                          labelText: l10n.armyBuilderFaction,
+                          labelStyle: AppTextStyles.caption,
+                          filled: true,
+                          fillColor: AppColors.background,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
-                        error: (_, __) => const SizedBox.shrink(),
-                        data: (detachments) {
-                          if (detachments.isEmpty)
-                            return const SizedBox.shrink();
-                          return DropdownButtonFormField<String?>(
-                            initialValue: _detachmentId,
-                            isExpanded: true,
-                            dropdownColor: AppColors.surface,
-                            style: AppTextStyles.body,
-                            decoration: InputDecoration(
-                              labelText: l10n.armyBuilderDetachmentLabel,
-                              labelStyle: AppTextStyles.caption,
-                              filled: true,
-                              fillColor: AppColors.background,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            items: [
-                              DropdownMenuItem<String?>(
-                                value: null,
-                                child: Text(l10n.armyBuilderDetachmentNone),
-                              ),
-                              ...detachments.map(
-                                (d) => DropdownMenuItem<String?>(
-                                  value: d.id,
-                                  child: Text(
-                                    d.name,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                        items: factions
+                            .map(
+                              (faction) => DropdownMenuItem(
+                                value: faction.id,
+                                child: Text(
+                                  faction.name,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                            ],
-                            onChanged: (value) =>
-                                setState(() => _detachmentId = value),
-                          );
-                        },
+                            )
+                            .toList(),
+                        onChanged: (value) => setState(() {
+                          _factionId = value;
+                          _detachmentId = null;
+                        }),
                       );
                     },
                   ),
-                ],
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _pointsLimitController,
-                  keyboardType: TextInputType.number,
-                  style: AppTextStyles.body,
-                  onSubmitted: (_) => _create(),
-                  decoration: InputDecoration(
-                    labelText: l10n.armyBuilderPointsLimitLabel,
-                    labelStyle: AppTextStyles.caption,
-                    filled: true,
-                    fillColor: AppColors.background,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text(
-                        l10n.armyBuilderCancel,
-                        style: AppTextStyles.body,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                      ),
-                      onPressed: _create,
-                      child: Text(l10n.armyBuilderCreate),
+                  if (_factionId != null) ...[
+                    const SizedBox(height: 16),
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final detachmentsAsync = ref.watch(
+                          detachmentsForFactionProvider(_factionId!),
+                        );
+                        return detachmentsAsync.when(
+                          loading: () => const LinearProgressIndicator(
+                            color: AppColors.primary,
+                          ),
+                          error: (_, __) => const SizedBox.shrink(),
+                          data: (detachments) {
+                            if (detachments.isEmpty)
+                              return const SizedBox.shrink();
+                            return DropdownButtonFormField<String?>(
+                              initialValue: _detachmentId,
+                              isExpanded: true,
+                              dropdownColor: AppColors.surface,
+                              style: AppTextStyles.body,
+                              decoration: InputDecoration(
+                                labelText: l10n.armyBuilderDetachmentLabel,
+                                labelStyle: AppTextStyles.caption,
+                                filled: true,
+                                fillColor: AppColors.background,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              items: [
+                                DropdownMenuItem<String?>(
+                                  value: null,
+                                  child: Text(l10n.armyBuilderDetachmentNone),
+                                ),
+                                ...detachments.map(
+                                  (d) => DropdownMenuItem<String?>(
+                                    value: d.id,
+                                    child: Text(
+                                      d.name,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              onChanged: (value) =>
+                                  setState(() => _detachmentId = value),
+                            );
+                          },
+                        );
+                      },
                     ),
                   ],
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _pointsLimitController,
+                    keyboardType: TextInputType.number,
+                    style: AppTextStyles.body,
+                    onSubmitted: (_) => _create(),
+                    decoration: InputDecoration(
+                      labelText: l10n.armyBuilderPointsLimitLabel,
+                      labelStyle: AppTextStyles.caption,
+                      filled: true,
+                      fillColor: AppColors.background,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => DiscardGuard.popIfConfirmed(
+                          context,
+                          () => _hasUnsavedInput,
+                        ),
+                        child: Text(
+                          l10n.armyBuilderCancel,
+                          style: AppTextStyles.body,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                        ),
+                        onPressed: _create,
+                        child: Text(l10n.armyBuilderCreate),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
