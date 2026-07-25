@@ -51,11 +51,19 @@ class UserPhotoService {
     return datasheetFile;
   }
 
+  /// Formats acceptés en lecture par [LocalCatalogImages] — un format
+  /// non reconnu ici (ex. HEIC, courant sur les galeries mobiles) serait
+  /// copié mais ensuite introuvable, la photo semblerait avoir disparu
+  /// sans message d'erreur. Refusé avant d'écraser une photo existante.
   Future<File> _saveTo(Directory folder, String id, String sourcePath) async {
-    await _removeFrom(folder, id);
-    await folder.create(recursive: true);
     final extension =
         p.extension(sourcePath).replaceFirst('.', '').toLowerCase();
+    if (!_extensions.contains(extension)) {
+      throw UnsupportedError('Format d\'image non pris en charge : .$extension');
+    }
+
+    await _removeFrom(folder, id);
+    await folder.create(recursive: true);
     final destination = File(p.join(folder.path, '$id.$extension'));
     return File(sourcePath).copy(destination.path);
   }

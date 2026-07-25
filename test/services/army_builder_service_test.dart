@@ -22,8 +22,9 @@ void main() {
     await database.close();
   });
 
-  test('duplicating an army copies its detachment, units and enhancements',
-      () async {
+  test(
+      'duplicating an army copies its detachment, units, enhancements, '
+      'warlord and notes', () async {
     final sourceId = await repository.createArmy(
       name: 'Originale',
       factionId: seedFactionId,
@@ -37,6 +38,8 @@ void main() {
       modelCount: 1,
     );
     await repository.setUnitEnhancement(unitId, enhDeathVisions);
+    await repository.setWarlord(sourceId, unitId);
+    await repository.updateNotes(sourceId, 'Liste pour le tournoi de mars');
 
     final newId = await service.duplicateArmy(sourceId, 'Copie');
     final copy = await repository.getArmy(newId!);
@@ -45,13 +48,16 @@ void main() {
     expect(copy.factionId, seedFactionId);
     expect(copy.detachmentId, detAngelicHost);
     expect(copy.pointsLimit, 2000);
+    expect(copy.notes, 'Liste pour le tournoi de mars');
     expect(copy.units, hasLength(1));
     expect(copy.units.single.datasheetName, 'Captain');
     expect(copy.units.single.enhancementName, 'Death Visions of Sanguinius');
+    expect(copy.units.single.isWarlord, isTrue);
 
     // L'originale n'est pas affectée par la copie.
     final original = await repository.getArmy(sourceId);
     expect(original!.units, hasLength(1));
+    expect(original.units.single.isWarlord, isTrue);
   });
 
   test('duplicating an unknown army returns null', () async {

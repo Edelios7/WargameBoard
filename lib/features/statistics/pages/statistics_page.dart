@@ -100,7 +100,7 @@ class StatisticsPage extends ConsumerWidget {
                         ),
                         _StatTile(
                           label: l10n.statsWinRate,
-                          value: battleStats == null
+                          value: battleStats == null || battleStats.totalGames == 0
                               ? '—'
                               : '${(battleStats.winRate * 100).round()} %',
                         ),

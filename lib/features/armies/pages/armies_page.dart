@@ -10,6 +10,7 @@ import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/decor_separator.dart';
+import '../../../core/widgets/discard_guard.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/datasheet_details.dart';
@@ -2346,6 +2347,8 @@ class _DuplicateArmyDialogState extends ConsumerState<_DuplicateArmyDialog> {
     super.dispose();
   }
 
+  bool get _hasUnsavedInput => _nameController.text.trim().isNotEmpty;
+
   Future<void> _duplicate() async {
     final l10n = AppLocalizations.of(context)!;
     final name = _nameController.text.trim().isEmpty
@@ -2369,59 +2372,69 @@ class _DuplicateArmyDialogState extends ConsumerState<_DuplicateArmyDialog> {
 
     return AppDialogShortcuts(
       onEnter: _duplicate,
-      child: Dialog(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: SizedBox(
-            width: 380,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(l10n.armyBuilderDuplicate, style: AppTextStyles.title),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: _nameController,
-                  autofocus: true,
-                  style: AppTextStyles.body,
-                  onSubmitted: (_) => _duplicate(),
-                  decoration: InputDecoration(
-                    labelText: l10n.armyBuilderDuplicateNameLabel,
-                    hintText: l10n.armyBuilderDuplicateSuffix(widget.army.name),
-                    hintStyle: AppTextStyles.caption,
-                    labelStyle: AppTextStyles.caption,
-                    filled: true,
-                    fillColor: AppColors.background,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
+      child: DiscardGuardScope(
+        hasUnsavedInput: () => _hasUnsavedInput,
+        child: Dialog(
+          backgroundColor: AppColors.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: SizedBox(
+              width: 380,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.armyBuilderDuplicate, style: AppTextStyles.title),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: _nameController,
+                    autofocus: true,
+                    style: AppTextStyles.body,
+                    onSubmitted: (_) => _duplicate(),
+                    decoration: InputDecoration(
+                      labelText: l10n.armyBuilderDuplicateNameLabel,
+                      hintText: l10n.armyBuilderDuplicateSuffix(
+                        widget.army.name,
+                      ),
+                      hintStyle: AppTextStyles.caption,
+                      labelStyle: AppTextStyles.caption,
+                      filled: true,
+                      fillColor: AppColors.background,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text(
-                        l10n.armyBuilderCancel,
-                        style: AppTextStyles.body,
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => DiscardGuard.popIfConfirmed(
+                          context,
+                          () => _hasUnsavedInput,
+                        ),
+                        child: Text(
+                          l10n.armyBuilderCancel,
+                          style: AppTextStyles.body,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                      const SizedBox(width: 8),
+                      FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                        ),
+                        onPressed: _duplicate,
+                        child: Text(l10n.armyBuilderDuplicate),
                       ),
-                      onPressed: _duplicate,
-                      child: Text(l10n.armyBuilderDuplicate),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

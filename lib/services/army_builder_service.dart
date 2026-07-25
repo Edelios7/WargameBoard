@@ -9,9 +9,12 @@ class ArmyBuilderService {
   const ArmyBuilderService(this.repository);
 
   /// Duplique une armée existante (même faction/détachement/limite de
-  /// points) sous un nouveau nom, avec toutes ses unités et leurs
-  /// enhancements. Retourne l'id de la nouvelle armée, ou `null` si
-  /// l'armée source n'existe pas.
+  /// points) sous un nouveau nom, avec toutes ses unités, leurs
+  /// enhancements, leur équipement choisi, le porte-étendard et les
+  /// notes — sinon dupliquer une liste déjà personnalisée la ferait
+  /// repartir de zéro sur tout sauf le squelette d'unités/points.
+  /// Retourne l'id de la nouvelle armée, ou `null` si l'armée source
+  /// n'existe pas.
   Future<String?> duplicateArmy(String armyId, String newName) async {
     final source = await repository.getArmy(armyId);
     if (source == null) return null;
@@ -32,6 +35,24 @@ class ArmyBuilderService {
       if (unit.enhancementId != null) {
         await repository.setUnitEnhancement(newUnitId, unit.enhancementId);
       }
+      final selections = await repository.getUnitEquipmentSelections(
+        unit.id,
+      );
+      for (final entry in selections.entries) {
+        if (entry.value.isEmpty) continue;
+        await repository.setUnitEquipmentSelection(
+          newUnitId,
+          entry.key,
+          entry.value,
+        );
+      }
+      if (unit.isWarlord) {
+        await repository.setWarlord(newArmyId, newUnitId);
+      }
+    }
+
+    if (source.notes != null) {
+      await repository.updateNotes(newArmyId, source.notes);
     }
 
     return newArmyId;
