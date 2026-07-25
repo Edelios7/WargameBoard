@@ -41,7 +41,6 @@ class _AddCollectionEntryDialogState
   );
   final _quantityController = TextEditingController(text: '1');
   final _notesController = TextEditingController();
-  final _priceController = TextEditingController();
 
   @override
   void initState() {
@@ -55,7 +54,6 @@ class _AddCollectionEntryDialogState
     _searchController.dispose();
     _quantityController.dispose();
     _notesController.dispose();
-    _priceController.dispose();
     super.dispose();
   }
 
@@ -96,9 +94,6 @@ class _AddCollectionEntryDialogState
       await repository.addEntry(
         datasheetId: selected.id,
         quantity: quantity,
-        purchasePrice: double.tryParse(
-          _priceController.text.trim().replaceAll(',', '.'),
-        ),
       );
       ref.invalidate(collectionEntriesProvider);
       ref.invalidate(collectionSummaryProvider);
@@ -231,30 +226,6 @@ class _AddCollectionEntryDialogState
                                 _selected == null ? null : _add(),
                             decoration: InputDecoration(
                               labelText: l10n.wishlistNotesDialogLabel,
-                              labelStyle: AppTextStyles.caption,
-                              filled: true,
-                              fillColor: AppColors.background,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                      if (!widget.wishlist) ...[
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: TextField(
-                            controller: _priceController,
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                            style: AppTextStyles.body,
-                            onSubmitted: (_) =>
-                                _selected == null ? null : _add(),
-                            decoration: InputDecoration(
-                              labelText: l10n.collectionPriceDialogLabel,
                               labelStyle: AppTextStyles.caption,
                               filled: true,
                               fillColor: AppColors.background,
