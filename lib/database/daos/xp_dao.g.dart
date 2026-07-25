@@ -7,6 +7,7 @@ mixin _$XpDaoMixin on DatabaseAccessor<AppDatabase> {
   $XpCategoryTotalsTable get xpCategoryTotals =>
       attachedDatabase.xpCategoryTotals;
   $XpFactionTotalsTable get xpFactionTotals => attachedDatabase.xpFactionTotals;
+  $XpMilestonesTable get xpMilestones => attachedDatabase.xpMilestones;
   $FactionsTable get factions => attachedDatabase.factions;
   XpDaoManager get managers => XpDaoManager(this);
 }
@@ -24,6 +25,8 @@ class XpDaoManager {
         _db.attachedDatabase,
         _db.xpFactionTotals,
       );
+  $$XpMilestonesTableTableManager get xpMilestones =>
+      $$XpMilestonesTableTableManager(_db.attachedDatabase, _db.xpMilestones);
   $$FactionsTableTableManager get factions =>
       $$FactionsTableTableManager(_db.attachedDatabase, _db.factions);
 }

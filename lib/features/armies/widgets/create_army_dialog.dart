@@ -22,6 +22,7 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
   final _pointsLimitController = TextEditingController();
   String? _factionId;
   String? _detachmentId;
+  bool _submitting = false;
 
   @override
   void dispose() {
@@ -35,6 +36,8 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
   Future<void> _create() async {
     final factionId = _factionId;
     if (_nameController.text.trim().isEmpty || factionId == null) return;
+    if (_submitting) return;
+    _submitting = true;
 
     final armyId = await ref
         .read(armyRepositoryProvider)

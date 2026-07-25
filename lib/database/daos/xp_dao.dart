@@ -5,10 +5,13 @@ import '../app_database.dart';
 import '../tables/factions_table.dart';
 import '../tables/xp_category_totals_table.dart';
 import '../tables/xp_faction_totals_table.dart';
+import '../tables/xp_milestones_table.dart';
 
 part 'xp_dao.g.dart';
 
-@DriftAccessor(tables: [XpCategoryTotals, XpFactionTotals, Factions])
+@DriftAccessor(
+  tables: [XpCategoryTotals, XpFactionTotals, XpMilestones, Factions],
+)
 class XpDao extends DatabaseAccessor<AppDatabase> with _$XpDaoMixin {
   XpDao(AppDatabase db) : super(db);
 
@@ -51,6 +54,23 @@ class XpDao extends DatabaseAccessor<AppDatabase> with _$XpDaoMixin {
         xp: Value(current + delta),
       ),
     );
+  }
+
+  /// Vérifie/marque un jalon XP "une seule fois, tous historiques
+  /// confondus" (ex. "première armée") — persistant, contrairement à un
+  /// `COUNT(*)` sur des lignes qui peuvent être supprimées puis
+  /// recréées.
+  Future<bool> hasMilestone(String key) async {
+    final row = await (select(
+      xpMilestones,
+    )..where((t) => t.key.equals(key))).getSingleOrNull();
+    return row != null;
+  }
+
+  Future<void> markMilestone(String key) async {
+    await into(
+      xpMilestones,
+    ).insertOnConflictUpdate(XpMilestonesCompanion.insert(key: key));
   }
 
   Future<bool> hasFactionXp(String factionId) async {

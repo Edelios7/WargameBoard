@@ -158,6 +158,26 @@ class BattleRepository {
     return database.battleDao.getEvents(battleId);
   }
 
+  /// Dépense des CP et journalise l'événement en une seule opération
+  /// atomique — voir [BattleDao.spendCommandPoints].
+  Future<void> spendCommandPoints(
+    String battleId, {
+    required bool mine,
+    required int amount,
+    required String label,
+    int? round,
+    BattlePhase? phase,
+  }) {
+    return database.battleDao.spendCommandPoints(
+      battleId,
+      mine: mine,
+      amount: amount,
+      label: label,
+      round: round,
+      phase: phase,
+    );
+  }
+
   /// Annule un événement du journal — voir [BattleDao.deleteEvent].
   Future<void> deleteEvent(String eventId) {
     return database.battleDao.deleteEvent(eventId);

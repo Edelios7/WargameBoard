@@ -424,4 +424,39 @@ void main() {
       },
     );
   });
+
+  test(
+    'two concurrent spendCommandPoints calls both apply and both log, '
+    'instead of one silently overwriting the other',
+    () async {
+      final id = await database.battleDao.startBattle(opponentName: 'Marc');
+      await database.battleDao.updateLiveState(
+        id,
+        myCommandPoints: const Value(3),
+      );
+
+      // Deux dépenses de 1 CP lancées avant que l'une n'ait fini d'écrire
+      // (double-clic, ou deux stratagèmes cliqués coup sur coup) doivent
+      // se sérialiser : le total final doit refléter les DEUX dépenses,
+      // pas une seule appliquée deux fois en journal.
+      await Future.wait([
+        database.battleDao.spendCommandPoints(
+          id,
+          mine: true,
+          amount: 1,
+          label: 'Stratagème A',
+        ),
+        database.battleDao.spendCommandPoints(
+          id,
+          mine: true,
+          amount: 1,
+          label: 'Stratagème B',
+        ),
+      ]);
+
+      final battle = await database.battleDao.getActiveBattle();
+      expect(battle!.myCommandPoints, 1);
+      expect(await database.battleDao.getEvents(id), hasLength(2));
+    },
+  );
 }

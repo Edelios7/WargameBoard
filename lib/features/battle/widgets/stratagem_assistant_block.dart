@@ -127,7 +127,7 @@ class StratagemAssistantBlock extends ConsumerWidget {
   }
 }
 
-class _StratagemTile extends ConsumerWidget {
+class _StratagemTile extends ConsumerStatefulWidget {
   final BattleDetails battle;
   final StratagemOption stratagem;
   final Color accentColor;
@@ -140,31 +140,45 @@ class _StratagemTile extends ConsumerWidget {
     required this.mine,
   });
 
-  Future<void> _use(WidgetRef ref) async {
+  @override
+  ConsumerState<_StratagemTile> createState() => _StratagemTileState();
+}
+
+class _StratagemTileState extends ConsumerState<_StratagemTile> {
+  bool _pending = false;
+
+  Future<void> _use() async {
+    if (_pending) return;
+    setState(() => _pending = true);
+    final battle = widget.battle;
+    final stratagem = widget.stratagem;
+    final mine = widget.mine;
     final repo = ref.read(battleRepositoryProvider);
-    final current = mine
-        ? (battle.myCommandPoints ?? 0)
-        : (battle.opponentCommandPoints ?? 0);
-    final next = (current - stratagem.commandPoints).clamp(0, 1 << 30);
-    await repo.updateLiveState(
+    // Relit le total de CP depuis la base au moment de l'écriture (pas la
+    // valeur figée dans `battle` au dernier build) — voir
+    // BattleDao.spendCommandPoints : un double-clic ou deux stratagèmes
+    // cliqués coup sur coup se sérialisent alors correctement au lieu de
+    // n'appliquer qu'une seule des deux déductions tout en journalisant
+    // les deux.
+    await repo.spendCommandPoints(
       battle.id,
-      myCommandPoints: mine ? Value(next) : const Value.absent(),
-      opponentCommandPoints: mine ? const Value.absent() : Value(next),
-    );
-    await repo.logEvent(
-      battle.id,
+      mine: mine,
+      amount: stratagem.commandPoints,
       label: stratagem.name,
-      cpDelta: mine ? -stratagem.commandPoints : null,
-      opponentCpDelta: mine ? null : -stratagem.commandPoints,
       round: battle.currentRound,
       phase: battle.currentPhase,
     );
     ref.invalidate(activeBattleProvider);
     ref.invalidate(battleEventsProvider(battle.id));
+    if (mounted) setState(() => _pending = false);
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final battle = widget.battle;
+    final stratagem = widget.stratagem;
+    final accentColor = widget.accentColor;
+    final mine = widget.mine;
     final l10n = AppLocalizations.of(context)!;
     final availableCp = mine
         ? (battle.myCommandPoints ?? 0)
@@ -219,7 +233,7 @@ class _StratagemTile extends ConsumerWidget {
               if (mine)
                 FilledButton(
                   style: FilledButton.styleFrom(backgroundColor: accentColor),
-                  onPressed: canAfford ? () => _use(ref) : null,
+                  onPressed: canAfford && !_pending ? _use : null,
                   child: Text(l10n.battleStratagemUse(stratagem.commandPoints)),
                 ),
             ],

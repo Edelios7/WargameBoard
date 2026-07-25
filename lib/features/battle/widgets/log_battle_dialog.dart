@@ -31,6 +31,7 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
   BattleResult? _result = BattleResult.victory;
   BattleType _type = BattleType.matched;
   DateTime _playedAt = DateTime.now();
+  bool _submitting = false;
 
   @override
   void dispose() {
@@ -70,6 +71,8 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
   }
 
   Future<void> _save() async {
+    if (_submitting) return;
+    _submitting = true;
     await ref
         .read(battleRepositoryProvider)
         .addBattle(
@@ -303,6 +306,10 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
                         DropdownMenuItem(
                           value: BattleType.narrative,
                           child: Text(l10n.battleTypeNarrative),
+                        ),
+                        DropdownMenuItem(
+                          value: BattleType.crusade,
+                          child: Text(l10n.battleTypeCrusade),
                         ),
                         DropdownMenuItem(
                           value: BattleType.tournament,

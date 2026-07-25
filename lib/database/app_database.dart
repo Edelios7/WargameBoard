@@ -63,6 +63,7 @@ import 'tables/projects_table.dart';
 
 import 'tables/xp_category_totals_table.dart';
 import 'tables/xp_faction_totals_table.dart';
+import 'tables/xp_milestones_table.dart';
 
 // =========================
 // DAO
@@ -157,6 +158,7 @@ part 'app_database.g.dart';
     // ===== XP =====
     XpCategoryTotals,
     XpFactionTotals,
+    XpMilestones,
   ],
   daos: [
     GameSystemDao,
@@ -208,7 +210,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 19;
+  int get schemaVersion => 20;
 
   // =========================
   // Migrations
@@ -381,6 +383,23 @@ class AppDatabase extends _$AppDatabase {
       if (from < 19) {
         if (!await _hasTable('favorite_datasheets')) {
           await m.createTable(favoriteDatasheets);
+        }
+      }
+      if (from < 20) {
+        if (!await _hasTable('xp_milestones')) {
+          await m.createTable(xpMilestones);
+        }
+        // Si des armées existent déjà, le bonus XP "première armée" a
+        // nécessairement déjà été accordé sous l'ancienne logique
+        // (comptage live) — on marque le jalon pour ne pas le recréditer
+        // à la prochaine armée créée.
+        final existingArmies = await customSelect(
+          'SELECT COUNT(*) AS c FROM armies',
+        ).getSingle();
+        if ((existingArmies.data['c'] as int) > 0) {
+          await into(xpMilestones).insertOnConflictUpdate(
+            XpMilestonesCompanion.insert(key: 'first_army'),
+          );
         }
       }
     },

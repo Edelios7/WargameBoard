@@ -389,6 +389,53 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
         .toList();
   }
 
+  /// Dépense des CP (ex. coût d'un stratagème) et journalise l'événement
+  /// en une seule opération transactionnelle : relit le total actuel
+  /// depuis la base juste avant d'écrire, plutôt que de faire confiance à
+  /// une valeur passée par l'appelant — deux appels concurrents (double
+  /// clic, deux stratagèmes coup sur coup avant que l'UI ne se
+  /// reconstruise) se sérialisent alors correctement au lieu d'écraser le
+  /// même total et de journaliser deux dépenses pour une seule déduction
+  /// réellement appliquée.
+  Future<void> spendCommandPoints(
+    String battleId, {
+    required bool mine,
+    required int amount,
+    required String label,
+    int? round,
+    BattlePhase? phase,
+  }) async {
+    await transaction(() async {
+      final battle = await (select(
+        battles,
+      )..where((t) => t.id.equals(battleId))).getSingle();
+
+      final current = mine
+          ? (battle.myCommandPoints ?? 0)
+          : (battle.opponentCommandPoints ?? 0);
+      final next = (current - amount).clamp(0, 1 << 30);
+
+      await (update(battles)..where((t) => t.id.equals(battleId))).write(
+        BattlesCompanion(
+          myCommandPoints: mine ? Value(next) : const Value.absent(),
+          opponentCommandPoints: mine ? const Value.absent() : Value(next),
+        ),
+      );
+
+      await into(battleEvents).insert(
+        BattleEventsCompanion.insert(
+          id: _uuid.v4(),
+          battleId: battleId,
+          round: Value(round),
+          phase: Value(phase),
+          label: label,
+          cpDelta: mine ? Value(-amount) : const Value.absent(),
+          opponentCpDelta: mine ? const Value.absent() : Value(-amount),
+        ),
+      );
+    });
+  }
+
   /// Supprime un événement du journal ("annuler") — si l'événement portait
   /// une variation de CP (mienne et/ou adverse), la variation est
   /// annulée en sens inverse sur la partie en cours, bornée à 0.

@@ -114,10 +114,13 @@ class XpService {
   }
 
   /// Création de la toute première armée (une seule fois, tous historiques
-  /// confondus).
+  /// confondus — un jalon persistant, pas un `COUNT(*)` live : celui-ci
+  /// retomberait à 1 après une suppression puis recréation, ce qui
+  /// permettait de récupérer le bonus à l'infini).
   Future<void> awardFirstArmyIfNeeded(String factionId) async {
-    final count = await database.armyDao.countArmies();
-    if (count != 1) return; // l'armée vient d'être insérée : count == 1
+    const milestone = 'first_army';
+    if (await database.xpDao.hasMilestone(milestone)) return;
+    await database.xpDao.markMilestone(milestone);
     await _award(
       category: XpCategory.collection,
       amount: collectionXpFirstArmy,

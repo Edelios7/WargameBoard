@@ -20033,6 +20033,221 @@ class XpFactionTotalsCompanion extends UpdateCompanion<XpFactionTotal> {
   }
 }
 
+class $XpMilestonesTable extends XpMilestones
+    with TableInfo<$XpMilestonesTable, XpMilestone> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $XpMilestonesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  @override
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _achievedAtMeta = const VerificationMeta(
+    'achievedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> achievedAt = GeneratedColumn<DateTime>(
+    'achieved_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [key, achievedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'xp_milestones';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<XpMilestone> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('key')) {
+      context.handle(
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyMeta);
+    }
+    if (data.containsKey('achieved_at')) {
+      context.handle(
+        _achievedAtMeta,
+        achievedAt.isAcceptableOrUnknown(data['achieved_at']!, _achievedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {key};
+  @override
+  XpMilestone map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return XpMilestone(
+      key: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}key'],
+      )!,
+      achievedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}achieved_at'],
+      )!,
+    );
+  }
+
+  @override
+  $XpMilestonesTable createAlias(String alias) {
+    return $XpMilestonesTable(attachedDatabase, alias);
+  }
+}
+
+class XpMilestone extends DataClass implements Insertable<XpMilestone> {
+  final String key;
+  final DateTime achievedAt;
+  const XpMilestone({required this.key, required this.achievedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['key'] = Variable<String>(key);
+    map['achieved_at'] = Variable<DateTime>(achievedAt);
+    return map;
+  }
+
+  XpMilestonesCompanion toCompanion(bool nullToAbsent) {
+    return XpMilestonesCompanion(
+      key: Value(key),
+      achievedAt: Value(achievedAt),
+    );
+  }
+
+  factory XpMilestone.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return XpMilestone(
+      key: serializer.fromJson<String>(json['key']),
+      achievedAt: serializer.fromJson<DateTime>(json['achievedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'key': serializer.toJson<String>(key),
+      'achievedAt': serializer.toJson<DateTime>(achievedAt),
+    };
+  }
+
+  XpMilestone copyWith({String? key, DateTime? achievedAt}) => XpMilestone(
+    key: key ?? this.key,
+    achievedAt: achievedAt ?? this.achievedAt,
+  );
+  XpMilestone copyWithCompanion(XpMilestonesCompanion data) {
+    return XpMilestone(
+      key: data.key.present ? data.key.value : this.key,
+      achievedAt: data.achievedAt.present
+          ? data.achievedAt.value
+          : this.achievedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('XpMilestone(')
+          ..write('key: $key, ')
+          ..write('achievedAt: $achievedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(key, achievedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is XpMilestone &&
+          other.key == this.key &&
+          other.achievedAt == this.achievedAt);
+}
+
+class XpMilestonesCompanion extends UpdateCompanion<XpMilestone> {
+  final Value<String> key;
+  final Value<DateTime> achievedAt;
+  final Value<int> rowid;
+  const XpMilestonesCompanion({
+    this.key = const Value.absent(),
+    this.achievedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  XpMilestonesCompanion.insert({
+    required String key,
+    this.achievedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : key = Value(key);
+  static Insertable<XpMilestone> custom({
+    Expression<String>? key,
+    Expression<DateTime>? achievedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (key != null) 'key': key,
+      if (achievedAt != null) 'achieved_at': achievedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  XpMilestonesCompanion copyWith({
+    Value<String>? key,
+    Value<DateTime>? achievedAt,
+    Value<int>? rowid,
+  }) {
+    return XpMilestonesCompanion(
+      key: key ?? this.key,
+      achievedAt: achievedAt ?? this.achievedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
+    if (achievedAt.present) {
+      map['achieved_at'] = Variable<DateTime>(achievedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('XpMilestonesCompanion(')
+          ..write('key: $key, ')
+          ..write('achievedAt: $achievedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -20112,6 +20327,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $XpFactionTotalsTable xpFactionTotals = $XpFactionTotalsTable(
     this,
   );
+  late final $XpMilestonesTable xpMilestones = $XpMilestonesTable(this);
   late final GameSystemDao gameSystemDao = GameSystemDao(this as AppDatabase);
   late final FactionDao factionDao = FactionDao(this as AppDatabase);
   late final AbilityDao abilityDao = AbilityDao(this as AppDatabase);
@@ -20171,6 +20387,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     projects,
     xpCategoryTotals,
     xpFactionTotals,
+    xpMilestones,
   ];
 }
 
@@ -30688,6 +30905,151 @@ typedef $$XpFactionTotalsTableProcessedTableManager =
       XpFactionTotal,
       PrefetchHooks Function()
     >;
+typedef $$XpMilestonesTableCreateCompanionBuilder =
+    XpMilestonesCompanion Function({
+      required String key,
+      Value<DateTime> achievedAt,
+      Value<int> rowid,
+    });
+typedef $$XpMilestonesTableUpdateCompanionBuilder =
+    XpMilestonesCompanion Function({
+      Value<String> key,
+      Value<DateTime> achievedAt,
+      Value<int> rowid,
+    });
+
+class $$XpMilestonesTableFilterComposer
+    extends Composer<_$AppDatabase, $XpMilestonesTable> {
+  $$XpMilestonesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get achievedAt => $composableBuilder(
+    column: $table.achievedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$XpMilestonesTableOrderingComposer
+    extends Composer<_$AppDatabase, $XpMilestonesTable> {
+  $$XpMilestonesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get achievedAt => $composableBuilder(
+    column: $table.achievedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$XpMilestonesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $XpMilestonesTable> {
+  $$XpMilestonesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get achievedAt => $composableBuilder(
+    column: $table.achievedAt,
+    builder: (column) => column,
+  );
+}
+
+class $$XpMilestonesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $XpMilestonesTable,
+          XpMilestone,
+          $$XpMilestonesTableFilterComposer,
+          $$XpMilestonesTableOrderingComposer,
+          $$XpMilestonesTableAnnotationComposer,
+          $$XpMilestonesTableCreateCompanionBuilder,
+          $$XpMilestonesTableUpdateCompanionBuilder,
+          (
+            XpMilestone,
+            BaseReferences<_$AppDatabase, $XpMilestonesTable, XpMilestone>,
+          ),
+          XpMilestone,
+          PrefetchHooks Function()
+        > {
+  $$XpMilestonesTableTableManager(_$AppDatabase db, $XpMilestonesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$XpMilestonesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$XpMilestonesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$XpMilestonesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> key = const Value.absent(),
+                Value<DateTime> achievedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => XpMilestonesCompanion(
+                key: key,
+                achievedAt: achievedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String key,
+                Value<DateTime> achievedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => XpMilestonesCompanion.insert(
+                key: key,
+                achievedAt: achievedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$XpMilestonesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $XpMilestonesTable,
+      XpMilestone,
+      $$XpMilestonesTableFilterComposer,
+      $$XpMilestonesTableOrderingComposer,
+      $$XpMilestonesTableAnnotationComposer,
+      $$XpMilestonesTableCreateCompanionBuilder,
+      $$XpMilestonesTableUpdateCompanionBuilder,
+      (
+        XpMilestone,
+        BaseReferences<_$AppDatabase, $XpMilestonesTable, XpMilestone>,
+      ),
+      XpMilestone,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -30782,4 +31144,6 @@ class $AppDatabaseManager {
       $$XpCategoryTotalsTableTableManager(_db, _db.xpCategoryTotals);
   $$XpFactionTotalsTableTableManager get xpFactionTotals =>
       $$XpFactionTotalsTableTableManager(_db, _db.xpFactionTotals);
+  $$XpMilestonesTableTableManager get xpMilestones =>
+      $$XpMilestonesTableTableManager(_db, _db.xpMilestones);
 }

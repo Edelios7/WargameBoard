@@ -34,6 +34,7 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
   String? _opponentArmyId;
   String? _opponentFactionId;
   BattleType _type = BattleType.matched;
+  bool _submitting = false;
 
   @override
   void dispose() {
@@ -80,6 +81,8 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
   }
 
   Future<void> _start() async {
+    if (_submitting) return;
+    _submitting = true;
     final id = await ref
         .read(battleRepositoryProvider)
         .startBattle(
