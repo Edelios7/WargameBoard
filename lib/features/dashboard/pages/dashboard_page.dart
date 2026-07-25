@@ -8,6 +8,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../core/widgets/donut_chart.dart';
+import '../../../core/widgets/hoverable.dart';
 import '../../../core/widgets/textured_button.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/battle_details.dart';
@@ -613,11 +614,25 @@ class _StatTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  value,
-                  style: AppTextStyles.heading,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 220),
+                  transitionBuilder: (child, animation) => FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, .2),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    ),
+                  ),
+                  child: Text(
+                    value,
+                    key: ValueKey(value),
+                    style: AppTextStyles.heading,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -884,63 +899,70 @@ class _ArmyRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Material(
-      color: AppColors.surface,
+    return Hoverable(
       borderRadius: BorderRadius.circular(10),
-      child: InkWell(
+      child: Material(
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(10),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Row(
-            children: [
-              FactionBadgeIcon(
-                factionName: army.factionName,
-                factionId: army.factionId,
-                size: 36,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      army.name,
-                      style: AppTextStyles.body,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(army.factionName, style: AppTextStyles.caption),
-                  ],
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onTap,
+          hoverColor: AppColors.primary.withValues(alpha: .06),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              children: [
+                FactionBadgeIcon(
+                  factionName: army.factionName,
+                  factionId: army.factionId,
+                  size: 36,
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color:
-                      (army.hasValidationErrors
-                              ? AppColors.error
-                              : AppColors.success)
-                          .withValues(alpha: .14),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  army.hasValidationErrors
-                      ? l10n.dashboardArmyStatusWarning
-                      : l10n.dashboardArmyStatusOk,
-                  style: AppTextStyles.eyebrow.copyWith(
-                    color: army.hasValidationErrors
-                        ? AppColors.error
-                        : AppColors.success,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        army.name,
+                        style: AppTextStyles.body,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(army.factionName, style: AppTextStyles.caption),
+                    ],
                   ),
                 ),
-              ),
-            ],
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color:
+                        (army.hasValidationErrors
+                                ? AppColors.error
+                                : AppColors.success)
+                            .withValues(alpha: .14),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    army.hasValidationErrors
+                        ? l10n.dashboardArmyStatusWarning
+                        : l10n.dashboardArmyStatusOk,
+                    style: AppTextStyles.eyebrow.copyWith(
+                      color: army.hasValidationErrors
+                          ? AppColors.error
+                          : AppColors.success,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1428,41 +1450,45 @@ class _QuickActionsCard extends StatelessWidget {
     required VoidCallback onTap,
     required bool opensDialog,
   }) {
-    return Material(
-      color: AppColors.surface,
+    return Hoverable(
       borderRadius: BorderRadius.circular(10),
-      child: InkWell(
+      child: Material(
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(10),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, size: 16, color: AppColors.primary),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  label,
-                  style: AppTextStyles.body,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onTap,
+          hoverColor: AppColors.primary.withValues(alpha: .06),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, size: 16, color: AppColors.primary),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: AppTextStyles.body,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-              // Chevron = navigue vers un autre écran ; carré = ouvre une
-              // fenêtre à remplir sans quitter le Dashboard — pour ne pas
-              // laisser croire que les quatre actions se comportent pareil.
-              Icon(
-                opensDialog
-                    ? Icons.open_in_new_rounded
-                    : Icons.chevron_right_rounded,
-                size: opensDialog ? 15 : 18,
-                color: AppColors.textSecondary,
-              ),
-            ],
+                // Chevron = navigue vers un autre écran ; carré = ouvre une
+                // fenêtre à remplir sans quitter le Dashboard — pour ne pas
+                // laisser croire que les quatre actions se comportent pareil.
+                Icon(
+                  opensDialog
+                      ? Icons.open_in_new_rounded
+                      : Icons.chevron_right_rounded,
+                  size: opensDialog ? 15 : 18,
+                  color: AppColors.textSecondary,
+                ),
+              ],
+            ),
           ),
         ),
       ),

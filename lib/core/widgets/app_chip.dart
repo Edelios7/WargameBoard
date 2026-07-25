@@ -51,11 +51,18 @@ class AppChip extends StatelessWidget {
             ),
           ),
           if (onDeleted != null) ...[
-            const SizedBox(width: 4),
-            InkWell(
-              borderRadius: BorderRadius.circular(10),
-              onTap: onDeleted,
-              child: Icon(Icons.close_rounded, size: 13, color: color),
+            const SizedBox(width: 2),
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(10),
+                onTap: onDeleted,
+                hoverColor: color.withValues(alpha: .16),
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Icon(Icons.close_rounded, size: 13, color: color),
+                ),
+              ),
             ),
           ],
         ],

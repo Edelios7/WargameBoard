@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/back_link.dart';
 import '../../../core/widgets/retry_error_state.dart';
 import '../../../database/models/weapon_summary.dart';
 import '../../../l10n/app_localizations.dart';
@@ -42,20 +43,9 @@ class _WeaponsInventoryPageState extends ConsumerState<WeaponsInventoryPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            InkWell(
+            BackLink(
+              label: l10n.catalogBackToCatalog,
               onTap: () => Navigator.of(context).pop(),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.arrow_back_rounded,
-                      size: 16, color: AppColors.textSecondary),
-                  const SizedBox(width: 6),
-                  Text(
-                    l10n.catalogBackToCatalog,
-                    style: AppTextStyles.caption,
-                  ),
-                ],
-              ),
             ),
             const SizedBox(height: 12),
             Text(l10n.catalogWeaponsTitle, style: AppTextStyles.heading),
@@ -117,13 +107,14 @@ class _WeaponsInventoryPageState extends ConsumerState<WeaponsInventoryPage> {
                       label: l10n.catalogWeaponsFilterRanged,
                       selected: _typeFilter == _WeaponTypeFilter.ranged,
                       onTap: () => setState(
-                          () => _typeFilter = _WeaponTypeFilter.ranged),
+                        () => _typeFilter = _WeaponTypeFilter.ranged,
+                      ),
                     ),
                     _TypeChip(
                       label: l10n.catalogWeaponsFilterMelee,
                       selected: _typeFilter == _WeaponTypeFilter.melee,
-                      onTap: () => setState(
-                          () => _typeFilter = _WeaponTypeFilter.melee),
+                      onTap: () =>
+                          setState(() => _typeFilter = _WeaponTypeFilter.melee),
                     ),
                     const SizedBox(width: 4),
                     _TypeChip(
@@ -131,7 +122,8 @@ class _WeaponsInventoryPageState extends ConsumerState<WeaponsInventoryPage> {
                       selected: _missingProfileOnly,
                       accentColor: AppColors.warning,
                       onTap: () => setState(
-                          () => _missingProfileOnly = !_missingProfileOnly),
+                        () => _missingProfileOnly = !_missingProfileOnly,
+                      ),
                     ),
                   ],
                 );
@@ -139,11 +131,7 @@ class _WeaponsInventoryPageState extends ConsumerState<WeaponsInventoryPage> {
                 if (!wide) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      search,
-                      const SizedBox(height: 12),
-                      filters,
-                    ],
+                    children: [search, const SizedBox(height: 12), filters],
                   );
                 }
                 return Row(
@@ -167,9 +155,9 @@ class _WeaponsInventoryPageState extends ConsumerState<WeaponsInventoryPage> {
                 data: (weapons) {
                   final filtered = weapons.where((weapon) {
                     if (_query.isNotEmpty &&
-                        !weapon.name
-                            .toLowerCase()
-                            .contains(_query.toLowerCase())) {
+                        !weapon.name.toLowerCase().contains(
+                          _query.toLowerCase(),
+                        )) {
                       return false;
                     }
                     switch (_typeFilter) {
@@ -252,9 +240,7 @@ class _TypeChip extends StatelessWidget {
               ? accentColor.withValues(alpha: .16)
               : AppColors.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: selected ? accentColor : AppColors.border,
-          ),
+          border: Border.all(color: selected ? accentColor : AppColors.border),
         ),
         child: Text(
           label,
@@ -343,9 +329,11 @@ class _WeaponRow extends StatelessWidget {
                     TableRow(
                       children: [
                         _cell(profile.name),
-                        _cell(profile.isMelee
-                            ? l10n.weaponMelee
-                            : '${profile.range}"'),
+                        _cell(
+                          profile.isMelee
+                              ? l10n.weaponMelee
+                              : '${profile.range}"',
+                        ),
                         _cell(profile.attacks),
                         _cell('${profile.strength}'),
                         _cell('${profile.armorPenetration}'),
@@ -359,13 +347,17 @@ class _WeaponRow extends StatelessWidget {
             const SizedBox(height: 6),
             Row(
               children: [
-                const Icon(Icons.warning_amber_rounded,
-                    size: 14, color: AppColors.warning),
+                const Icon(
+                  Icons.warning_amber_rounded,
+                  size: 14,
+                  color: AppColors.warning,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   l10n.catalogWeaponsNoProfile,
-                  style:
-                      AppTextStyles.caption.copyWith(color: AppColors.warning),
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.warning,
+                  ),
                 ),
               ],
             ),

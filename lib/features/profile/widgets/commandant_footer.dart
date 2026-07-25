@@ -86,11 +86,18 @@ class CommandantFooter extends ConsumerWidget {
                 const SizedBox(height: 8),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: level?.progress ?? 0,
-                    minHeight: 5,
-                    backgroundColor: AppColors.background,
-                    valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(end: level?.progress ?? 0),
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut,
+                    builder: (context, value, _) => LinearProgressIndicator(
+                      value: value,
+                      minHeight: 5,
+                      backgroundColor: AppColors.background,
+                      valueColor: const AlwaysStoppedAnimation(
+                        AppColors.primary,
+                      ),
+                    ),
                   ),
                 ),
               ],

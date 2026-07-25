@@ -159,9 +159,8 @@ class _CollectionPageState extends ConsumerState<CollectionPage>
                         ),
                         onPressed: () => showDialog(
                           context: context,
-                          builder: (_) => AddCollectionEntryDialog(
-                            wishlist: isWishlistTab,
-                          ),
+                          builder: (_) =>
+                              AddCollectionEntryDialog(wishlist: isWishlistTab),
                         ),
                         icon: const Icon(Icons.add_rounded),
                         label: Text(
@@ -361,8 +360,9 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
     switch (_sort) {
       case _CollectionSort.nameAsc:
         sorted.sort(
-          (a, b) =>
-              a.datasheetName.toLowerCase().compareTo(b.datasheetName.toLowerCase()),
+          (a, b) => a.datasheetName.toLowerCase().compareTo(
+            b.datasheetName.toLowerCase(),
+          ),
         );
       case _CollectionSort.dateAddedDesc:
         sorted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -548,10 +548,7 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
           const SizedBox(height: 24),
         ],
         if (recent.isNotEmpty) ...[
-          Text(
-            l10n.collectionRecentAdditionsTitle,
-            style: AppTextStyles.title,
-          ),
+          Text(l10n.collectionRecentAdditionsTitle, style: AppTextStyles.title),
           const SizedBox(height: 12),
           _RecentAdditionsRow(entries: recent),
           const SizedBox(height: 24),
@@ -1616,7 +1613,9 @@ class _CollectionCard extends ConsumerWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: selectionMode && selected ? AppColors.primary : AppColors.border,
+          color: selectionMode && selected
+              ? AppColors.primary
+              : AppColors.border,
           width: selectionMode && selected ? 2 : 1,
         ),
       ),
@@ -1842,19 +1841,28 @@ class _QuantityAdjustRowState extends State<_QuantityAdjustRow> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: .18),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  numberPart,
-                  key: const Key('quantity-badge-number'),
-                  style: AppTextStyles.body.copyWith(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 18,
-                    color: AppColors.primary,
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 180),
+                transitionBuilder: (child, animation) =>
+                    ScaleTransition(scale: animation, child: child),
+                child: Container(
+                  key: ValueKey(numberPart),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: .18),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    numberPart,
+                    key: const Key('quantity-badge-number'),
+                    style: AppTextStyles.body.copyWith(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 18,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
               ),

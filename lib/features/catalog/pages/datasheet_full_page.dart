@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/back_link.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/catalog_provider.dart';
 import '../widgets/datasheet_detail_panel.dart';
@@ -24,20 +24,9 @@ class DatasheetFullPage extends ConsumerWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(28, 24, 28, 12),
-            child: InkWell(
+            child: BackLink(
+              label: l10n.commonBack,
               onTap: () => Navigator.of(context).pop(),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.arrow_back_rounded,
-                      size: 16, color: AppColors.textSecondary),
-                  const SizedBox(width: 6),
-                  Text(
-                    l10n.commonBack,
-                    style: AppTextStyles.caption,
-                  ),
-                ],
-              ),
             ),
           ),
           Expanded(

@@ -5,6 +5,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
+import '../../../core/widgets/hoverable.dart';
 import '../../../database/models/cost_bracket.dart';
 import '../../../database/models/datasheet_details.dart';
 import '../../../database/models/model_details.dart';
@@ -144,10 +145,7 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.file(
-                        imageFile,
-                        fit: BoxFit.contain,
-                      ),
+                      child: Image.file(imageFile, fit: BoxFit.contain),
                     ),
                   ),
                 ),
@@ -180,15 +178,28 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
                 children: [
                   ...visibleKeywords.map((k) => AppChip(label: k)),
                   if (sheet.keywords.length > 4)
-                    GestureDetector(
-                      onTap: () =>
-                          setState(() => _expandKeywords = !_expandKeywords),
-                      child: Text(
-                        _expandKeywords
-                            ? l10n.catalogSeeLess
-                            : l10n.catalogSeeMore,
-                        style: AppTextStyles.caption.copyWith(
-                          color: AppColors.primary,
+                    Hoverable(
+                      borderRadius: BorderRadius.circular(6),
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () => setState(
+                            () => _expandKeywords = !_expandKeywords,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 2,
+                            ),
+                            child: Text(
+                              _expandKeywords
+                                  ? l10n.catalogSeeLess
+                                  : l10n.catalogSeeMore,
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
