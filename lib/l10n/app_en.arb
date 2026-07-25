@@ -411,6 +411,13 @@
       "percent": { "type": "int" }
     }
   },
+  "collectionStatFactionsTitle": "Factions represented",
+  "collectionStatFactionsSub": "{count} entries total",
+  "@collectionStatFactionsSub": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "collectionValueTitle": "Collection value",
   "collectionValueUnquantifiedSub": "Unquantifiable",
   "collectionValueTierStarting": "Starting out",

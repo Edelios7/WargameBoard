@@ -260,4 +260,109 @@ void main() {
         await database.keywordDao.getById('kw-should-not-persist');
     expect(keyword, isNull);
   });
+
+  test(
+    'an explicitly empty "models" list does not wipe out models already '
+    'imported for that datasheet',
+    () async {
+      Map<String, dynamic> withModels() => {
+            'datasheets': [
+              {
+                'id': 'ds-test-keep-models',
+                'name': 'Keep Models Squad',
+                'factionId': seedFactionId,
+                'battlefieldRole': 'Elites',
+                'unitType': 'Infantry',
+                'models': [
+                  {
+                    'name': 'Fighter',
+                    'movement': 6,
+                    'toughness': 4,
+                    'save': 3,
+                    'wounds': 2,
+                    'leadership': 6,
+                    'objectiveControl': 1,
+                  },
+                ],
+              },
+            ],
+          };
+      Map<String, dynamic> withEmptyModels() => {
+            'datasheets': [
+              {
+                'id': 'ds-test-keep-models',
+                'name': 'Keep Models Squad',
+                'factionId': seedFactionId,
+                'battlefieldRole': 'Elites',
+                'unitType': 'Infantry',
+                'points': 90,
+                'models': <Map<String, dynamic>>[],
+              },
+            ],
+          };
+
+      await service.importJson(jsonEncode(withModels()));
+      // Un document partiel qui ne visait qu'à mettre à jour "points" mais
+      // inclut par erreur "models": [] ne doit pas purger les modèles.
+      await service.importJson(jsonEncode(withEmptyModels()));
+
+      final search = await database.datasheetDao.search('Keep Models Squad');
+      final details =
+          await database.datasheetDao.getDatasheet(search.single.id);
+      expect(details!.models, hasLength(1));
+      expect(details.models.single.toughness, 4);
+    },
+  );
+
+  test(
+    'rejects a datasheet referencing an unknown weaponId/keywordId/'
+    'abilityId instead of silently inserting an orphan link',
+    () async {
+      await expectLater(
+        service.importJson(jsonEncode({
+          'datasheets': [
+            {
+              'id': 'ds-test-orphan-weapon',
+              'name': 'Orphan Weapon Squad',
+              'factionId': seedFactionId,
+              'battlefieldRole': 'Elites',
+              'unitType': 'Infantry',
+              'models': [
+                {
+                  'name': 'Fighter',
+                  'movement': 6,
+                  'toughness': 4,
+                  'save': 3,
+                  'wounds': 2,
+                  'leadership': 6,
+                  'objectiveControl': 1,
+                },
+              ],
+              'weaponIds': ['wp-does-not-exist'],
+            },
+          ],
+        })),
+        throwsA(isA<CatalogImportException>()),
+      );
+
+      await expectLater(
+        service.importJson(jsonEncode({
+          'datasheets': [
+            {
+              'id': 'ds-test-orphan-keyword',
+              'name': 'Orphan Keyword Squad',
+              'factionId': seedFactionId,
+              'battlefieldRole': 'Elites',
+              'unitType': 'Infantry',
+              'keywordIds': ['kw-does-not-exist'],
+            },
+          ],
+        })),
+        throwsA(isA<CatalogImportException>()),
+      );
+
+      final search = await database.datasheetDao.search('Orphan');
+      expect(search, isEmpty);
+    },
+  );
 }

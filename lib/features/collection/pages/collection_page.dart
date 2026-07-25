@@ -763,8 +763,6 @@ class _OverviewStatsRow extends StatelessWidget {
         ? 0
         : (summary!.paintedRatio * 100).round();
 
-    final valueTier = _valueTier(l10n, summary?.totalValue ?? 0);
-
     final resultLabel = switch (lastBattle?.result) {
       BattleResult.victory => l10n.battleResultVictory,
       BattleResult.defeat => l10n.battleResultDefeat,
@@ -804,9 +802,9 @@ class _OverviewStatsRow extends StatelessWidget {
             ),
             _StatTile(
               icon: Icons.diamond_outlined,
-              label: l10n.collectionValueTitle,
-              value: valueTier,
-              sublabel: l10n.collectionValueUnquantifiedSub,
+              label: l10n.collectionStatFactionsTitle,
+              value: quantityByFaction.length.toString(),
+              sublabel: l10n.collectionStatFactionsSub(entries.length),
             ),
             _StatTile(
               icon: Icons.sports_martial_arts_rounded,
@@ -822,13 +820,6 @@ class _OverviewStatsRow extends StatelessWidget {
         );
       },
     );
-  }
-
-  String _valueTier(AppLocalizations l10n, double totalValue) {
-    if (totalValue >= 1500) return l10n.collectionValueTierLegendary;
-    if (totalValue >= 500) return l10n.collectionValueTierEpic;
-    if (totalValue >= 100) return l10n.collectionValueTierSolid;
-    return l10n.collectionValueTierStarting;
   }
 }
 

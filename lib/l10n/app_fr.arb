@@ -411,6 +411,13 @@
       "percent": { "type": "int" }
     }
   },
+  "collectionStatFactionsTitle": "Factions représentées",
+  "collectionStatFactionsSub": "{count} fiches au total",
+  "@collectionStatFactionsSub": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "collectionValueTitle": "Valeur de la collection",
   "collectionValueUnquantifiedSub": "Non quantifiable",
   "collectionValueTierStarting": "Naissante",

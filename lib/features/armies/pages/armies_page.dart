@@ -19,6 +19,7 @@ import '../../../database/models/model_details.dart';
 import '../../../database/models/weapon_details.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/army_provider.dart';
+import '../../../providers/battle_provider.dart';
 import '../../../providers/catalog_provider.dart';
 import '../../../providers/collection_provider.dart';
 import '../../../services/army_validation_service.dart';
@@ -957,6 +958,13 @@ class _BuilderTopBar extends ConsumerWidget {
                     await ref.read(armyRepositoryProvider).deleteArmy(army.id);
                     ref.read(selectedArmyIdProvider.notifier).state = null;
                     ref.invalidate(armiesListProvider);
+                    // deleteArmy annule armyId/opponentArmyId sur les
+                    // batailles qui référençaient cette armée (préserve
+                    // leur historique) — sans cette invalidation, l'onglet
+                    // Bataille/Statistiques continue d'afficher son nom
+                    // jusqu'au redémarrage de l'app (FutureProvider mis en
+                    // cache, pas autoDispose).
+                    ref.invalidate(battlesListProvider);
                     break;
                 }
               },

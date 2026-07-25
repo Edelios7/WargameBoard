@@ -152,6 +152,21 @@ class CatalogImportService {
     return value;
   }
 
+  /// Vérifie qu'une ligne d'id [id] existe dans [table] — SQLite n'a pas
+  /// de contrainte de clé étrangère active dans cette base
+  /// (`PRAGMA foreign_keys` jamais activée), donc rien d'autre n'empêche
+  /// un id mal orthographié référencé par une datasheet de s'insérer
+  /// silencieusement comme lien orphelin.
+  Future<bool> _exists(TableInfo table, String id) async {
+    final rows = await database
+        .customSelect(
+          'SELECT 1 FROM ${table.actualTableName} WHERE id = ? LIMIT 1',
+          variables: [Variable.withString(id)],
+        )
+        .get();
+    return rows.isNotEmpty;
+  }
+
   Future<int> _importKeywords(Map<String, dynamic> root) async {
     final items = _section(root, 'keywords');
     for (final item in items) {
@@ -316,8 +331,13 @@ class CatalogImportService {
       }
 
       final models = item['models'];
-      if (models is List) {
+      if (models is List && models.isNotEmpty) {
         // Le document importé fait foi : remplace les modèles existants.
+        // Une liste explicitement vide n'est PAS traitée comme "supprimer
+        // tous les modèles" — un document partiel (export buggé, JSON qui
+        // ne visait qu'à mettre à jour costs/keywordIds) ne doit jamais
+        // pouvoir purger silencieusement les profils déjà enrichis d'une
+        // fiche existante.
         final oldModels = await (database.select(database.datasheetModels)
               ..where((t) => t.datasheetId.equals(datasheetId)))
             .get();
@@ -371,6 +391,14 @@ class CatalogImportService {
         // foi, y compris pour retirer une arme qui ne devrait plus y
         // figurer.
         const modelIndex = 0;
+        for (final weaponId in weaponIds.cast<String>()) {
+          if (!await _exists(database.weapons, weaponId)) {
+            throw CatalogImportException(
+              'Arme inconnue "$weaponId" référencée par la datasheet '
+              '$datasheetId.',
+            );
+          }
+        }
         await (database.delete(database.datasheetWeapons)
               ..where((t) =>
                   t.datasheetModelId.equals('dm-$datasheetId-$modelIndex')))
@@ -394,6 +422,14 @@ class CatalogImportService {
         // Le document importé fait foi : on retire d'abord les liens
         // existants pour que les mots-clés qui en ont disparu le soient
         // aussi côté base (sinon ils restent affichés indéfiniment).
+        for (final keywordId in keywordIds.cast<String>()) {
+          if (!await _exists(database.keywords, keywordId)) {
+            throw CatalogImportException(
+              'Mot-clé inconnu "$keywordId" référencé par la datasheet '
+              '$datasheetId.',
+            );
+          }
+        }
         await (database.delete(database.datasheetKeywordLinks)
               ..where((t) => t.datasheetId.equals(datasheetId)))
             .go();
@@ -414,6 +450,14 @@ class CatalogImportService {
       if (abilityIds is List) {
         // Même logique que pour les mots-clés ci-dessus : purge avant
         // réinsertion pour refléter les suppressions du document importé.
+        for (final abilityId in abilityIds.cast<String>()) {
+          if (!await _exists(database.abilities, abilityId)) {
+            throw CatalogImportException(
+              'Capacité inconnue "$abilityId" référencée par la datasheet '
+              '$datasheetId.',
+            );
+          }
+        }
         await (database.delete(database.datasheetAbilityLinks)
               ..where((t) => t.datasheetId.equals(datasheetId)))
             .go();

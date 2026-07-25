@@ -803,6 +803,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get collectionStatFactionsTitle => 'Factions represented';
+
+  @override
+  String collectionStatFactionsSub(int count) {
+    return '$count entries total';
+  }
+
+  @override
   String get collectionValueTitle => 'Collection value';
 
   @override

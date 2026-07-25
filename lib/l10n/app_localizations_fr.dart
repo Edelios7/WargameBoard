@@ -816,6 +816,14 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get collectionStatFactionsTitle => 'Factions représentées';
+
+  @override
+  String collectionStatFactionsSub(int count) {
+    return '$count fiches au total';
+  }
+
+  @override
   String get collectionValueTitle => 'Valeur de la collection';
 
   @override

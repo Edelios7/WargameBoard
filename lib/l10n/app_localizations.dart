@@ -1532,6 +1532,18 @@ abstract class AppLocalizations {
   /// **'Peintes : {count} ({percent}%)'**
   String collectionStatModelsPaintedSub(int count, int percent);
 
+  /// No description provided for @collectionStatFactionsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Factions représentées'**
+  String get collectionStatFactionsTitle;
+
+  /// No description provided for @collectionStatFactionsSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} fiches au total'**
+  String collectionStatFactionsSub(int count);
+
   /// No description provided for @collectionValueTitle.
   ///
   /// In fr, this message translates to:
