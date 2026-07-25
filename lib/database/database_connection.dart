@@ -50,7 +50,15 @@ Future<void> _bootstrapFromSeedAsset(File databaseFile) async {
       bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes),
     );
   } catch (_) {
-    // Pas de base pré-remplie dans ce build (cas normal en dev/CI) — on
-    // laisse la migration onCreate seeder le catalogue minimal comme avant.
+    // Pas de base pré-remplie dans ce build (cas normal en dev/CI), ou
+    // écriture interrompue en cours de route (disque plein, permissions)
+    // — dans les deux cas on laisse la migration onCreate seeder le
+    // catalogue minimal comme avant, jamais un fichier à moitié écrit :
+    // sinon `databaseFile.existsSync()` redeviendrait vrai côté appelant
+    // et NativeDatabase ouvrirait ce fichier tronqué au lieu de le
+    // recréer proprement.
+    if (databaseFile.existsSync()) {
+      await databaseFile.delete();
+    }
   }
 }

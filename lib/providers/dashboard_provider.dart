@@ -34,6 +34,20 @@ class RecentlyViewedNotifier extends StateNotifier<List<String>> {
       datasheetId,
       ...state.where((id) => id != datasheetId),
     ].take(_maxRecentlyViewed).toList();
+    _setAndPersist(updated);
+  }
+
+  /// Retire des ids devenus introuvables (fiche supprimée) — appelé par
+  /// [recentlyViewedDatasheetsProvider] quand il en détecte, pour ne pas
+  /// laisser une place de l'historique bloquée indéfiniment.
+  void removeAll(List<String> ids) {
+    if (ids.isEmpty) return;
+    final updated = state.where((id) => !ids.contains(id)).toList();
+    if (updated.length == state.length) return;
+    _setAndPersist(updated);
+  }
+
+  void _setAndPersist(List<String> updated) {
     state = updated;
     ref
         .read(sharedPreferencesProvider)
@@ -53,9 +67,15 @@ final recentlyViewedDatasheetsProvider =
 
   final repository = ref.watch(catalogRepositoryProvider);
   final results = <SearchResult>[];
+  final orphanIds = <String>[];
   for (final id in ids) {
     final details = await repository.getDatasheet(id);
-    if (details == null) continue;
+    if (details == null) {
+      // Fiche supprimée/introuvable depuis : ne prend plus jamais une
+      // des 8 places de l'historique récent une fois retirée d'ici.
+      orphanIds.add(id);
+      continue;
+    }
     results.add(SearchResult(
       id: details.id,
       name: details.name,
@@ -63,6 +83,9 @@ final recentlyViewedDatasheetsProvider =
       factionId: details.factionId,
       factionName: details.factionName,
     ));
+  }
+  if (orphanIds.isNotEmpty) {
+    ref.read(recentlyViewedProvider.notifier).removeAll(orphanIds);
   }
   return results;
 });

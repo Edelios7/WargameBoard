@@ -446,6 +446,15 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
     }
 
     final filtered = _sorted(entries.where(_matches).toList());
+    // Une entrée qui sort du filtre actif (changement de faction/état/
+    // recherche pendant que le mode sélection est actif) ne doit plus
+    // compter dans "N sélectionné(s)" ni être touchée par une action
+    // groupée — sans ça, le badge et l'action groupée continuent de
+    // porter sur des entrées qu'on ne voit plus à l'écran.
+    final visibleFilteredIds = filtered.map((e) => e.id).toSet();
+    if (_selectedIds.any((id) => !visibleFilteredIds.contains(id))) {
+      _selectedIds.retainWhere(visibleFilteredIds.contains);
+    }
 
     return SingleChildScrollView(
       padding: const EdgeInsets.only(top: 16, bottom: 24),

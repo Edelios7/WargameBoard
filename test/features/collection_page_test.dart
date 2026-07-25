@@ -244,6 +244,70 @@ void main() {
   });
 
   testWidgets(
+      'an entry that drops out of the active filter while selected is no '
+      'longer counted or touched by the bulk action',
+      (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await database.collectionDao.addEntry(
+      datasheetId: 'ds-captain',
+      quantity: 3,
+    );
+    await database.collectionDao.addEntry(
+      datasheetId: 'ds-death-company-marines',
+      quantity: 5,
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    final selectionToggle = find.byIcon(Icons.checklist_rounded);
+    await tester.ensureVisible(selectionToggle);
+    await tester.pumpAndSettle();
+    await tester.tap(selectionToggle);
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.circle_outlined), findsNWidgets(2));
+    for (var i = 0; i < 2; i++) {
+      final checkbox = find.byIcon(Icons.circle_outlined).first;
+      await tester.ensureVisible(checkbox);
+      await tester.pumpAndSettle();
+      await tester.tap(checkbox);
+      await tester.pumpAndSettle();
+    }
+    expect(find.text('2 sélectionnée(s)'), findsOneWidget);
+
+    // Filtrer la recherche pour ne plus faire apparaître qu'une des deux
+    // entrées sélectionnées — l'autre doit sortir du décompte.
+    final searchField = find.byWidgetPredicate(
+      (widget) =>
+          widget is TextField &&
+          widget.decoration?.hintText == 'Rechercher dans la collection...',
+    );
+    await tester.enterText(searchField, 'Captain');
+    await tester.pumpAndSettle();
+
+    final markPaintedButton = find.text('Marquer entièrement peint');
+    await tester.ensureVisible(markPaintedButton);
+    await tester.pumpAndSettle();
+    await tester.tap(markPaintedButton);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Marquer entièrement peint').last);
+    await tester.pumpAndSettle();
+
+    final entries = await database.collectionDao.listEntries();
+    final captain = entries.singleWhere((e) => e.datasheetName == 'Captain');
+    final deathCompany = entries.singleWhere(
+      (e) => e.datasheetName == 'Death Company Marines',
+    );
+    expect(captain.painted, captain.quantity);
+    expect(deathCompany.painted, 0);
+  });
+
+  testWidgets(
       'the collection page renders without overflow on a phone-sized screen',
       (tester) async {
     tester.view.physicalSize = const Size(390, 844);

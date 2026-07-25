@@ -2324,6 +2324,25 @@ class _ArmyNotesFieldState extends ConsumerState<_ArmyNotesField> {
 
   @override
   void dispose() {
+    // Filet de rattrapage pour les fermetures qui ne font pas perdre le
+    // focus au champ avant de démonter le widget (Échap → maybePop
+    // direct, tap sur le voile derrière le dialogue) : sans ça, le texte
+    // tapé disparaît silencieusement au lieu d'être sauvegardé comme
+    // pour toute autre fermeture. Le container reste valide après la
+    // destruction du widget (contrairement à `ref`), donc on le capture
+    // ici pour que l'écriture puisse se terminer une fois le dialogue
+    // déjà fermé.
+    final text = _controller.text.trim();
+    if (text != (widget.initialNotes ?? '')) {
+      final container = ProviderScope.containerOf(context, listen: false);
+      container
+          .read(armyRepositoryProvider)
+          .updateNotes(widget.armyId, text.isEmpty ? null : text)
+          .then((_) {
+        container.invalidate(selectedArmyProvider);
+        container.invalidate(armiesListProvider);
+      });
+    }
     _focusNode.dispose();
     _controller.dispose();
     super.dispose();
