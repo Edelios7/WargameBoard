@@ -290,7 +290,7 @@ class _ArmyListPage extends ConsumerWidget {
                                             )
                                           : l10n.pointsSuffix(army.totalPoints),
                                       style: AppTextStyles.body.copyWith(
-                                        color: army.isOverLimit
+                                        color: army.hasValidationErrors
                                             ? AppColors.error
                                             : AppColors.primary,
                                         fontWeight: FontWeight.w600,

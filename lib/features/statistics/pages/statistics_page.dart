@@ -319,7 +319,7 @@ class _ArmyPointsBar extends StatelessWidget {
                 '${army.totalPoints} pts',
                 style: AppTextStyles.body.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: army.isOverLimit
+                  color: army.hasValidationErrors
                       ? AppColors.error
                       : AppColors.primary,
                 ),
@@ -333,7 +333,9 @@ class _ArmyPointsBar extends StatelessWidget {
               value: ratio.clamp(0, 1),
               minHeight: 8,
               backgroundColor: AppColors.surface,
-              color: army.isOverLimit ? AppColors.error : AppColors.primary,
+              color: army.hasValidationErrors
+                  ? AppColors.error
+                  : AppColors.primary,
             ),
           ),
         ],

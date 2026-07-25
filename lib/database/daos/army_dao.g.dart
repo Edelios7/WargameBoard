@@ -16,6 +16,13 @@ mixin _$ArmyDaoMixin on DatabaseAccessor<AppDatabase> {
   $DetachmentsTable get detachments => attachedDatabase.detachments;
   $EnhancementsTable get enhancements => attachedDatabase.enhancements;
   $StratagemsTable get stratagems => attachedDatabase.stratagems;
+  $BattlesTable get battles => attachedDatabase.battles;
+  $BattleUnitStatesTable get battleUnitStates =>
+      attachedDatabase.battleUnitStates;
+  $BattleUnitModifiersTable get battleUnitModifiers =>
+      attachedDatabase.battleUnitModifiers;
+  $BattleUnitWoundsTable get battleUnitWounds =>
+      attachedDatabase.battleUnitWounds;
   ArmyDaoManager get managers => ArmyDaoManager(this);
 }
 
@@ -51,4 +58,21 @@ class ArmyDaoManager {
       $$EnhancementsTableTableManager(_db.attachedDatabase, _db.enhancements);
   $$StratagemsTableTableManager get stratagems =>
       $$StratagemsTableTableManager(_db.attachedDatabase, _db.stratagems);
+  $$BattlesTableTableManager get battles =>
+      $$BattlesTableTableManager(_db.attachedDatabase, _db.battles);
+  $$BattleUnitStatesTableTableManager get battleUnitStates =>
+      $$BattleUnitStatesTableTableManager(
+        _db.attachedDatabase,
+        _db.battleUnitStates,
+      );
+  $$BattleUnitModifiersTableTableManager get battleUnitModifiers =>
+      $$BattleUnitModifiersTableTableManager(
+        _db.attachedDatabase,
+        _db.battleUnitModifiers,
+      );
+  $$BattleUnitWoundsTableTableManager get battleUnitWounds =>
+      $$BattleUnitWoundsTableTableManager(
+        _db.attachedDatabase,
+        _db.battleUnitWounds,
+      );
 }

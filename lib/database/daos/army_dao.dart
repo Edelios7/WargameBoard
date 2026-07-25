@@ -7,6 +7,10 @@ import '../models/cost_bracket.dart';
 import '../tables/armies_table.dart';
 import '../tables/army_unit_equipment_selections_table.dart';
 import '../tables/army_units_table.dart';
+import '../tables/battle_unit_modifiers_table.dart';
+import '../tables/battle_unit_states_table.dart';
+import '../tables/battle_unit_wounds_table.dart';
+import '../tables/battles_table.dart';
 import '../tables/datasheet_costs_table.dart';
 import '../tables/datasheets_table.dart';
 import '../tables/detachments_table.dart';
@@ -31,6 +35,10 @@ part 'army_dao.g.dart';
     Detachments,
     Enhancements,
     Stratagems,
+    Battles,
+    BattleUnitStates,
+    BattleUnitModifiers,
+    BattleUnitWounds,
   ],
 )
 class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
@@ -67,7 +75,41 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     return id;
   }
 
+  /// Supprime une armée et tout ce qui en dépend — y compris, s'il y en
+  /// a, l'état de bataille par unité (unités marquées détruites,
+  /// bonus/malus, PV) : sans base de données avec `ON DELETE CASCADE`,
+  /// laisser ces lignes en place les rendrait orphelines pour toujours
+  /// (elles référencent des `armyUnitId` qui n'existeraient plus). Les
+  /// batailles qui référençaient cette armée sont conservées dans
+  /// l'historique mais leur lien vers l'armée supprimée est retiré.
   Future<void> deleteArmy(String armyId) async {
+    final units = await (select(
+      armyUnits,
+    )..where((t) => t.armyId.equals(armyId))).get();
+
+    for (final unit in units) {
+      await (delete(
+        battleUnitStates,
+      )..where((t) => t.armyUnitId.equals(unit.id))).go();
+      await (delete(
+        battleUnitModifiers,
+      )..where((t) => t.armyUnitId.equals(unit.id))).go();
+      await (delete(
+        battleUnitWounds,
+      )..where((t) => t.armyUnitId.equals(unit.id))).go();
+    }
+
+    await (update(
+      battles,
+    )..where((t) => t.armyId.equals(armyId))).write(
+      const BattlesCompanion(armyId: Value(null)),
+    );
+    await (update(
+      battles,
+    )..where((t) => t.opponentArmyId.equals(armyId))).write(
+      const BattlesCompanion(opponentArmyId: Value(null)),
+    );
+
     await (delete(armyUnits)..where((t) => t.armyId.equals(armyId))).go();
     await (delete(armies)..where((t) => t.id.equals(armyId))).go();
   }
@@ -306,6 +348,7 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         factionName: faction.name,
         totalPoints: await _totalPoints(army.id),
         pointsLimit: army.pointsLimit,
+        enhancementsCount: await _enhancementsCount(army.id),
         updatedAt: army.updatedAt,
       ));
     }
@@ -389,6 +432,13 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
       totalPoints: totalPoints,
       pointsLimit: army.pointsLimit,
     );
+  }
+
+  Future<int> _enhancementsCount(String armyId) async {
+    final rows = await (select(
+      armyUnits,
+    )..where((t) => t.armyId.equals(armyId) & t.enhancementId.isNotNull())).get();
+    return rows.length;
   }
 
   Future<int> _totalPoints(String armyId) async {

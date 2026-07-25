@@ -207,4 +207,67 @@ void main() {
     army = await database.armyDao.getArmy(armyId);
     expect(army!.notes, isNull);
   });
+
+  test(
+    'deleteArmy also clears battle state tied to its units and unlinks '
+    'past battles, instead of leaving orphaned rows',
+    () async {
+      final armyId = await database.armyDao.createArmy(
+        name: 'Liste temporaire',
+        factionId: seedFactionId,
+      );
+      final results = await database.datasheetDao.search('Captain');
+      final unitId = await database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: results.single.id,
+        modelCount: 1,
+      );
+
+      final battleId = await database.battleDao.startBattle(
+        armyId: armyId,
+        opponentName: 'Marc',
+      );
+      await database.battleDao.setUnitDestroyed(
+        battleId,
+        unitId,
+        destroyed: true,
+      );
+
+      await database.armyDao.deleteArmy(armyId);
+
+      expect(await database.armyDao.getArmy(armyId), isNull);
+      expect(await database.battleDao.getUnitStates(battleId), isEmpty);
+
+      // La partie (toujours en "setup") reste en base, mais ne référence
+      // plus l'armée supprimée.
+      final battle = await database.battleDao.getActiveBattle();
+      expect(battle, isNotNull);
+      expect(battle!.id, battleId);
+      expect(battle.armyId, isNull);
+      expect(battle.armyName, isNull);
+    },
+  );
+
+  test(
+    'hasValidationErrors reflects both the points limit and the '
+    'enhancement-count rule, in the list summary too',
+    () async {
+      final armyId = await database.armyDao.createArmy(
+        name: 'Liste avec détachement',
+        factionId: seedFactionId,
+        detachmentId: detAngelicHost,
+      );
+      final results = await database.datasheetDao.search('Captain');
+      final unitId = await database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: results.single.id,
+        modelCount: 1,
+      );
+      await database.armyDao.setUnitEnhancement(unitId, enhDeathVisions);
+
+      final beforeLimitBreak = await database.armyDao.listArmies();
+      expect(beforeLimitBreak.single.enhancementsCount, 1);
+      expect(beforeLimitBreak.single.hasValidationErrors, isFalse);
+    },
+  );
 }

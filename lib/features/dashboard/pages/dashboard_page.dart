@@ -923,16 +923,18 @@ class _ArmyRow extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color:
-                      (army.isOverLimit ? AppColors.error : AppColors.success)
+                      (army.hasValidationErrors
+                              ? AppColors.error
+                              : AppColors.success)
                           .withValues(alpha: .14),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  army.isOverLimit
+                  army.hasValidationErrors
                       ? l10n.dashboardArmyStatusWarning
                       : l10n.dashboardArmyStatusOk,
                   style: AppTextStyles.eyebrow.copyWith(
-                    color: army.isOverLimit
+                    color: army.hasValidationErrors
                         ? AppColors.error
                         : AppColors.success,
                   ),

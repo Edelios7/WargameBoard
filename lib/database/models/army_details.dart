@@ -5,6 +5,7 @@ class ArmyListItem {
   final String factionName;
   final int totalPoints;
   final int? pointsLimit;
+  final int enhancementsCount;
   final DateTime updatedAt;
 
   const ArmyListItem({
@@ -14,10 +15,18 @@ class ArmyListItem {
     required this.factionName,
     required this.totalPoints,
     this.pointsLimit,
+    this.enhancementsCount = 0,
     required this.updatedAt,
   });
 
   bool get isOverLimit => pointsLimit != null && totalPoints > pointsLimit!;
+
+  /// `true` si l'armée enfreint une règle de composition bloquante — pas
+  /// seulement le dépassement de points, aussi la limite de 3
+  /// enhancements par liste (même seuil que
+  /// `ArmyValidationService.maxEnhancements`, dupliqué ici pour éviter
+  /// une dépendance de ce modèle de données vers la couche service).
+  bool get hasValidationErrors => isOverLimit || enhancementsCount > 3;
 }
 
 class ArmyUnitDetails {

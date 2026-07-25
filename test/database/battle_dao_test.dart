@@ -387,5 +387,41 @@ void main() {
         expect(wounds.single.modelIndex, 2);
       },
     );
+
+    test(
+      'deleteBattle also clears its per-unit state (destroyed/modifiers/'
+      'wounds), not just the events journal',
+      () async {
+        final battleId = await database.battleDao.startBattle(
+          opponentName: 'Marc',
+        );
+        final armyUnitId = await seedArmyUnit(database);
+
+        await database.battleDao.setUnitDestroyed(
+          battleId,
+          armyUnitId,
+          destroyed: true,
+        );
+        await database.battleDao.addUnitModifier(
+          battleId,
+          armyUnitId,
+          statKey: BattleStatKey.toughness,
+          delta: 1,
+        );
+        await database.battleDao.setModelWounds(
+          battleId,
+          armyUnitId,
+          1,
+          currentWounds: 1,
+          maxWounds: 3,
+        );
+
+        await database.battleDao.deleteBattle(battleId);
+
+        expect(await database.battleDao.getUnitStates(battleId), isEmpty);
+        expect(await database.battleDao.getUnitModifiers(battleId), isEmpty);
+        expect(await database.battleDao.getUnitWounds(battleId), isEmpty);
+      },
+    );
   });
 }

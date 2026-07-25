@@ -90,8 +90,21 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
     return id;
   }
 
+  /// Supprime une partie et tout ce qui lui est propre — le journal,
+  /// mais aussi l'état par unité de cette partie précise (unités
+  /// marquées détruites, bonus/malus, PV), qui resterait sinon orphelin
+  /// (aucun `ON DELETE CASCADE` en base).
   Future<void> deleteBattle(String id) async {
     await (delete(battleEvents)..where((t) => t.battleId.equals(id))).go();
+    await (delete(
+      battleUnitStates,
+    )..where((t) => t.battleId.equals(id))).go();
+    await (delete(
+      battleUnitModifiers,
+    )..where((t) => t.battleId.equals(id))).go();
+    await (delete(
+      battleUnitWounds,
+    )..where((t) => t.battleId.equals(id))).go();
     await (delete(battles)..where((t) => t.id.equals(id))).go();
   }
 
