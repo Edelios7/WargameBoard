@@ -216,12 +216,7 @@ class _NarrowCatalogLayout extends ConsumerWidget {
           child: Row(
             children: [
               Expanded(
-                child: _SearchField(
-                  hintText: l10n.catalogSearchHint,
-                  onChanged: (value) => ref
-                      .read(catalogSearchQueryProvider.notifier)
-                      .state = value,
-                ),
+                child: _CatalogSearchField(hintText: l10n.catalogSearchHint),
               ),
               const SizedBox(width: 8),
               Tooltip(
@@ -549,6 +544,7 @@ class _FiltersPanel extends ConsumerWidget {
                     ref.read(catalogEditionFilterProvider.notifier).state =
                         null;
                     ref.read(catalogPointsRangeProvider.notifier).state = null;
+                    ref.read(catalogSearchQueryProvider.notifier).state = '';
                   },
                   child: Text(
                     l10n.catalogResetFilters,
@@ -560,11 +556,7 @@ class _FiltersPanel extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 14),
-          _SearchField(
-            hintText: l10n.catalogSearchHint,
-            onChanged: (value) =>
-                ref.read(catalogSearchQueryProvider.notifier).state = value,
-          ),
+          _CatalogSearchField(hintText: l10n.catalogSearchHint),
           const SizedBox(height: 18),
           _FilterLabel(l10n.catalogFilterFaction),
           factionsAsync.when(
@@ -1160,6 +1152,79 @@ class _KeywordPickerSheetState extends State<_KeywordPickerSheet> {
   }
 }
 
+/// Champ de recherche du Catalogue, lié directement à
+/// [catalogSearchQueryProvider] : contrairement à un simple
+/// TextField(onChanged:...), il reflète aussi les changements faits
+/// ailleurs (ex. "Réinitialiser les filtres" qui vide la recherche) au
+/// lieu de garder le texte tapé affiché alors qu'il ne filtre plus rien.
+class _CatalogSearchField extends ConsumerStatefulWidget {
+  final String hintText;
+
+  const _CatalogSearchField({required this.hintText});
+
+  @override
+  ConsumerState<_CatalogSearchField> createState() =>
+      _CatalogSearchFieldState();
+}
+
+class _CatalogSearchFieldState extends ConsumerState<_CatalogSearchField> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(
+      text: ref.read(catalogSearchQueryProvider),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen<String>(catalogSearchQueryProvider, (previous, next) {
+      if (next != _controller.text) {
+        _controller.value = TextEditingValue(
+          text: next,
+          selection: TextSelection.collapsed(offset: next.length),
+        );
+      }
+    });
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: TextField(
+        controller: _controller,
+        onChanged: (value) =>
+            ref.read(catalogSearchQueryProvider.notifier).state = value,
+        style: AppTextStyles.body,
+        decoration: InputDecoration(
+          hintText: widget.hintText,
+          hintStyle: AppTextStyles.caption,
+          prefixIcon: const Icon(
+            Icons.search_rounded,
+            color: AppColors.textSecondary,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 14),
+        ),
+      ),
+    );
+  }
+}
+
+/// Champ de recherche générique, à état purement local (contrairement à
+/// [_CatalogSearchField]) — utilisé pour filtrer une petite liste déjà
+/// affichée en mémoire (ex. la liste de mots-clés d'un filtre), pas la
+/// recherche principale du Catalogue.
 class _SearchField extends StatelessWidget {
   final String hintText;
   final ValueChanged<String> onChanged;

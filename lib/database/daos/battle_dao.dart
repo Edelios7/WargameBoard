@@ -290,22 +290,42 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   /// (dés en main, écran vite tapé) n'a pas à recompter manuellement où
   /// il en était. Ne fait rien si déjà à la toute première phase du
   /// round 1 (rien à annuler).
+  ///
+  /// Supprime aussi les événements du journal déjà logués dans la phase
+  /// qu'on quitte (et annule leur variation de CP éventuelle, comme
+  /// [deleteEvent]) — sinon le round/phase affichés reviendraient en
+  /// arrière alors que des PC dépensés pendant cette phase resteraient
+  /// décomptés, désynchronisant l'affichage et le journal.
   Future<void> previousPhase(String battleId) async {
     final battle = await (select(
       battles,
     )..where((t) => t.id.equals(battleId))).getSingle();
 
-    final currentIndex = battle.currentPhase == null
-        ? 0
-        : _battlePhaseOrder.indexOf(battle.currentPhase!);
+    final currentPhase = battle.currentPhase ?? _battlePhaseOrder.first;
+    final currentIndex = _battlePhaseOrder.indexOf(currentPhase);
     final currentRound = battle.currentRound ?? 1;
     final isFirstPhase = currentIndex == 0;
     if (isFirstPhase && currentRound <= 1) return;
 
+    final eventsInLeavingPhase = await (select(battleEvents)..where(
+          (t) =>
+              t.battleId.equals(battleId) &
+              t.round.equals(currentRound) &
+              t.phase.equalsValue(currentPhase),
+        ))
+        .get();
+    // deleteEvent annule aussi la variation de CP de chaque événement
+    // supprimé, donc les PC affichés restent cohérents avec le journal.
+    for (final event in eventsInLeavingPhase) {
+      await deleteEvent(event.id);
+    }
+
     await updateLiveState(
       battleId,
       currentPhase: Value(
-        isFirstPhase ? _battlePhaseOrder.last : _battlePhaseOrder[currentIndex - 1],
+        isFirstPhase
+            ? _battlePhaseOrder.last
+            : _battlePhaseOrder[currentIndex - 1],
       ),
       currentRound: isFirstPhase
           ? Value(currentRound - 1)

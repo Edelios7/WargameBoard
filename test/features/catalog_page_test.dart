@@ -117,6 +117,34 @@ void main() {
     });
 
     testWidgets(
+        '"Réinitialiser" also clears the search text, not just the filter chips',
+        (tester) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(wrap(database, prefs));
+      await tester.pumpAndSettle();
+
+      // Une recherche texte + un filtre de faction, tous les deux actifs.
+      await tester.enterText(find.byType(TextField).first, 'Sanguinary');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Blood Angels').first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Sanguinary'), findsOneWidget);
+
+      await tester.tap(find.text('Réinitialiser'));
+      await tester.pumpAndSettle();
+
+      // Le texte tapé a bien disparu de la barre de recherche, pas
+      // seulement les filtres — sinon la liste resterait filtrée par un
+      // texte qu'on ne voit plus.
+      expect(find.text('Sanguinary'), findsNothing);
+    });
+
+    testWidgets(
         'starring a datasheet and toggling favorites-only narrows the list to it',
         (tester) async {
       tester.view.physicalSize = const Size(1400, 900);

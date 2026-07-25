@@ -134,6 +134,47 @@ void main() {
       expect(active.currentRound, 2);
     });
 
+    test('previousPhase does nothing at the very start of round 1', () async {
+      final id = await database.battleDao.startBattle(opponentName: 'Marc');
+
+      await database.battleDao.previousPhase(id);
+
+      final active = await database.battleDao.getActiveBattle();
+      expect(active!.currentPhase, BattlePhase.command);
+      expect(active.currentRound, 1);
+    });
+
+    test(
+        'previousPhase rewinds the phase/round and reverts CP logged in the '
+        'phase being left, so the display and the journal stay in sync',
+        () async {
+      final id = await database.battleDao.startBattle(opponentName: 'Marc');
+      await database.battleDao.advancePhase(id); // command -> movement
+
+      // Un stratagème coûteux dépensé pendant Mouvement...
+      await database.battleDao.updateLiveState(id, myCommandPoints: const Value(2));
+      await database.battleDao.logEvent(
+        id,
+        label: 'Rapid Ingress',
+        cpDelta: -1,
+        round: 1,
+        phase: BattlePhase.movement,
+      );
+      await database.battleDao.updateLiveState(id, myCommandPoints: const Value(1));
+
+      // ...puis un tap de trop sur "Phase suivante" annulé.
+      await database.battleDao.previousPhase(id);
+
+      final active = await database.battleDao.getActiveBattle();
+      expect(active!.currentPhase, BattlePhase.command);
+      expect(active.currentRound, 1);
+      // Les PC dépensés pendant la phase annulée sont recrédités.
+      expect(active.myCommandPoints, 2);
+
+      final events = await database.battleDao.getEvents(id);
+      expect(events, isEmpty);
+    });
+
     test('logEvent records CP history readable via getEvents', () async {
       final id = await database.battleDao.startBattle(opponentName: 'Marc');
 

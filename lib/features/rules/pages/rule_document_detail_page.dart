@@ -3,9 +3,11 @@ import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/rule_pdf_source.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/rules/rule_document.dart';
 import '../../../l10n/app_localizations.dart';
+import 'rule_pdf_viewer_page.dart';
 
 /// Page affichée après avoir ouvert un document depuis la page Règles :
 /// son texte réel (titre, intro, sections) quand [RuleDocument.sections]
@@ -16,6 +18,28 @@ class RuleDocumentDetailPage extends StatelessWidget {
   final RuleDocument document;
 
   const RuleDocumentDetailPage({super.key, required this.document});
+
+  Future<void> _openBook(BuildContext context, AppLocalizations l10n) async {
+    final localAssetId = document.localAssetId;
+    final bytes = localAssetId == null
+        ? null
+        : await RulePdfSource.resolve(localAssetId);
+    if (!context.mounted) return;
+
+    if (bytes != null) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) =>
+              RulePdfViewerPage(title: document.title, bytes: bytes),
+        ),
+      );
+      return;
+    }
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.rulesOpenBookMissing)));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,10 +103,29 @@ class RuleDocumentDetailPage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 24),
                   child: Center(
-                    child: Text(
-                      l10n.rulesNoDigitizedContent,
-                      style: AppTextStyles.caption,
-                      textAlign: TextAlign.center,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          l10n.rulesNoDigitizedContent,
+                          style: AppTextStyles.caption,
+                          textAlign: TextAlign.center,
+                        ),
+                        if (document.localAssetId != null) ...[
+                          const SizedBox(height: 16),
+                          FilledButton.icon(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                            ),
+                            onPressed: () => _openBook(context, l10n),
+                            icon: const Icon(
+                              Icons.menu_book_rounded,
+                              size: 18,
+                            ),
+                            label: Text(l10n.rulesOpenBook),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ),
