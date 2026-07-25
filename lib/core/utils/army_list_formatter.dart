@@ -16,12 +16,19 @@ class ArmyListFormatter {
           ? '${army.totalPoints} / ${army.pointsLimit} pts'
           : '${army.totalPoints} pts',
     );
+    if (army.hasUnitsWithUnknownCost) {
+      buffer.writeln(
+        '(total sous-estimé : au moins une unité a un coût inconnu, voir ci-dessous)',
+      );
+    }
     buffer.writeln();
 
     for (final unit in army.units) {
       buffer.write('- ${unit.datasheetName} x${unit.modelCount}');
       if (unit.isWarlord) buffer.write(' [Warlord]');
-      buffer.write(' (${unit.points} pts)');
+      buffer.write(
+        unit.hasUnknownCost ? ' (coût inconnu)' : ' (${unit.points} pts)',
+      );
       if (unit.enhancementName != null) {
         buffer.write(' [${unit.enhancementName} +${unit.enhancementPoints} pts]');
       }

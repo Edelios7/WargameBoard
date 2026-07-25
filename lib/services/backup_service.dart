@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
 import '../database/app_database.dart';
 
@@ -88,9 +89,32 @@ class BackupService {
   }
 }
 
+/// `true` si [file] s'ouvre comme une base SQLite lisible et cohérente
+/// (`PRAGMA integrity_check`) — un fichier renommé en `.sqlite` par erreur,
+/// tronqué, ou corrompu doit être rejeté avant de toucher à la vraie base,
+/// pas découvert au redémarrage suivant une fois l'originale déjà effacée.
+bool _isValidSqliteDatabase(File file) {
+  sqlite3.Database? db;
+  try {
+    db = sqlite3.sqlite3.open(file.path, mode: sqlite3.OpenMode.readOnly);
+    final result = db.select('PRAGMA integrity_check');
+    return result.isNotEmpty && result.first.values.first == 'ok';
+  } catch (_) {
+    return false;
+  } finally {
+    db?.dispose();
+  }
+}
+
 /// Si une restauration a été programmée (voir [BackupService.stageRestore]),
 /// remplace la base actuelle par le fichier mis en attente — appelé avant
 /// l'ouverture de la connexion Drift, jamais pendant qu'elle est active.
+///
+/// Le fichier en attente est validé avant que quoi que ce soit ne soit
+/// touché à la base réelle, et celle-ci est mise de côté (renommée) plutôt
+/// que supprimée directement, pour ne jamais se retrouver sans base
+/// utilisable ni traiter les données du joueur comme jetables si une
+/// étape échoue en cours de route.
 Future<void> applyPendingRestore() async {
   final documentsDirectory = await getApplicationDocumentsDirectory();
   final staged = File(
@@ -98,8 +122,15 @@ Future<void> applyPendingRestore() async {
   );
   if (!staged.existsSync()) return;
 
+  if (!_isValidSqliteDatabase(staged)) {
+    await staged.delete();
+    return;
+  }
+
   final databaseFile = File(p.join(documentsDirectory.path, databaseFileName));
-  if (databaseFile.existsSync()) await databaseFile.delete();
+  if (databaseFile.existsSync()) {
+    await databaseFile.rename('${databaseFile.path}.before-restore');
+  }
 
   // Les fichiers annexes du journal WAL d'une session précédente ne
   // doivent pas survivre au remplacement de la base qu'ils accompagnent.

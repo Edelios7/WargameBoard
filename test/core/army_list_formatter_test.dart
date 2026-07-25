@@ -66,4 +66,47 @@ void main() {
     expect(text, isNot(contains('[')));
     expect(text, contains('90 pts'));
   });
+
+  test(
+    'flags a unit with no known cost instead of printing a misleading '
+    '"0 pts", and warns that the total is an underestimate',
+    () {
+      const army = ArmyDetails(
+        id: 'a1',
+        name: 'Liste incomplète',
+        factionId: 'fac-blood-angels',
+        factionName: 'Blood Angels',
+        totalPoints: 90,
+        units: [
+          ArmyUnitDetails(
+            id: 'u1',
+            datasheetId: 'ds-captain',
+            datasheetName: 'Captain',
+            modelCount: 1,
+            minimumModels: 1,
+            maximumModels: 1,
+            datasheetPoints: 90,
+          ),
+          ArmyUnitDetails(
+            id: 'u2',
+            datasheetId: 'ds-no-cost',
+            datasheetName: 'Fiche sans données de coût',
+            modelCount: 1,
+            minimumModels: 1,
+            maximumModels: 1,
+            datasheetPoints: null,
+          ),
+        ],
+      );
+
+      final text = ArmyListFormatter.format(army);
+
+      expect(
+        text,
+        contains('- Fiche sans données de coût x1 (coût inconnu)'),
+      );
+      expect(text, isNot(contains('Fiche sans données de coût x1 (0 pts)')));
+      expect(text, contains('total sous-estimé'));
+    },
+  );
 }

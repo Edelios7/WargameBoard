@@ -32,13 +32,24 @@ class CatalogPage extends ConsumerWidget {
     final unitTypeFilter = ref.watch(catalogUnitTypeFilterProvider);
     final editionFilter = ref.watch(catalogEditionFilterProvider);
     final pointsRange = ref.watch(catalogPointsRangeProvider);
+    final favoritesOnlyFilter = ref.watch(catalogFavoritesOnlyProvider);
     final hasActiveFilters =
         factionFilter != null ||
         keywordFilter.isNotEmpty ||
         roleFilter != null ||
         unitTypeFilter != null ||
         editionFilter != null ||
-        pointsRange != null;
+        pointsRange != null ||
+        favoritesOnlyFilter;
+
+    final favoriteIds = ref.watch(catalogFavoritesProvider).value ?? const {};
+    final visibleResultsCount = resultsAsync.value == null
+        ? null
+        : (favoritesOnlyFilter
+              ? resultsAsync.value!
+                    .where((r) => favoriteIds.contains(r.id))
+                    .length
+              : resultsAsync.value!.length);
 
     final headerBannerFile = factionFilter != null
         ? LocalCatalogImages.factionBanner(factionFilter)
@@ -133,7 +144,7 @@ class CatalogPage extends ConsumerWidget {
                       width: filtersWidth,
                       child: _FiltersPanel(
                         hasActiveFilters: hasActiveFilters,
-                        resultsCount: resultsAsync.value?.length,
+                        resultsCount: visibleResultsCount,
                       ),
                     ),
                     Container(width: 1, color: AppColors.border),
@@ -190,13 +201,23 @@ class _NarrowCatalogLayout extends ConsumerWidget {
       builder: (context) => Consumer(
         builder: (context, ref, _) {
           final results = ref.watch(catalogSearchResultsProvider);
+          final favoritesOnly = ref.watch(catalogFavoritesOnlyProvider);
+          final favoriteIds =
+              ref.watch(catalogFavoritesProvider).value ?? const {};
+          final resultsCount = results.value == null
+              ? null
+              : (favoritesOnly
+                    ? results.value!
+                          .where((r) => favoriteIds.contains(r.id))
+                          .length
+                    : results.value!.length);
           return ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.85,
             ),
             child: _FiltersPanel(
               hasActiveFilters: hasActiveFilters,
-              resultsCount: results.value?.length,
+              resultsCount: resultsCount,
             ),
           );
         },
@@ -420,7 +441,11 @@ class _FactionTile extends StatelessWidget {
         .where((w) => w.isNotEmpty)
         .toList();
     if (words.isEmpty) return '?';
-    if (words.length == 1) return words.first.substring(0, 2).toUpperCase();
+    if (words.length == 1) {
+      return words.first
+          .substring(0, words.first.length.clamp(0, 2))
+          .toUpperCase();
+    }
     return (words[0][0] + words[1][0]).toUpperCase();
   }
 
@@ -545,6 +570,8 @@ class _FiltersPanel extends ConsumerWidget {
                         null;
                     ref.read(catalogPointsRangeProvider.notifier).state = null;
                     ref.read(catalogSearchQueryProvider.notifier).state = '';
+                    ref.read(catalogFavoritesOnlyProvider.notifier).state =
+                        false;
                   },
                   child: Text(
                     l10n.catalogResetFilters,
