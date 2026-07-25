@@ -58,8 +58,22 @@ class BattleRepository {
     return id;
   }
 
-  Future<void> deleteBattle(String id) {
-    return database.battleDao.deleteBattle(id);
+  /// Supprime une partie et reprend l'XP qui lui avait été créditée, le
+  /// cas échéant — voir [XpService.revokeBattle]. Une partie encore en
+  /// "setup"/"active" (jamais finalisée) n'a jamais reçu d'XP et n'en
+  /// reprend donc pas.
+  Future<void> deleteBattle(String id) async {
+    final battle = await database.battleDao.getBattleRow(id);
+    if (battle != null &&
+        (battle.status == null || battle.status == BattleStatus.completed)) {
+      await xpService.revokeBattle(
+        armyId: battle.armyId,
+        result: battle.result,
+        type: battle.type,
+        playedAt: battle.playedAt,
+      );
+    }
+    await database.battleDao.deleteBattle(id);
   }
 
   Future<BattleDetails?> getNextUpcoming() {

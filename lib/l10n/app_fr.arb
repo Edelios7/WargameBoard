@@ -193,6 +193,12 @@
   "armyBuilderEmptyList": "Aucune armée pour l'instant",
   "armyBuilderSelectPrompt": "Sélectionnez une armée ou créez-en une nouvelle",
   "armyBuilderAddUnit": "Ajouter une unité",
+  "armyBuilderAddUnitFailed": "Impossible d'ajouter « {name} » : sa fiche est introuvable",
+  "@armyBuilderAddUnitFailed": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "armyBuilderEmptyUnits": "Aucune unité dans cette armée",
   "armyBuilderDeleteArmy": "Supprimer l'armée",
   "armyBuilderMoreActions": "Plus d'actions",

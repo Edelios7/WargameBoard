@@ -94,6 +94,13 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   /// mais aussi l'état par unité de cette partie précise (unités
   /// marquées détruites, bonus/malus, PV), qui resterait sinon orphelin
   /// (aucun `ON DELETE CASCADE` en base).
+  /// Ligne brute d'une partie (pas de jointure) — utilisé par
+  /// [BattleRepository.deleteBattle] pour savoir si de l'XP a été
+  /// créditée pour cette partie avant de la supprimer.
+  Future<Battle?> getBattleRow(String id) {
+    return (select(battles)..where((t) => t.id.equals(id))).getSingleOrNull();
+  }
+
   Future<void> deleteBattle(String id) async {
     await (delete(battleEvents)..where((t) => t.battleId.equals(id))).go();
     await (delete(

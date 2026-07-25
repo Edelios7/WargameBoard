@@ -418,6 +418,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get armyBuilderAddUnit => 'Add a unit';
 
   @override
+  String armyBuilderAddUnitFailed(String name) {
+    return 'Couldn\'t add \"$name\": its datasheet is missing';
+  }
+
+  @override
   String get armyBuilderEmptyUnits => 'No units in this army';
 
   @override

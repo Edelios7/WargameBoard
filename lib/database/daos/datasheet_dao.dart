@@ -402,8 +402,14 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
       );
     }
 
+    // Trié par editionId : sans ce tri explicite, SQLite ne garantit pas
+    // un ordre stable, et une datasheet avec des coûts sur plusieurs
+    // éditions non courantes pourrait retourner un `editionId`/coût
+    // différent d'un appel à l'autre (et différent de celui choisi par
+    // ArmyDao._getCostBracketsByDatasheet, qui applique le même repli).
     final fallbackRows = await (select(datasheetCosts)
-          ..where((t) => t.datasheetId.equals(datasheetId)))
+          ..where((t) => t.datasheetId.equals(datasheetId))
+          ..orderBy([(t) => OrderingTerm.asc(t.editionId)]))
         .get();
     if (fallbackRows.isEmpty) {
       return (brackets: const <CostBracket>[], editionId: '');

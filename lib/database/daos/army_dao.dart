@@ -506,7 +506,8 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         datasheetIds.where((id) => !result.containsKey(id)).toList();
     for (final id in missingIds) {
       final fallbackRows = await (select(datasheetCosts)
-            ..where((t) => t.datasheetId.equals(id)))
+            ..where((t) => t.datasheetId.equals(id))
+            ..orderBy([(t) => OrderingTerm.asc(t.editionId)]))
           .get();
       if (fallbackRows.isEmpty) continue;
       final editionId = fallbackRows.first.editionId;

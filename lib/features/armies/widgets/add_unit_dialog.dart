@@ -57,7 +57,24 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
   Future<void> _addUnit(SearchResult result, {int quantity = 1}) async {
     final repository = ref.read(catalogRepositoryProvider);
     final details = await repository.getDatasheet(result.id);
-    final modelCount = details?.unit.defaultSize ?? 1;
+    if (details == null) {
+      // Fiche introuvable (orpheline/corrompue) : mieux vaut ne rien
+      // ajouter que d'insérer une unité avec un modelCount de repli
+      // arbitraire (1) qui ne correspond à rien de réel.
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.armyBuilderAddUnitFailed(
+                result.name,
+              ),
+            ),
+          ),
+        );
+      }
+      return;
+    }
+    final modelCount = details.unit.defaultSize;
     final armyRepository = ref.read(armyRepositoryProvider);
 
     for (var i = 0; i < quantity; i++) {

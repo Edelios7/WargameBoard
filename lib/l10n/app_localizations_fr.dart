@@ -424,6 +424,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get armyBuilderAddUnit => 'Ajouter une unité';
 
   @override
+  String armyBuilderAddUnitFailed(String name) {
+    return 'Impossible d\'ajouter « $name » : sa fiche est introuvable';
+  }
+
+  @override
   String get armyBuilderEmptyUnits => 'Aucune unité dans cette armée';
 
   @override

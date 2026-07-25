@@ -193,6 +193,12 @@
   "armyBuilderEmptyList": "No armies yet",
   "armyBuilderSelectPrompt": "Select an army or create a new one",
   "armyBuilderAddUnit": "Add a unit",
+  "armyBuilderAddUnitFailed": "Couldn't add \"{name}\": its datasheet is missing",
+  "@armyBuilderAddUnitFailed": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "armyBuilderEmptyUnits": "No units in this army",
   "armyBuilderNoUnitsYet": "Add units to build your roster",
   "armyBuilderDeleteArmy": "Delete army",

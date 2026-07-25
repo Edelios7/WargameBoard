@@ -23,6 +23,22 @@ class XpService {
     }
   }
 
+  /// Symétrique de [_award] — reprend l'XP créditée pour une action
+  /// ensuite annulée (ex. suppression d'une partie journalisée). Les
+  /// totaux ne descendent jamais sous 0 (voir `XpDao.incrementCategory`/
+  /// `incrementFaction`).
+  Future<void> _revoke({
+    required XpCategory category,
+    required int amount,
+    String? factionId,
+  }) async {
+    if (amount <= 0) return;
+    await database.xpDao.incrementCategory(category, -amount);
+    if (factionId != null) {
+      await database.xpDao.incrementFaction(factionId, -amount);
+    }
+  }
+
   /// Peinture d'un modèle (ou plusieurs, `delta` figurines) sur une
   /// datasheet donnée. `squadCompleted` ajoute le bonus d'escouade
   /// entièrement peinte.
@@ -87,6 +103,34 @@ class XpService {
         armyId == null ? null : await database.armyDao.getFactionId(armyId);
 
     await _award(
+      category: XpCategory.battle,
+      amount: amount,
+      factionId: factionId,
+    );
+  }
+
+  /// Reprend l'XP créditée par [awardBattle] pour la même partie — appelé
+  /// quand une partie qui avait déjà reçu son XP (journalisée
+  /// rétroactivement, ou terminée en direct via `finishBattle`) est
+  /// supprimée, pour empêcher un exploit "créer une partie fictive,
+  /// encaisser l'XP, la supprimer, recommencer".
+  Future<void> revokeBattle({
+    String? armyId,
+    BattleResult? result,
+    BattleType type = BattleType.matched,
+    required DateTime playedAt,
+  }) async {
+    if (result == null && playedAt.isAfter(DateTime.now())) return;
+
+    var amount = battleXpPlayed;
+    if (result != null) amount += battleXpResult;
+    if (type == BattleType.narrative) amount += battleXpNarrativeBonus;
+    if (type == BattleType.tournament) amount += battleXpTournamentBonus;
+
+    final factionId =
+        armyId == null ? null : await database.armyDao.getFactionId(armyId);
+
+    await _revoke(
       category: XpCategory.battle,
       amount: amount,
       factionId: factionId,

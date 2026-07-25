@@ -854,6 +854,12 @@ abstract class AppLocalizations {
   /// **'Ajouter une unité'**
   String get armyBuilderAddUnit;
 
+  /// No description provided for @armyBuilderAddUnitFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'ajouter « {name} » : sa fiche est introuvable'**
+  String armyBuilderAddUnitFailed(String name);
+
   /// No description provided for @armyBuilderEmptyUnits.
   ///
   /// In fr, this message translates to:

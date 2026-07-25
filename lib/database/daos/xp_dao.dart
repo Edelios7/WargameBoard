@@ -28,6 +28,8 @@ class XpDao extends DatabaseAccessor<AppDatabase> with _$XpDaoMixin {
     }
   }
 
+  /// `delta` peut être négatif (reprise d'XP suite à l'annulation d'une
+  /// action) — le total ne descend jamais sous 0.
   Future<void> incrementCategory(XpCategory category, int delta) async {
     if (delta == 0) return;
     final row = await (select(xpCategoryTotals)
@@ -37,11 +39,12 @@ class XpDao extends DatabaseAccessor<AppDatabase> with _$XpDaoMixin {
     await into(xpCategoryTotals).insertOnConflictUpdate(
       XpCategoryTotalsCompanion.insert(
         category: category.name,
-        xp: Value(current + delta),
+        xp: Value((current + delta).clamp(0, 1 << 30)),
       ),
     );
   }
 
+  /// `delta` peut être négatif — voir [incrementCategory].
   Future<void> incrementFaction(String factionId, int delta) async {
     if (delta == 0) return;
     final row = await (select(xpFactionTotals)
@@ -51,7 +54,7 @@ class XpDao extends DatabaseAccessor<AppDatabase> with _$XpDaoMixin {
     await into(xpFactionTotals).insertOnConflictUpdate(
       XpFactionTotalsCompanion.insert(
         factionId: factionId,
-        xp: Value(current + delta),
+        xp: Value((current + delta).clamp(0, 1 << 30)),
       ),
     );
   }
