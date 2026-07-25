@@ -3,8 +3,8 @@ import 'package:wargameboard/database/models/cost_bracket.dart';
 
 void main() {
   group('resolveCostForModelCount', () {
-    test('returns 0 when there are no brackets', () {
-      expect(resolveCostForModelCount(const [], 5), 0);
+    test('returns null (unknown cost) when there are no brackets', () {
+      expect(resolveCostForModelCount(const [], 5), isNull);
     });
 
     test('returns the flat cost when there is a single unsized bracket', () {
@@ -31,7 +31,7 @@ void main() {
       ];
       final atFive = resolveCostForModelCount(brackets, 5);
       final atTen = resolveCostForModelCount(brackets, 10);
-      expect(atTen, isNot(atFive * 2));
+      expect(atTen, isNot(atFive! * 2));
       expect(atTen, 160);
     });
 

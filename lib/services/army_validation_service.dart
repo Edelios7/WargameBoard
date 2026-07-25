@@ -6,6 +6,7 @@ enum ArmyValidationIssue {
   noDetachmentSelected,
   tooManyEnhancements,
   noWarlordSelected,
+  unknownUnitCosts,
 }
 
 class ArmyValidationResult {
@@ -54,6 +55,9 @@ class ArmyValidationService {
     }
     if (army.units.isNotEmpty && !army.units.any((u) => u.isWarlord)) {
       warnings.add(ArmyValidationIssue.noWarlordSelected);
+    }
+    if (army.hasUnitsWithUnknownCost) {
+      warnings.add(ArmyValidationIssue.unknownUnitCosts);
     }
 
     return ArmyValidationResult(

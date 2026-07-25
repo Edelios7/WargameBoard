@@ -28,9 +28,14 @@ class CostBracket {
 ///    plus petit palier disponible (on ne descend jamais sous le prix
 ///    plancher officiel) ;
 /// 4. à défaut de tout palier chiffré, un coût "à taille fixe" ;
-/// 5. sinon 0 (aucune donnée de coût pour cette datasheet).
-int resolveCostForModelCount(List<CostBracket> brackets, int modelCount) {
-  if (brackets.isEmpty) return 0;
+/// 5. sinon `null` — aucune donnée de coût pour cette datasheet. Ne
+///    JAMAIS retourner 0 dans ce cas : une datasheet sans donnée de
+///    coût n'est pas gratuite, l'appelant doit distinguer "coût
+///    inconnu" de "coûte réellement 0 pt" (les deux existent dans le
+///    catalogue) au lieu de fausser silencieusement le total d'une
+///    liste et la validation de limite de points.
+int? resolveCostForModelCount(List<CostBracket> brackets, int modelCount) {
+  if (brackets.isEmpty) return null;
 
   final sized = brackets.where((b) => b.modelCount != null).toList()
     ..sort((a, b) => a.modelCount!.compareTo(b.modelCount!));

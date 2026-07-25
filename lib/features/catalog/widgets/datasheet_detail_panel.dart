@@ -180,7 +180,27 @@ class DatasheetDetailPanel extends StatelessWidget {
     );
   }
 
-  Widget _pointsBadge(AppLocalizations l10n, int points) {
+  Widget _pointsBadge(AppLocalizations l10n, int? points) {
+    if (points == null) {
+      return Tooltip(
+        message: l10n.unknownCostTooltip,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.warning.withValues(alpha: .18),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: AppColors.warning.withValues(alpha: .4)),
+          ),
+          child: Text(
+            l10n.unknownCost,
+            style: AppTextStyles.body.copyWith(
+              color: AppColors.warning,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      );
+    }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(

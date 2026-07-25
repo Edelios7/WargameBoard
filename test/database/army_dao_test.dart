@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:wargameboard/database/app_database.dart';
 import 'package:wargameboard/database/seed/detachment_seed.dart';
 import 'package:wargameboard/database/seed/faction_seed.dart';
+import 'package:wargameboard/services/army_validation_service.dart';
 
 void main() {
   late AppDatabase database;
@@ -268,6 +269,62 @@ void main() {
       final beforeLimitBreak = await database.armyDao.listArmies();
       expect(beforeLimitBreak.single.enhancementsCount, 1);
       expect(beforeLimitBreak.single.hasValidationErrors, isFalse);
+    },
+  );
+
+  test(
+    'a datasheet with no cost bracket data resolves to an unknown cost, '
+    'not a free 0 pt — and is flagged instead of silently deflating the '
+    'army total',
+    () async {
+      const noCostDatasheetId = 'ds-no-cost-data';
+      await database.into(database.datasheets).insert(
+            DatasheetsCompanion.insert(
+              id: noCostDatasheetId,
+              factionId: seedFactionId,
+              name: 'Fiche sans données de coût',
+              battlefieldRole: 'Troops',
+              unitType: 'Infantry',
+            ),
+          );
+
+      final armyId = await database.armyDao.createArmy(
+        name: 'Liste avec fiche incomplète',
+        factionId: seedFactionId,
+      );
+      final captainResults = await database.datasheetDao.search('Captain');
+      await database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: captainResults.single.id,
+        modelCount: 1,
+      );
+      await database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: noCostDatasheetId,
+        modelCount: 1,
+      );
+
+      final army = await database.armyDao.getArmy(armyId);
+      final noCostUnit =
+          army!.units.firstWhere((u) => u.datasheetId == noCostDatasheetId);
+
+      expect(noCostUnit.datasheetPoints, isNull);
+      expect(noCostUnit.hasUnknownCost, isTrue);
+      expect(noCostUnit.points, 0);
+      expect(army.hasUnitsWithUnknownCost, isTrue);
+      // Le total reste la somme des coûts connus (celui du Captain), pas 0
+      // ni une erreur : seule l'unité sans donnée est signalée à part.
+      expect(army.totalPoints, greaterThan(0));
+
+      final list = await database.armyDao.listArmies();
+      expect(list.single.hasUnknownCost, isTrue);
+
+      const validationService = ArmyValidationService();
+      final validation = validationService.validate(army);
+      expect(
+        validation.warnings,
+        contains(ArmyValidationIssue.unknownUnitCosts),
+      );
     },
   );
 }

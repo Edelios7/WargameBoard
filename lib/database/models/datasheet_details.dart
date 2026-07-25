@@ -38,7 +38,10 @@ class DatasheetDetails {
 
   final UnitDetails unit;
 
-  final int points;
+  /// `null` si cette datasheet n'a aucune donnée de coût dans le
+  /// catalogue — à ne jamais confondre avec "coûte 0 pt" (les deux cas
+  /// existent), voir [resolveCostForModelCount].
+  final int? points;
 
   /// Paliers de coût connus pour cette datasheet (voir [CostBracket]) —
   /// [points] est déjà le coût résolu pour la taille par défaut de

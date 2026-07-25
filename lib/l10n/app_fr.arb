@@ -176,6 +176,8 @@
     }
   },
 
+  "unknownCost": "Coût inconnu",
+  "unknownCostTooltip": "Cette fiche n'a pas de coût en points dans le catalogue — absente du décompte total, vérifie-le manuellement.",
   "pointsSuffix": "{points} pts",
   "@pointsSuffix": {
     "placeholders": {
@@ -222,6 +224,7 @@
   "armyBuilderSetWarlord": "Désigner comme Warlord",
   "armyBuilderUnsetWarlord": "Retirer le statut de Warlord",
   "armyValidationNoWarlord": "Aucun Warlord désigné",
+  "armyValidationUnknownUnitCosts": "Certaines unités ont un coût inconnu — le total est sous-estimé",
   "armyBuilderNotesLabel": "Notes",
   "armyBuilderDuplicateNameLabel": "Nom de la copie",
   "armyBuilderDuplicateSuffix": "{name} (copie)",

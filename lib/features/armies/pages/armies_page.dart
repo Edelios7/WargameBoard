@@ -37,6 +37,8 @@ String _warningLabel(AppLocalizations l10n, ArmyValidationIssue issue) {
       return l10n.armyValidationTooManyEnhancements;
     case ArmyValidationIssue.noWarlordSelected:
       return l10n.armyValidationNoWarlord;
+    case ArmyValidationIssue.unknownUnitCosts:
+      return l10n.armyValidationUnknownUnitCosts;
   }
 }
 
@@ -282,19 +284,38 @@ class _ArmyListPage extends ConsumerWidget {
                                       ],
                                     ),
                                     const SizedBox(height: 12),
-                                    Text(
-                                      army.pointsLimit != null
-                                          ? l10n.armyBuilderPointsWithLimit(
-                                              army.totalPoints,
-                                              army.pointsLimit!,
-                                            )
-                                          : l10n.pointsSuffix(army.totalPoints),
-                                      style: AppTextStyles.body.copyWith(
-                                        color: army.hasValidationErrors
-                                            ? AppColors.error
-                                            : AppColors.primary,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          army.pointsLimit != null
+                                              ? l10n
+                                                  .armyBuilderPointsWithLimit(
+                                                    army.totalPoints,
+                                                    army.pointsLimit!,
+                                                  )
+                                              : l10n.pointsSuffix(
+                                                  army.totalPoints,
+                                                ),
+                                          style: AppTextStyles.body.copyWith(
+                                            color: army.hasValidationErrors
+                                                ? AppColors.error
+                                                : AppColors.primary,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        if (army.hasUnknownCost) ...[
+                                          const SizedBox(width: 6),
+                                          Tooltip(
+                                            message: l10n.unknownCostTooltip,
+                                            child: Icon(
+                                              Icons.warning_amber_rounded,
+                                              size: 16,
+                                              color: AppColors.warning,
+                                            ),
+                                          ),
+                                        ],
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -1329,12 +1350,19 @@ class _UnitRosterRow extends StatelessWidget {
                     ],
                   ),
                 ),
-                Text(
-                  l10n.pointsSuffix(unit.points),
-                  style: AppTextStyles.body.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
-                    fontSize: 13,
+                Tooltip(
+                  message: unit.hasUnknownCost ? l10n.unknownCostTooltip : '',
+                  child: Text(
+                    unit.hasUnknownCost
+                        ? l10n.unknownCost
+                        : l10n.pointsSuffix(unit.points),
+                    style: AppTextStyles.body.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: unit.hasUnknownCost
+                          ? AppColors.warning
+                          : AppColors.primary,
+                      fontSize: 13,
+                    ),
                   ),
                 ),
                 IconButton(
@@ -1473,11 +1501,15 @@ class _UnitCard extends ConsumerWidget {
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: .55),
+                    color: unit.hasUnknownCost
+                        ? AppColors.warning.withValues(alpha: .85)
+                        : Colors.black.withValues(alpha: .55),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    l10n.pointsSuffix(unit.points),
+                    unit.hasUnknownCost
+                        ? l10n.unknownCost
+                        : l10n.pointsSuffix(unit.points),
                     style: AppTextStyles.eyebrow.copyWith(color: Colors.white),
                   ),
                 ),
@@ -1629,11 +1661,20 @@ class _UnitDetailsPanel extends ConsumerWidget {
                     )
                     .then((_) => ref.invalidate(selectedArmyProvider)),
               ),
-              Text(
-                l10n.pointsSuffix(currentUnit.points),
-                style: AppTextStyles.body.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w700,
+              Tooltip(
+                message: currentUnit.hasUnknownCost
+                    ? l10n.unknownCostTooltip
+                    : '',
+                child: Text(
+                  currentUnit.hasUnknownCost
+                      ? l10n.unknownCost
+                      : l10n.pointsSuffix(currentUnit.points),
+                  style: AppTextStyles.body.copyWith(
+                    color: currentUnit.hasUnknownCost
+                        ? AppColors.warning
+                        : AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],

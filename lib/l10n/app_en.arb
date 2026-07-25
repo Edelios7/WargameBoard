@@ -176,6 +176,8 @@
     }
   },
 
+  "unknownCost": "Unknown cost",
+  "unknownCostTooltip": "This datasheet has no points cost in the catalog — excluded from the total, check it manually.",
   "pointsSuffix": "{points} pts",
   "@pointsSuffix": {
     "placeholders": {
@@ -223,6 +225,7 @@
   "armyBuilderSetWarlord": "Set as Warlord",
   "armyBuilderUnsetWarlord": "Remove Warlord status",
   "armyValidationNoWarlord": "No Warlord selected",
+  "armyValidationUnknownUnitCosts": "Some units have an unknown cost — the total is underestimated",
   "armyBuilderNotesLabel": "Notes",
   "armyBuilderDuplicateNameLabel": "Copy name",
   "armyBuilderDuplicateSuffix": "{name} (copy)",

@@ -376,7 +376,8 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
 
   /// Coût en points pour un nombre de figurines donné, en tenant compte
   /// des paliers de coût par taille d'unité (voir [resolveCostForModelCount]).
-  Future<int> getCostForModelCount(String datasheetId, int modelCount) async {
+  /// `null` si cette datasheet n'a aucune donnée de coût.
+  Future<int?> getCostForModelCount(String datasheetId, int modelCount) async {
     final costs = await _getCostBrackets(datasheetId);
     return resolveCostForModelCount(costs.brackets, modelCount);
   }

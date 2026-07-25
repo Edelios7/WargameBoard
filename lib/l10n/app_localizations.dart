@@ -788,6 +788,18 @@ abstract class AppLocalizations {
   /// **'{min} - {max} figurines (par défaut : {defaultSize})'**
   String unitSizeRange(int min, int max, int defaultSize);
 
+  /// No description provided for @unknownCost.
+  ///
+  /// In fr, this message translates to:
+  /// **'Coût inconnu'**
+  String get unknownCost;
+
+  /// No description provided for @unknownCostTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette fiche n\'a pas de coût en points dans le catalogue — absente du décompte total, vérifie-le manuellement.'**
+  String get unknownCostTooltip;
+
   /// No description provided for @pointsSuffix.
   ///
   /// In fr, this message translates to:
@@ -961,6 +973,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Aucun Warlord désigné'**
   String get armyValidationNoWarlord;
+
+  /// No description provided for @armyValidationUnknownUnitCosts.
+  ///
+  /// In fr, this message translates to:
+  /// **'Certaines unités ont un coût inconnu — le total est sous-estimé'**
+  String get armyValidationUnknownUnitCosts;
 
   /// No description provided for @armyBuilderNotesLabel.
   ///

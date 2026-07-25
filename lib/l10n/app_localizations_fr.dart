@@ -387,6 +387,13 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get unknownCost => 'Coût inconnu';
+
+  @override
+  String get unknownCostTooltip =>
+      'Cette fiche n\'a pas de coût en points dans le catalogue — absente du décompte total, vérifie-le manuellement.';
+
+  @override
   String pointsSuffix(int points) {
     return '$points pts';
   }
@@ -480,6 +487,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get armyValidationNoWarlord => 'Aucun Warlord désigné';
+
+  @override
+  String get armyValidationUnknownUnitCosts =>
+      'Certaines unités ont un coût inconnu — le total est sous-estimé';
 
   @override
   String get armyBuilderNotesLabel => 'Notes';

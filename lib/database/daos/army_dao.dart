@@ -341,14 +341,16 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     for (final row in rows) {
       final army = row.readTable(armies);
       final faction = row.readTable(factions);
+      final points = await _totalPointsInfo(army.id);
       result.add(ArmyListItem(
         id: army.id,
         name: army.name,
         factionId: faction.id,
         factionName: faction.name,
-        totalPoints: await _totalPoints(army.id),
+        totalPoints: points.total,
         pointsLimit: army.pointsLimit,
         enhancementsCount: await _enhancementsCount(army.id),
+        hasUnknownCost: points.hasUnknownCost,
         updatedAt: army.updatedAt,
       ));
     }
@@ -403,7 +405,7 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
       final datasheetPoints =
           resolveCostForModelCount(brackets, unit.modelCount);
       final enhancementPoints = enhancement?.points ?? 0;
-      totalPoints += datasheetPoints + enhancementPoints;
+      totalPoints += (datasheetPoints ?? 0) + enhancementPoints;
       units.add(ArmyUnitDetails(
         id: unit.id,
         datasheetId: datasheet.id,
@@ -441,7 +443,9 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     return rows.length;
   }
 
-  Future<int> _totalPoints(String armyId) async {
+  Future<({int total, bool hasUnknownCost})> _totalPointsInfo(
+    String armyId,
+  ) async {
     final query = select(armyUnits).join([
       leftOuterJoin(
         enhancements,
@@ -457,14 +461,18 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         await _getCostBracketsByDatasheet(datasheetIds.toList());
 
     var total = 0;
+    var hasUnknownCost = false;
     for (final row in rows) {
       final unit = row.readTable(armyUnits);
       final brackets = costsByDatasheet[unit.datasheetId] ?? const [];
-      total += resolveCostForModelCount(brackets, unit.modelCount);
+      final datasheetPoints =
+          resolveCostForModelCount(brackets, unit.modelCount);
+      if (datasheetPoints == null) hasUnknownCost = true;
+      total += datasheetPoints ?? 0;
       final enhancement = row.readTableOrNull(enhancements);
       total += enhancement?.points ?? 0;
     }
-    return total;
+    return (total: total, hasUnknownCost: hasUnknownCost);
   }
 
   /// Récupère les paliers de coût (voir [CostBracket]) de plusieurs

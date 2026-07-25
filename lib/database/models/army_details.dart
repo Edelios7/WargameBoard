@@ -6,6 +6,12 @@ class ArmyListItem {
   final int totalPoints;
   final int? pointsLimit;
   final int enhancementsCount;
+
+  /// `true` si au moins une unité de cette armée n'a aucune donnée de
+  /// coût connue dans le catalogue — [totalPoints] est alors une
+  /// sous-estimation (ces unités comptent pour 0 dans le total), pas
+  /// une valeur fiable pour juger du respect de [pointsLimit].
+  final bool hasUnknownCost;
   final DateTime updatedAt;
 
   const ArmyListItem({
@@ -16,6 +22,7 @@ class ArmyListItem {
     required this.totalPoints,
     this.pointsLimit,
     this.enhancementsCount = 0,
+    this.hasUnknownCost = false,
     required this.updatedAt,
   });
 
@@ -37,7 +44,13 @@ class ArmyUnitDetails {
   final int modelCount;
   final int minimumModels;
   final int maximumModels;
-  final int datasheetPoints;
+
+  /// `null` si cette datasheet n'a aucune donnée de coût dans le
+  /// catalogue — voir [resolveCostForModelCount] (`cost_bracket.dart`).
+  /// Ne compte alors pour 0 que dans [points]/le total de l'armée par
+  /// nécessité arithmétique ; [hasUnknownCost] permet à l'affichage de
+  /// distinguer ce cas d'une unité qui coûte réellement 0 pt.
+  final int? datasheetPoints;
   final String? enhancementId;
   final String? enhancementName;
   final int enhancementPoints;
@@ -67,7 +80,9 @@ class ArmyUnitDetails {
     this.isWarlord = false,
   });
 
-  int get points => datasheetPoints + enhancementPoints;
+  bool get hasUnknownCost => datasheetPoints == null;
+
+  int get points => (datasheetPoints ?? 0) + enhancementPoints;
 }
 
 class ArmyDetails {
@@ -96,6 +111,11 @@ class ArmyDetails {
   });
 
   bool get isOverLimit => pointsLimit != null && totalPoints > pointsLimit!;
+
+  /// `true` si au moins une unité n'a aucune donnée de coût connue —
+  /// [totalPoints] est alors une sous-estimation (ces unités comptent
+  /// pour 0), pas un total fiable.
+  bool get hasUnitsWithUnknownCost => units.any((u) => u.hasUnknownCost);
 }
 
 class DetachmentOption {
