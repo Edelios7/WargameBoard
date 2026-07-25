@@ -11,8 +11,14 @@ final armyValidationServiceProvider = Provider<ArmyValidationService>(
   (ref) => const ArmyValidationService(),
 );
 
-final armyValidationProvider =
-    Provider.family<ArmyValidationResult?, ArmyDetails?>((ref, army) {
+// autoDispose : `army` vient de selectedArmyProvider, qui réémet une
+// nouvelle instance d'ArmyDetails (identité d'objet différente, pas de
+// ==/hashCode surchargés) à chaque modification de l'armée — sans
+// autoDispose, chaque ajout/retrait d'unité ou changement de quantité
+// pendant une session de construction d'armée créait une entrée de
+// cache permanente jamais libérée.
+final armyValidationProvider = Provider.autoDispose
+    .family<ArmyValidationResult?, ArmyDetails?>((ref, army) {
       if (army == null) return null;
       return ref.watch(armyValidationServiceProvider).validate(army);
     });
@@ -78,8 +84,8 @@ final stratagemsForDetachmentProvider =
 /// Choix d'équipement optionnel actuels d'une unité d'armée, par
 /// groupe d'équipement. Invalidé après un changement de sélection pour
 /// refléter le nouveau chargement d'armes de l'unité.
-final unitEquipmentSelectionsProvider =
-    FutureProvider.family<Map<String, List<String>>, String>((ref, armyUnitId) {
+final unitEquipmentSelectionsProvider = FutureProvider.autoDispose
+    .family<Map<String, List<String>>, String>((ref, armyUnitId) {
       final repository = ref.watch(armyRepositoryProvider);
       return repository.getUnitEquipmentSelections(armyUnitId);
     });
