@@ -2525,6 +2525,23 @@ class _DuplicateArmyDialogState extends ConsumerState<_DuplicateArmyDialog> {
   }
 }
 
+/// Certains détachements n'ont pas de vrai texte de règle en base (source
+/// PDF indisponible) et gardent un tag brut du style "[2 PDD · PRENDRE ET
+/// TENIR]" issu d'un import de points/catégorie de mission. On l'affiche
+/// sous une forme lisible plutôt que tel quel.
+final _detachmentTagPattern = RegExp(r'^\[(\d+)\s*PDD\s*·\s*(.+)\]$');
+
+({int commandPoints, String category})? _parseDetachmentTag(
+  String description,
+) {
+  final match = _detachmentTagPattern.firstMatch(description.trim());
+  if (match == null) return null;
+  return (
+    commandPoints: int.parse(match.group(1)!),
+    category: match.group(2)!,
+  );
+}
+
 class _StratagemsDialog extends ConsumerWidget {
   final String detachmentId;
   final String factionId;
@@ -2565,7 +2582,23 @@ class _StratagemsDialog extends ConsumerWidget {
                 ),
                 if (detachment?.description != null) ...[
                   const SizedBox(height: 8),
-                  Text(detachment!.description!, style: AppTextStyles.caption),
+                  Builder(
+                    builder: (context) {
+                      final tag = _parseDetachmentTag(detachment!.description!);
+                      if (tag == null) {
+                        return Text(
+                          detachment.description!,
+                          style: AppTextStyles.caption,
+                        );
+                      }
+                      return Text(
+                        '${l10n.armyBuilderStratagemCp(tag.commandPoints)} · ${tag.category}',
+                        style: AppTextStyles.caption.copyWith(
+                          fontStyle: FontStyle.italic,
+                        ),
+                      );
+                    },
+                  ),
                 ],
                 const SizedBox(height: 16),
                 Text(l10n.armyBuilderStratagems, style: AppTextStyles.eyebrow),
