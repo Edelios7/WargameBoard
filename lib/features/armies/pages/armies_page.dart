@@ -430,12 +430,12 @@ Future<void> _pickEnhancement(
       child: Dialog(
         backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 400),
+        child: SizedBox(
+          width: 460,
+          height: 520,
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: ListView(
-              shrinkWrap: true,
               children: [
                 ListTile(
                   title: Text(
@@ -447,9 +447,23 @@ Future<void> _pickEnhancement(
                 ...options.map(
                   (option) => ListTile(
                     title: Text(option.name, style: AppTextStyles.body),
-                    subtitle: Text(
-                      l10n.pointsSuffix(option.points),
-                      style: AppTextStyles.caption,
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          l10n.pointsSuffix(option.points),
+                          style: AppTextStyles.caption,
+                        ),
+                        if (option.description != null &&
+                            option.description!.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            option.description!,
+                            style: AppTextStyles.caption,
+                          ),
+                        ],
+                      ],
                     ),
                     onTap: () => Navigator.of(context).pop(option.id),
                   ),
