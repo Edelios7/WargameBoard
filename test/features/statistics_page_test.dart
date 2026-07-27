@@ -55,7 +55,12 @@ void main() {
       datasheetId: captain.single.id,
       quantity: 3,
     );
-    await database.collectionDao.updateCounts(entryId, painted: 2);
+    await database.collectionDao.updateCounts(
+      entryId,
+      assembled: 2,
+      primed: 2,
+      painted: 2,
+    );
 
     await tester.pumpWidget(wrap());
     await tester.pumpAndSettle();

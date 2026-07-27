@@ -24,6 +24,7 @@
   "settingsImportDescription": "Import datasheets from JSON (existing ids get updated).",
   "settingsImportButton": "Import JSON",
   "settingsBackupTitle": "Backup",
+  "settingsDisplayNameSaved": "Name saved",
   "settingsBackupDescription": "Your data (armies, collection, battle history...) only lives on this machine — export a backup from time to time so you never lose it.",
   "settingsBackupExportButton": "Export",
   "settingsBackupExportSuccess": "Backup saved: {path}",
@@ -50,6 +51,7 @@
       "count": { "type": "int" }
     }
   },
+  "settingsImportUnexpectedError": "Import failed — check the JSON format (a field probably has an unexpected type)",
 
   "catalogSearchHint": "Search for a unit...",
   "catalogEmptyResults": "No unit found",
@@ -581,6 +583,13 @@
   "dashboardAddProjectHint": "New project...",
   "dashboardAddProjectAction": "Add project",
   "dashboardDeleteProject": "Delete project",
+  "dashboardDeleteProjectConfirmTitle": "Delete this project?",
+  "dashboardDeleteProjectConfirmMessage": "\"{title}\" will be permanently deleted.",
+  "@dashboardDeleteProjectConfirmMessage": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
   "dashboardSearchHint": "Search (Ctrl+K)",
   "dashboardArmyStatusOk": "Valid",
   "dashboardArmyStatusWarning": "Warning",

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/back_link.dart';
+import '../../../core/widgets/retry_error_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/catalog_provider.dart';
 import '../widgets/datasheet_detail_panel.dart';
@@ -33,10 +34,21 @@ class DatasheetFullPage extends ConsumerWidget {
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 900),
-                child: DatasheetDetailPanel(
-                  datasheet: detailAsync.value,
-                  loading: detailAsync.isLoading,
-                ),
+                // Sans ce branchement, une erreur de chargement (id
+                // périmé après un ré-import, incident DB...) affichait
+                // silencieusement "Sélectionnez une fiche" — un message
+                // qui laisse croire qu'aucune fiche n'a été demandée,
+                // plutôt que de proposer de réessayer.
+                child: detailAsync.hasError
+                    ? RetryErrorState(
+                        onRetry: () => ref.invalidate(
+                          datasheetByIdProvider(datasheetId),
+                        ),
+                      )
+                    : DatasheetDetailPanel(
+                        datasheet: detailAsync.value,
+                        loading: detailAsync.isLoading,
+                      ),
               ),
             ),
           ),

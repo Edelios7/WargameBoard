@@ -24,6 +24,7 @@
   "settingsImportDescription": "Importer des datasheets au format JSON (mise à jour si l'id existe déjà).",
   "settingsImportButton": "Importer du JSON",
   "settingsBackupTitle": "Sauvegarde",
+  "settingsDisplayNameSaved": "Nom enregistré",
   "settingsBackupDescription": "Tes données (armées, collection, historique de parties...) ne vivent que sur cette machine — exporte une sauvegarde de temps en temps pour ne rien perdre en cas de problème.",
   "settingsBackupExportButton": "Exporter",
   "settingsBackupExportSuccess": "Sauvegarde enregistrée : {path}",
@@ -50,6 +51,7 @@
       "count": { "type": "int" }
     }
   },
+  "settingsImportUnexpectedError": "Échec de l'import — vérifie le format du JSON (un champ a probablement un type inattendu)",
 
   "catalogSearchHint": "Rechercher une unité...",
   "catalogEmptyResults": "Aucune unité trouvée",
@@ -581,6 +583,13 @@
   "dashboardAddProjectHint": "Nouveau projet...",
   "dashboardAddProjectAction": "Ajouter le projet",
   "dashboardDeleteProject": "Supprimer le projet",
+  "dashboardDeleteProjectConfirmTitle": "Supprimer ce projet ?",
+  "dashboardDeleteProjectConfirmMessage": "« {title} » sera définitivement supprimé.",
+  "@dashboardDeleteProjectConfirmMessage": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
   "dashboardSearchHint": "Rechercher (Ctrl+K)",
   "dashboardArmyStatusOk": "Valide",
   "dashboardArmyStatusWarning": "Attention",

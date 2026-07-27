@@ -65,15 +65,21 @@ class CollectionDao extends DatabaseAccessor<AppDatabase>
             .getSingle();
 
     final newQuantity = quantity ?? entry.quantity;
-    int clamp(int? value, int fallback) =>
-        (value ?? fallback).clamp(0, newQuantity);
+    // Une figurine ne peut pas être peinte sans avoir été apprêtée, ni
+    // apprêtée sans avoir été montée : chaque palier est borné par le
+    // précédent (pas seulement par `quantity` indépendamment), sinon on
+    // peut passer directement à "peinte" sans jamais monter/apprêter la
+    // figurine et toucher l'XP de peinture pour rien.
+    final newAssembled = (assembled ?? entry.assembled).clamp(0, newQuantity);
+    final newPrimed = (primed ?? entry.primed).clamp(0, newAssembled);
+    final newPainted = (painted ?? entry.painted).clamp(0, newPrimed);
 
     await (update(ownedMiniatures)..where((t) => t.id.equals(id))).write(
       OwnedMiniaturesCompanion(
         quantity: Value(newQuantity),
-        assembled: Value(clamp(assembled, entry.assembled)),
-        primed: Value(clamp(primed, entry.primed)),
-        painted: Value(clamp(painted, entry.painted)),
+        assembled: Value(newAssembled),
+        primed: Value(newPrimed),
+        painted: Value(newPainted),
         updatedAt: Value(DateTime.now()),
       ),
     );

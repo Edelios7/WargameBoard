@@ -70,6 +70,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsBackupTitle => 'Sauvegarde';
 
   @override
+  String get settingsDisplayNameSaved => 'Nom enregistré';
+
+  @override
   String get settingsBackupDescription =>
       'Tes données (armées, collection, historique de parties...) ne vivent que sur cette machine — exporte une sauvegarde de temps en temps pour ne rien perdre en cas de problème.';
 
@@ -129,6 +132,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String settingsImportSuccess(int count) {
     return '$count éléments importés';
   }
+
+  @override
+  String get settingsImportUnexpectedError =>
+      'Échec de l\'import — vérifie le format du JSON (un champ a probablement un type inattendu)';
 
   @override
   String get catalogSearchHint => 'Rechercher une unité...';
@@ -1222,6 +1229,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dashboardDeleteProject => 'Supprimer le projet';
+
+  @override
+  String get dashboardDeleteProjectConfirmTitle => 'Supprimer ce projet ?';
+
+  @override
+  String dashboardDeleteProjectConfirmMessage(String title) {
+    return '« $title » sera définitivement supprimé.';
+  }
 
   @override
   String get dashboardSearchHint => 'Rechercher (Ctrl+K)';

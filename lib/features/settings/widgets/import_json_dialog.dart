@@ -83,6 +83,17 @@ class _ImportJsonDialogState extends ConsumerState<ImportJsonDialog> {
         _running = false;
         _error = e.message;
       });
+    } catch (e) {
+      // Un JSON syntaxiquement valide mais avec un type de champ inattendu
+      // (ex. un nombre là où une chaîne est attendue) lève une exception
+      // brute (TypeError...) plutôt qu'une CatalogImportException — sans ce
+      // filet, le dialogue restait bloqué en spinner pour toujours (Annuler
+      // est désactivé tant que `_running` est vrai, voir plus bas).
+      if (!mounted) return;
+      setState(() {
+        _running = false;
+        _error = l10n.settingsImportUnexpectedError;
+      });
     }
   }
 

@@ -156,6 +156,24 @@ class _AddCollectionEntryDialogState
                               color: AppColors.primary,
                             ),
                           )
+                        : _results.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.search_off_rounded,
+                                  size: 36,
+                                  color: AppColors.textSecondary,
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  l10n.catalogEmptyResults,
+                                  style: AppTextStyles.caption,
+                                ),
+                              ],
+                            ),
+                          )
                         : ListView.builder(
                             itemCount: _results.length,
                             itemBuilder: (context, index) {

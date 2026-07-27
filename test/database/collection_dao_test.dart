@@ -53,6 +53,46 @@ void main() {
     expect(entry.painted, 0);
   });
 
+  test(
+    'updateCounts cannot mark a miniature painted without it being '
+    'assembled/primed first (no free painting XP)',
+    () async {
+      final results = await database.datasheetDao.search('Captain');
+      final entryId = await database.collectionDao.addEntry(
+        datasheetId: results.single.id,
+        quantity: 5,
+      );
+
+      // Tente de passer directement à "peinte" sans jamais monter ni
+      // apprêter la figurine.
+      await database.collectionDao.updateCounts(entryId, painted: 3);
+      var entry = (await database.collectionDao.listEntries()).single;
+      expect(entry.assembled, 0);
+      expect(entry.primed, 0);
+      expect(entry.painted, 0);
+
+      // Une fois montée et apprêtée, la peinture peut suivre — mais pas
+      // au-delà de ce qui est apprêté.
+      await database.collectionDao.updateCounts(
+        entryId,
+        assembled: 4,
+        primed: 2,
+      );
+      await database.collectionDao.updateCounts(entryId, painted: 3);
+      entry = (await database.collectionDao.listEntries()).single;
+      expect(entry.assembled, 4);
+      expect(entry.primed, 2);
+      expect(entry.painted, 2);
+
+      // Réduire l'effectif monté fait redescendre les paliers suivants.
+      await database.collectionDao.updateCounts(entryId, assembled: 1);
+      entry = (await database.collectionDao.listEntries()).single;
+      expect(entry.assembled, 1);
+      expect(entry.primed, 1);
+      expect(entry.painted, 1);
+    },
+  );
+
   test('getSummary aggregates totals across entries', () async {
     final captain = await database.datasheetDao.search('Captain');
     final guard = await database.datasheetDao.search('Sanguinary');
@@ -65,7 +105,14 @@ void main() {
       datasheetId: guard.single.id,
       quantity: 3,
     );
-    await database.collectionDao.updateCounts(captainEntry, painted: 1);
+    // painted ne peut jamais dépasser assembled/primed (voir le test
+    // dédié ci-dessous) — on les renseigne tous les trois ici.
+    await database.collectionDao.updateCounts(
+      captainEntry,
+      assembled: 1,
+      primed: 1,
+      painted: 1,
+    );
 
     final summary = await database.collectionDao.getSummary();
 

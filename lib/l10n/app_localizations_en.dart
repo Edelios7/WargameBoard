@@ -70,6 +70,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsBackupTitle => 'Backup';
 
   @override
+  String get settingsDisplayNameSaved => 'Name saved';
+
+  @override
   String get settingsBackupDescription =>
       'Your data (armies, collection, battle history...) only lives on this machine — export a backup from time to time so you never lose it.';
 
@@ -125,6 +128,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String settingsImportSuccess(int count) {
     return '$count items imported';
   }
+
+  @override
+  String get settingsImportUnexpectedError =>
+      'Import failed — check the JSON format (a field probably has an unexpected type)';
 
   @override
   String get catalogSearchHint => 'Search for a unit...';
@@ -1208,6 +1215,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardDeleteProject => 'Delete project';
+
+  @override
+  String get dashboardDeleteProjectConfirmTitle => 'Delete this project?';
+
+  @override
+  String dashboardDeleteProjectConfirmMessage(String title) {
+    return '\"$title\" will be permanently deleted.';
+  }
 
   @override
   String get dashboardSearchHint => 'Search (Ctrl+K)';

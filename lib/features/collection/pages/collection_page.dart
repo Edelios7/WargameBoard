@@ -1480,6 +1480,18 @@ class _WishlistTab extends ConsumerWidget {
                         icon: const Icon(Icons.close_rounded),
                         color: AppColors.textSecondary,
                         onPressed: () async {
+                          // Même garde-fou que la suppression d'une entrée
+                          // de collection (_confirmRemoveEntry) : sans ça,
+                          // ce bouton identique dans l'onglet Collection
+                          // demande confirmation mais pas ici, ce qui
+                          // surprend l'utilisateur au moment où il s'y
+                          // attend le moins.
+                          final confirmed = await _confirmRemoveEntry(
+                            context,
+                            l10n,
+                            item.datasheetName,
+                          );
+                          if (!confirmed) return;
                           await ref
                               .read(collectionRepositoryProvider)
                               .deleteWishlistItem(item.id);
@@ -1710,16 +1722,22 @@ class _CollectionCard extends ConsumerWidget {
               max: entry.quantity,
               onChanged: (v) => _updateCount(ref, 'assembled', v),
             ),
+            // Une figurine ne peut pas être apprêtée avant d'être montée,
+            // ni peinte avant d'être apprêtée : le plafond de chaque
+            // palier suit le précédent, pas `quantity` (voir
+            // CollectionDao.updateCounts, qui applique déjà cette règle
+            // côté données — ce plafond évite en plus un "+" qui aurait
+            // l'air actif sans rien faire une fois le plafond réel atteint).
             _CountRow(
               label: l10n.collectionPrimed,
               value: entry.primed,
-              max: entry.quantity,
+              max: entry.assembled,
               onChanged: (v) => _updateCount(ref, 'primed', v),
             ),
             _CountRow(
               label: l10n.collectionPainted,
               value: entry.painted,
-              max: entry.quantity,
+              max: entry.primed,
               onChanged: (v) => _updateCount(ref, 'painted', v),
             ),
           ],

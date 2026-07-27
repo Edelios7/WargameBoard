@@ -218,6 +218,12 @@ abstract class AppLocalizations {
   /// **'Sauvegarde'**
   String get settingsBackupTitle;
 
+  /// No description provided for @settingsDisplayNameSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom enregistré'**
+  String get settingsDisplayNameSaved;
+
   /// No description provided for @settingsBackupDescription.
   ///
   /// In fr, this message translates to:
@@ -313,6 +319,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'{count} éléments importés'**
   String settingsImportSuccess(int count);
+
+  /// No description provided for @settingsImportUnexpectedError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échec de l\'import — vérifie le format du JSON (un champ a probablement un type inattendu)'**
+  String get settingsImportUnexpectedError;
 
   /// No description provided for @catalogSearchHint.
   ///
@@ -2293,6 +2305,18 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Supprimer le projet'**
   String get dashboardDeleteProject;
+
+  /// No description provided for @dashboardDeleteProjectConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer ce projet ?'**
+  String get dashboardDeleteProjectConfirmTitle;
+
+  /// No description provided for @dashboardDeleteProjectConfirmMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'« {title} » sera définitivement supprimé.'**
+  String dashboardDeleteProjectConfirmMessage(String title);
 
   /// No description provided for @dashboardSearchHint.
   ///

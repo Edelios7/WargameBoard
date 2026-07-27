@@ -48,6 +48,21 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     }
   }
 
+  // Sauvegarde silencieusement à chaque frappe (comme avant), mais ne
+  // confirme qu'une fois la saisie terminée (Entrée / perte de focus) —
+  // un SnackBar à chaque caractère serait pire que l'absence de feedback
+  // actuelle. Les autres actions de cette page (export/restauration de
+  // sauvegarde) confirment déjà leur succès ; ce champ était la seule
+  // exception silencieuse.
+  void _saveNameWithFeedback() {
+    _saveName();
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l10n.settingsDisplayNameSaved)),
+    );
+  }
+
   Future<void> _exportBackup() async {
     final l10n = AppLocalizations.of(context)!;
     try {
@@ -168,8 +183,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                             ),
                           ),
                           onChanged: (_) => _saveName(),
-                          onSubmitted: (_) => _saveName(),
-                          onEditingComplete: _saveName,
+                          onSubmitted: (_) => _saveNameWithFeedback(),
+                          onEditingComplete: _saveNameWithFeedback,
                         ),
                       ],
                     ),

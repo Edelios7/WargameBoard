@@ -12,6 +12,7 @@ import '../../../database/app_database.dart' show Faction, Keyword;
 import '../../../database/models/catalog_sort.dart';
 import '../../../database/models/search_result.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../core/widgets/retry_error_state.dart';
 import '../../../providers/catalog_provider.dart';
 import '../widgets/catalog_preview_panel.dart';
 import 'datasheet_full_page.dart';
@@ -163,10 +164,15 @@ class CatalogPage extends ConsumerWidget {
                     ),
                     Container(width: 1, color: AppColors.border),
                     Expanded(
-                      child: CatalogPreviewPanel(
-                        datasheet: detailAsync.value,
-                        loading: detailAsync.isLoading,
-                      ),
+                      child: detailAsync.hasError
+                          ? RetryErrorState(
+                              onRetry: () =>
+                                  ref.invalidate(selectedDatasheetProvider),
+                            )
+                          : CatalogPreviewPanel(
+                              datasheet: detailAsync.value,
+                              loading: detailAsync.isLoading,
+                            ),
                     ),
                   ],
                 );

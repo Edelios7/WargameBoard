@@ -1654,6 +1654,42 @@ class _ProjectRow extends ConsumerWidget {
                 icon: const Icon(Icons.close_rounded, size: 16),
                 color: AppColors.textSecondary,
                 onPressed: () async {
+                  final l10n = AppLocalizations.of(context)!;
+                  // Cette croix minuscule supprimait le projet sans
+                  // confirmation — un clic mal calibré perdait
+                  // définitivement un suivi, contrairement à toute autre
+                  // suppression de l'app (armée, unité, entrée de
+                  // collection) qui demande toujours confirmation.
+                  final confirmed = await showDialog<bool>(
+                    context: context,
+                    builder: (dialogContext) => AlertDialog(
+                      backgroundColor: AppColors.surface,
+                      title: Text(
+                        l10n.dashboardDeleteProjectConfirmTitle,
+                        style: AppTextStyles.title,
+                      ),
+                      content: Text(
+                        l10n.dashboardDeleteProjectConfirmMessage(title),
+                        style: AppTextStyles.body,
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () =>
+                              Navigator.of(dialogContext).pop(false),
+                          child: Text(l10n.armyBuilderCancel),
+                        ),
+                        FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.error,
+                          ),
+                          onPressed: () =>
+                              Navigator.of(dialogContext).pop(true),
+                          child: Text(l10n.dashboardDeleteProject),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (confirmed != true) return;
                   await ref
                       .read(projectRepositoryProvider)
                       .deleteProject(id);

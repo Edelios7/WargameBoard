@@ -74,7 +74,14 @@ class _RulesPageState extends State<RulesPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final hero = kRuleDocuments.firstWhere((d) => d.isCurrent);
+    // orElse en filet de sécurité : kRuleDocuments est un catalogue statique
+    // édité à la main, et rien n'empêche une future entrée d'oublier
+    // `isCurrent: true` — sans repli, ça ferait planter toute la page
+    // Règles au lieu d'un simple mauvais choix de mise en avant.
+    final hero = kRuleDocuments.firstWhere(
+      (d) => d.isCurrent,
+      orElse: () => kRuleDocuments.first,
+    );
     final documents = _filtered;
     final recent = [...documents]
       ..sort((a, b) => b.lastUpdate.compareTo(a.lastUpdate));
