@@ -210,7 +210,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 20;
+  int get schemaVersion => 21;
 
   // =========================
   // Migrations
@@ -400,6 +400,11 @@ class AppDatabase extends _$AppDatabase {
           await into(xpMilestones).insertOnConflictUpdate(
             XpMilestonesCompanion.insert(key: 'first_army'),
           );
+        }
+      }
+      if (from < 21) {
+        if (!await _hasColumn('datasheets', 'archetype')) {
+          await m.addColumn(datasheets, datasheets.archetype);
         }
       }
     },

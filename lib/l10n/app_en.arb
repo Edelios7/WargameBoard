@@ -621,6 +621,11 @@
   },
   "foodChainVerdictBalanced": "Balanced",
   "foodChainMoreDetails": "Learn more",
+  "unitArchetypeHorde": "Horde",
+  "unitArchetypeElite": "Elite",
+  "unitArchetypeArmored": "Armored / Monster",
+  "unitArchetypeAntiTank": "Anti-tank specialist",
+  "unitArchetypeSupport": "Support / Control",
   "rulesDocumentsCount": "{count} documents",
   "@rulesDocumentsCount": {
     "placeholders": {

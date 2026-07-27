@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
+import '../../../core/widgets/archetype_badge.dart';
 import '../../../database/models/ability_details.dart';
 import '../../../database/models/cost_bracket.dart';
 import '../../../database/models/datasheet_details.dart';
@@ -170,6 +171,10 @@ class DatasheetDetailPanel extends StatelessWidget {
                       const SizedBox(width: 8),
                     ],
                     Text(sheet.factionName, style: AppTextStyles.caption),
+                    if (sheet.archetype != null) ...[
+                      const SizedBox(width: 10),
+                      ArchetypeChip(archetype: sheet.archetype!),
+                    ],
                   ],
                 ),
               ],

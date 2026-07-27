@@ -621,6 +621,11 @@
   },
   "foodChainVerdictBalanced": "Équilibré",
   "foodChainMoreDetails": "En savoir plus",
+  "unitArchetypeHorde": "Horde",
+  "unitArchetypeElite": "Élite",
+  "unitArchetypeArmored": "Blindé / Monstre",
+  "unitArchetypeAntiTank": "Spécialiste anti-char",
+  "unitArchetypeSupport": "Soutien / Contrôle",
   "rulesDocumentsCount": "{count} documents",
   "@rulesDocumentsCount": {
     "placeholders": {

@@ -1302,6 +1302,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get foodChainMoreDetails => 'Learn more';
 
   @override
+  String get unitArchetypeHorde => 'Horde';
+
+  @override
+  String get unitArchetypeElite => 'Elite';
+
+  @override
+  String get unitArchetypeArmored => 'Armored / Monster';
+
+  @override
+  String get unitArchetypeAntiTank => 'Anti-tank specialist';
+
+  @override
+  String get unitArchetypeSupport => 'Support / Control';
+
+  @override
   String rulesDocumentsCount(int count) {
     return '$count documents';
   }

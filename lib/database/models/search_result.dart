@@ -1,3 +1,5 @@
+import '../../domain/catalog/common/unit_archetype.dart';
+
 class SearchResult {
   final String id;
 
@@ -19,6 +21,10 @@ class SearchResult {
 
   final int? points;
 
+  /// Archétype de jeu estimé (voir [classifyArchetype]) — `null` si pas
+  /// encore calculé pour cette fiche, ou pour un résultat non-datasheet.
+  final UnitArchetype? archetype;
+
   const SearchResult({
     required this.id,
     required this.name,
@@ -30,5 +36,6 @@ class SearchResult {
     this.editionId,
     this.unitType,
     this.points,
+    this.archetype,
   });
 }

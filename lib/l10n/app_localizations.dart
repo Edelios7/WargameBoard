@@ -2468,6 +2468,36 @@ abstract class AppLocalizations {
   /// **'En savoir plus'**
   String get foodChainMoreDetails;
 
+  /// No description provided for @unitArchetypeHorde.
+  ///
+  /// In fr, this message translates to:
+  /// **'Horde'**
+  String get unitArchetypeHorde;
+
+  /// No description provided for @unitArchetypeElite.
+  ///
+  /// In fr, this message translates to:
+  /// **'Élite'**
+  String get unitArchetypeElite;
+
+  /// No description provided for @unitArchetypeArmored.
+  ///
+  /// In fr, this message translates to:
+  /// **'Blindé / Monstre'**
+  String get unitArchetypeArmored;
+
+  /// No description provided for @unitArchetypeAntiTank.
+  ///
+  /// In fr, this message translates to:
+  /// **'Spécialiste anti-char'**
+  String get unitArchetypeAntiTank;
+
+  /// No description provided for @unitArchetypeSupport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Soutien / Contrôle'**
+  String get unitArchetypeSupport;
+
   /// No description provided for @rulesDocumentsCount.
   ///
   /// In fr, this message translates to:

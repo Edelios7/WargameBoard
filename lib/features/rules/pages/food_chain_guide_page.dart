@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_card.dart';
-import '../../../domain/rules/food_chain_data.dart';
+import '../../../domain/catalog/common/unit_archetype.dart';
 import '../../../domain/rules/rule_document.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -168,6 +168,7 @@ class _ArchetypeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final info = kArchetypeInfo[archetype]!;
     return SizedBox(
       width: 132,
@@ -185,7 +186,7 @@ class _ArchetypeChip extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              info.name,
+              archetypeName(l10n, archetype),
               textAlign: TextAlign.center,
               style: AppTextStyles.body.copyWith(
                 color: selected ? AppColors.primary : AppColors.textPrimary,
@@ -213,12 +214,12 @@ class _MatchupResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final infoA = kArchetypeInfo[a]!;
-    final infoB = kArchetypeInfo[b]!;
     final balanced = result.advantage == null;
     final verdictText = balanced
         ? l10n.foodChainVerdictBalanced
-        : l10n.foodChainVerdictAdvantage(kArchetypeInfo[result.advantage]!.name);
+        : l10n.foodChainVerdictAdvantage(
+            archetypeName(l10n, result.advantage!),
+          );
 
     return AppCard(
       child: Column(
@@ -228,7 +229,10 @@ class _MatchupResultCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _ArchetypeBadge(info: infoA, highlighted: result.advantage == a),
+              _ArchetypeBadge(
+                archetype: a,
+                highlighted: result.advantage == a,
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
@@ -238,7 +242,10 @@ class _MatchupResultCard extends StatelessWidget {
                   ),
                 ),
               ),
-              _ArchetypeBadge(info: infoB, highlighted: result.advantage == b),
+              _ArchetypeBadge(
+                archetype: b,
+                highlighted: result.advantage == b,
+              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -279,13 +286,15 @@ class _MatchupResultCard extends StatelessWidget {
 }
 
 class _ArchetypeBadge extends StatelessWidget {
-  final ArchetypeInfo info;
+  final UnitArchetype archetype;
   final bool highlighted;
 
-  const _ArchetypeBadge({required this.info, required this.highlighted});
+  const _ArchetypeBadge({required this.archetype, required this.highlighted});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final info = kArchetypeInfo[archetype]!;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -296,7 +305,7 @@ class _ArchetypeBadge extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          info.name,
+          archetypeName(l10n, archetype),
           textAlign: TextAlign.center,
           style: AppTextStyles.caption.copyWith(
             color: highlighted ? AppColors.success : AppColors.textSecondary,

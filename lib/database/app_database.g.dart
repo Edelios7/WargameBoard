@@ -3669,6 +3669,17 @@ class $DatasheetsTable extends Datasheets
     ),
     defaultValue: const Constant(true),
   );
+  static const VerificationMeta _archetypeMeta = const VerificationMeta(
+    'archetype',
+  );
+  @override
+  late final GeneratedColumn<String> archetype = GeneratedColumn<String>(
+    'archetype',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -3705,6 +3716,7 @@ class $DatasheetsTable extends Datasheets
     isEpicHero,
     isLegend,
     isActive,
+    archetype,
     createdAt,
     updatedAt,
   ];
@@ -3799,6 +3811,12 @@ class $DatasheetsTable extends Datasheets
         isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
       );
     }
+    if (data.containsKey('archetype')) {
+      context.handle(
+        _archetypeMeta,
+        archetype.isAcceptableOrUnknown(data['archetype']!, _archetypeMeta),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -3860,6 +3878,10 @@ class $DatasheetsTable extends Datasheets
         DriftSqlType.bool,
         data['${effectivePrefix}is_active'],
       )!,
+      archetype: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}archetype'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -3888,6 +3910,13 @@ class Datasheet extends DataClass implements Insertable<Datasheet> {
   final bool isEpicHero;
   final bool isLegend;
   final bool isActive;
+
+  /// Archétype de jeu estimé ("horde", "elite", "armored", "antiTank",
+  /// "support" — noms de [UnitArchetype]), calculé une fois par
+  /// `tools/backfill_unit_archetypes_test.dart` à partir des mots-clés,
+  /// de l'effectif et des armes. `null` tant que le backfill n'a pas
+  /// tourné pour cette fiche.
+  final String? archetype;
   final DateTime createdAt;
   final DateTime updatedAt;
   const Datasheet({
@@ -3901,6 +3930,7 @@ class Datasheet extends DataClass implements Insertable<Datasheet> {
     required this.isEpicHero,
     required this.isLegend,
     required this.isActive,
+    this.archetype,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -3919,6 +3949,9 @@ class Datasheet extends DataClass implements Insertable<Datasheet> {
     map['is_epic_hero'] = Variable<bool>(isEpicHero);
     map['is_legend'] = Variable<bool>(isLegend);
     map['is_active'] = Variable<bool>(isActive);
+    if (!nullToAbsent || archetype != null) {
+      map['archetype'] = Variable<String>(archetype);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -3938,6 +3971,9 @@ class Datasheet extends DataClass implements Insertable<Datasheet> {
       isEpicHero: Value(isEpicHero),
       isLegend: Value(isLegend),
       isActive: Value(isActive),
+      archetype: archetype == null && nullToAbsent
+          ? const Value.absent()
+          : Value(archetype),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -3959,6 +3995,7 @@ class Datasheet extends DataClass implements Insertable<Datasheet> {
       isEpicHero: serializer.fromJson<bool>(json['isEpicHero']),
       isLegend: serializer.fromJson<bool>(json['isLegend']),
       isActive: serializer.fromJson<bool>(json['isActive']),
+      archetype: serializer.fromJson<String?>(json['archetype']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -3977,6 +4014,7 @@ class Datasheet extends DataClass implements Insertable<Datasheet> {
       'isEpicHero': serializer.toJson<bool>(isEpicHero),
       'isLegend': serializer.toJson<bool>(isLegend),
       'isActive': serializer.toJson<bool>(isActive),
+      'archetype': serializer.toJson<String?>(archetype),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -3993,6 +4031,7 @@ class Datasheet extends DataClass implements Insertable<Datasheet> {
     bool? isEpicHero,
     bool? isLegend,
     bool? isActive,
+    Value<String?> archetype = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => Datasheet(
@@ -4006,6 +4045,7 @@ class Datasheet extends DataClass implements Insertable<Datasheet> {
     isEpicHero: isEpicHero ?? this.isEpicHero,
     isLegend: isLegend ?? this.isLegend,
     isActive: isActive ?? this.isActive,
+    archetype: archetype.present ? archetype.value : this.archetype,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -4029,6 +4069,7 @@ class Datasheet extends DataClass implements Insertable<Datasheet> {
           : this.isEpicHero,
       isLegend: data.isLegend.present ? data.isLegend.value : this.isLegend,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      archetype: data.archetype.present ? data.archetype.value : this.archetype,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -4047,6 +4088,7 @@ class Datasheet extends DataClass implements Insertable<Datasheet> {
           ..write('isEpicHero: $isEpicHero, ')
           ..write('isLegend: $isLegend, ')
           ..write('isActive: $isActive, ')
+          ..write('archetype: $archetype, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -4065,6 +4107,7 @@ class Datasheet extends DataClass implements Insertable<Datasheet> {
     isEpicHero,
     isLegend,
     isActive,
+    archetype,
     createdAt,
     updatedAt,
   );
@@ -4082,6 +4125,7 @@ class Datasheet extends DataClass implements Insertable<Datasheet> {
           other.isEpicHero == this.isEpicHero &&
           other.isLegend == this.isLegend &&
           other.isActive == this.isActive &&
+          other.archetype == this.archetype &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -4097,6 +4141,7 @@ class DatasheetsCompanion extends UpdateCompanion<Datasheet> {
   final Value<bool> isEpicHero;
   final Value<bool> isLegend;
   final Value<bool> isActive;
+  final Value<String?> archetype;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -4111,6 +4156,7 @@ class DatasheetsCompanion extends UpdateCompanion<Datasheet> {
     this.isEpicHero = const Value.absent(),
     this.isLegend = const Value.absent(),
     this.isActive = const Value.absent(),
+    this.archetype = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -4126,6 +4172,7 @@ class DatasheetsCompanion extends UpdateCompanion<Datasheet> {
     this.isEpicHero = const Value.absent(),
     this.isLegend = const Value.absent(),
     this.isActive = const Value.absent(),
+    this.archetype = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -4145,6 +4192,7 @@ class DatasheetsCompanion extends UpdateCompanion<Datasheet> {
     Expression<bool>? isEpicHero,
     Expression<bool>? isLegend,
     Expression<bool>? isActive,
+    Expression<String>? archetype,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -4160,6 +4208,7 @@ class DatasheetsCompanion extends UpdateCompanion<Datasheet> {
       if (isEpicHero != null) 'is_epic_hero': isEpicHero,
       if (isLegend != null) 'is_legend': isLegend,
       if (isActive != null) 'is_active': isActive,
+      if (archetype != null) 'archetype': archetype,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -4177,6 +4226,7 @@ class DatasheetsCompanion extends UpdateCompanion<Datasheet> {
     Value<bool>? isEpicHero,
     Value<bool>? isLegend,
     Value<bool>? isActive,
+    Value<String?>? archetype,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
@@ -4192,6 +4242,7 @@ class DatasheetsCompanion extends UpdateCompanion<Datasheet> {
       isEpicHero: isEpicHero ?? this.isEpicHero,
       isLegend: isLegend ?? this.isLegend,
       isActive: isActive ?? this.isActive,
+      archetype: archetype ?? this.archetype,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -4231,6 +4282,9 @@ class DatasheetsCompanion extends UpdateCompanion<Datasheet> {
     if (isActive.present) {
       map['is_active'] = Variable<bool>(isActive.value);
     }
+    if (archetype.present) {
+      map['archetype'] = Variable<String>(archetype.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -4256,6 +4310,7 @@ class DatasheetsCompanion extends UpdateCompanion<Datasheet> {
           ..write('isEpicHero: $isEpicHero, ')
           ..write('isLegend: $isLegend, ')
           ..write('isActive: $isActive, ')
+          ..write('archetype: $archetype, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -22179,6 +22234,7 @@ typedef $$DatasheetsTableCreateCompanionBuilder =
       Value<bool> isEpicHero,
       Value<bool> isLegend,
       Value<bool> isActive,
+      Value<String?> archetype,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -22195,6 +22251,7 @@ typedef $$DatasheetsTableUpdateCompanionBuilder =
       Value<bool> isEpicHero,
       Value<bool> isLegend,
       Value<bool> isActive,
+      Value<String?> archetype,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -22256,6 +22313,11 @@ class $$DatasheetsTableFilterComposer
 
   ColumnFilters<bool> get isActive => $composableBuilder(
     column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get archetype => $composableBuilder(
+    column: $table.archetype,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -22329,6 +22391,11 @@ class $$DatasheetsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get archetype => $composableBuilder(
+    column: $table.archetype,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -22387,6 +22454,9 @@ class $$DatasheetsTableAnnotationComposer
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
 
+  GeneratedColumn<String> get archetype =>
+      $composableBuilder(column: $table.archetype, builder: (column) => column);
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -22435,6 +22505,7 @@ class $$DatasheetsTableTableManager
                 Value<bool> isEpicHero = const Value.absent(),
                 Value<bool> isLegend = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
+                Value<String?> archetype = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -22449,6 +22520,7 @@ class $$DatasheetsTableTableManager
                 isEpicHero: isEpicHero,
                 isLegend: isLegend,
                 isActive: isActive,
+                archetype: archetype,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -22465,6 +22537,7 @@ class $$DatasheetsTableTableManager
                 Value<bool> isEpicHero = const Value.absent(),
                 Value<bool> isLegend = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
+                Value<String?> archetype = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -22479,6 +22552,7 @@ class $$DatasheetsTableTableManager
                 isEpicHero: isEpicHero,
                 isLegend: isLegend,
                 isActive: isActive,
+                archetype: archetype,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,

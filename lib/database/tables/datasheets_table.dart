@@ -32,6 +32,13 @@ class Datasheets extends Table {
   BoolColumn get isActive =>
       boolean().withDefault(const Constant(true))();
 
+  /// Archétype de jeu estimé ("horde", "elite", "armored", "antiTank",
+  /// "support" — noms de [UnitArchetype]), calculé une fois par
+  /// `tools/backfill_unit_archetypes_test.dart` à partir des mots-clés,
+  /// de l'effectif et des armes. `null` tant que le backfill n'a pas
+  /// tourné pour cette fiche.
+  TextColumn get archetype => text().nullable()();
+
   DateTimeColumn get createdAt =>
       dateTime().withDefault(currentDateAndTime)();
 

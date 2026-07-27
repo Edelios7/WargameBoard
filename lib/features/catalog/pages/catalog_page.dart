@@ -7,6 +7,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/faction_colors.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
+import '../../../core/widgets/archetype_badge.dart';
 import '../../../database/app_database.dart' show Faction, Keyword;
 import '../../../database/models/catalog_sort.dart';
 import '../../../database/models/search_result.dart';
@@ -1389,25 +1390,41 @@ class _DatasheetListItem extends ConsumerWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: imageFile != null
-                                ? Image.file(
-                                    imageFile,
-                                    width: 52,
-                                    height: 52,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Container(
-                                    width: 52,
-                                    height: 52,
-                                    color: factionColor.withValues(alpha: .16),
-                                    child: Icon(
-                                      Icons.shield_outlined,
-                                      color: factionColor,
-                                      size: 20,
-                                    ),
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: imageFile != null
+                                    ? Image.file(
+                                        imageFile,
+                                        width: 52,
+                                        height: 52,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Container(
+                                        width: 52,
+                                        height: 52,
+                                        color: factionColor.withValues(
+                                          alpha: .16,
+                                        ),
+                                        child: Icon(
+                                          Icons.shield_outlined,
+                                          color: factionColor,
+                                          size: 20,
+                                        ),
+                                      ),
+                              ),
+                              if (result.archetype != null)
+                                Positioned(
+                                  right: -4,
+                                  bottom: -4,
+                                  child: ArchetypeBadge(
+                                    archetype: result.archetype!,
+                                    size: 20,
                                   ),
+                                ),
+                            ],
                           ),
                           const SizedBox(width: 12),
                           Expanded(

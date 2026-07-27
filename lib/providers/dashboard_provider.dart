@@ -82,6 +82,7 @@ final recentlyViewedDatasheetsProvider =
       type: 'datasheet',
       factionId: details.factionId,
       factionName: details.factionName,
+      archetype: details.archetype,
     ));
   }
   if (orphanIds.isNotEmpty) {

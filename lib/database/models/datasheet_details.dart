@@ -1,3 +1,4 @@
+import '../../domain/catalog/common/unit_archetype.dart';
 import 'ability_details.dart';
 import 'cost_bracket.dart';
 import 'equipment_details.dart';
@@ -50,6 +51,10 @@ class DatasheetDetails {
   /// figurines dans l'army builder).
   final List<CostBracket> costBrackets;
 
+  /// Archétype de jeu estimé (voir [classifyArchetype]) — `null` tant que
+  /// le backfill n'a pas encore tourné pour cette fiche.
+  final UnitArchetype? archetype;
+
   const DatasheetDetails({
     required this.id,
     required this.name,
@@ -67,5 +72,6 @@ class DatasheetDetails {
     required this.unit,
     required this.points,
     this.costBrackets = const [],
+    this.archetype,
   });
 }

@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+import '../../domain/catalog/common/unit_archetype.dart';
 import '../../domain/catalog/factions/space_marine_chapters.dart';
 import '../../domain/xp/xp_awards.dart';
 import '../app_database.dart';
@@ -130,6 +131,7 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
         factionName: faction.name,
         gameSystemId: faction.gameSystemId,
         editionId: null,
+        archetype: parseArchetype(datasheet.archetype),
       );
     }
     final sortedIds = counts.keys.toList()
@@ -217,6 +219,7 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
         editionId: null,
         unitType: datasheet.unitType,
         points: points,
+        archetype: parseArchetype(datasheet.archetype),
       );
     }
 
@@ -371,6 +374,7 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
       unit: unit,
       points: points,
       costBrackets: costs.brackets,
+      archetype: parseArchetype(datasheet.archetype),
     );
   }
 
