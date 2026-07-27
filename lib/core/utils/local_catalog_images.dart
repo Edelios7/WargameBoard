@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path/path.dart' as p;
 
+import 'local_assets_root.dart';
 import 'user_content_paths.dart';
 
 /// Résout une image de référence locale (datasheet, faction...) si elle
@@ -19,14 +20,10 @@ class LocalCatalogImages {
     // dart:io n'a pas accès au système de fichiers local sur le web ; ces
     // visuels ne sont de toute façon jamais servis hors machine locale.
     if (kIsWeb) return null;
+    final root = LocalAssetsRoot.path ?? Directory.current.path;
     for (final extension in _extensions) {
       final file = File(
-        p.join(
-          Directory.current.path,
-          'local_assets',
-          folder,
-          '$id.$extension',
-        ),
+        p.join(root, 'local_assets', folder, '$id.$extension'),
       );
       if (file.existsSync()) return file;
     }

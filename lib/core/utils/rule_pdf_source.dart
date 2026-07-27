@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' as p;
 
+import 'local_assets_root.dart';
+
 /// Résout les octets d'un PDF de règles officiel, jamais commité (voir
 /// local_assets/rules/README.md et .gitignore) — deux sources possibles
 /// selon la plateforme :
@@ -24,13 +26,9 @@ class RulePdfSource {
 
   static Future<Uint8List?> resolve(String localAssetId) async {
     if (!kIsWeb) {
+      final root = LocalAssetsRoot.path ?? Directory.current.path;
       final file = File(
-        p.join(
-          Directory.current.path,
-          'local_assets',
-          'rules',
-          '$localAssetId.pdf',
-        ),
+        p.join(root, 'local_assets', 'rules', '$localAssetId.pdf'),
       );
       if (file.existsSync()) return file.readAsBytes();
     }
