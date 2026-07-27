@@ -98,7 +98,7 @@ void main() {
   });
 
   testWidgets(
-      'the army lists document lists every faction as a section',
+      'the army lists document lists several styles per faction',
       (tester) async {
     await tester.binding.setSurfaceSize(const Size(1400, 2200));
     addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -112,8 +112,12 @@ void main() {
     await tester.tap(find.text("Exemples de listes d'armée").first);
     await tester.pumpAndSettle();
 
-    expect(find.text('BLOOD ANGELS'), findsOneWidget);
-    expect(find.textContaining('Total : 2000 pts'), findsWidgets);
+    expect(find.text('BLOOD ANGELS — CHARGE ÉCARLATE'), findsOneWidget);
+    expect(
+      find.text('BLOOD ANGELS — COLONNE BLINDÉE DU SANG'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('— Total :'), findsWidgets);
   });
 
   testWidgets(

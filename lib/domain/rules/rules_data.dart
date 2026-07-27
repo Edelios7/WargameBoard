@@ -243,7 +243,7 @@ final List<RuleDocument> kRuleDocuments = [
     id: 'guide-listes-d-armee',
     title: "Exemples de listes d'armée",
     category: RuleCategory.armyLists,
-    version: '1.0',
+    version: '1.1',
     releaseDate: DateTime(2026, 7, 27),
     lastUpdate: DateTime(2026, 7, 27),
     language: 'Français',
@@ -253,230 +253,286 @@ final List<RuleDocument> kRuleDocuments = [
     downloads: 0,
     errataCount: 0,
     intro:
-        "Une liste par faction, à ~2000 pts, construite uniquement avec des "
-        "unités et des coûts réellement présents dans le catalogue de "
-        "l'application — pour avoir un point de départ concret plutôt qu'une "
-        "page blanche en ouvrant l'Army Builder. Ce ne sont pas forcément "
-        "les listes les plus optimisées du moment (le méta évolue sans "
-        "arrêt), et certaines factions ont un total légèrement inférieur à "
-        "2000 pts quand leur catalogue actuel ne compte pas encore assez "
-        "d'unités chiffrées pour aller plus loin.",
+        "Deux styles de liste par faction — inspirés des façons de jouer "
+        "réellement rencontrées en partie (horde, colonne blindée, alpha "
+        "strike, gunline, deathstar d'élite...), pas d'un remplissage "
+        "algorithmique au hasard. Chaque liste est construite uniquement "
+        "avec des unités et des coûts réellement présents dans le "
+        "catalogue de l'application, à environ 2000 pts. Ce ne sont pas "
+        "forcément les listes les plus optimisées du moment (le méta "
+        "évolue sans arrêt) mais des bases concrètes et légales pour "
+        "démarrer une faction dans un style de jeu donné.",
     sections: [
       RuleSection(
-        heading: 'Adepta Sororitas',
+        heading: 'Adepta Sororitas — Croisade Zélote',
         body:
-            'Exemple de liste à environ 1995 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Imagifère — 65 pts\nEscouade De Sœurs De Bataille — 105 pts\nExo-harnais Parangon — 210 pts\nSainte Célestine — 150 pts\nEscouade Dominion — 115 pts\nExorcist — 210 pts\nEscouade Retributor — 105 pts\nEscouade De Sœurs Novices — 100 pts\n2 × Castigator — 320 pts\nEscouade Séraphine — 80 pts\nImmolator — 115 pts\nEscouade Zéphyrine — 80 pts\nMachines De Pénitence — 75 pts\nEscouade Repentia — 75 pts\nRhino Sororitas — 75 pts\nCélestes Sacro-saintes — 70 pts\nArco-flagellants — 45 pts'
-            ' — Total : 1995 pts',
+            'Une ruée de foi fanatique où novices, repentia et arco-flagellants submergent l\'ennemi au corps à corps sous la protection des Séraphines et Zéphyrines.\n\nChanoinesse — 75 pts\nSainte Célestine — 150 pts\nPalatine — 50 pts\n3 × Escouade De Sœurs De Bataille — 315 pts\n3 × Escouade Repentia — 225 pts\n2 × Escouade Séraphine — 160 pts\n2 × Escouade Zéphyrine — 160 pts\n3 × Arco-flagellants — 135 pts\n2 × Escouade Dominion — 230 pts\n3 × Escouade De Sœurs Novices — 300 pts — Total : 1800 pts',
       ),
       RuleSection(
-        heading: 'Adeptus Custodes',
+        heading: 'Adepta Sororitas — Colonne Blindée',
         body:
-            'Exemple de liste à environ 1980 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Champion Des Lames — 120 pts\nProsecutors — 40 pts\n2 × Gardes Custodiens — 420 pts\n2 × Land Raider Vénérable — 440 pts\n2 × Vertus Praetors — 300 pts\nVigilators — 50 pts\n2 × Dreadnought Contemptor Vénérable — 340 pts\nCustodiens Allarus — 120 pts\n2 × Rhino Anathema Psykana — 150 pts'
-            ' — Total : 1980 pts',
+            'Une force mécanisée qui avance derrière un mur de Rhino, Immolator, Exorcist et Castigator, avec Morvenn Vahl en fer de lance.\n\nMorvenn Vahl — 170 pts\n2 × Exorcist — 420 pts\n2 × Castigator — 320 pts\n2 × Rhino Sororitas — 150 pts\n2 × Immolator — 230 pts\n3 × Escouade De Sœurs De Bataille — 315 pts\nEscouade Retributor — 105 pts\nExo-harnais Parangon — 210 pts — Total : 1920 pts',
       ),
       RuleSection(
-        heading: 'Adeptus Mechanicus',
+        heading: 'Adeptus Custodes — Muraille Dorée',
         body:
-            'Exemple de liste à environ 2000 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Technaugure — 55 pts\nRangers Skitarii — 85 pts\nPatrouilleurs Skitarii — 95 pts\n2 × Robots Kastelan — 360 pts\nBrécheurs Kataphron — 160 pts\nStérilisateurs Pteraxii — 80 pts\nDésintégrateur Skorpius — 165 pts\nDestructeurs Kataphron — 105 pts\nCorrôdeurs Sicariens — 75 pts\nOnagre Des Dunes — 155 pts\nÉlectroprêtres Fulgurites — 70 pts\nGlisseur Skorpius — 85 pts\nVautours Pteraxii — 70 pts\nFerro-échassiers Ballistarii — 75 pts\nInfiltrateurs Sicariens — 70 pts\nÉlectroprêtres Corpuscarii — 65 pts\nHussards Serberys — 60 pts\nServitors — 60 pts\n2 × Soufredogues Serberys — 110 pts'
-            ' — Total : 2000 pts',
+            'Un mur d\'élite compact de Gardes Custodiens et Custodiens Allarus, épaulé par un Land Raider et un Dreadnought Contemptor, qui avance lentement et écrase tout sur son passage.\n\nTrajann Valoris — 140 pts\n3 × Gardes Custodiens — 630 pts\n2 × Custodiens Allarus — 240 pts\nCapitaine-rempart En Armure Terminator Allarus — 130 pts\nLand Raider Vénérable — 220 pts\nDreadnought Contemptor Vénérable — 170 pts\nAleya — 65 pts\nChevalier-centura — 55 pts\n2 × Prosecutors — 80 pts\nValerian — 110 pts\nChampion Des Lames — 120 pts — Total : 1960 pts',
       ),
       RuleSection(
-        heading: 'Aeldari',
+        heading: 'Adeptus Custodes — Charge Ailée',
         body:
-            'Exemple de liste à environ 2000 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Maugan Ra — 100 pts\nGardiens Défenseurs — 100 pts\nGardiens De Choc — 100 pts\nChevalier Fantôme — 435 pts\nGardes Fantômes — 170 pts\nDragons Flamboyants — 120 pts\nConclave De Psycharques Coureurs Célestes — 45 pts\nTisseur De Nuit — 190 pts\nGuerriers Fantômes — 160 pts\nLances Étincelantes — 110 pts\nPrisme De Feu — 150 pts\nTisseurs Célestes — 95 pts\nBanshees Huantes — 95 pts\nFaucon — 130 pts'
-            ' — Total : 2000 pts',
+            'Une frappe rapide de Praetors Vertus et de Vigilators déferlant sur les flancs, menée par un Capitaine-Rempart sur motojet Dawneagle.\n\nCapitaine-rempart Sur Motojet Dawneagle — 150 pts\n5 × Vertus Praetors — 750 pts\n6 × Vigilators — 300 pts\n3 × Prosecutors — 120 pts\nTrajann Valoris — 140 pts\nChampion Des Lames — 120 pts\nAleya — 65 pts\nChevalier-centura — 55 pts\nValerian — 110 pts — Total : 1810 pts',
       ),
       RuleSection(
-        heading: 'Agents de l\'Imperium',
+        heading: 'Adeptus Mechanicus — Horde Skitarii',
         body:
-            'Exemple de liste à environ 1385 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Assassin Culexus — 85 pts\n3 × Cosmomarins En Armes — 150 pts\n3 × Escouade Vigilant — 255 pts\n3 × Sapeurs De La Marine Impériale — 270 pts\n3 × Escouade D’exaction — 270 pts\n3 × Escouade Subductor — 255 pts\nAssassin Callidus — 100 pts'
-            ' — Total : 1385 pts',
+            'Un essaim de troupes Skitarii bon marché (Rangers, Patrouilleurs, éclaireurs et cavaliers Serberys) qui submerge le nombre d\'objectifs.\n\nMaréchal Skitarii — 35 pts\n3 × Rangers Skitarii — 255 pts\n3 × Patrouilleurs Skitarii — 285 pts\n2 × Électroprêtres Corpuscarii — 130 pts\n2 × Électroprêtres Fulgurites — 140 pts\n2 × Vautours Pteraxii — 140 pts\n2 × Hussards Serberys — 120 pts\n2 × Soufredogues Serberys — 110 pts\n2 × Infiltrateurs Sicariens — 140 pts\n2 × Corrôdeurs Sicariens — 150 pts\n2 × Stérilisateurs Pteraxii — 160 pts\nTechnaugure — 55 pts\nTechnoarchéologue — 45 pts\n2 × Servitors — 120 pts — Total : 1885 pts',
       ),
       RuleSection(
-        heading: 'Astra Militarum',
+        heading: 'Adeptus Mechanicus — Légion Robotique',
         body:
-            'Exemple de liste à environ 2000 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Sly Marbo — 55 pts\nTroupes De Choc Cadiennes — 65 pts\nDeath Korps De Krieg — 65 pts\nCombattants Des Jungles De Catachan — 65 pts\nStormsword — 465 pts\n2 × Batterie D’artillerie — 190 pts\nEscouade De Taurogryns — 100 pts\nKasrkin — 110 pts\nBanesword — 450 pts\nEscouade D’État-Major Du Militarum Tempestus — 85 pts\nFantômes De Gaunt — 100 pts\nChar De Combat Rogal Dorn — 250 pts'
-            ' — Total : 2000 pts',
+            'Un mur de robots et de cyborgs (Kastelan, Kataphron, Onagres, Ballistarii) coordonné par Belisarius Cawl pour un tir massif à distance.\n\nBelisarius Cawl — 175 pts\n2 × Robots Kastelan — 360 pts\n2 × Brécheurs Kataphron — 320 pts\n2 × Destructeurs Kataphron — 210 pts\n2 × Onagre Des Dunes — 310 pts\n2 × Ferro-échassiers Ballistarii — 150 pts\nRangers Skitarii — 85 pts\nTechnoprêtre Dominus — 65 pts\nDésintégrateur Skorpius — 165 pts — Total : 1840 pts',
       ),
       RuleSection(
-        heading: 'Black Templars',
+        heading: 'Aeldari — Hôte des Aspects',
         body:
-            'Exemple de liste à environ 2000 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Chapelain En Armure Terminator — 75 pts\nEscouade D’assaut Intercessor — 75 pts\nEscouade Intercessor — 80 pts\n2 × Escouade Lourde Intercessor — 200 pts\nLand Raider Redeemer — 270 pts\nEscouade Eliminator — 85 pts\nEscouade Desolator — 200 pts\nEscouade D’assaut Terminator — 180 pts\nLand Raider — 220 pts\nQuad Invader — 60 pts\nEscouade Centurion Devastator — 165 pts\nEscouade Terminator — 170 pts\nRepulsor Executioner — 220 pts'
-            ' — Total : 2000 pts',
+            'Quatre Seigneurs Phénix mènent chacun leur guerrier d\'Aspect dans une frappe rapide et chirurgicale visant les points faibles de l\'ennemi.\n\nAsurmen — 125 pts\nFuegan — 120 pts\nJain Zar — 105 pts\nMaugan Ra — 100 pts\n2 × Faucheurs Noirs — 180 pts\n2 × Dragons Flamboyants — 240 pts\n2 × Banshees Huantes — 190 pts\n2 × Scorpions Foudroyants — 170 pts\n2 × Gardiens Défenseurs — 200 pts\n2 × Éperviers Voltigeurs — 170 pts\n2 × Lances Étincelantes — 220 pts — Total : 1820 pts',
       ),
       RuleSection(
-        heading: 'Blood Angels',
+        heading: 'Aeldari — Muraille Spectrale',
         body:
-            'Exemple de liste à environ 2000 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Doyen En Armure Terminator — 75 pts\nEscouade D’assaut Intercessor — 75 pts\nEscouade Intercessor — 80 pts\n2 × Escouade Lourde Intercessor — 200 pts\nLand Raider Redeemer — 270 pts\nEscouade Eliminator — 85 pts\nEscouade Desolator — 200 pts\nEscouade D’assaut Terminator — 180 pts\nRepulsor Executioner — 220 pts\nQuad Invader — 60 pts\nEscouade Centurion Devastator — 165 pts\nEscouade Terminator — 170 pts\nLand Raider Crusader — 220 pts'
-            ' — Total : 2000 pts',
+            'Un noyau de constructions Fantômes (Seigneur, Chevalier, Guerriers et Gardes Fantômes) avance lentement, invulnérable, soutenu par les pouvoirs psychiques d\'Eldrad Ulthran.\n\nSeigneur Fantôme — 140 pts\nChevalier Fantôme — 435 pts\n2 × Guerriers Fantômes — 320 pts\n2 × Gardes Fantômes — 340 pts\nEldrad Ulthran — 110 pts\n2 × Gardiens De Choc — 200 pts\nPsycharque — 70 pts\n2 × Marcheurs De Guerre — 170 pts\n2 × Vypers — 130 pts — Total : 1915 pts',
       ),
       RuleSection(
-        heading: 'Chaos Daemons',
+        heading: 'Agents de l\'Imperium — Temple des Assassins',
         body:
-            'Exemple de liste à environ 2000 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Epidemius — 80 pts\nNurglings — 40 pts\nDémonettes — 100 pts\n2 × Sanguinaires — 220 pts\n2 × Bourdons De La Peste — 220 pts\n2 × Horreurs Roses — 280 pts\nCanon À Crânes — 95 pts\n2 × Horreurs Bleues — 250 pts\nBêtes De Nurgle — 65 pts\n2 × Portepestes — 220 pts\nHurleurs — 80 pts\nMolosses De Khorne — 75 pts\nIncendiaires — 65 pts\n2 × Autel Des Crânes — 210 pts'
-            ' — Total : 2000 pts',
+            'Les quatre types d\'Assassins de la Temple Assassinorum, doublés pour la redondance, frappent en profondeur pendant qu\'un léger cordon de suite tient les objectifs.\n\n2 × Assassin Vindicare — 220 pts\n2 × Assassin Culexus — 170 pts\n2 × Assassin Eversor — 220 pts\n2 × Assassin Callidus — 200 pts\nInquisiteur Coteaz — 75 pts\n4 × Cosmomarins En Armes — 200 pts\n2 × Escouade Vigilant — 170 pts\n2 × Escouade Subductor — 170 pts\n2 × Escouade D’Exaction — 180 pts\n2 × Sapeurs De La Marine Impériale — 180 pts\nInquisiteur — 55 pts — Total : 1840 pts',
       ),
       RuleSection(
-        heading: 'Chaos Knights',
+        heading: 'Agents de l\'Imperium — Cellule d\'Inquisition',
         body:
-            'Exemple de liste à environ 1980 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            '2 × Dogue Rabatteur — 280 pts\nDogue Exécuteur — 130 pts\n2 × Dogue Brigand — 280 pts\n2 × Chevalier Abominable — 710 pts\n2 × Dogue Karnivore — 300 pts\n2 × Dogue Chasseur — 280 pts'
-            ' — Total : 1980 pts',
+            'Un état-major d\'Inquisiteurs (Draxus, Greyfax, Coteaz) dirige un vaste réseau de suites impériales, avec un soutien ponctuel d\'Assassins pour les cibles prioritaires.\n\nDame Inquisitrice Kyria Draxus — 75 pts\nInquisitrice Greyfax — 65 pts\nInquisiteur Coteaz — 75 pts\n2 × Inquisiteur — 110 pts\n3 × Escouade Vigilant — 255 pts\n6 × Cosmomarins En Armes — 300 pts\n3 × Escouade D’Exaction — 270 pts\n3 × Escouade Subductor — 255 pts\n3 × Sapeurs De La Marine Impériale — 270 pts\nAssassin Culexus — 85 pts\nAssassin Callidus — 100 pts — Total : 1860 pts',
       ),
       RuleSection(
-        heading: 'Chaos Space Marines',
+        heading: 'Astra Militarum — Colonne Blindée',
         body:
-            'Exemple de liste à environ 1970 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Maître Des Exécutions — 80 pts\nBande De Cultistes — 50 pts\nLégionnaires — 90 pts\nSeigneur Des Crânes De Khorne — 450 pts\nObliterators — 160 pts\nEscouade Terminator Du Chaos — 180 pts\nLand Raider Du Chaos — 220 pts\nHavocs — 125 pts\nÉlus — 125 pts\nMétaragne — 205 pts\nFabius Bile — 85 pts\nSerres Du Warp — 125 pts\nRhino Du Chaos — 75 pts'
-            ' — Total : 1970 pts',
+            'Une escorte d\'infanterie minimale protège un mur de chars Leman Russ et un Baneblade qui encaissent et pulvérisent tout ce qui bouge.\n\nSeigneur Solaire Leontus — 130 pts\nTroupes De Choc Cadiennes — 65 pts\nChar De Combat Rogal Dorn — 250 pts\n2 × Char De Combat Leman Russ — 370 pts\nLeman Russ Demolisher — 190 pts\n2 × Basilisk — 280 pts\nHellhound — 125 pts\nChimera — 85 pts\nBaneblade — 450 pts — Total : 1945 pts',
       ),
       RuleSection(
-        heading: 'Dark Angels',
+        heading: 'Astra Militarum — Marée Humaine',
         body:
-            'Exemple de liste à environ 2000 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Doyen En Armure Terminator — 75 pts\nEscouade D’assaut Intercessor — 75 pts\nEscouade Intercessor — 80 pts\nEscouade Lourde Intercessor — 100 pts\nLand Raider Redeemer — 270 pts\nEscouade Eliminator — 85 pts\nEscouade Desolator — 200 pts\nEscouade D’assaut Terminator — 180 pts\nRepulsor Executioner — 220 pts\nQuad Invader — 60 pts\nEscouade Centurion Devastator — 165 pts\nEscouade Terminator De La Deathwing — 180 pts\nLand Raider — 220 pts\nEscouade Infernus — 90 pts'
-            ' — Total : 2000 pts',
+            'Des dizaines de fantassins bon marché, encadrés d\'officiers et de commissaires, submergent l\'adversaire par le nombre pur.\n\nUrsula Creed — 85 pts\nCastellan Cadien — 55 pts\nCommissaire — 30 pts\nPrêcheur Régimentaire — 35 pts\nPsyker Primaris — 60 pts\n6 × Troupes De Choc Cadiennes — 390 pts\n5 × Death Korps De Krieg — 325 pts\n2 × Combattants Des Jungles De Catachan — 130 pts\nFantômes De Gaunt — 100 pts\nKasrkin — 110 pts\nSnipers Ratlings — 60 pts\nCavaliers D’Attila — 60 pts\n2 × Escouade D’Ogryns — 120 pts\nEscouade De Taurogryns — 100 pts\nNork Deddog — 60 pts\nGarde Du Corps Ogryn — 40 pts\nBatterie D’Artillerie — 95 pts — Total : 1855 pts',
       ),
       RuleSection(
-        heading: 'Death Guard',
+        heading: 'Black Templars — Poing Blindé',
         body:
-            'Exemple de liste à environ 1965 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Biologus Putréfacteur — 60 pts\nMarines De La Peste — 95 pts\n2 × Land Raider De La Death Guard — 480 pts\n2 × Terminators Du Linceul — 320 pts\n2 × Profanateur De La Death Guard — 330 pts\nTerminators Rouillarques — 115 pts\nPredator Destructor De La Death Guard — 145 pts\nPredator Annihilator De La Death Guard — 135 pts\nSemi-chenillés Méphitiques — 100 pts\nDrone Fétide — 100 pts\nRhino De La Death Guard — 85 pts'
-            ' — Total : 1965 pts',
+            'Gladiators, Repulsors et Land Raider avancent en formation pour écraser l\'ennemi sous un déluge de tirs mécanisés.\n\nCapitaine En Armure Gravis — 80 pts\nMaréchal — 80 pts\nEscouade Intercessor — 80 pts\n2 × Gladiator Lancer — 320 pts\nGladiator Reaper — 160 pts\nGladiator Valiant — 150 pts\nRepulsor — 180 pts\nRepulsor Executioner — 220 pts\n2 × Impulsor — 160 pts\nLand Raider Crusader — 220 pts\nDreadnought Redemptor — 195 pts — Total : 1845 pts',
       ),
       RuleSection(
-        heading: 'Deathwatch',
+        heading: 'Black Templars — Croisade Vengeresse',
         body:
-            'Exemple de liste à environ 1980 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Chapelain En Armure Terminator — 75 pts\nEscouade D’assaut Intercessor — 75 pts\nEscouade Intercessor — 80 pts\nEscouade Lourde Intercessor — 100 pts\nLand Raider Redeemer — 270 pts\nEscouade Eliminator — 85 pts\nKill Team Indomitor — 250 pts\nEscouade Terminator Deathwatch — 190 pts\nRepulsor Executioner — 220 pts\nQuad Invader — 60 pts\nEscouade Desolator — 200 pts\nEscouade D’assaut Terminator — 180 pts\nDreadnought Redemptor — 195 pts'
-            ' — Total : 1980 pts',
+            'Le Sénéchal, le Champion de l\'Empereur et des escouades Terminator embarquées en Land Raider foncent au corps-à-corps dès le premier tour.\n\nGrand Sénéchal Helbrecht — 120 pts\nLe Champion De L’Empereur — 90 pts\nChapelain Grimaldus — 110 pts\nChapelain En Armure Terminator — 75 pts\n2 × Frères D’Épée Primaris — 210 pts\nEscouade D’Assaut Terminator — 180 pts\nEscouade Terminator — 170 pts\nEscouade D’Assaut Intercessor — 75 pts\nLand Raider Crusader — 220 pts\nLand Raider Redeemer — 270 pts\nEscouade De Vétérans Bladeguards — 80 pts\nDreadnought Brutalis — 160 pts\nEscouade Infernus — 90 pts\nTechmarine — 55 pts — Total : 1905 pts',
       ),
       RuleSection(
-        heading: 'Drukhari',
+        heading: 'Blood Angels — Charge Écarlate',
         body:
-            'Exemple de liste à environ 1955 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Drazhar — 85 pts\n3 × Guerriers Kabalites — 345 pts\n3 × Ravageur — 345 pts\n3 × Cour De L’archonte — 375 pts\n2 × Talos — 160 pts\n3 × Hellions — 255 pts\n2 × Venom — 140 pts\n2 × Écumeurs — 140 pts\n2 × Cronos — 110 pts'
-            ' — Total : 1955 pts',
+            'La Compagnie de la Mort et la Garde Sanguinaire, portées par le Sanguinor et Astorath, plongent en avant pour un assaut au corps-à-corps dès le tour 1.\n\nCommandeur Dante — 120 pts\nLemartes — 100 pts\nPrêtre Sanguinien — 75 pts\n4 × Death Company Marines — 340 pts\n3 × Marines De La Compagnie De La Mort À Réacteurs Dorsaux — 360 pts\n2 × Sanguinary Guard — 250 pts\nLe Sanguinor — 140 pts\nAstorath — 95 pts\nEscouade D’Assaut Intercessor — 75 pts\nDreadnought De La Compagnie De La Mort — 160 pts\nIntercessors De La Compagnie De La Mort — 85 pts — Total : 1800 pts',
       ),
       RuleSection(
-        heading: 'Genestealer Cults',
+        heading: 'Blood Angels — Colonne Blindée du Sang',
         body:
-            'Exemple de liste à environ 2000 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Hybrides Néophytes — 65 pts\n2 × Concasseur Goliath — 240 pts\n2 × Aberrants — 270 pts\nChacals Atalans — 85 pts\nPatriarche — 75 pts\n2 × Tout-terrain Achilles — 190 pts\nAbominant — 85 pts\nGenestealers Pure-souche — 75 pts\nMagus — 50 pts\n2 × Camion Goliath — 170 pts\n2 × Primus — 140 pts\nHybrides Métamorphes — 70 pts\nSaboteur Reductus — 65 pts\nKelermorphe — 60 pts\nNexos — 60 pts\nAlphus Chacal — 55 pts\nAcolyte Garde-icône — 50 pts\nBiophagus — 50 pts\nClamavus — 50 pts\nSanctus — 50 pts\nLocus — 45 pts'
-            ' — Total : 2000 pts',
+            'Predator Baal et Land Raiders avancent en escadron mécanisé pendant que Méphiston appuie la percée de ses pouvoirs psychiques.\n\nCaptain — 80 pts\nMaître Archiviste Méphiston — 120 pts\nEscouade Intercessor — 80 pts\n3 × Predator Baal — 375 pts\n2 × Rhino — 150 pts\nRazorback — 95 pts\nLand Raider Crusader — 220 pts\nLand Raider Redeemer — 270 pts\nVindicator — 185 pts\nDreadnought — 135 pts\nWhirlwind — 190 pts — Total : 1900 pts',
       ),
       RuleSection(
-        heading: 'Grey Knights',
+        heading: 'Chaos Daemons — Horde de Khorne',
         body:
-            'Exemple de liste à environ 1955 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Castellan Crowe — 90 pts\nEscouade Terminator De Confrérie — 160 pts\nLand Raider Redeemer Des Grey Knights — 270 pts\nEscouade Paladin — 180 pts\nLand Raider Des Grey Knights — 220 pts\nEscouade Interceptor — 130 pts\nLand Raider Crusader Des Grey Knights — 220 pts\nEscouade Purificator — 125 pts\nCuirassier Némésis — 210 pts\nEscouade Purgator — 125 pts\nDreadnought Vénérable Des Grey Knights — 140 pts\nRazorback Des Grey Knights — 85 pts'
-            ' — Total : 1955 pts',
+            'Une masse de Sanguinaires et de Molosses, précédée par de grands démons du Sang, fonce au corps-à-corps sans jamais s\'arrêter.\n\nMaître Du Sang — 65 pts\nMaître Des Crânes — 100 pts\nKaranak — 75 pts\n4 × Sanguinaires — 440 pts\n3 × Molosses De Khorne — 225 pts\n2 × Canon À Crânes — 190 pts\nMutileur Sur Trône De Sang — 165 pts\nBuveur De Sang — 305 pts\nSkarbrand — 305 pts — Total : 1870 pts',
       ),
       RuleSection(
-        heading: 'Imperial Knights',
+        heading: 'Chaos Daemons — Panthéon des Grands Démons',
         body:
-            'Exemple de liste à environ 1885 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Chevalier Castellan — 410 pts\nArmigères Helvériens — 140 pts\nArmigères Hastaires — 140 pts\nCanis Rex — 415 pts\nChevalier Croisé — 395 pts\nChevalier Vigilant — 385 pts'
-            ' — Total : 1885 pts',
+            'Be\'lakor et les Grands Démons des quatre Dieux Sombres forment une deathstar de monstres, soutenue par de petites lignes démoniaques jetables.\n\nBe’Lakor — 375 pts\nGrand Immonde — 250 pts\nDuc Du Changement — 260 pts\nGardien Des Secrets — 270 pts\nKairos Fateweaver — 270 pts\nPrince Démon Du Chaos — 180 pts\nHorreurs Bleues — 125 pts\nDémonettes — 100 pts\nNurglings — 40 pts\nEpidemius — 80 pts — Total : 1950 pts',
       ),
       RuleSection(
-        heading: 'Leagues of Votann',
+        heading: 'Chaos Knights — Meute de Dogues',
         body:
-            'Exemple de liste à environ 1975 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            '2 × Guerriers Âtrekogs — 200 pts\n2 × Forteresse Mobile Hekaton — 480 pts\n2 × Âtregardes Einhyrs — 270 pts\n2 × Beserks Cthoniens — 200 pts\n2 × Sagitaur — 190 pts\n2 × Ûthar Le Destiné — 190 pts\n2 × Pionniers Hernkogs — 160 pts\nTonnekogs Brokhyrs — 80 pts\nKâhl — 70 pts\nChampion Einhyr — 70 pts\nGrimnyr — 65 pts'
-            ' — Total : 1975 pts',
+            'Une nuée de petits Chevaliers Dogues rapides et nombreux quadrille le champ de bataille pour saturer les objectifs, épaulée par un unique titan lourd.\n\nDogue Rabatteur — 140 pts\n4 × Dogue Exécuteur — 520 pts\n2 × Dogue Karnivore — 300 pts\n2 × Dogue Brigand — 280 pts\n2 × Dogue Chasseur — 280 pts\nChevalier Abominable — 355 pts — Total : 1875 pts',
       ),
       RuleSection(
-        heading: 'Necrons',
+        heading: 'Chaos Knights — Cohorte de Titans',
         body:
-            'Exemple de liste à environ 1985 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Orikan Le Devin — 80 pts\nImmortels — 70 pts\nGuerriers Nécrons — 90 pts\nCrypte Tesseract — 425 pts\nDestroyers Lourds Lokhusts — 55 pts\nDestroyers Skorpekhs — 90 pts\nPrétoriens Du Triarcat — 90 pts\nMonolithe — 400 pts\nCryptoserfs — 60 pts\nDestroyers Ophydiens — 80 pts\n2 × Rôdeur Du Triarcat — 220 pts\nDestroyers Lokhusts — 40 pts\n2 × Console D’annihilation — 210 pts\nRéanimateur Canoptek — 75 pts'
-            ' — Total : 1985 pts',
+            'Une poignée de Chevaliers Titanesques massifs, à peine accompagnés de deux Dogues pour tenir les lignes, écrase tout sur son passage à coups de canons lourds.\n\nChevalier Pillard — 375 pts\nChevalier Profanateur — 365 pts\nChevalier Saccageur — 365 pts\nChevalier Abominable — 355 pts\n2 × Dogue Exécuteur — 260 pts\nDogue Rabatteur — 140 pts — Total : 1860 pts',
       ),
       RuleSection(
-        heading: 'Orks',
+        heading: 'Chaos Space Marines — Horde de Renégats',
         body:
-            'Exemple de liste à environ 1955 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Gros Mek En Méga-armure — 90 pts\nBoyz — 80 pts\n2 × Morkanaute — 560 pts\nMéganobz — 65 pts\n2 × Kommandos — 240 pts\n2 × Gorkanaute — 530 pts\n2 × Nobz — 210 pts\nBoosta-klata Kustom — 70 pts\nGretchins — 40 pts\nDragsta Shokk — 70 pts'
-            ' — Total : 1955 pts',
+            'Une marée de cultistes et de légionnaires bon marché, portée par des porte-voix qui les jettent au combat en masse.\n\n4 × Bande De Cultistes — 200 pts\n2 × Escouade De Gardes Renégats — 140 pts\n2 × Hommes-bêtes Affregors — 140 pts\n4 × Légionnaires — 360 pts\n3 × Cultistes Maudits — 270 pts\n2 × Apôtre Noir — 130 pts\nSeigneur Du Chaos — 90 pts\nMaître Des Exécutions — 80 pts\nHuron Blackheart — 80 pts\nObliterators — 160 pts\nÉlus — 125 pts\n2 × Motards Du Chaos — 140 pts — Total : 1915 pts',
       ),
       RuleSection(
-        heading: 'Space Marines (Adeptus Astartes)',
+        heading: 'Chaos Space Marines — Colonne Blindée du Chaos',
         body:
-            'Exemple de liste à environ 2000 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Chapelain En Armure Terminator — 75 pts\nEscouade D’assaut Intercessor — 75 pts\nEscouade Intercessor — 80 pts\n2 × Escouade Lourde Intercessor — 200 pts\nLand Raider Redeemer — 270 pts\nEscouade Eliminator — 85 pts\nEscouade Desolator — 200 pts\nEscouade D’assaut Terminator — 180 pts\nRepulsor Executioner — 220 pts\nQuad Invader — 60 pts\nEscouade Centurion Devastator — 165 pts\nEscouade Terminator — 170 pts\nLand Raider Crusader — 220 pts'
-            ' — Total : 2000 pts',
+            'Une colonne de chars et d\'engins démoniaques qui écrase l\'ennemi sous un déluge de blindage, menée depuis un Métarôdeur.\n\nSeigneur De La Discorde Sur Métarôdeur — 160 pts\nLand Raider Du Chaos — 220 pts\n2 × Predator Annihilator Du Chaos — 270 pts\nPredator Destructor Du Chaos — 140 pts\nVindicator Du Chaos — 185 pts\nProfanateur — 190 pts\nMétabrutus — 130 pts\n2 × Rhino Du Chaos — 150 pts\n2 × Légionnaires — 180 pts\nMétaragne — 205 pts — Total : 1830 pts',
       ),
       RuleSection(
-        heading: 'Space Wolves',
+        heading: 'Dark Angels — Deathwing - Deathstar Terminator',
         body:
-            'Exemple de liste à environ 2000 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Doyen En Armure Terminator — 75 pts\nEscouade D’assaut Intercessor — 75 pts\nEscouade Intercessor — 80 pts\nEscouade Lourde Intercessor — 100 pts\nLand Raider Redeemer — 270 pts\nEscouade Eliminator — 85 pts\nEscouade Desolator — 200 pts\nEscouade D’assaut Terminator — 180 pts\nRepulsor Executioner — 220 pts\nQuad Invader — 60 pts\nEscouade Centurion Devastator — 165 pts\nChasseurs Gris — 180 pts\nLand Raider — 220 pts\nEscouade Infernus — 90 pts'
-            ' — Total : 2000 pts',
+            'Un noyau de Terminators de la Deathwing débarqués par des Land Raiders, conçu pour percer n\'importe quelle ligne ennemie au corps-à-corps comme à distance.\n\nAzraël — 115 pts\nBélial — 85 pts\nAsmodaï — 70 pts\n4 × Escouade Terminator De La Deathwing — 720 pts\nArchiviste En Armure Terminator — 75 pts\n2 × Land Raider Crusader — 440 pts\nLand Raider Redeemer — 270 pts\nEscouade Intercessor — 80 pts — Total : 1855 pts',
       ),
       RuleSection(
-        heading: 'T\'au Empire',
+        heading: 'Dark Angels — Ravenwing - Frappe Éclair Blindée',
         body:
-            'Exemple de liste à environ 1990 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Commandant En Exo-armure Enforcer — 80 pts\nÉquipe De Brécheurs — 100 pts\nStormsurge — 400 pts\nExo-armures Stealth — 110 pts\n2 × Carnivores Kroots — 130 pts\nExo-armure Riptide — 190 pts\nExorôdeurs Kroots — 55 pts\nFrelons Vespides — 65 pts\nExo-armure Ghostkeel — 160 pts\nCavaliers Krootox — 40 pts\nChiens Kroots — 40 pts\nBombardier Sun Shark — 160 pts\nChar Hammerhead — 145 pts\nChar Sky Ray — 140 pts\nTourelle Tidewall — 90 pts\nDevilfish — 85 pts'
-            ' — Total : 1990 pts',
+            'Une colonne rapide de motos et de véhicules légers de la Ravenwing qui frappe vite, contourne les lignes et se disperse avant la riposte.\n\nSammaël — 115 pts\nLazarus — 70 pts\nCapitaine À Réacteur Dorsal — 75 pts\n2 × Darkshroud De La Ravenwing — 200 pts\n2 × Land Speeder Vengeance De La Ravenwing — 240 pts\n5 × Escouade Outrider — 400 pts\n3 × Escouade D’Assaut Intercessor — 225 pts\nStorm Speeder Hammerstrike — 125 pts\nStorm Speeder Thunderstrike — 150 pts\n2 × Quad Invader — 120 pts\n2 × Escouade Suppressor — 150 pts — Total : 1870 pts',
       ),
       RuleSection(
-        heading: 'Thousand Sons',
+        heading: 'Death Guard — Colonne Blindée Putride',
         body:
-            'Exemple de liste à environ 1995 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Sorcier Des Thousand Sons En Armure Terminator — 85 pts\nTzaangors — 70 pts\nMarines Rubricae — 105 pts\n2 × Land Raider Des Thousand Sons — 440 pts\nRejetons Du Chaos Des Thousand Sons — 65 pts\nTerminators Du Scarabée Occulte — 180 pts\nVindicator Des Thousand Sons — 185 pts\nTzaangors Éclairés — 55 pts\nMutalithe À Vortex — 175 pts\nProfanateur Des Thousand Sons — 165 pts\nPredator Destructor Des Thousand Sons — 140 pts\nPredator Annihilator Des Thousand Sons — 130 pts\nMétabrutus Des Thousand Sons — 110 pts\nRhino Des Thousand Sons — 90 pts'
-            ' — Total : 1995 pts',
+            'Des Rhinos et Predators rouillés escortent un Land Raider et des drones pourrisseurs pour une avancée mécanisée lente mais increvable.\n\nSeigneur De La Contagion — 120 pts\nPorte-icône De La Death Guard — 45 pts\n3 × Marines De La Peste — 285 pts\n3 × Rhino De La Death Guard — 255 pts\nLand Raider De La Death Guard — 240 pts\n2 × Predator Annihilator De La Death Guard — 270 pts\nPredator Destructor De La Death Guard — 145 pts\nProfanateur De La Death Guard — 165 pts\n2 × Semi-chenillés Méphitiques — 200 pts\nDrone Fétide — 100 pts — Total : 1825 pts',
       ),
       RuleSection(
-        heading: 'Tyranids',
+        heading: 'Death Guard — Deathstar Démoniaque de Mortarion',
         body:
-            'Exemple de liste à environ 2000 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Neurotyran — 105 pts\nTermagants — 60 pts\nHormagaunts — 65 pts\nGargouilles — 85 pts\nTyrannofex — 200 pts\nRôdeurs — 125 pts\nZoanthropes — 100 pts\nMaleceptor — 170 pts\n2 × Gardes Des Ruches — 180 pts\nGuerriers Tyranides Avec Bio-armes De Mêlée — 75 pts\nToxicrène — 150 pts\nGardes Tyranides — 80 pts\nGenestealers — 75 pts\nTrygon — 140 pts\nLictor — 60 pts\nVenomthropes — 70 pts\nExocrine — 140 pts\nBiovores — 50 pts\nBondisseurs De Von Ryan — 70 pts'
-            ' — Total : 2000 pts',
+            'Mortarion en personne ouvre la voie à des Terminators corrompus et un Prince Démon ailé, une liste d\'élite pensée pour un assaut dévastateur.\n\nMortarion — 380 pts\nTyphus — 100 pts\nSeigneur De La Virulence — 100 pts\nSeigneur De La Contagion — 120 pts\n3 × Terminators Rouillarques — 345 pts\n2 × Terminators Du Linceul — 320 pts\n2 × Marines De La Peste — 190 pts\nCorrupteur Nidoreux — 50 pts\nPrince Démon De La Death Guard Ailé — 195 pts — Total : 1800 pts',
       ),
       RuleSection(
-        heading: 'World Eaters',
+        heading: 'Deathwatch — Kill Teams Interarmes',
         body:
-            'Exemple de liste à environ 1945 pts, construite à partir des coûts '
-            'réellement recensés dans le catalogue — une base solide et légale pour découvrir la faction, pas forcément la liste la plus optimisée du moment (le méta évolue, et certains coûts ne sont pas encore renseignés).\n\n'
-            'Seigneur Invocatus — 110 pts\nChakhals — 65 pts\nBerzerks De Khorne — 180 pts\nSeigneur Des Crânes De Khorne — 505 pts\nOctoliés Exaltés — 140 pts\nEscouade Terminator Des World Eaters — 175 pts\nLand Raider Des World Eaters — 220 pts\nOctoliés — 135 pts\nProfanateur Des World Eaters — 180 pts\nRejetons Du Chaos Des World Eaters — 90 pts\nPredator Annihilator Des World Eaters — 145 pts'
-            ' — Total : 1945 pts',
+            'Plusieurs Kill Teams spécialisées, chacune taillée pour une mission différente, coordonnées par un Maître du Guet.\n\nMaître Du Guet — 95 pts\nCapitaine Du Guet Artemis — 65 pts\nCapitaine En Armure Terminator — 95 pts\n2 × Kill Team Fortis — 360 pts\nKill Team Indomitor — 250 pts\nKill Team Spectrus — 180 pts\n3 × Vétérans Deathwatch — 300 pts\n2 × Escouade Terminator Deathwatch — 380 pts\nEscouade Intercessor — 80 pts — Total : 1805 pts',
+      ),
+      RuleSection(
+        heading: 'Deathwatch — Frappe Téléportée Terminator',
+        body:
+            'Une masse de Terminators Deathwatch et alliés qui se téléporte au cœur de la bataille pour un choc frontal immédiat.\n\nMaître Du Guet — 95 pts\nCapitaine Du Guet Artemis — 65 pts\nCapitaine En Armure Terminator — 95 pts\nArchiviste En Armure Terminator — 75 pts\n4 × Escouade Terminator Deathwatch — 760 pts\nEscouade D’Assaut Terminator — 180 pts\nKill Team Indomitor — 250 pts\n2 × Vétérans Deathwatch — 200 pts\nEscouade Intercessor — 80 pts — Total : 1800 pts',
+      ),
+      RuleSection(
+        heading: 'Drukhari — Raid Kabalite Éclair',
+        body:
+            'Guerriers Kabalites et Ravageurs embarqués en Venoms pour frapper vite au poison, prendre les objectifs et se replier avant la contre-attaque.\n\nArchonte — 80 pts\nDrazhar — 85 pts\n4 × Guerriers Kabalites — 460 pts\n4 × Venom — 280 pts\n3 × Ravageur — 345 pts\n2 × Hellions — 170 pts\n2 × Écumeurs — 140 pts\n2 × Cour De L’Archonte — 250 pts — Total : 1810 pts',
+      ),
+      RuleSection(
+        heading: 'Drukhari — Coven de la Souffrance',
+        body:
+            'Talos et Cronos des Coteries d\'Hémoncules encadrent des tueuses d\'élite pour une attrition au corps-à-corps que rien n\'arrête.\n\nLelith Hesperax — 85 pts\nDrazhar — 85 pts\nArchonte — 80 pts\n4 × Talos — 320 pts\n4 × Cronos — 220 pts\n3 × Guerriers Kabalites — 345 pts\n2 × Venom — 140 pts\nRavageur — 115 pts\n2 × Hellions — 170 pts\n2 × Cour De L’Archonte — 250 pts — Total : 1810 pts',
+      ),
+      RuleSection(
+        heading: 'Genestealer Cults — Nuée du Culte',
+        body:
+            'Une horde d\'infiltrés et de mutants qui submerge l\'adversaire par le nombre avant qu\'il ne comprenne d\'où vient l\'attaque.\n\n5 × Hybrides Néophytes — 325 pts\n4 × Genestealers Pure-souche — 300 pts\n3 × Aberrants — 405 pts\n2 × Hybrides Métamorphes — 140 pts\nAbominant — 85 pts\nPatriarche — 75 pts\nMagus — 50 pts\nPrimus — 70 pts\nNexos — 60 pts\nKelermorphe — 60 pts\nLocus — 45 pts\nAcolyte Garde-icône — 50 pts\nSanctus — 50 pts\nClamavus — 50 pts\nSaboteur Reductus — 65 pts\nBiophagus — 50 pts — Total : 1880 pts',
+      ),
+      RuleSection(
+        heading: 'Genestealer Cults — Blitz Mécanisé',
+        body:
+            'Un raid rapide sur roues et chenilles, où camions et tout-terrains déposent les cultistes au contact avant que la ligne adverse ne réagisse.\n\n4 × Tout-terrain Achilles — 380 pts\n3 × Concasseur Goliath — 360 pts\n3 × Camion Goliath — 255 pts\n4 × Chacals Atalans — 340 pts\n2 × Alphus Chacal — 110 pts\n2 × Hybrides Néophytes — 130 pts\nPrimus — 70 pts\nMagus — 50 pts\nKelermorphe — 60 pts\nSanctus — 50 pts — Total : 1805 pts',
+      ),
+      RuleSection(
+        heading: 'Grey Knights — Frappe Téléportée',
+        body:
+            'Toute l\'armée arrive par téléportation en une seule vague pour écraser un point de la table dès le premier tour.\n\n2 × Escouade Terminator De Confrérie — 320 pts\n2 × Escouade Paladin — 360 pts\n2 × Escouade Purificator — 250 pts\n2 × Escouade Interceptor — 260 pts\n2 × Escouade Purgator — 250 pts\nGrand Maître Voldus — 110 pts\nGrand Maître — 95 pts\nFrère-capitaine — 90 pts\nChapelain De Confrérie — 65 pts — Total : 1800 pts',
+      ),
+      RuleSection(
+        heading: 'Grey Knights — Colonne Blindée',
+        body:
+            'Land Raiders et Dreadknights avancent en formation compacte, blindage lourd en tête pour percer n\'importe quelle ligne.\n\nLand Raider Des Grey Knights — 220 pts\nLand Raider Crusader Des Grey Knights — 220 pts\nLand Raider Redeemer Des Grey Knights — 270 pts\n2 × Cuirassier Némésis — 420 pts\nGrand Maître En Cuirasse Némésis — 225 pts\nDreadnought Vénérable Des Grey Knights — 140 pts\nRazorback Des Grey Knights — 85 pts\nRhino Des Grey Knights — 80 pts\nEscouade Terminator De Confrérie — 160 pts — Total : 1820 pts',
+      ),
+      RuleSection(
+        heading: 'Imperial Knights — Cohorte Armigère',
+        body:
+            'Une meute de chevaliers légers et rapides qui submerge le flanc adverse par le nombre plutôt que par la puissance de feu brute.\n\n4 × Armigères Helvériens — 560 pts\n4 × Armigères Hastaires — 560 pts\nChevalier Errant — 375 pts\nChevalier Castellan — 410 pts — Total : 1905 pts',
+      ),
+      RuleSection(
+        heading: 'Imperial Knights — Marche des Titans',
+        body:
+            'Une poignée de chevaliers lourds et quadri-armés qui avancent lentement mais rasent tout ce qui se trouve sur leur passage.\n\nChevalier Castellan — 410 pts\nCanis Rex — 415 pts\nChevalier Croisé — 395 pts\nChevalier Vigilant — 385 pts\n2 × Armigères Helvériens — 280 pts — Total : 1885 pts',
+      ),
+      RuleSection(
+        heading: 'Leagues of Votann — Poing Blindé',
+        body:
+            'Forteresses mobiles et transports blindés amènent guerriers et walkers Tonnekogs directement au contact, protégés par du blindage épais.\n\n3 × Forteresse Mobile Hekaton — 720 pts\n3 × Sagitaur — 285 pts\n3 × Tonnekogs Brokhyrs — 240 pts\n2 × Guerriers Âtrekogs — 200 pts\nKâhl — 70 pts\nChampion Einhyr — 70 pts\nÛthar Le Destiné — 95 pts\n2 × Pionniers Hernkogs — 160 pts — Total : 1840 pts',
+      ),
+      RuleSection(
+        heading: 'Leagues of Votann — Infanterie Lourde des Loges',
+        body:
+            'Une masse de guerriers en armure lourde et d\'Einhyrs d\'élite qui tient le terrain et gagne les combats d\'usure.\n\n4 × Guerriers Âtrekogs — 400 pts\n4 × Âtregardes Einhyrs — 540 pts\n3 × Beserks Cthoniens — 300 pts\n3 × Grimnyr — 195 pts\n2 × Pionniers Hernkogs — 160 pts\nÛthar Le Destiné — 95 pts\nKâhl — 70 pts\nChampion Einhyr — 70 pts — Total : 1830 pts',
+      ),
+      RuleSection(
+        heading: 'Necrons — Marée Nécrontyr',
+        body:
+            'Des rangs de guerriers et immortels qui se relèvent sans cesse, appuyés par des cryptecs et un Monolithe pour une gunline increvable.\n\n5 × Guerriers Nécrons — 450 pts\n3 × Immortels — 210 pts\n2 × Réanimateur Canoptek — 150 pts\nTechnomancien — 80 pts\nChronomancien — 65 pts\nPlasmancien — 55 pts\nImotekh Le Seigneur Des Tempêtes — 100 pts\nMonolithe — 400 pts\n2 × Cryptoserfs — 120 pts\nRôdeur Du Triarcat — 110 pts\nConsole D’Annihilation — 105 pts — Total : 1845 pts',
+      ),
+      RuleSection(
+        heading: 'Necrons — Culte des Destroyers',
+        body:
+            'Des essaims de Destroyers volants frappent vite et loin derrière les lignes ennemies, soutenus par un éclat de C’tan.\n\n3 × Destroyers Skorpekhs — 270 pts\n3 × Destroyers Ophydiens — 240 pts\n2 × Prétoriens Du Triarcat — 180 pts\n4 × Destroyers Lourds Lokhusts — 220 pts\n4 × Destroyers Lokhusts — 160 pts\nSeigneur Skorpekh — 90 pts\nSeigneur Lokhust — 80 pts\nÉcharde C’Tan Du Dragon Du Néant — 300 pts\n2 × Immortels — 140 pts\nDestroyer Hexmark — 75 pts\nCryptoserfs — 60 pts — Total : 1815 pts',
+      ),
+      RuleSection(
+        heading: 'Orks — Marée Verte',
+        body:
+            'Une horde tout-terrain de Boyz, Gretchins et Nobz qui submerge l\'adversaire par le nombre et l\'usure, portée par Ghazghkull Thraka.\n\n4 × Boyz — 320 pts\n4 × Gretchins — 160 pts\n4 × Nobz — 420 pts\n3 × Kommandos — 360 pts\n2 × Méganobz — 130 pts\nGhazghkull Thraka — 235 pts\nBoss Snikrot — 75 pts\nMek — 45 pts\nZodgrod Wortsnagga — 90 pts — Total : 1835 pts',
+      ),
+      RuleSection(
+        heading: 'Orks — Waaagh! Mécanisée',
+        body:
+            'Une colonne de marcheurs et véhicules kustom (Gorkanautes, Morkanaute) qui écrase l\'ennemi sous le blindage et la puissance de feu, escortée par Mozrog Skragbad.\n\n3 × Gorkanaute — 795 pts\nMorkanaute — 280 pts\n2 × Boosta-klata Kustom — 140 pts\n2 × Dragsta Shokk — 140 pts\nMozrog Skragbad — 145 pts\nGros Mek En Méga-armure — 90 pts\nGros Mek Avec Kanon Shokk — 80 pts\nMek — 45 pts\n2 × Boyz — 160 pts — Total : 1875 pts',
+      ),
+      RuleSection(
+        heading: 'Space Marines (Adeptus Astartes) — Colonne Blindée Gladiator',
+        body:
+            'Une percée blindée rapide construite autour des chars Gladiator et Predator, appuyée par des Intercessors en Impulsor pour prendre les objectifs.\n\nCapitaine En Armure Gravis — 80 pts\nTechmarine — 55 pts\n2 × Escouade Intercessor — 160 pts\n2 × Impulsor — 160 pts\nGladiator Lancer — 160 pts\n2 × Gladiator Reaper — 320 pts\nGladiator Valiant — 150 pts\n2 × Predator Annihilator — 270 pts\nRepulsor Executioner — 220 pts\nDreadnought Brutalis — 160 pts\nDreadnought — 135 pts — Total : 1870 pts',
+      ),
+      RuleSection(
+        heading:
+            'Space Marines (Adeptus Astartes) — Gunline Terminators & Devastators',
+        body:
+            'Une ligne statique de Terminators et d\'armes lourdes qui tient le terrain et pilonne l\'adversaire de loin, menée par Darnath Lysander.\n\nDarnath Lysander — 100 pts\nCapitaine En Armure Terminator — 95 pts\nChapelain En Armure Terminator — 75 pts\n2 × Escouade Intercessor — 160 pts\nEscouade Lourde Intercessor — 100 pts\n2 × Escouade Terminator — 340 pts\nEscouade D’Assaut Terminator — 180 pts\n2 × Escouade Devastator — 240 pts\nEscouade Eliminator — 85 pts\nEscouade Desolator — 200 pts\nEscouade Hellblaster — 110 pts\nWhirlwind — 190 pts — Total : 1875 pts',
+      ),
+      RuleSection(
+        heading: 'Space Wolves — Meute Sauvage',
+        body:
+            'Un raid éclair de Loups Tonnerre, Wulfen et Griffes Sanglantes qui charge dès le premier tour derrière Ragnar Blackmane et Arjac Rockfist.\n\nRagnar Blackmane — 100 pts\nArjac Rockfist — 105 pts\nChef De Meute Garde Loup — 65 pts\n3 × Cavalerie Sur Loups Tonnerre — 345 pts\n3 × Wulfen — 255 pts\n2 × Loups Fenrissiens — 80 pts\n2 × Griffes Sanglantes — 270 pts\n2 × Terminators Gardes Loups — 340 pts\nDreadnought Wulfen — 145 pts\nMurderfang — 160 pts — Total : 1865 pts',
+      ),
+      RuleSection(
+        heading: 'Space Wolves — Chasseurs Gris Mécanisés',
+        body:
+            'Une ligne de bataille solide de Chasseurs Gris et de Terminators Gardes Loups qui tient les objectifs et matraque à distance, autour de Logan Grimnar et Björn.\n\nLogan Grimnar — 110 pts\nBjörn Main Funeste — 170 pts\nPrêtre De Fer — 60 pts\n2 × Chasseurs Gris — 360 pts\nEscouade Lourde Intercessor — 100 pts\n2 × Terminators Gardes Loups — 340 pts\n2 × Gardes Loups — 170 pts\n2 × Escouade Devastator — 240 pts\nDreadnought Vénérable Des Space Wolves — 140 pts\nWhirlwind — 190 pts — Total : 1880 pts',
+      ),
+      RuleSection(
+        heading: 'T\'au Empire — Firebase Statique',
+        body:
+            'Une ligne de tir immobile de Brécheurs, Broadsides et Riptide protégée par des fortifications Tidewall, avec le Stormsurge comme pièce maîtresse.\n\nÉthéré — 50 pts\nDarkstrider — 60 pts\nSabre De Feu — 50 pts\n3 × Équipe De Brécheurs — 300 pts\n3 × Exo-armures Broadside — 240 pts\n2 × Exo-armure Riptide — 380 pts\nStormsurge — 400 pts\nChar Sky Ray — 140 pts\nLigne-bouclier Tidewall — 85 pts\nTourelle Tidewall — 90 pts — Total : 1795 pts',
+      ),
+      RuleSection(
+        heading: 'T\'au Empire — Raid Kroot & Skyfleet',
+        body:
+            'Une force mobile de tribus Kroot en éclaireurs et de véhicules volants (Piranhas, Hammerhead, Sun Shark) qui frappe vite et se disperse, menée par des commandants en exo-armure de saut.\n\nCommandante Shadowsun — 100 pts\nCommandant Farsight — 85 pts\nCommandant En Exo-armure Coldstar — 95 pts\nMentor Kroot — 45 pts\n3 × Carnivores Kroots — 195 pts\n3 × Chiens Kroots — 120 pts\n3 × Cavaliers Krootox — 120 pts\n2 × Exorôdeurs Kroots — 110 pts\nExo-armures Stealth — 110 pts\nExo-armure Ghostkeel — 160 pts\n2 × Frelons Vespides — 130 pts\n2 × Piranha — 120 pts\n2 × Char Hammerhead — 290 pts\nDevilfish — 85 pts\nBombardier Sun Shark — 160 pts — Total : 1925 pts',
+      ),
+      RuleSection(
+        heading: 'Thousand Sons — Colonne Blindée de Tzeentch',
+        body:
+            'Un mur de chars (Land Raider, Predators, Vindicators, Profanateurs) qui avance en formation pour écraser l\'adversaire à distance et en force de choc, avec juste assez d\'infanterie embarquée pour tenir les objectifs.\n\nLand Raider Des Thousand Sons — 220 pts\n2 × Predator Annihilator Des Thousand Sons — 260 pts\n2 × Predator Destructor Des Thousand Sons — 280 pts\n2 × Vindicator Des Thousand Sons — 370 pts\n2 × Profanateur Des Thousand Sons — 330 pts\nMétabrutus Des Thousand Sons — 110 pts\nRhino Des Thousand Sons — 90 pts\nMarines Rubricae — 105 pts\nSorcier Exalté — 80 pts — Total : 1845 pts',
+      ),
+      RuleSection(
+        heading: 'Thousand Sons — Cohorte Psychique de Magnus',
+        body:
+            'Magnus le Rouge et sa cour de sorciers déversent des dégâts psychiques massifs pendant que les Marines Rubricae et Terminators du Scarabée Occulte encaissent et tiennent le terrain.\n\nMagnus Le Rouge — 435 pts\nAhriman — 100 pts\n3 × Marines Rubricae — 315 pts\n2 × Terminators Du Scarabée Occulte — 360 pts\nSorcier Exalté Sur Disque De Tzeentch — 100 pts\nMaître Infernal — 95 pts\n3 × Rejetons Du Chaos Des Thousand Sons — 195 pts\nPrince Démon Des Thousand Sons Ailé — 170 pts\nSorcier Des Thousand Sons — 85 pts — Total : 1855 pts',
+      ),
+      RuleSection(
+        heading: 'Tyranids — Multitude Infinie',
+        body:
+            'Une marée de Termagants, Hormagaunts, Gargouilles et Genestealers déferle en nombre pour saturer le champ de bataille, portée par le Tervigon et Le Maître des Essaims qui régénèrent l\'essaim.\n\n4 × Termagants — 240 pts\n4 × Hormagaunts — 260 pts\n2 × Gargouilles — 170 pts\n3 × Genestealers — 225 pts\nTervigon — 160 pts\nLe Maître Des Essaims — 220 pts\n2 × Neurogaunts — 90 pts\n2 × Venomthropes — 140 pts\nZoanthropes — 100 pts\n2 × Biovores — 100 pts\n2 × Barbgaunts — 110 pts — Total : 1815 pts',
+      ),
+      RuleSection(
+        heading: 'Tyranids — Monstres du Grand Dévoreur',
+        body:
+            'Une ménagerie de grosses créatures (Tyrannofex, Exocrine, Carnifex, Trygons, Haruspex) déferle en peu d\'unités mais très résistantes, difficiles à retirer de la table et dévastatrices en corps-à-corps comme à distance.\n\nTyran Des Ruches — 195 pts\nTyrannofex — 200 pts\nExocrine — 140 pts\nHaruspex — 125 pts\n2 × Carnifex — 230 pts\n2 × Trygon — 280 pts\nMawloc — 135 pts\nToxicrène — 150 pts\nMaleceptor — 170 pts\nPsychophage — 110 pts\nTermagants — 60 pts\nBarbgaunts — 55 pts — Total : 1850 pts',
+      ),
+      RuleSection(
+        heading: 'World Eaters — Charge Sanglante de Khorne',
+        body:
+            'Angron, Khârn et des vagues de Berzerkers et Chakhals se ruent au corps-à-corps dès le premier tour pour trancher l\'adversaire avant qu\'il ne puisse riposter.\n\nAngron — 360 pts\nKhârn Le Félon — 100 pts\nSeigneur Invocatus — 110 pts\n3 × Berzerks De Khorne — 540 pts\n3 × Chakhals — 195 pts\nOctoliés — 135 pts\nOctoliés Exaltés — 140 pts\nRejetons Du Chaos Des World Eaters — 90 pts\nEscouade Terminator Des World Eaters — 175 pts — Total : 1845 pts',
+      ),
+      RuleSection(
+        heading: 'World Eaters — Colonne Blindée de Khorne',
+        body:
+            'Un Prince Démon mène une colonne de Land Raider, Predators, Profanateur et Rhinos qui transportent les Berzerkers au contact tout en pilonnant l\'ennemi à distance.\n\nLand Raider Des World Eaters — 220 pts\n2 × Predator Annihilator Des World Eaters — 290 pts\n2 × Predator Destructor Des World Eaters — 290 pts\nProfanateur Des World Eaters — 180 pts\nMétabrutus Des World Eaters — 120 pts\n2 × Rhino Des World Eaters — 170 pts\n2 × Berzerks De Khorne — 360 pts\nPrince Démon Des World Eaters — 200 pts — Total : 1830 pts',
       ),
     ],
   ),
