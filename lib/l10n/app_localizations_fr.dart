@@ -1289,6 +1289,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get rulesCategoryProfiles => 'Points et profils';
 
   @override
+  String get rulesCategoryTactics => 'Guides tactiques';
+
+  @override
   String rulesDocumentsCount(int count) {
     return '$count documents';
   }

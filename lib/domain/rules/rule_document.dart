@@ -1,4 +1,11 @@
-enum RuleCategory { mainRules, missions, faqs, errata, pointsAndProfiles }
+enum RuleCategory {
+  mainRules,
+  missions,
+  faqs,
+  errata,
+  pointsAndProfiles,
+  tacticalGuides,
+}
 
 /// One update/erratum within a [RuleDocument] (a heading and its full
 /// rule text), shown on the document's detail page.

@@ -2420,6 +2420,12 @@ abstract class AppLocalizations {
   /// **'Points et profils'**
   String get rulesCategoryProfiles;
 
+  /// No description provided for @rulesCategoryTactics.
+  ///
+  /// In fr, this message translates to:
+  /// **'Guides tactiques'**
+  String get rulesCategoryTactics;
+
   /// No description provided for @rulesDocumentsCount.
   ///
   /// In fr, this message translates to:

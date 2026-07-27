@@ -608,6 +608,7 @@
   "rulesCategoryFaqs": "FAQs",
   "rulesCategoryErrata": "Errata",
   "rulesCategoryProfiles": "Points and profiles",
+  "rulesCategoryTactics": "Tactical guides",
   "rulesDocumentsCount": "{count} documents",
   "@rulesDocumentsCount": {
     "placeholders": {
