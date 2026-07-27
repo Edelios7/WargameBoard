@@ -1278,6 +1278,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rulesCategoryTactics => 'Tactical guides';
 
   @override
+  String get foodChainPickerTitle => 'Who has the edge?';
+
+  @override
+  String get foodChainPickerHint =>
+      'Pick two unit types to see who comes out on top, and why.';
+
+  @override
+  String get foodChainPickLabelA => 'First unit';
+
+  @override
+  String get foodChainPickLabelB => 'Second unit';
+
+  @override
+  String foodChainVerdictAdvantage(String name) {
+    return 'Advantage: $name';
+  }
+
+  @override
+  String get foodChainVerdictBalanced => 'Balanced';
+
+  @override
+  String get foodChainMoreDetails => 'Learn more';
+
+  @override
   String rulesDocumentsCount(int count) {
     return '$count documents';
   }

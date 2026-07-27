@@ -2426,6 +2426,48 @@ abstract class AppLocalizations {
   /// **'Guides tactiques'**
   String get rulesCategoryTactics;
 
+  /// No description provided for @foodChainPickerTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Qui a l\'avantage ?'**
+  String get foodChainPickerTitle;
+
+  /// No description provided for @foodChainPickerHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisis deux types d\'unités pour voir qui prend le dessus, et pourquoi.'**
+  String get foodChainPickerHint;
+
+  /// No description provided for @foodChainPickLabelA.
+  ///
+  /// In fr, this message translates to:
+  /// **'Première unité'**
+  String get foodChainPickLabelA;
+
+  /// No description provided for @foodChainPickLabelB.
+  ///
+  /// In fr, this message translates to:
+  /// **'Deuxième unité'**
+  String get foodChainPickLabelB;
+
+  /// No description provided for @foodChainVerdictAdvantage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Avantage : {name}'**
+  String foodChainVerdictAdvantage(String name);
+
+  /// No description provided for @foodChainVerdictBalanced.
+  ///
+  /// In fr, this message translates to:
+  /// **'Équilibré'**
+  String get foodChainVerdictBalanced;
+
+  /// No description provided for @foodChainMoreDetails.
+  ///
+  /// In fr, this message translates to:
+  /// **'En savoir plus'**
+  String get foodChainMoreDetails;
+
   /// No description provided for @rulesDocumentsCount.
   ///
   /// In fr, this message translates to:

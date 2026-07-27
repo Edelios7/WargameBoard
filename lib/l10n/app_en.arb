@@ -609,6 +609,18 @@
   "rulesCategoryErrata": "Errata",
   "rulesCategoryProfiles": "Points and profiles",
   "rulesCategoryTactics": "Tactical guides",
+  "foodChainPickerTitle": "Who has the edge?",
+  "foodChainPickerHint": "Pick two unit types to see who comes out on top, and why.",
+  "foodChainPickLabelA": "First unit",
+  "foodChainPickLabelB": "Second unit",
+  "foodChainVerdictAdvantage": "Advantage: {name}",
+  "@foodChainVerdictAdvantage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "foodChainVerdictBalanced": "Balanced",
+  "foodChainMoreDetails": "Learn more",
   "rulesDocumentsCount": "{count} documents",
   "@rulesDocumentsCount": {
     "placeholders": {

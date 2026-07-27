@@ -609,6 +609,18 @@
   "rulesCategoryErrata": "Erratas",
   "rulesCategoryProfiles": "Points et profils",
   "rulesCategoryTactics": "Guides tactiques",
+  "foodChainPickerTitle": "Qui a l'avantage ?",
+  "foodChainPickerHint": "Choisis deux types d'unités pour voir qui prend le dessus, et pourquoi.",
+  "foodChainPickLabelA": "Première unité",
+  "foodChainPickLabelB": "Deuxième unité",
+  "foodChainVerdictAdvantage": "Avantage : {name}",
+  "@foodChainVerdictAdvantage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "foodChainVerdictBalanced": "Équilibré",
+  "foodChainMoreDetails": "En savoir plus",
   "rulesDocumentsCount": "{count} documents",
   "@rulesDocumentsCount": {
     "placeholders": {
