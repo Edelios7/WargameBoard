@@ -13,8 +13,9 @@ void main() {
     );
   }
 
-  testWidgets('shows the recent documents and lets categories be filtered',
-      (tester) async {
+  testWidgets('shows the recent documents and lets categories be filtered', (
+    tester,
+  ) async {
     await tester.binding.setSurfaceSize(const Size(1400, 2200));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -31,23 +32,24 @@ void main() {
   });
 
   testWidgets(
-      'opening the hero rulebook opens the in-app PDF viewer when the local file exists',
-      (tester) async {
-    await tester.binding.setSurfaceSize(const Size(1400, 2200));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+    'opening the hero rulebook opens the in-app PDF viewer when the local file exists',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(1400, 2200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    await tester.pumpWidget(wrap());
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Ouvrir le livre de règles'));
-    // La résolution du fichier local est asynchrone (I/O) : on laisse le
-    // temps à la promesse de se résoudre avant de vérifier la navigation,
-    // sans pumpAndSettle pour ne pas attendre le rendu natif du PDF.
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
+      await tester.tap(find.text('Ouvrir le livre de règles'));
+      // La résolution du fichier local est asynchrone (I/O) : on laisse le
+      // temps à la promesse de se résoudre avant de vérifier la navigation,
+      // sans pumpAndSettle pour ne pas attendre le rendu natif du PDF.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.text('Warhammer 40,000 – Édition 11'), findsWidgets);
-  });
+      expect(find.text('Warhammer 40,000 – Édition 11'), findsWidgets);
+    },
+  );
 
   testWidgets('Voir tout expands the recent documents list', (tester) async {
     await tester.binding.setSurfaceSize(const Size(1400, 2200));
@@ -64,8 +66,9 @@ void main() {
     expect(find.text('Voir moins'), findsWidgets);
   });
 
-  testWidgets('the filters toggle hides and shows the categories grid',
-      (tester) async {
+  testWidgets('the filters toggle hides and shows the categories grid', (
+    tester,
+  ) async {
     await tester.binding.setSurfaceSize(const Size(1400, 2200));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -80,69 +83,78 @@ void main() {
     expect(find.text('TOUTES'), findsNothing);
   });
 
-  testWidgets('a help row item without real content shows a coming-soon message',
-      (tester) async {
-    await tester.binding.setSurfaceSize(const Size(1400, 2200));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+  testWidgets(
+    'a help row item without real content shows a coming-soon message',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(1400, 2200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    await tester.pumpWidget(wrap());
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Vidéos explicatives'));
-    await tester.pump();
+      await tester.tap(find.text('Vidéos explicatives'));
+      await tester.pump();
 
-    expect(
-      find.text('Vidéos explicatives : pas encore disponible'),
-      findsOneWidget,
-    );
-  });
+      expect(
+        find.text('Vidéos explicatives : pas encore disponible'),
+        findsOneWidget,
+      );
+    },
+  );
 
   testWidgets(
-      'the army lists document lists several styles per faction',
-      (tester) async {
-    await tester.binding.setSurfaceSize(const Size(1400, 2200));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+    'picking a faction in the army lists guide reveals its list styles',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(1400, 2200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    await tester.pumpWidget(wrap());
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Exemples de listes'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Exemples de listes'));
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text("Exemples de listes d'armée").first);
-    await tester.pumpAndSettle();
+      await tester.tap(find.text("Exemples de listes d'armée").first);
+      await tester.pumpAndSettle();
 
-    expect(find.text('BLOOD ANGELS — CHARGE ÉCARLATE'), findsOneWidget);
-    expect(
-      find.text('BLOOD ANGELS — COLONNE BLINDÉE DU SANG'),
-      findsOneWidget,
-    );
-    expect(find.textContaining('— Total :'), findsWidgets);
-  });
+      // Aucune faction choisie au départ : pas de liste affichée.
+      expect(find.text('Charge Écarlate'), findsNothing);
+
+      await tester.tap(find.text('Blood Angels'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Charge Écarlate'), findsOneWidget);
+      expect(find.text('Colonne Blindée du Sang'), findsOneWidget);
+      expect(find.textContaining('pts'), findsWidgets);
+    },
+  );
 
   testWidgets(
-      'opening the tactical guide document opens the interactive food chain page',
-      (tester) async {
-    await tester.binding.setSurfaceSize(const Size(1400, 2200));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+    'opening the tactical guide document opens the interactive food chain page',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(1400, 2200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    await tester.pumpWidget(wrap());
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('La chaîne alimentaire des unités').first);
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('La chaîne alimentaire des unités').first);
+      await tester.pumpAndSettle();
 
-    expect(find.text('Qui a l\'avantage ?'), findsOneWidget);
-  });
+      expect(find.text('Qui a l\'avantage ?'), findsOneWidget);
+    },
+  );
 
-  testWidgets('the rules page renders without overflow on a phone-sized screen',
-      (tester) async {
-    await tester.binding.setSurfaceSize(const Size(390, 844));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+  testWidgets(
+    'the rules page renders without overflow on a phone-sized screen',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(390, 844));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    await tester.pumpWidget(wrap());
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
 
-    expect(tester.takeException(), isNull);
-  });
+      expect(tester.takeException(), isNull);
+    },
+  );
 }
