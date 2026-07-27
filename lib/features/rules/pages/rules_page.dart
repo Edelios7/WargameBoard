@@ -578,6 +578,11 @@ class _CategoriesGrid extends StatelessWidget {
         Icons.hub_rounded,
         l10n.rulesCategoryTactics,
       ),
+      (
+        RuleCategory.armyLists,
+        Icons.list_alt_rounded,
+        l10n.rulesCategoryArmyLists,
+      ),
     ];
 
     return LayoutBuilder(

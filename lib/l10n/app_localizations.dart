@@ -2456,6 +2456,12 @@ abstract class AppLocalizations {
   /// **'Guides tactiques'**
   String get rulesCategoryTactics;
 
+  /// No description provided for @rulesCategoryArmyLists.
+  ///
+  /// In fr, this message translates to:
+  /// **'Exemples de listes'**
+  String get rulesCategoryArmyLists;
+
   /// No description provided for @foodChainPickerTitle.
   ///
   /// In fr, this message translates to:

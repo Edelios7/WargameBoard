@@ -1297,6 +1297,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rulesCategoryTactics => 'Tactical guides';
 
   @override
+  String get rulesCategoryArmyLists => 'Example army lists';
+
+  @override
   String get foodChainPickerTitle => 'Who has the edge?';
 
   @override

@@ -98,6 +98,25 @@ void main() {
   });
 
   testWidgets(
+      'the army lists document lists every faction as a section',
+      (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1400, 2200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Exemples de listes'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text("Exemples de listes d'armée").first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('BLOOD ANGELS'), findsOneWidget);
+    expect(find.textContaining('Total : 2000 pts'), findsWidgets);
+  });
+
+  testWidgets(
       'opening the tactical guide document opens the interactive food chain page',
       (tester) async {
     await tester.binding.setSurfaceSize(const Size(1400, 2200));

@@ -5,6 +5,7 @@ enum RuleCategory {
   errata,
   pointsAndProfiles,
   tacticalGuides,
+  armyLists,
 }
 
 /// One update/erratum within a [RuleDocument] (a heading and its full
