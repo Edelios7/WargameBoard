@@ -571,6 +571,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Too many enhancements (max 3)';
 
   @override
+  String get armyValidationDuplicateEnhancement =>
+      'An enhancement is equipped on more than one unit at once';
+
+  @override
   String get armyBuilderBack => 'Back';
 
   @override
@@ -1754,6 +1758,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String battleStratagemUse(int cp) {
     return 'Use (-$cp CP)';
   }
+
+  @override
+  String get battleStratagemNotEnoughCp =>
+      'Not enough CP available for this stratagem';
 
   @override
   String get battleDashboardFinish => 'Finish battle';

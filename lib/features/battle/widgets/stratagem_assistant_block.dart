@@ -159,7 +159,7 @@ class _StratagemTileState extends ConsumerState<_StratagemTile> {
     // cliqués coup sur coup se sérialisent alors correctement au lieu de
     // n'appliquer qu'une seule des deux déductions tout en journalisant
     // les deux.
-    await repo.spendCommandPoints(
+    final spent = await repo.spendCommandPoints(
       battle.id,
       mine: mine,
       amount: stratagem.commandPoints,
@@ -169,7 +169,15 @@ class _StratagemTileState extends ConsumerState<_StratagemTile> {
     );
     ref.invalidate(activeBattleProvider);
     ref.invalidate(battleEventsProvider(battle.id));
-    if (mounted) setState(() => _pending = false);
+    if (mounted) {
+      setState(() => _pending = false);
+      if (!spent) {
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.battleStratagemNotEnoughCp)),
+        );
+      }
+    }
   }
 
   @override

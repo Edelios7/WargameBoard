@@ -281,6 +281,7 @@
   "armyValidationEmptyArmy": "Empty army — add some units",
   "armyValidationNoDetachment": "No detachment selected",
   "armyValidationTooManyEnhancements": "Too many enhancements (max 3)",
+  "armyValidationDuplicateEnhancement": "An enhancement is equipped on more than one unit at once",
 
   "armyBuilderBack": "Back",
   "armyBuilderStatPoints": "Points",
@@ -824,6 +825,7 @@
   "battleStratagemAssistantTitle": "Stratagems for this phase",
   "battleStratagemAssistantOpponentTitle": "Opponent stratagems for this phase",
   "battleStratagemUse": "Use (-{cp} CP)",
+  "battleStratagemNotEnoughCp": "Not enough CP available for this stratagem",
   "@battleStratagemUse": {
     "placeholders": {
       "cp": { "type": "int" }

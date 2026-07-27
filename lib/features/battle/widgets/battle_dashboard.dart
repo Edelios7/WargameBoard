@@ -1116,9 +1116,16 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
       datasheetByIdProvider(widget.unit.datasheetId),
     );
     final models = datasheetAsync.value?.models ?? const [];
+    // Une même datasheet peut avoir plusieurs profils de PV (ex. un
+    // sergent/porteur d'arme spéciale à 2 PV contre 1 PV pour la troupe de
+    // base) sans qu'on sache ici quel index de figurine correspond à quel
+    // profil — on prend le minimum plutôt que le maximum : dans une escouade,
+    // la troupe de base (le profil le plus faible) est presque toujours
+    // majoritaire, donc ça ne fausse au pire qu'une poignée de figurines
+    // spéciales au lieu de quasiment toute l'escouade.
     final maxWounds = models.isEmpty
         ? 1
-        : models.map((m) => m.wounds).reduce((a, b) => a > b ? a : b);
+        : models.map((m) => m.wounds).reduce((a, b) => a < b ? a : b);
     final woundsAsync = ref.watch(battleUnitWoundsProvider(widget.battleId));
     final currentWoundsByModel = <int, int>{
       for (final wound in woundsAsync.value ?? const [])
@@ -1863,6 +1870,20 @@ class NotesBlock extends ConsumerStatefulWidget {
 class _NotesBlockState extends ConsumerState<NotesBlock> {
   late final _controller = TextEditingController(text: widget.notes);
   late final _focusNode = FocusNode()..addListener(_onFocusChange);
+
+  @override
+  void didUpdateWidget(NotesBlock oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Resynchronise le champ si les notes ont changé ailleurs qu'à travers
+    // ce widget (ex. sur un autre appareil, ou par un futur code path) —
+    // seulement quand le champ n'a pas le focus, pour ne jamais écraser une
+    // saisie en cours.
+    if (!_focusNode.hasFocus &&
+        widget.notes != oldWidget.notes &&
+        widget.notes != _controller.text) {
+      _controller.text = widget.notes ?? '';
+    }
+  }
 
   @override
   void dispose() {

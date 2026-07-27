@@ -1124,6 +1124,12 @@ abstract class AppLocalizations {
   /// **'Trop d\'enhancements (max 3)'**
   String get armyValidationTooManyEnhancements;
 
+  /// No description provided for @armyValidationDuplicateEnhancement.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une amélioration est portée par plusieurs unités à la fois'**
+  String get armyValidationDuplicateEnhancement;
+
   /// No description provided for @armyBuilderBack.
   ///
   /// In fr, this message translates to:
@@ -3289,6 +3295,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Utiliser (-{cp} PC)'**
   String battleStratagemUse(int cp);
+
+  /// No description provided for @battleStratagemNotEnoughCp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas assez de PC disponibles pour ce stratagème'**
+  String get battleStratagemNotEnoughCp;
 
   /// No description provided for @battleDashboardFinish.
   ///

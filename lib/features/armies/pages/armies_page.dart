@@ -36,6 +36,8 @@ String _warningLabel(AppLocalizations l10n, ArmyValidationIssue issue) {
       return l10n.armyBuilderOverLimit;
     case ArmyValidationIssue.tooManyEnhancements:
       return l10n.armyValidationTooManyEnhancements;
+    case ArmyValidationIssue.duplicateEnhancement:
+      return l10n.armyValidationDuplicateEnhancement;
     case ArmyValidationIssue.noWarlordSelected:
       return l10n.armyValidationNoWarlord;
     case ArmyValidationIssue.unknownUnitCosts:
@@ -416,11 +418,25 @@ Future<void> _pickEnhancement(
   WidgetRef ref,
   String detachmentId,
   ArmyUnitDetails unit,
+  ArmyDetails army,
 ) async {
   final l10n = AppLocalizations.of(context)!;
-  final options = await ref
+  final allOptions = await ref
       .read(armyRepositoryProvider)
       .getEnhancementsForDetachment(detachmentId);
+
+  // Une amélioration ne peut être portée que par une seule figurine de
+  // l'armée à la fois : celles déjà prises par une AUTRE unité ne sont
+  // pas proposées ici (mais l'unité en cours garde la sienne dans la
+  // liste, pour pouvoir la reconfirmer sans la perdre).
+  final usedElsewhere = army.units
+      .where((u) => u.id != unit.id)
+      .map((u) => u.enhancementId)
+      .whereType<String>()
+      .toSet();
+  final options = allOptions
+      .where((o) => !usedElsewhere.contains(o.id))
+      .toList();
 
   if (!context.mounted) return;
 
@@ -1858,6 +1874,7 @@ class _UnitDetailsPanel extends ConsumerWidget {
                 ref,
                 army.detachmentId!,
                 currentUnit,
+                army,
               ),
               child: Text(
                 currentUnit.enhancementName ??
@@ -2210,6 +2227,7 @@ class _EditUnitDialog extends ConsumerWidget {
                       ref,
                       army.detachmentId!,
                       currentUnit,
+                      army,
                     ),
                     child: Text(
                       currentUnit.enhancementName ??

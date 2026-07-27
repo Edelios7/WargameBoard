@@ -86,7 +86,14 @@ final recentlyViewedDatasheetsProvider =
     ));
   }
   if (orphanIds.isNotEmpty) {
-    ref.read(recentlyViewedProvider.notifier).removeAll(orphanIds);
+    // Différé après la fin de ce build : appeler removeAll ici même
+    // déclencherait un rebuild de ce provider (qui observe
+    // recentlyViewedProvider) avant même d'avoir renvoyé son propre
+    // résultat, refaisant inutilement un aller-retour DB pour les ids
+    // restants dans la foulée.
+    Future.microtask(
+      () => ref.read(recentlyViewedProvider.notifier).removeAll(orphanIds),
+    );
   }
   return results;
 });

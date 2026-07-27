@@ -173,8 +173,9 @@ class BattleRepository {
   }
 
   /// Dépense des CP et journalise l'événement en une seule opération
-  /// atomique — voir [BattleDao.spendCommandPoints].
-  Future<void> spendCommandPoints(
+  /// atomique — voir [BattleDao.spendCommandPoints]. Retourne `false` sans
+  /// rien modifier si le solde est insuffisant.
+  Future<bool> spendCommandPoints(
     String battleId, {
     required bool mine,
     required int amount,

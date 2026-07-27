@@ -404,7 +404,13 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   /// reconstruise) se sérialisent alors correctement au lieu d'écraser le
   /// même total et de journaliser deux dépenses pour une seule déduction
   /// réellement appliquée.
-  Future<void> spendCommandPoints(
+  /// Retire `amount` PC et journalise la dépense — retourne `false` (et ne
+  /// touche à rien) si le solde actuel est insuffisant, plutôt que
+  /// d'accepter silencieusement une dépense partielle : sans ce garde-fou,
+  /// deux stratagèmes cliqués coup sur coup avec 1PC en réserve pouvaient
+  /// tous les deux "réussir" (le second ramenant simplement le solde de 0
+  /// à 0) alors qu'un seul aurait dû passer.
+  Future<bool> spendCommandPoints(
     String battleId, {
     required bool mine,
     required int amount,
@@ -412,7 +418,7 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
     int? round,
     BattlePhase? phase,
   }) async {
-    await transaction(() async {
+    return transaction(() async {
       final battle = await (select(
         battles,
       )..where((t) => t.id.equals(battleId))).getSingle();
@@ -420,7 +426,10 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
       final current = mine
           ? (battle.myCommandPoints ?? 0)
           : (battle.opponentCommandPoints ?? 0);
-      final next = (current - amount).clamp(0, 1 << 30);
+      if (current < amount) {
+        return false;
+      }
+      final next = current - amount;
 
       await (update(battles)..where((t) => t.id.equals(battleId))).write(
         BattlesCompanion(
@@ -440,6 +449,7 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
           opponentCpDelta: mine ? const Value.absent() : Value(-amount),
         ),
       );
+      return true;
     });
   }
 

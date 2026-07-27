@@ -7,6 +7,7 @@ enum ArmyValidationIssue {
   tooManyEnhancements,
   noWarlordSelected,
   unknownUnitCosts,
+  duplicateEnhancement,
 }
 
 class ArmyValidationResult {
@@ -48,10 +49,19 @@ class ArmyValidationService {
     if (army.pointsLimit != null && army.detachmentId == null) {
       warnings.add(ArmyValidationIssue.noDetachmentSelected);
     }
-    final enhancementsCount =
-        army.units.where((u) => u.enhancementId != null).length;
-    if (enhancementsCount > maxEnhancements) {
+    final enhancementIds = army.units
+        .map((u) => u.enhancementId)
+        .whereType<String>()
+        .toList();
+    if (enhancementIds.length > maxEnhancements) {
       errors.add(ArmyValidationIssue.tooManyEnhancements);
+    }
+    // Une amélioration ne peut être portée que par une seule figurine à
+    // la fois — le sélecteur (armies_page.dart, _pickEnhancement) filtre
+    // déjà celles prises ailleurs, mais on le revérifie ici en filet de
+    // sécurité (données existantes avant ce correctif, etc.).
+    if (enhancementIds.toSet().length != enhancementIds.length) {
+      errors.add(ArmyValidationIssue.duplicateEnhancement);
     }
     if (army.units.isNotEmpty && !army.units.any((u) => u.isWarlord)) {
       warnings.add(ArmyValidationIssue.noWarlordSelected);

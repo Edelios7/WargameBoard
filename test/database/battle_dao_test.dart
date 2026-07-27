@@ -459,4 +459,36 @@ void main() {
       expect(await database.battleDao.getEvents(id), hasLength(2));
     },
   );
+
+  test(
+    'spendCommandPoints rejects a spend that would exceed the current '
+    'balance instead of silently clamping to 0',
+    () async {
+      final id = await database.battleDao.startBattle(opponentName: 'Marc');
+      await database.battleDao.updateLiveState(
+        id,
+        myCommandPoints: const Value(1),
+      );
+
+      final firstSucceeded = await database.battleDao.spendCommandPoints(
+        id,
+        mine: true,
+        amount: 1,
+        label: 'Stratagème A',
+      );
+      final secondSucceeded = await database.battleDao.spendCommandPoints(
+        id,
+        mine: true,
+        amount: 1,
+        label: 'Stratagème B',
+      );
+
+      expect(firstSucceeded, isTrue);
+      expect(secondSucceeded, isFalse);
+
+      final battle = await database.battleDao.getActiveBattle();
+      expect(battle!.myCommandPoints, 0);
+      expect(await database.battleDao.getEvents(id), hasLength(1));
+    },
+  );
 }

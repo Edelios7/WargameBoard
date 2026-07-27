@@ -281,6 +281,7 @@
   "armyValidationEmptyArmy": "Armée vide — ajoute des unités",
   "armyValidationNoDetachment": "Aucun détachement sélectionné",
   "armyValidationTooManyEnhancements": "Trop d'enhancements (max 3)",
+  "armyValidationDuplicateEnhancement": "Une amélioration est portée par plusieurs unités à la fois",
 
   "armyBuilderBack": "Retour",
   "armyBuilderStatPoints": "Points",
@@ -824,6 +825,7 @@
   "battleStratagemAssistantTitle": "Stratagèmes pour cette phase",
   "battleStratagemAssistantOpponentTitle": "Stratagèmes adverses pour cette phase",
   "battleStratagemUse": "Utiliser (-{cp} PC)",
+  "battleStratagemNotEnoughCp": "Pas assez de PC disponibles pour ce stratagème",
   "@battleStratagemUse": {
     "placeholders": {
       "cp": { "type": "int" }

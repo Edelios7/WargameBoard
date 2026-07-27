@@ -579,6 +579,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Trop d\'enhancements (max 3)';
 
   @override
+  String get armyValidationDuplicateEnhancement =>
+      'Une amélioration est portée par plusieurs unités à la fois';
+
+  @override
   String get armyBuilderBack => 'Retour';
 
   @override
@@ -1772,6 +1776,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String battleStratagemUse(int cp) {
     return 'Utiliser (-$cp PC)';
   }
+
+  @override
+  String get battleStratagemNotEnoughCp =>
+      'Pas assez de PC disponibles pour ce stratagème';
 
   @override
   String get battleDashboardFinish => 'Terminer la partie';
