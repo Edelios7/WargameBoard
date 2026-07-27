@@ -2504,6 +2504,42 @@ abstract class AppLocalizations {
   /// **'En savoir plus'**
   String get foodChainMoreDetails;
 
+  /// No description provided for @armyGuidePickerTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisis ta faction'**
+  String get armyGuidePickerTitle;
+
+  /// No description provided for @armyGuidePickerHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionne une faction pour découvrir ses styles de liste, inspirés de vraies façons de jouer.'**
+  String get armyGuidePickerHint;
+
+  /// No description provided for @armyGuideSearchHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher une faction…'**
+  String get armyGuideSearchHint;
+
+  /// No description provided for @armyGuideNoFactionSelected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisis une faction ci-dessus pour voir ses styles de liste.'**
+  String get armyGuideNoFactionSelected;
+
+  /// No description provided for @armyGuideStylesCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} styles disponibles'**
+  String armyGuideStylesCount(int count);
+
+  /// No description provided for @armyGuideTotalPoints.
+  ///
+  /// In fr, this message translates to:
+  /// **'{points} pts'**
+  String armyGuideTotalPoints(int points);
+
   /// No description provided for @unitArchetypeHorde.
   ///
   /// In fr, this message translates to:
@@ -3193,6 +3229,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Armes'**
   String get battleUnitWeaponsTitle;
+
+  /// No description provided for @battleUnitAbilitiesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Capacités'**
+  String get battleUnitAbilitiesTitle;
 
   /// No description provided for @battleUnitNoModifiers.
   ///

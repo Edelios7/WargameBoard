@@ -632,6 +632,22 @@
   },
   "foodChainVerdictBalanced": "Équilibré",
   "foodChainMoreDetails": "En savoir plus",
+  "armyGuidePickerTitle": "Choisis ta faction",
+  "armyGuidePickerHint": "Sélectionne une faction pour découvrir ses styles de liste, inspirés de vraies façons de jouer.",
+  "armyGuideSearchHint": "Rechercher une faction…",
+  "armyGuideNoFactionSelected": "Choisis une faction ci-dessus pour voir ses styles de liste.",
+  "armyGuideStylesCount": "{count} styles disponibles",
+  "@armyGuideStylesCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "armyGuideTotalPoints": "{points} pts",
+  "@armyGuideTotalPoints": {
+    "placeholders": {
+      "points": { "type": "int" }
+    }
+  },
   "unitArchetypeHorde": "Horde",
   "unitArchetypeElite": "Élite",
   "unitArchetypeArmored": "Blindé / Monstre",
@@ -813,6 +829,7 @@
   "battleUnitViewFullSheet": "Voir la fiche complète",
   "battleUnitStatsTitle": "Caractéristiques",
   "battleUnitWeaponsTitle": "Armes",
+  "battleUnitAbilitiesTitle": "Capacités",
   "battleUnitNoModifiers": "Aucun bonus/malus actif",
   "battleUnitWoundLose": "Retirer 1 PV",
   "battleUnitWoundRestore": "Rendre 1 PV",

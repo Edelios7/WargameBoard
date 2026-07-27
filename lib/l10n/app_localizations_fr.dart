@@ -1338,6 +1338,30 @@ class AppLocalizationsFr extends AppLocalizations {
   String get foodChainMoreDetails => 'En savoir plus';
 
   @override
+  String get armyGuidePickerTitle => 'Choisis ta faction';
+
+  @override
+  String get armyGuidePickerHint =>
+      'Sélectionne une faction pour découvrir ses styles de liste, inspirés de vraies façons de jouer.';
+
+  @override
+  String get armyGuideSearchHint => 'Rechercher une faction…';
+
+  @override
+  String get armyGuideNoFactionSelected =>
+      'Choisis une faction ci-dessus pour voir ses styles de liste.';
+
+  @override
+  String armyGuideStylesCount(int count) {
+    return '$count styles disponibles';
+  }
+
+  @override
+  String armyGuideTotalPoints(int points) {
+    return '$points pts';
+  }
+
+  @override
   String get unitArchetypeHorde => 'Horde';
 
   @override
@@ -1723,6 +1747,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get battleUnitWeaponsTitle => 'Armes';
+
+  @override
+  String get battleUnitAbilitiesTitle => 'Capacités';
 
   @override
   String get battleUnitNoModifiers => 'Aucun bonus/malus actif';

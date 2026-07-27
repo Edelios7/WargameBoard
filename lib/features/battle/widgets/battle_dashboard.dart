@@ -1298,6 +1298,34 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
                       ),
                     ),
                 ],
+                if ((datasheetAsync.value?.abilities ?? const []).isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.battleUnitAbilitiesTitle.toUpperCase(),
+                    style: AppTextStyles.eyebrow,
+                  ),
+                  const SizedBox(height: 8),
+                  for (final ability in datasheetAsync.value!.abilities)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            ability.name,
+                            style: AppTextStyles.body.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          if (ability.description.isNotEmpty)
+                            Text(
+                              ability.description,
+                              style: AppTextStyles.caption,
+                            ),
+                        ],
+                      ),
+                    ),
+                ],
                 const SizedBox(height: 12),
                 FilledButton(
                   style: FilledButton.styleFrom(
