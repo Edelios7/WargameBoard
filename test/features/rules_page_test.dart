@@ -125,6 +125,7 @@ void main() {
 
       expect(find.text('Charge Écarlate'), findsOneWidget);
       expect(find.text('Colonne Blindée du Sang'), findsOneWidget);
+      expect(find.text('Rempart Sanguinaire'), findsOneWidget);
       expect(find.textContaining('pts'), findsWidgets);
     },
   );
