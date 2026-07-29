@@ -80,3 +80,4 @@ flutter:
     - assets/images/dashboard/
     - assets/seed_data/
     - assets/rulebook/
+    - assets/data/

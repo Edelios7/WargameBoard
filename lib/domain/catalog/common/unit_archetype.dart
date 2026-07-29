@@ -197,7 +197,7 @@ UnitArchetype classifyArchetype({
   required bool hasDedicatedAntiTankWeapon,
 }) {
   final normalizedKeywords = keywords
-      .map((k) => _stripAccents(k.toUpperCase()))
+      .map((k) => stripAccents(k.toUpperCase()))
       .toSet();
   final isVehicleOrMonster =
       normalizedKeywords.contains('VEHICULE') ||
@@ -222,7 +222,10 @@ UnitArchetype classifyArchetype({
   return UnitArchetype.elite;
 }
 
-String _stripAccents(String input) {
+/// Retire les diacritiques latins usuels — utilisé pour normaliser des
+/// noms d'unités avant comparaison (classification d'archétype, matching
+/// texte→fiche dans `tools/backfill_army_synergies_test.dart`).
+String stripAccents(String input) {
   const withDiacritics = 'ÀÂÄÁÃÅÈÉÊËÌÍÎÏÒÓÔÖÕÙÚÛÜÇÑ';
   const withoutDiacritics = 'AAAAAAEEEEIIIIOOOOOUUUUCN';
   var result = input;

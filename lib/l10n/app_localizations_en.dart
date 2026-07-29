@@ -1324,6 +1324,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get foodChainMoreDetails => 'Learn more';
 
   @override
+  String get armyProfileAxisTir => 'Shooting';
+
+  @override
+  String get armyProfileAxisCorpsACorps => 'Melee';
+
+  @override
+  String get armyProfileAxisResilience => 'Resilience';
+
+  @override
+  String get armyProfileAxisMobilite => 'Mobility';
+
+  @override
+  String get armyProfileAxisControle => 'Objective control';
+
+  @override
+  String get armyProfileLabelEquilibree => 'Balanced';
+
+  @override
   String get armyGuidePickerTitle => 'Pick your faction';
 
   @override

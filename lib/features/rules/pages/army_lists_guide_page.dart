@@ -3,108 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../domain/rules/army_list_style_parser.dart';
 import '../../../domain/rules/rule_document.dart';
 import '../../../l10n/app_localizations.dart';
-
-/// Un style de liste pour une faction donnée, extrait d'un [RuleSection]
-/// dont le heading suit la convention `"{Faction} — {Style}"` et le body
-/// `"{description}\n\n{unités séparées par \n} — Total : {N} pts"` (voir
-/// le générateur qui a produit `rules_data.dart`).
-class _ArmyListStyle {
-  final String name;
-  final String description;
-  final List<_ArmyListUnit> units;
-  final int totalPoints;
-
-  const _ArmyListStyle({
-    required this.name,
-    required this.description,
-    required this.units,
-    required this.totalPoints,
-  });
-}
-
-class _ArmyListUnit {
-  final int quantity;
-  final String name;
-
-  /// Total en points pour cette ligne (déjà multiplié par [quantity] dans
-  /// le texte source, ex. "3 × Boyz — 240 pts") — pas le coût à l'unité.
-  final int lineTotalPoints;
-
-  const _ArmyListUnit({
-    required this.quantity,
-    required this.name,
-    required this.lineTotalPoints,
-  });
-}
-
-const _totalSeparator = ' — Total : ';
-
-/// Regroupe les [RuleSection] du document par faction (heading
-/// `"Faction — Style"`) en conservant l'ordre d'origine, et convertit
-/// chaque section en [_ArmyListStyle] structuré pour un rendu soigné —
-/// au lieu du bloc de texte brut affiché par [RuleDocumentDetailPage].
-Map<String, List<_ArmyListStyle>> _groupByFaction(List<RuleSection> sections) {
-  final byFaction = <String, List<_ArmyListStyle>>{};
-  for (final section in sections) {
-    final sepIndex = section.heading.indexOf(' — ');
-    if (sepIndex == -1) continue;
-    final faction = section.heading.substring(0, sepIndex);
-    final styleName = section.heading.substring(sepIndex + 3);
-    final style = _parseStyle(styleName, section.body);
-    if (style == null) continue;
-    byFaction.putIfAbsent(faction, () => []).add(style);
-  }
-  return byFaction;
-}
-
-_ArmyListStyle? _parseStyle(String styleName, String body) {
-  final descSplit = body.indexOf('\n\n');
-  if (descSplit == -1) return null;
-  final description = body.substring(0, descSplit);
-  final rest = body.substring(descSplit + 2);
-
-  final totalIndex = rest.lastIndexOf(_totalSeparator);
-  if (totalIndex == -1) return null;
-  final unitBlock = rest.substring(0, totalIndex);
-  final totalText = rest.substring(totalIndex + _totalSeparator.length);
-  final totalPoints = int.tryParse(totalText.replaceAll(RegExp(r'[^0-9]'), ''));
-  if (totalPoints == null) return null;
-
-  final units = <_ArmyListUnit>[];
-  for (final line in unitBlock.split('\n')) {
-    final dashIndex = line.lastIndexOf(' — ');
-    if (dashIndex == -1) continue;
-    var namePart = line.substring(0, dashIndex);
-    final pointsPart = line.substring(dashIndex + 3);
-    final lineTotalPoints = int.tryParse(
-      pointsPart.replaceAll(RegExp(r'[^0-9]'), ''),
-    );
-    if (lineTotalPoints == null) continue;
-
-    var quantity = 1;
-    final qtyMatch = RegExp(r'^(\d+)\s*×\s*').firstMatch(namePart);
-    if (qtyMatch != null) {
-      quantity = int.parse(qtyMatch.group(1)!);
-      namePart = namePart.substring(qtyMatch.end);
-    }
-    units.add(
-      _ArmyListUnit(
-        quantity: quantity,
-        name: namePart,
-        lineTotalPoints: lineTotalPoints,
-      ),
-    );
-  }
-
-  return _ArmyListStyle(
-    name: styleName,
-    description: description,
-    units: units,
-    totalPoints: totalPoints,
-  );
-}
 
 /// Icône indicative choisie par mots-clés dans le nom du style — purement
 /// décoratif, pas une classification officielle (cf. [UnitArchetype] pour
@@ -146,14 +47,14 @@ class ArmyListsGuidePage extends StatefulWidget {
 }
 
 class _ArmyListsGuidePageState extends State<ArmyListsGuidePage> {
-  late final Map<String, List<_ArmyListStyle>> _byFaction;
+  late final Map<String, List<ArmyListStyle>> _byFaction;
   String? _selectedFaction;
   String _query = '';
 
   @override
   void initState() {
     super.initState();
-    _byFaction = _groupByFaction(widget.document.sections);
+    _byFaction = groupStyleSectionsByFaction(widget.document.sections);
   }
 
   @override
@@ -326,7 +227,7 @@ class _EmptySelectionHint extends StatelessWidget {
 }
 
 class _StyleCard extends StatelessWidget {
-  final _ArmyListStyle style;
+  final ArmyListStyle style;
   final AppLocalizations l10n;
 
   const _StyleCard({required this.style, required this.l10n});

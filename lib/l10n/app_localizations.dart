@@ -2504,6 +2504,42 @@ abstract class AppLocalizations {
   /// **'En savoir plus'**
   String get foodChainMoreDetails;
 
+  /// No description provided for @armyProfileAxisTir.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tir'**
+  String get armyProfileAxisTir;
+
+  /// No description provided for @armyProfileAxisCorpsACorps.
+  ///
+  /// In fr, this message translates to:
+  /// **'Corps-à-corps'**
+  String get armyProfileAxisCorpsACorps;
+
+  /// No description provided for @armyProfileAxisResilience.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résilience'**
+  String get armyProfileAxisResilience;
+
+  /// No description provided for @armyProfileAxisMobilite.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mobilité'**
+  String get armyProfileAxisMobilite;
+
+  /// No description provided for @armyProfileAxisControle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contrôle d\'objectifs'**
+  String get armyProfileAxisControle;
+
+  /// No description provided for @armyProfileLabelEquilibree.
+  ///
+  /// In fr, this message translates to:
+  /// **'Équilibrée'**
+  String get armyProfileLabelEquilibree;
+
   /// No description provided for @armyGuidePickerTitle.
   ///
   /// In fr, this message translates to:
