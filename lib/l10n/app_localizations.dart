@@ -2540,6 +2540,54 @@ abstract class AppLocalizations {
   /// **'Équilibrée'**
   String get armyProfileLabelEquilibree;
 
+  /// No description provided for @armyOverviewTab.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vue d\'ensemble'**
+  String get armyOverviewTab;
+
+  /// No description provided for @armyDetailsTab.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détails'**
+  String get armyDetailsTab;
+
+  /// No description provided for @armyOverviewSectionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil d\'armée'**
+  String get armyOverviewSectionTitle;
+
+  /// No description provided for @armyOverviewEmptyArmy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoute des unités pour voir le profil de ton armée.'**
+  String get armyOverviewEmptyArmy;
+
+  /// No description provided for @armyRecommendationsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Unités complémentaires'**
+  String get armyRecommendationsTitle;
+
+  /// No description provided for @armyRecommendationReasonSynergy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Souvent joué avec {unit}'**
+  String armyRecommendationReasonSynergy(String unit);
+
+  /// No description provided for @armyRecommendationReasonRoleGap.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ton armée n\'a pas d\'unité {archetype}'**
+  String armyRecommendationReasonRoleGap(String archetype);
+
+  /// No description provided for @armyRecommendationEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas de suggestion pour l\'instant — ta faction n\'a plus d\'unité à recommander.'**
+  String get armyRecommendationEmpty;
+
   /// No description provided for @armyGuidePickerTitle.
   ///
   /// In fr, this message translates to:

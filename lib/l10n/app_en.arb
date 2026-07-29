@@ -638,6 +638,24 @@
   "armyProfileAxisMobilite": "Mobility",
   "armyProfileAxisControle": "Objective control",
   "armyProfileLabelEquilibree": "Balanced",
+  "armyOverviewTab": "Overview",
+  "armyDetailsTab": "Details",
+  "armyOverviewSectionTitle": "Army profile",
+  "armyOverviewEmptyArmy": "Add units to see your army's profile.",
+  "armyRecommendationsTitle": "Complementary units",
+  "armyRecommendationReasonSynergy": "Often played with {unit}",
+  "@armyRecommendationReasonSynergy": {
+    "placeholders": {
+      "unit": { "type": "String" }
+    }
+  },
+  "armyRecommendationReasonRoleGap": "Your army has no {archetype} unit",
+  "@armyRecommendationReasonRoleGap": {
+    "placeholders": {
+      "archetype": { "type": "String" }
+    }
+  },
+  "armyRecommendationEmpty": "No suggestion right now — your faction has no more units to recommend.",
   "armyGuidePickerTitle": "Pick your faction",
   "armyGuidePickerHint": "Select a faction to discover its list styles, inspired by real ways of playing it.",
   "armyGuideSearchHint": "Search a faction…",

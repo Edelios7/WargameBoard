@@ -12,11 +12,16 @@ import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/discard_guard.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
+import '../../../core/widgets/radar_chart.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/datasheet_details.dart';
 import '../../../database/models/equipment_details.dart';
 import '../../../database/models/model_details.dart';
 import '../../../database/models/weapon_details.dart';
+import '../../../domain/armies/army_profile.dart';
+import '../../../domain/armies/army_recommendations.dart';
+import '../../../domain/catalog/common/unit_archetype.dart';
+import '../../../domain/rules/army_synergy_data.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/army_provider.dart';
 import '../../../providers/battle_provider.dart';
@@ -741,7 +746,10 @@ class _ArmyBuilderPage extends ConsumerWidget {
               // Trois colonnes fixes (300 + grille + 340) ne laissent plus
               // de place à rien sur un écran de téléphone — on empile
               // sidebar, grille puis détails de l'unité sélectionnée dans
-              // une seule colonne défilante.
+              // une seule colonne défilante. Toujours affiché, même sans
+              // unité sélectionnée : c'est là que vit l'onglet "Vue
+              // d'ensemble" (profil/radar/recommandations), utile dès
+              // qu'une armée existe, y compris vide.
               if (constraints.maxWidth < 900) {
                 return SingleChildScrollView(
                   child: Column(
@@ -754,10 +762,8 @@ class _ArmyBuilderPage extends ConsumerWidget {
                       SizedBox(height: 420, child: _BuilderSidebar(army: army)),
                       Container(height: 1, color: AppColors.border),
                       unitGrid,
-                      if (selectedUnit != null) ...[
-                        Container(height: 1, color: AppColors.border),
-                        _UnitDetailsPanel(army: army, unit: selectedUnit),
-                      ],
+                      Container(height: 1, color: AppColors.border),
+                      _UnitDetailsPanel(army: army, unit: selectedUnit),
                     ],
                   ),
                 );
@@ -1589,29 +1595,158 @@ class _UnitCard extends ConsumerWidget {
   }
 }
 
-class _UnitDetailsPanel extends ConsumerWidget {
+class _UnitDetailsPanel extends ConsumerStatefulWidget {
   final ArmyDetails army;
   final ArmyUnitDetails? unit;
 
   const _UnitDetailsPanel({required this.army, required this.unit});
 
   @override
+  ConsumerState<_UnitDetailsPanel> createState() => _UnitDetailsPanelState();
+}
+
+class _UnitDetailsPanelState extends ConsumerState<_UnitDetailsPanel> {
+  // `null` = pas encore de choix explicite de l'utilisateur : on suit le
+  // comportement historique (afficher les détails de l'unité choisie).
+  // Une fois togglé, le choix reste sticky même si la sélection d'unité
+  // change entre-temps.
+  bool? _showOverview;
+
+  bool get _effectiveShowOverview {
+    if (widget.unit == null) return true;
+    return _showOverview ?? false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final showOverview = _effectiveShowOverview;
+    final content = showOverview
+        ? _ArmyOverviewCard(army: widget.army)
+        : _UnitDetailsBody(army: widget.army, unit: widget.unit!);
+
+    final tabs = Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      child: Row(
+        children: [
+          Expanded(
+            child: _PanelTabButton(
+              label: l10n.armyOverviewTab,
+              icon: Icons.radar_rounded,
+              selected: showOverview,
+              onTap: () => setState(() => _showOverview = true),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _PanelTabButton(
+              label: l10n.armyDetailsTab,
+              icon: Icons.info_outline_rounded,
+              selected: !showOverview,
+              onTap: widget.unit == null
+                  ? null
+                  : () => setState(() => _showOverview = false),
+            ),
+          ),
+        ],
+      ),
+    );
+    final divider = Container(
+      margin: const EdgeInsets.symmetric(vertical: 12),
+      height: 1,
+      color: AppColors.border,
+    );
+
+    // Ce panneau est utilisé à la fois dans un contexte à hauteur bornée
+    // (colonne desktop, cf. Row + CrossAxisAlignment.stretch dans
+    // _ArmyBuilderPage) et dans un contexte à hauteur non bornée
+    // (empilement mobile dans un SingleChildScrollView). Dans une Column,
+    // un enfant non-flexible reçoit toute la hauteur disponible comme
+    // plafond (pas "le reste après les autres enfants") : sans Expanded,
+    // le contenu se comporte donc bien en hauteur non bornée (il se
+    // limite à sa taille intrinsèque) mais déborde en hauteur bornée
+    // (lui + les onglets dépassent le budget total). D'où ce
+    // LayoutBuilder : Expanded seulement quand la hauteur est bornée.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            tabs,
+            divider,
+            constraints.hasBoundedHeight ? Expanded(child: content) : content,
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _PanelTabButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  const _PanelTabButton({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final disabled = onTap == null;
+    final color = disabled
+        ? AppColors.textSecondary.withValues(alpha: .4)
+        : (selected ? AppColors.primary : AppColors.textSecondary);
+    return Material(
+      color: selected ? AppColors.primary.withValues(alpha: .12) : Colors.transparent,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 15, color: color),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: AppTextStyles.caption.copyWith(
+                    color: color,
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Détail de l'unité sélectionnée — le contenu historique de l'ancien
+/// `_UnitDetailsPanel`, maintenant affiché uniquement sous l'onglet
+/// "Détails" (voir [_UnitDetailsPanelState]).
+class _UnitDetailsBody extends ConsumerWidget {
+  final ArmyDetails army;
+  final ArmyUnitDetails unit;
+
+  const _UnitDetailsBody({required this.army, required this.unit});
+
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final currentUnit = unit;
-
-    if (currentUnit == null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(
-            l10n.armyBuilderSelectUnitPrompt,
-            style: AppTextStyles.caption,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
 
     final datasheetAsync = ref.watch(
       datasheetByIdProvider(currentUnit.datasheetId),
@@ -1917,6 +2052,211 @@ class _UnitDetailsPanel extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Onglet "Vue d'ensemble" du panneau de droite : profil dominant, radar
+/// de forces/faiblesses et recommandations d'unités complémentaires —
+/// affiché par défaut sur une armée vide, accessible à tout moment
+/// ensuite (voir [_UnitDetailsPanelState]).
+class _ArmyOverviewCard extends ConsumerWidget {
+  final ArmyDetails army;
+
+  const _ArmyOverviewCard({required this.army});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final catalogAsync = ref.watch(factionCatalogDetailsProvider(army.factionId));
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      child: catalogAsync.when(
+        loading: () => const Padding(
+          padding: EdgeInsets.only(top: 40),
+          child: Center(
+            child: CircularProgressIndicator(color: AppColors.primary),
+          ),
+        ),
+        error: (error, _) =>
+            Text('$error', style: AppTextStyles.caption),
+        data: (catalog) {
+          final catalogById = {for (final d in catalog) d.id: d};
+          final scores = computeArmyProfile(army, catalogById);
+          final profile = dominantProfile(scores);
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.armyOverviewSectionTitle.toUpperCase(),
+                style: AppTextStyles.eyebrow,
+              ),
+              const SizedBox(height: 4),
+              Text(armyProfileLabel(l10n, profile), style: AppTextStyles.title),
+              const SizedBox(height: 8),
+              if (army.units.isEmpty)
+                Text(l10n.armyOverviewEmptyArmy, style: AppTextStyles.caption)
+              else
+                Center(
+                  child: RadarChart(
+                    size: 220,
+                    axes: [
+                      RadarAxis(
+                        label: armyProfileAxisName(l10n, ArmyProfileAxis.tir),
+                        value: scores.tir,
+                      ),
+                      RadarAxis(
+                        label: armyProfileAxisName(
+                          l10n,
+                          ArmyProfileAxis.corpsACorps,
+                        ),
+                        value: scores.corpsACorps,
+                      ),
+                      RadarAxis(
+                        label: armyProfileAxisName(
+                          l10n,
+                          ArmyProfileAxis.resilience,
+                        ),
+                        value: scores.resilience,
+                      ),
+                      RadarAxis(
+                        label: armyProfileAxisName(
+                          l10n,
+                          ArmyProfileAxis.mobilite,
+                        ),
+                        value: scores.mobilite,
+                      ),
+                      RadarAxis(
+                        label: armyProfileAxisName(
+                          l10n,
+                          ArmyProfileAxis.controle,
+                        ),
+                        value: scores.controle,
+                      ),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 24),
+              _RecommendationsBlock(army: army, catalog: catalog),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Bandeau "tutoriel" de recommandations d'unités complémentaires — voir
+/// [suggestUnits] pour la logique (synergie issue des listes de style
+/// par faction, avec repli sur les trous de rôle).
+class _RecommendationsBlock extends ConsumerWidget {
+  final ArmyDetails army;
+  final List<DatasheetDetails> catalog;
+
+  const _RecommendationsBlock({required this.army, required this.catalog});
+
+  Future<void> _addSuggestion(WidgetRef ref, DatasheetDetails sheet) async {
+    final armyRepository = ref.read(armyRepositoryProvider);
+    await armyRepository.addUnit(
+      armyId: army.id,
+      datasheetId: sheet.id,
+      modelCount: sheet.unit.defaultSize,
+    );
+    ref.invalidate(selectedArmyProvider);
+    ref.invalidate(armiesListProvider);
+    ref.invalidate(armyByIdProvider(army.id));
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final synergyAsync = ref.watch(armySynergyDataProvider);
+
+    return synergyAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
+      data: (synergy) {
+        final suggestions = suggestUnits(
+          army: army,
+          synergy: synergy,
+          factionCatalog: catalog,
+        );
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.lightbulb_outline_rounded,
+                  size: 15,
+                  color: AppColors.primary,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  l10n.armyRecommendationsTitle.toUpperCase(),
+                  style: AppTextStyles.eyebrow,
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            if (suggestions.isEmpty)
+              Text(l10n.armyRecommendationEmpty, style: AppTextStyles.caption)
+            else
+              ...suggestions.map(
+                (suggestion) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: AppCard(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    onTap: () => _addSuggestion(
+                      ref,
+                      catalog.firstWhere((d) => d.id == suggestion.datasheetId),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                suggestion.datasheetName,
+                                style: AppTextStyles.body,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                suggestion.reason == UnitSuggestionReason.synergy
+                                    ? l10n.armyRecommendationReasonSynergy(
+                                        suggestion.synergyPartnerName ?? '',
+                                      )
+                                    : l10n.armyRecommendationReasonRoleGap(
+                                        archetypeName(
+                                          l10n,
+                                          suggestion.missingArchetype!,
+                                        ),
+                                      ),
+                                style: AppTextStyles.caption,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(
+                          Icons.add_circle_outline_rounded,
+                          size: 20,
+                          color: AppColors.primary,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }

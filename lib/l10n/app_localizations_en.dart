@@ -1342,6 +1342,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get armyProfileLabelEquilibree => 'Balanced';
 
   @override
+  String get armyOverviewTab => 'Overview';
+
+  @override
+  String get armyDetailsTab => 'Details';
+
+  @override
+  String get armyOverviewSectionTitle => 'Army profile';
+
+  @override
+  String get armyOverviewEmptyArmy => 'Add units to see your army\'s profile.';
+
+  @override
+  String get armyRecommendationsTitle => 'Complementary units';
+
+  @override
+  String armyRecommendationReasonSynergy(String unit) {
+    return 'Often played with $unit';
+  }
+
+  @override
+  String armyRecommendationReasonRoleGap(String archetype) {
+    return 'Your army has no $archetype unit';
+  }
+
+  @override
+  String get armyRecommendationEmpty =>
+      'No suggestion right now — your faction has no more units to recommend.';
+
+  @override
   String get armyGuidePickerTitle => 'Pick your faction';
 
   @override

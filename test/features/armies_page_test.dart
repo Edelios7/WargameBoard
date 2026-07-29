@@ -158,4 +158,68 @@ void main() {
     expect(find.text('Captain'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+      'the overview tab is shown by default on an empty army and shows the army profile',
+      (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await database.armyDao.createArmy(
+      name: 'Armée vide',
+      factionId: 'fac-blood-angels',
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Armée vide'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('PROFIL D\'ARMÉE'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'adding a unit switches the default tab to Details, and Overview stays reachable',
+      (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final armyId = await database.armyDao.createArmy(
+      name: 'Ma liste',
+      factionId: 'fac-blood-angels',
+    );
+    final captain = await database.datasheetDao.search('Captain');
+    await database.armyDao.addUnit(
+      armyId: armyId,
+      datasheetId: captain.single.id,
+      modelCount: 1,
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Ma liste'));
+    await tester.pumpAndSettle();
+
+    // Une unité existe déjà : l'onglet Détails est affiché par défaut.
+    expect(find.text('PROFIL D\'ARMÉE'), findsNothing);
+
+    await tester.tap(find.text('Vue d\'ensemble'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('PROFIL D\'ARMÉE'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.text('Détails'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Captain'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
 }
