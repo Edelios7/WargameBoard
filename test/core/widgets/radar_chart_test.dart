@@ -41,4 +41,25 @@ void main() {
 
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+      'does not throw and stays within bounds for a size smaller than the '
+      'fixed label margin', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: RadarChart(
+            size: 40,
+            axes: [
+              RadarAxis(label: 'Tir', value: 70),
+              RadarAxis(label: 'CAC', value: 20),
+              RadarAxis(label: 'Résilience', value: 50),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+  });
 }

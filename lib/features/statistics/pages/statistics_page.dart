@@ -173,7 +173,10 @@ class StatisticsPage extends ConsumerWidget {
                       style: AppTextStyles.title,
                     ),
                     const SizedBox(height: 16),
-                    battles.isEmpty
+                    // Une bataille "pas encore jouée" (result == null)
+                    // n'a pas sa place dans la forme récente : elle n'a
+                    // pas encore d'issue à afficher.
+                    battles.every((b) => b.result == null)
                         ? Text(l10n.battleEmptyList, style: AppTextStyles.caption)
                         : _RecentFormRow(l10n: l10n, battles: battles),
                     const DecorSeparator(
@@ -478,7 +481,8 @@ class _RecentFormRow extends StatelessWidget {
     final dateFormat = DateFormat.yMMMd(
       Localizations.localeOf(context).toString(),
     );
-    final recent = battles.take(10).toList().reversed.toList();
+    final decided = battles.where((b) => b.result != null).toList();
+    final recent = decided.take(10).toList().reversed.toList();
 
     return Wrap(
       spacing: 8,

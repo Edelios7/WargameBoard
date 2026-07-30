@@ -10,6 +10,7 @@ import '../../../database/models/battle_details.dart';
 import '../../../database/tables/battles_table.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/battle_provider.dart';
+import '../../../providers/xp_provider.dart';
 import 'battle_detail_page.dart';
 import '../widgets/battle_dashboard.dart';
 import '../widgets/battle_setup_dialog.dart';
@@ -281,6 +282,11 @@ class _BattleCard extends ConsumerWidget {
                 ref.invalidate(battlesListProvider);
                 ref.invalidate(nextBattleProvider);
                 ref.invalidate(lastBattleProvider);
+                // deleteBattle reprend l'XP créditée par cette partie côté
+                // base (xpService.revokeBattle) — sans invalider ce
+                // provider indépendant, l'XP affichée ailleurs (Profil,
+                // Statistiques) reste périmée jusqu'à une autre action.
+                ref.invalidate(xpSummaryProvider);
               },
             ),
           ),

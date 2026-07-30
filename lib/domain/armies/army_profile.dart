@@ -88,6 +88,15 @@ ArmyProfileScores computeArmyProfile(
   for (final unit in army.units) {
     final sheet = datasheetsById[unit.datasheetId];
     if (sheet == null) continue;
+    // Chaque axe est une densité de puissance PAR POINT dépensé — une
+    // unité à coût inconnu (points = 0 par convention arithmétique, cf.
+    // ArmyUnitDetails.hasUnknownCost) ne peut pas y être représentée
+    // équitablement : l'inclure gonflerait artificiellement tir/CAC/
+    // résilience/contrôle (comptés via modelCount, sans rapport avec le
+    // coût) sans jamais faire grossir le dénominateur totalPoints. La
+    // mobilité l'excluait déjà (pondérée par unit.points) — on applique
+    // la même règle aux quatre autres axes pour rester cohérent.
+    if (unit.hasUnknownCost) continue;
     final modelCount = unit.modelCount > 0 ? unit.modelCount : 1;
 
     for (final weapon in sheet.weapons) {

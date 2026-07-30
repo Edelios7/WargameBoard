@@ -34,7 +34,7 @@ DatasheetDetails _sheet({
 ArmyUnitDetails _armyUnit({
   required String datasheetId,
   required int modelCount,
-  required int points,
+  int? points,
 }) {
   return ArmyUnitDetails(
     id: '$datasheetId-instance',
@@ -181,6 +181,86 @@ void main() {
       expect(scores.tir, 0);
       expect(scores.corpsACorps, 0);
       expect(scores.resilience, 0);
+    });
+
+    test(
+        'a unit with an unknown cost does not skew any axis (excluded like '
+        'it already was from mobilité)', () {
+      final sheet = _sheet(
+        id: 'ds-tir',
+        name: 'Tireur',
+        weapons: [
+          const WeaponDetails(
+            id: 'w1',
+            name: 'Fusil bolter',
+            type: 'Arme à distance',
+            keywords: [],
+            abilities: [],
+            profiles: [
+              WeaponProfileDetails(
+                name: 'Fusil bolter',
+                range: 24,
+                attacks: '2',
+                strength: 4,
+                armorPenetration: 0,
+                damage: '1',
+                isMelee: false,
+              ),
+            ],
+          ),
+        ],
+        models: const [
+          ModelDetails(
+            id: 'm1',
+            name: 'Tireur',
+            movement: 6,
+            toughness: 4,
+            save: 3,
+            wounds: 2,
+            leadership: 6,
+            objectiveControl: 1,
+          ),
+        ],
+      );
+      final knownUnit = _armyUnit(
+        datasheetId: 'ds-tir',
+        modelCount: 5,
+        points: 80,
+      );
+      final unknownCostUnit = _armyUnit(
+        datasheetId: 'ds-tir',
+        modelCount: 50,
+      );
+      expect(unknownCostUnit.hasUnknownCost, isTrue);
+
+      final withoutUnknown = computeArmyProfile(
+        ArmyDetails(
+          id: 'a1',
+          name: 'Armée de tir',
+          factionId: 'fac-test',
+          factionName: 'Test',
+          units: [knownUnit],
+          totalPoints: 80,
+        ),
+        {'ds-tir': sheet},
+      );
+      final withUnknownAdded = computeArmyProfile(
+        ArmyDetails(
+          id: 'a1',
+          name: 'Armée de tir',
+          factionId: 'fac-test',
+          factionName: 'Test',
+          units: [knownUnit, unknownCostUnit],
+          // totalPoints n'inclut que le coût connu, comme le calcule le
+          // reste de l'appli pour une unité à coût inconnu.
+          totalPoints: 80,
+        ),
+        {'ds-tir': sheet},
+      );
+
+      expect(withUnknownAdded.tir, withoutUnknown.tir);
+      expect(withUnknownAdded.resilience, withoutUnknown.resilience);
+      expect(withUnknownAdded.controle, withoutUnknown.controle);
     });
   });
 

@@ -52,8 +52,11 @@ class _RadarChartPainter extends CustomPainter {
     if (axes.length < 3) return;
 
     final center = Offset(size.width / 2, size.height / 2);
-    // Marge fixe pour laisser la place aux labels autour du polygone.
-    final radius = size.width / 2 - 36;
+    // Marge fixe pour laisser la place aux labels autour du polygone —
+    // clampée à 0 : sans ça, un widget plus petit que la marge (72px)
+    // donnerait un rayon négatif et dessinerait tout en miroir par
+    // rapport au centre au lieu d'un simple petit radar.
+    final radius = math.max(0.0, size.width / 2 - 36);
     final angleStep = 2 * math.pi / axes.length;
 
     Offset unitVector(int i) {

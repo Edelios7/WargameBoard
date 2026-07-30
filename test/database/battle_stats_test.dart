@@ -25,14 +25,15 @@ void main() {
     expect(stats.winRate, 0.5);
   });
 
-  test('battles without a result count as played but not in the win rate',
-      () {
+  test(
+      'a battle without a result (not played yet) is excluded from '
+      'totalGames and the win rate', () {
     final stats = BattleStats.fromBattles([
       _battle(BattleResult.victory),
       _battle(null),
     ]);
 
-    expect(stats.totalGames, 2);
+    expect(stats.totalGames, 1);
     expect(stats.winRate, 1.0);
   });
 

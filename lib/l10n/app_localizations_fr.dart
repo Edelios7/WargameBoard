@@ -108,6 +108,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Sauvegarde prête — ferme et relance l\'application pour l\'appliquer.';
 
   @override
+  String get settingsBackupRestoreInvalidFile =>
+      'Ce fichier n\'est pas une sauvegarde Wargame Board valide — restauration annulée.';
+
+  @override
+  String get settingsBackupRestoreUnsupportedSchema =>
+      'Cette sauvegarde vient d\'une version plus récente de l\'application — mets à jour l\'application avant de la restaurer.';
+
+  @override
   String get settingsBackupRestoreCancel =>
       'Annuler la restauration en attente';
 

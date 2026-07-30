@@ -38,7 +38,11 @@ class BattleStats {
       }
     }
     return BattleStats(
-      totalGames: battles.length,
+      // Ne compte que les parties avec un résultat renseigné : une
+      // bataille journalisée "pas encore jouée" (result == null) n'est
+      // pas une partie décidée, elle ne doit ni grossir le total ni
+      // faire chuter artificiellement le taux de victoire affiché.
+      totalGames: victories + defeats + draws,
       victories: victories,
       defeats: defeats,
       draws: draws,

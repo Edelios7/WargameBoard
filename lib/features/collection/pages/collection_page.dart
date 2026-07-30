@@ -632,10 +632,13 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
                   color: AppColors.surface,
                   itemBuilder: (context) => [
                     PopupMenuItem(
+                      // Exporte ce qui est affiché (filtres actifs
+                      // compris), pas toute la collection — sinon
+                      // filtrer avant d'exporter ne servirait à rien.
                       onTap: () => _copyExport(
                         context,
                         l10n,
-                        CollectionExportFormatter.toCsv(entries),
+                        CollectionExportFormatter.toCsv(filtered),
                       ),
                       child: Text(
                         l10n.collectionExportCsv,
@@ -646,7 +649,7 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
                       onTap: () => _copyExport(
                         context,
                         l10n,
-                        CollectionExportFormatter.toJson(entries),
+                        CollectionExportFormatter.toJson(filtered),
                       ),
                       child: Text(
                         l10n.collectionExportJson,

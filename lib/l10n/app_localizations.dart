@@ -278,6 +278,18 @@ abstract class AppLocalizations {
   /// **'Sauvegarde prête — ferme et relance l\'application pour l\'appliquer.'**
   String get settingsBackupRestoreStaged;
 
+  /// No description provided for @settingsBackupRestoreInvalidFile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce fichier n\'est pas une sauvegarde Wargame Board valide — restauration annulée.'**
+  String get settingsBackupRestoreInvalidFile;
+
+  /// No description provided for @settingsBackupRestoreUnsupportedSchema.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette sauvegarde vient d\'une version plus récente de l\'application — mets à jour l\'application avant de la restaurer.'**
+  String get settingsBackupRestoreUnsupportedSchema;
+
   /// No description provided for @settingsBackupRestoreCancel.
   ///
   /// In fr, this message translates to:

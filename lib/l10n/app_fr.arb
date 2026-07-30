@@ -39,6 +39,8 @@
   "settingsBackupRestoreConfirmBody": "Toutes les données actuelles (armées, collection, historique de parties...) seront remplacées par celles de la sauvegarde choisie. Cette action est irréversible. L'application doit être relancée pour l'appliquer.",
   "settingsBackupRestoreConfirmAction": "Restaurer et relancer plus tard",
   "settingsBackupRestoreStaged": "Sauvegarde prête — ferme et relance l'application pour l'appliquer.",
+  "settingsBackupRestoreInvalidFile": "Ce fichier n'est pas une sauvegarde Wargame Board valide — restauration annulée.",
+  "settingsBackupRestoreUnsupportedSchema": "Cette sauvegarde vient d'une version plus récente de l'application — mets à jour l'application avant de la restaurer.",
   "settingsBackupRestoreCancel": "Annuler la restauration en attente",
   "settingsImportPasteHint": "Colle ici le document JSON...",
   "settingsImportBehaviorHint": "Chaque entrée avec un id déjà existant est mise à jour ; les autres sont ajoutées. Rien d'autre dans le catalogue n'est touché ou supprimé.",

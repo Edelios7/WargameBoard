@@ -42,14 +42,23 @@ class UnitSuggestion {
 /// Ne lance jamais d'exception : une entrée de synergie pointant vers un
 /// id absent de [factionCatalog], ou une fiche sans coût connu, est
 /// simplement ignorée.
+///
+/// [remainingPoints], quand l'armée a une limite de points définie, est
+/// le budget qu'il reste (`pointsLimit - totalPoints`) : une unité dont
+/// le coût le dépasse n'est jamais suggérée — ce ne serait pas une
+/// suggestion utile de cliquer dessus pour dépasser aussitôt sa limite.
+/// `null` désactive ce filtre (armée sans limite de points).
 List<UnitSuggestion> suggestUnits({
   required ArmyDetails army,
   required Map<String, Map<String, int>> synergy,
   required List<DatasheetDetails> factionCatalog,
   int max = 3,
+  int? remainingPoints,
 }) {
   final alreadyInArmy = army.units.map((u) => u.datasheetId).toSet();
   final catalogById = {for (final d in factionCatalog) d.id: d};
+  bool fitsBudget(int? points) =>
+      remainingPoints == null || (points != null && points <= remainingPoints);
 
   final synergyWeight = <String, int>{};
   final bestPartnerName = <String, String>{};
@@ -81,6 +90,7 @@ List<UnitSuggestion> suggestUnits({
     if (suggestions.length >= max) break;
     final sheet = catalogById[id];
     if (sheet == null) continue;
+    if (!fitsBudget(sheet.points)) continue;
     suggestions.add(
       UnitSuggestion(
         datasheetId: id,
@@ -110,6 +120,7 @@ List<UnitSuggestion> suggestUnits({
                 (d) =>
                     d.archetype == archetype &&
                     d.points != null &&
+                    fitsBudget(d.points) &&
                     !alreadyInArmy.contains(d.id) &&
                     !suggestedIds.contains(d.id),
               )

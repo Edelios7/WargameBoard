@@ -172,6 +172,32 @@ void main() {
       expect(result.any((s) => s.datasheetId == 'no-cost'), isFalse);
     });
 
+    test(
+        'ne suggère jamais une unité dont le coût dépasse le budget de '
+        'points restant', () {
+      final catalog = [
+        _sheet(id: 'syn-cher', name: 'Synergie Chère', points: 300),
+        _sheet(id: 'horde-abordable', name: 'Horde', archetype: UnitArchetype.horde, points: 50),
+        _sheet(id: 'elite-cher', name: 'Elite Chère', archetype: UnitArchetype.elite, points: 300),
+      ];
+      final army = _army([_armyUnit('base', name: 'Base')]);
+      final synergy = {
+        'base': {'syn-cher': 5},
+      };
+
+      final result = suggestUnits(
+        army: army,
+        synergy: synergy,
+        factionCatalog: catalog,
+        max: 3,
+        remainingPoints: 100,
+      );
+
+      expect(result.any((s) => s.datasheetId == 'syn-cher'), isFalse);
+      expect(result.any((s) => s.datasheetId == 'elite-cher'), isFalse);
+      expect(result.any((s) => s.datasheetId == 'horde-abordable'), isTrue);
+    });
+
     test('respecte la limite max en combinant synergie et trou de rôle', () {
       final catalog = [
         _sheet(id: 'syn-1', name: 'Synergie 1'),

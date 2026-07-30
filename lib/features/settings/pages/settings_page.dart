@@ -11,6 +11,7 @@ import '../../../providers/backup_provider.dart';
 import '../../../providers/dashboard_provider.dart';
 import '../../../providers/locale_provider.dart';
 import '../../../providers/shared_preferences_provider.dart';
+import '../../../services/backup_service.dart' show RestoreStageResult;
 import '../widgets/import_json_dialog.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
@@ -109,12 +110,27 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
     if (confirmed != true || !mounted) return;
 
-    final staged = await ref.read(backupServiceProvider).stageRestore();
-    if (!mounted || !staged) return;
-    ref.invalidate(pendingRestoreProvider);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(l10n.settingsBackupRestoreStaged)));
+    final result = await ref.read(backupServiceProvider).stageRestore();
+    if (!mounted) return;
+    switch (result) {
+      case RestoreStageResult.cancelled:
+        return;
+      case RestoreStageResult.invalidFile:
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.settingsBackupRestoreInvalidFile)),
+        );
+        return;
+      case RestoreStageResult.unsupportedSchema:
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.settingsBackupRestoreUnsupportedSchema)),
+        );
+        return;
+      case RestoreStageResult.staged:
+        ref.invalidate(pendingRestoreProvider);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.settingsBackupRestoreStaged)),
+        );
+    }
   }
 
   Future<void> _cancelPendingRestore() async {

@@ -749,21 +749,29 @@ class _CommandPointsBlock extends ConsumerWidget {
         ? (battle.myCommandPoints ?? 0)
         : (battle.opponentCommandPoints ?? 0);
     final next = (current + delta).clamp(0, 1 << 30);
+    // On journalise l'écart réellement appliqué (next - current), pas le
+    // delta demandé : si les PC sont déjà à 0 et qu'on clique sur "-", le
+    // clamp absorbe le changement (écart réel = 0) — journaliser le -1
+    // demandé ferait qu'un "annuler" ultérieur ajouterait 1 PC qui n'a
+    // jamais été réellement retiré.
+    final appliedDelta = next - current;
     await repo.updateLiveState(
       battle.id,
       myCommandPoints: mine ? Value(next) : const Value.absent(),
       opponentCommandPoints: mine ? const Value.absent() : Value(next),
     );
-    await repo.logEvent(
-      battle.id,
-      label: mine
-          ? 'CP ${delta > 0 ? '+1' : '-1'}'
-          : 'Opponent CP ${delta > 0 ? '+1' : '-1'}',
-      cpDelta: mine ? delta : null,
-      opponentCpDelta: mine ? null : delta,
-      round: battle.currentRound,
-      phase: battle.currentPhase,
-    );
+    if (appliedDelta != 0) {
+      await repo.logEvent(
+        battle.id,
+        label: mine
+            ? 'CP ${delta > 0 ? '+1' : '-1'}'
+            : 'Opponent CP ${delta > 0 ? '+1' : '-1'}',
+        cpDelta: mine ? appliedDelta : null,
+        opponentCpDelta: mine ? null : appliedDelta,
+        round: battle.currentRound,
+        phase: battle.currentPhase,
+      );
+    }
     ref.invalidate(activeBattleProvider);
     ref.invalidate(battleEventsProvider(battle.id));
   }

@@ -763,7 +763,11 @@ class _ArmyBuilderPage extends ConsumerWidget {
                       Container(height: 1, color: AppColors.border),
                       unitGrid,
                       Container(height: 1, color: AppColors.border),
-                      _UnitDetailsPanel(army: army, unit: selectedUnit),
+                      _UnitDetailsPanel(
+                        key: ValueKey(army.id),
+                        army: army,
+                        unit: selectedUnit,
+                      ),
                     ],
                   ),
                 );
@@ -778,7 +782,11 @@ class _ArmyBuilderPage extends ConsumerWidget {
                   Container(width: 1, color: AppColors.border),
                   SizedBox(
                     width: 340,
-                    child: _UnitDetailsPanel(army: army, unit: selectedUnit),
+                    child: _UnitDetailsPanel(
+                      key: ValueKey(army.id),
+                      army: army,
+                      unit: selectedUnit,
+                    ),
                   ),
                 ],
               );
@@ -1599,7 +1607,11 @@ class _UnitDetailsPanel extends ConsumerStatefulWidget {
   final ArmyDetails army;
   final ArmyUnitDetails? unit;
 
-  const _UnitDetailsPanel({required this.army, required this.unit});
+  const _UnitDetailsPanel({
+    super.key,
+    required this.army,
+    required this.unit,
+  });
 
   @override
   ConsumerState<_UnitDetailsPanel> createState() => _UnitDetailsPanelState();
@@ -2182,6 +2194,9 @@ class _RecommendationsBlock extends ConsumerWidget {
           army: army,
           synergy: synergy,
           factionCatalog: catalog,
+          remainingPoints: army.pointsLimit == null
+              ? null
+              : army.pointsLimit! - army.totalPoints,
         );
 
         return Column(

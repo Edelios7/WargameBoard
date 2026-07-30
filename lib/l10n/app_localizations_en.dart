@@ -105,6 +105,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Backup ready — close and reopen the app to apply it.';
 
   @override
+  String get settingsBackupRestoreInvalidFile =>
+      'This file isn\'t a valid Wargame Board backup — restore cancelled.';
+
+  @override
+  String get settingsBackupRestoreUnsupportedSchema =>
+      'This backup comes from a newer version of the app — update the app before restoring it.';
+
+  @override
   String get settingsBackupRestoreCancel => 'Cancel pending restore';
 
   @override

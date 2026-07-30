@@ -18,6 +18,12 @@ const databaseFileName = 'wargame_board.sqlite';
 /// la connexion Drift ne soit ouverte.
 const _pendingRestoreSuffix = '.restore';
 
+/// Résultat de [BackupService.stageRestore] — distingue l'annulation
+/// (l'utilisateur ferme le sélecteur sans choisir de fichier, rien à
+/// signaler) des deux façons dont un fichier choisi peut être rejeté,
+/// pour que l'appelant affiche le bon message.
+enum RestoreStageResult { staged, cancelled, invalidFile, unsupportedSchema }
+
 /// Sauvegarde et restauration de la base de données locale — la seule
 /// copie des données du joueur (armées, collection, historique de
 /// parties...), jamais synchronisée ailleurs.
@@ -53,22 +59,43 @@ class BackupService {
 
   /// Ouvre un sélecteur de fichier pour choisir une sauvegarde `.sqlite`
   /// et la met en attente de restauration — voir [_pendingRestoreSuffix].
-  /// Retourne `true` si une restauration a bien été programmée.
-  Future<bool> stageRestore() async {
+  ///
+  /// Le fichier choisi est validé ICI (lisibilité SQLite + version de
+  /// schéma) plutôt qu'au redémarrage suivant : un fichier invalide
+  /// programmé sans contrôle ne serait rejeté qu'à ce moment-là par
+  /// [applyPendingRestore], en silence — l'utilisateur croirait sa
+  /// restauration effective alors qu'elle n'a jamais eu lieu.
+  Future<RestoreStageResult> stageRestore() async {
     final result = await FilePicker.pickFiles(
       dialogTitle: 'Choisir une sauvegarde à restaurer',
       type: FileType.custom,
       allowedExtensions: ['sqlite'],
     );
     final path = result?.files.single.path;
-    if (path == null) return false;
+    if (path == null) return RestoreStageResult.cancelled;
+
+    final picked = File(path);
+    if (!_isValidSqliteDatabase(picked)) {
+      return RestoreStageResult.invalidFile;
+    }
+    final pickedSchemaVersion = _readSchemaVersion(picked);
+    if (pickedSchemaVersion != null &&
+        pickedSchemaVersion > database.schemaVersion) {
+      // La sauvegarde vient d'une version plus récente de l'appli, dont
+      // le schéma de base contient des colonnes/tables que cette version
+      // installée ne connaît pas — Drift ne sait migrer que vers l'avant
+      // (onUpgrade), pas revenir en arrière. Mieux vaut refuser
+      // clairement ici que de remplacer la base et planter au prochain
+      // lancement, une fois l'originale déjà mise de côté.
+      return RestoreStageResult.unsupportedSchema;
+    }
 
     final documentsDirectory = await getApplicationDocumentsDirectory();
     final staged = File(
       p.join(documentsDirectory.path, '$databaseFileName$_pendingRestoreSuffix'),
     );
-    await File(path).copy(staged.path);
-    return true;
+    await picked.copy(staged.path);
+    return RestoreStageResult.staged;
   }
 
   /// Annule une restauration programmée mais pas encore appliquée.
@@ -101,6 +128,22 @@ bool _isValidSqliteDatabase(File file) {
     return result.isNotEmpty && result.first.values.first == 'ok';
   } catch (_) {
     return false;
+  } finally {
+    db?.dispose();
+  }
+}
+
+/// Lit `PRAGMA user_version` (là où Drift range `schemaVersion`) d'un
+/// fichier `.sqlite` sans l'ouvrir via Drift. `null` si le fichier n'est
+/// pas une base SQLite lisible.
+int? _readSchemaVersion(File file) {
+  sqlite3.Database? db;
+  try {
+    db = sqlite3.sqlite3.open(file.path, mode: sqlite3.OpenMode.readOnly);
+    final result = db.select('PRAGMA user_version');
+    return result.isEmpty ? null : result.first.values.first as int;
+  } catch (_) {
+    return null;
   } finally {
     db?.dispose();
   }

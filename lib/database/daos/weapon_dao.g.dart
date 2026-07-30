@@ -8,6 +8,7 @@ mixin _$WeaponDaoMixin on DatabaseAccessor<AppDatabase> {
   $WeaponProfilesTable get weaponProfiles => attachedDatabase.weaponProfiles;
   $DatasheetWeaponsTable get datasheetWeapons =>
       attachedDatabase.datasheetWeapons;
+  $DatasheetModelsTable get datasheetModels => attachedDatabase.datasheetModels;
   WeaponDaoManager get managers => WeaponDaoManager(this);
 }
 
@@ -25,5 +26,10 @@ class WeaponDaoManager {
       $$DatasheetWeaponsTableTableManager(
         _db.attachedDatabase,
         _db.datasheetWeapons,
+      );
+  $$DatasheetModelsTableTableManager get datasheetModels =>
+      $$DatasheetModelsTableTableManager(
+        _db.attachedDatabase,
+        _db.datasheetModels,
       );
 }

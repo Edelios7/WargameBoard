@@ -18,6 +18,27 @@ import '../widgets/catalog_preview_panel.dart';
 import 'datasheet_full_page.dart';
 import 'weapons_inventory_page.dart';
 
+/// Recalculée à chaque appel à partir des providers de filtre — jamais
+/// mise en cache dans un champ figé, pour rester correcte y compris dans
+/// la feuille de filtres mobile (route séparée, ne se reconstruit pas
+/// avec la page parente) : voir `_NarrowCatalogLayout._openFilters`.
+bool _hasActiveCatalogFilters(WidgetRef ref) {
+  final factionFilter = ref.watch(catalogFactionFilterProvider);
+  final keywordFilter = ref.watch(catalogKeywordFilterProvider);
+  final roleFilter = ref.watch(catalogRoleFilterProvider);
+  final unitTypeFilter = ref.watch(catalogUnitTypeFilterProvider);
+  final editionFilter = ref.watch(catalogEditionFilterProvider);
+  final pointsRange = ref.watch(catalogPointsRangeProvider);
+  final favoritesOnlyFilter = ref.watch(catalogFavoritesOnlyProvider);
+  return factionFilter != null ||
+      keywordFilter.isNotEmpty ||
+      roleFilter != null ||
+      unitTypeFilter != null ||
+      editionFilter != null ||
+      pointsRange != null ||
+      favoritesOnlyFilter;
+}
+
 class CatalogPage extends ConsumerWidget {
   const CatalogPage({super.key});
 
@@ -29,20 +50,8 @@ class CatalogPage extends ConsumerWidget {
     final selectedId = ref.watch(selectedDatasheetIdProvider);
 
     final factionFilter = ref.watch(catalogFactionFilterProvider);
-    final keywordFilter = ref.watch(catalogKeywordFilterProvider);
-    final roleFilter = ref.watch(catalogRoleFilterProvider);
-    final unitTypeFilter = ref.watch(catalogUnitTypeFilterProvider);
-    final editionFilter = ref.watch(catalogEditionFilterProvider);
-    final pointsRange = ref.watch(catalogPointsRangeProvider);
     final favoritesOnlyFilter = ref.watch(catalogFavoritesOnlyProvider);
-    final hasActiveFilters =
-        factionFilter != null ||
-        keywordFilter.isNotEmpty ||
-        roleFilter != null ||
-        unitTypeFilter != null ||
-        editionFilter != null ||
-        pointsRange != null ||
-        favoritesOnlyFilter;
+    final hasActiveFilters = _hasActiveCatalogFilters(ref);
 
     final favoriteIds = ref.watch(catalogFavoritesProvider).value ?? const {};
     final visibleResultsCount = resultsAsync.value == null
@@ -223,7 +232,12 @@ class _NarrowCatalogLayout extends ConsumerWidget {
               maxHeight: MediaQuery.of(context).size.height * 0.85,
             ),
             child: _FiltersPanel(
-              hasActiveFilters: hasActiveFilters,
+              // Recalculé ici (pas le `hasActiveFilters` figé passé en
+              // paramètre à _openFilters) : cette feuille reste ouverte
+              // pendant qu'on modifie les filtres depuis son propre
+              // contenu, donc "Réinitialiser" doit disparaître dès que
+              // les filtres redeviennent tous vides.
+              hasActiveFilters: _hasActiveCatalogFilters(ref),
               resultsCount: resultsCount,
             ),
           );

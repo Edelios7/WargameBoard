@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../app_database.dart';
 import '../models/weapon_summary.dart';
+import '../tables/datasheet_models_table.dart';
 import '../tables/datasheet_weapons_table.dart';
 import '../tables/weapons_table.dart';
 import '../tables/weapon_profiles_table.dart';
@@ -13,6 +14,7 @@ part 'weapon_dao.g.dart';
     Weapons,
     WeaponProfiles,
     DatasheetWeapons,
+    DatasheetModels,
   ],
 )
 class WeaponDao extends DatabaseAccessor<AppDatabase>
@@ -52,15 +54,27 @@ class WeaponDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Inventaire complet des armes du catalogue avec leurs profils et leur
-  /// nombre d'utilisations (nombre de fiches/modèles qui les embarquent).
-  /// Fait 3 requêtes en tout (pas de N+1) puis assemble en mémoire.
+  /// nombre d'utilisations (nombre de FICHES distinctes qui l'embarquent —
+  /// pas de N+1 : 3 requêtes en tout puis assemblage en mémoire).
+  ///
+  /// `DatasheetWeapons` relie une arme à un modèle (`datasheetModelId`),
+  /// pas directement à une fiche : une escouade dont chaque figurine porte
+  /// la même arme produit une ligne par modèle. Compter ces lignes
+  /// surévaluerait donc l'usage dès qu'une fiche a plusieurs modèles avec
+  /// la même arme — on passe par `DatasheetModels` pour dédupliquer sur
+  /// `datasheetId`.
   Future<List<WeaponSummary>> listWeaponsWithUsage() async {
     final allWeapons = await select(weapons).get();
     final allProfiles = await select(weaponProfiles).get();
 
     final usageQuery = selectOnly(datasheetWeapons)
-      ..addColumns([datasheetWeapons.weaponId, datasheetWeapons.id.count()])
-      ..groupBy([datasheetWeapons.weaponId]);
+      ..addColumns([datasheetWeapons.weaponId, datasheetModels.datasheetId])
+      ..join([
+        innerJoin(
+          datasheetModels,
+          datasheetModels.id.equalsExp(datasheetWeapons.datasheetModelId),
+        ),
+      ]);
     final usageRows = await usageQuery.get();
 
     final profilesByWeapon = <String, List<WeaponProfile>>{};
@@ -68,10 +82,17 @@ class WeaponDao extends DatabaseAccessor<AppDatabase>
       profilesByWeapon.putIfAbsent(profile.weaponId, () => []).add(profile);
     }
 
+    final datasheetIdsByWeapon = <String, Set<String>>{};
+    for (final row in usageRows) {
+      final weaponId = row.read(datasheetWeapons.weaponId)!;
+      final datasheetId = row.read(datasheetModels.datasheetId)!;
+      datasheetIdsByWeapon
+          .putIfAbsent(weaponId, () => <String>{})
+          .add(datasheetId);
+    }
     final usageByWeapon = <String, int>{
-      for (final row in usageRows)
-        row.read(datasheetWeapons.weaponId)!:
-            row.read(datasheetWeapons.id.count())!,
+      for (final entry in datasheetIdsByWeapon.entries)
+        entry.key: entry.value.length,
     };
 
     final summaries = allWeapons.map((weapon) {

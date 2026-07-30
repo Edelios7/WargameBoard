@@ -39,6 +39,8 @@
   "settingsBackupRestoreConfirmBody": "All current data (armies, collection, battle history...) will be replaced by the chosen backup. This cannot be undone. The app needs to restart to apply it.",
   "settingsBackupRestoreConfirmAction": "Restore and restart later",
   "settingsBackupRestoreStaged": "Backup ready — close and reopen the app to apply it.",
+  "settingsBackupRestoreInvalidFile": "This file isn't a valid Wargame Board backup — restore cancelled.",
+  "settingsBackupRestoreUnsupportedSchema": "This backup comes from a newer version of the app — update the app before restoring it.",
   "settingsBackupRestoreCancel": "Cancel pending restore",
   "settingsImportPasteHint": "Paste the JSON document here...",
   "settingsImportBehaviorHint": "Any entry whose id already exists gets updated; new ones get added. Nothing else in the catalog is touched or removed.",
