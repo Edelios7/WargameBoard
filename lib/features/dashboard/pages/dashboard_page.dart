@@ -115,6 +115,20 @@ class DashboardPage extends ConsumerWidget {
                   onOpenSettings: () => goTo(AppTab.settings),
                   onOpenProfile: () => goTo(AppTab.profile),
                   onSearch: (query) {
+                    // Les filtres du Catalogue sont des StateProvider
+                    // globaux qui survivent à la navigation entre onglets
+                    // — sans les réinitialiser, une recherche lancée
+                    // depuis le Dashboard peut atterrir sur "0 résultat"
+                    // à cause d'un filtre resté actif d'une précédente
+                    // visite, sans que rien n'indique que c'est lui (et
+                    // non la recherche) qui est en cause.
+                    ref.invalidate(catalogFactionFilterProvider);
+                    ref.invalidate(catalogKeywordFilterProvider);
+                    ref.invalidate(catalogRoleFilterProvider);
+                    ref.invalidate(catalogUnitTypeFilterProvider);
+                    ref.invalidate(catalogEditionFilterProvider);
+                    ref.invalidate(catalogPointsRangeProvider);
+                    ref.invalidate(catalogFavoritesOnlyProvider);
                     ref.read(catalogSearchQueryProvider.notifier).state = query;
                     goTo(AppTab.catalog);
                   },
@@ -937,6 +951,17 @@ class _ArmyRow extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (army.hasUnknownCost) ...[
+                  Tooltip(
+                    message: l10n.unknownCostTooltip,
+                    child: Icon(
+                      Icons.warning_amber_rounded,
+                      size: 16,
+                      color: AppColors.warning,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                ],
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,

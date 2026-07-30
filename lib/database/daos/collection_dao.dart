@@ -45,6 +45,12 @@ class CollectionDao extends DatabaseAccessor<AppDatabase>
     return id;
   }
 
+  Future<OwnedMiniature?> getEntry(String id) {
+    return (select(
+      ownedMiniatures,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
+  }
+
   Future<void> deleteEntry(String id) {
     return (delete(ownedMiniatures)..where((t) => t.id.equals(id))).go();
   }

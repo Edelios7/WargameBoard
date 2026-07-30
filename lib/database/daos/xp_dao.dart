@@ -76,13 +76,6 @@ class XpDao extends DatabaseAccessor<AppDatabase> with _$XpDaoMixin {
     ).insertOnConflictUpdate(XpMilestonesCompanion.insert(key: key));
   }
 
-  Future<bool> hasFactionXp(String factionId) async {
-    final row = await (select(xpFactionTotals)
-          ..where((t) => t.factionId.equals(factionId)))
-        .getSingleOrNull();
-    return row != null && row.xp > 0;
-  }
-
   Future<Map<XpCategory, int>> getCategoryTotals() async {
     final rows = await select(xpCategoryTotals).get();
     final byName = {for (final row in rows) row.category: row.xp};

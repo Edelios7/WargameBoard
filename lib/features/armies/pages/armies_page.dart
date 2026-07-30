@@ -114,6 +114,7 @@ Future<void> _duplicateUnit(
   }
   ref.invalidate(selectedArmyProvider);
   ref.invalidate(armiesListProvider);
+  ref.invalidate(armyByIdProvider(army.id));
   ref.read(selectedUnitIdProvider.notifier).state = newUnitId;
 }
 
@@ -407,6 +408,7 @@ Future<void> _pickDetachment(
       .setDetachment(army.id, newDetachmentId);
   ref.invalidate(selectedArmyProvider);
   ref.invalidate(armiesListProvider);
+  ref.invalidate(armyByIdProvider(army.id));
 
   if (resetCount > 0 && context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -504,6 +506,7 @@ Future<void> _pickEnhancement(
       .setUnitEnhancement(unit.id, selected.isEmpty ? null : selected);
   ref.invalidate(selectedArmyProvider);
   ref.invalidate(armiesListProvider);
+  ref.invalidate(armyByIdProvider(army.id));
 }
 
 /// Liste d'armes effective d'une unité d'armée : les armes fixes de la
@@ -1286,6 +1289,7 @@ class _BuilderSidebarState extends ConsumerState<_BuilderSidebar> {
                           }
                           ref.invalidate(selectedArmyProvider);
                           ref.invalidate(armiesListProvider);
+                          ref.invalidate(armyByIdProvider(army.id));
                         },
                       );
                     },
@@ -1844,7 +1848,10 @@ class _UnitDetailsBody extends ConsumerWidget {
                       army.id,
                       currentUnit.isWarlord ? null : currentUnit.id,
                     )
-                    .then((_) => ref.invalidate(selectedArmyProvider)),
+                    .then((_) {
+                      ref.invalidate(selectedArmyProvider);
+                      ref.invalidate(armyByIdProvider(army.id));
+                    }),
               ),
               Tooltip(
                 message: currentUnit.hasUnknownCost
@@ -1936,6 +1943,7 @@ class _UnitDetailsBody extends ConsumerWidget {
                     onTap: () => showDialog(
                       context: context,
                       builder: (_) => _EquipmentGroupDialog(
+                        armyId: army.id,
                         armyUnitId: currentUnit.id,
                         group: group,
                         initialSelection: chosenOptionIds,
@@ -2334,11 +2342,13 @@ class _StatBlock extends StatelessWidget {
 }
 
 class _EquipmentGroupDialog extends ConsumerStatefulWidget {
+  final String armyId;
   final String armyUnitId;
   final EquipmentGroupDetails group;
   final List<String> initialSelection;
 
   const _EquipmentGroupDialog({
+    required this.armyId,
     required this.armyUnitId,
     required this.group,
     required this.initialSelection,
@@ -2385,6 +2395,13 @@ class _EquipmentGroupDialogState extends ConsumerState<_EquipmentGroupDialog> {
           _selected.toList(),
         );
     ref.invalidate(unitEquipmentSelectionsProvider(widget.armyUnitId));
+    // Sans ces deux invalidations, "Copier la liste" (qui lit
+    // ArmyDetails.units[].equipmentChoices, calculé une fois pour toutes
+    // par selectedArmyProvider) continuait d'exporter l'ancien choix
+    // d'arme tant qu'aucune autre action ne rafraîchissait par ailleurs.
+    ref.invalidate(selectedArmyProvider);
+    ref.invalidate(armiesListProvider);
+    ref.invalidate(armyByIdProvider(widget.armyId));
     if (mounted) Navigator.of(context).pop();
   }
 
@@ -2542,6 +2559,7 @@ class _EditUnitDialog extends ConsumerWidget {
                                     );
                                 ref.invalidate(selectedArmyProvider);
                                 ref.invalidate(armiesListProvider);
+                                ref.invalidate(armyByIdProvider(army.id));
                               },
                       ),
                       Text(
@@ -2564,6 +2582,7 @@ class _EditUnitDialog extends ConsumerWidget {
                                     );
                                 ref.invalidate(selectedArmyProvider);
                                 ref.invalidate(armiesListProvider);
+                                ref.invalidate(armyByIdProvider(army.id));
                               },
                       ),
                     ],
@@ -2613,6 +2632,7 @@ class _EditUnitDialog extends ConsumerWidget {
                             .removeUnit(currentUnit.id);
                         ref.invalidate(selectedArmyProvider);
                         ref.invalidate(armiesListProvider);
+                        ref.invalidate(armyByIdProvider(army.id));
                         ref.read(selectedUnitIdProvider.notifier).state = null;
                         if (context.mounted) Navigator.of(context).pop();
                       },
@@ -2736,6 +2756,7 @@ class _ArmyNotesFieldState extends ConsumerState<_ArmyNotesField> {
           .then((_) {
         container.invalidate(selectedArmyProvider);
         container.invalidate(armiesListProvider);
+        container.invalidate(armyByIdProvider(widget.armyId));
       });
     }
     _focusNode.dispose();
@@ -2751,6 +2772,7 @@ class _ArmyNotesFieldState extends ConsumerState<_ArmyNotesField> {
         .updateNotes(widget.armyId, text.isEmpty ? null : text);
     ref.invalidate(selectedArmyProvider);
     ref.invalidate(armiesListProvider);
+    ref.invalidate(armyByIdProvider(widget.armyId));
   }
 
   @override

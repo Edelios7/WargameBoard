@@ -273,7 +273,20 @@ class CatalogImportService {
 
       final editionId = item['editionId'] as String?;
       final costBrackets = item['costs'];
-      if (costBrackets is List && editionId != null) {
+      if (costBrackets is List && costBrackets.isNotEmpty && editionId != null) {
+        // Le document importé fait foi pour cette édition : supprime les
+        // paliers déjà en base avant de réinsérer, sinon un palier retiré
+        // d'un correctif (ex. fusion 5/10 figurines en un seul coût)
+        // restait en base indéfiniment et continuait de s'afficher comme
+        // un choix d'effectif fantôme. Une liste vide n'est PAS traitée
+        // comme "tout supprimer" (même garde-fou que pour `models` plus
+        // bas) : elle ne touche à rien, cf. le `else` juste en dessous.
+        await (database.delete(database.datasheetCosts)..where(
+              (t) =>
+                  t.datasheetId.equals(datasheetId) &
+                  t.editionId.equals(editionId),
+            ))
+            .go();
         // Plusieurs paliers de coût par taille d'unité (ex. 5 modèles
         // = 90 pts, 10 modèles = 160 pts) — voir DatasheetCosts.modelCount.
         for (final entry in costBrackets) {
@@ -302,9 +315,23 @@ class CatalogImportService {
                 ),
               );
         }
-      } else {
+      } else if (costBrackets is! List || costBrackets.isEmpty) {
+        // `costs` absent ou explicitement vide : si `points` (coût
+        // simple) n'est pas non plus fourni, on ne touche à rien — même
+        // garde-fou que le cas rempli ci-dessus, une liste vide ne doit
+        // jamais purger silencieusement des coûts déjà enrichis. Mais si
+        // `points` EST fourni, c'est une intention explicite (coût
+        // simple) : un import précédent a pu laisser d'anciens paliers
+        // par effectif, qui doivent disparaître pour ne pas continuer à
+        // proposer des choix d'effectif absents du document source.
         final points = item['points'] as int?;
         if (points != null && editionId != null) {
+          await (database.delete(database.datasheetCosts)..where(
+                (t) =>
+                    t.datasheetId.equals(datasheetId) &
+                    t.editionId.equals(editionId),
+              ))
+              .go();
           await database.into(database.datasheetCosts).insertOnConflictUpdate(
                 DatasheetCostsCompanion.insert(
                   id: 'cost-$datasheetId',

@@ -105,4 +105,73 @@ void main() {
       expect(wishlist, isEmpty);
     },
   );
+
+  test(
+    'explicitly lowering painted then raising it back does not award XP '
+    'twice for the same models',
+    () async {
+      final results = await database.datasheetDao.search('Captain');
+      final entryId = await repository.addEntry(
+        datasheetId: results.single.id,
+        quantity: 5,
+      );
+
+      // painted est borné par primed, lui-même borné par assembled (une
+      // figurine ne peut pas être peinte sans être apprêtée) — les trois
+      // doivent être fournis pour que "painted: 5" prenne effet.
+      await repository.updateCounts(
+        entryId,
+        assembled: 5,
+        primed: 5,
+        painted: 5,
+      );
+      final afterFirstPaint = await database.xpDao.getCategoryTotals();
+
+      // Bouton "-" jusqu'à 0, puis "+" jusqu'à 5 : mêmes figurines,
+      // jamais réellement dépeintes puis repeintes pour de vrai.
+      await repository.updateCounts(entryId, painted: 0);
+      final afterUnpaint = await database.xpDao.getCategoryTotals();
+      expect(
+        afterUnpaint[XpCategory.painting]!,
+        lessThan(afterFirstPaint[XpCategory.painting]!),
+      );
+
+      await repository.updateCounts(entryId, painted: 5);
+      final afterRepaint = await database.xpDao.getCategoryTotals();
+      expect(
+        afterRepaint[XpCategory.painting],
+        afterFirstPaint[XpCategory.painting],
+      );
+    },
+  );
+
+  test(
+    'deleting a collection entry and re-adding it does not re-award the '
+    'new-box XP for the same purchase',
+    () async {
+      final results = await database.datasheetDao.search('Captain');
+      final entryId = await repository.addEntry(
+        datasheetId: results.single.id,
+        quantity: 1,
+      );
+      final afterFirst = await database.xpDao.getCategoryTotals();
+
+      await repository.deleteEntry(entryId);
+      final afterDelete = await database.xpDao.getCategoryTotals();
+      expect(
+        afterDelete[XpCategory.collection]!,
+        lessThan(afterFirst[XpCategory.collection]!),
+      );
+
+      await repository.addEntry(
+        datasheetId: results.single.id,
+        quantity: 1,
+      );
+      final afterRoundTrip = await database.xpDao.getCategoryTotals();
+      expect(
+        afterRoundTrip[XpCategory.collection],
+        afterFirst[XpCategory.collection],
+      );
+    },
+  );
 }

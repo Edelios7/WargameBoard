@@ -34,8 +34,15 @@ class CollectionRepository {
     return id;
   }
 
-  Future<void> deleteEntry(String id) {
-    return database.collectionDao.deleteEntry(id);
+  Future<void> deleteEntry(String id) async {
+    // Reprend l'XP "nouvelle boîte" créditée à l'ajout — sinon
+    // ajouter/supprimer/rajouter la même entrée créditerait l'XP à
+    // l'infini pour la même figurine jamais réellement acquise deux fois.
+    final entry = await database.collectionDao.getEntry(id);
+    await database.collectionDao.deleteEntry(id);
+    if (entry != null) {
+      await xpService.revokeNewBox(entry.datasheetId);
+    }
   }
 
   Future<void> setPurchasePrice(String id, double? purchasePrice) {
@@ -75,6 +82,22 @@ class CollectionRepository {
         delta: assembledDelta > 0 ? assembledDelta : 0,
         squadCompleted: assembledJustCompleted,
       );
+    } else if (assembledDelta < 0 && assembled != null) {
+      // Symétrique de l'award ci-dessus, mais seulement pour une baisse
+      // EXPLICITEMENT demandée (bouton "-" sur `assembled`) : sans ça,
+      // redescendre puis remonter le compteur recréditerait l'XP à
+      // l'infini pour les mêmes figurines. On ignore en revanche la baisse
+      // provoquée en effet de bord par une réduction de `quantity` (le
+      // clamp de `CollectionDao.updateCounts`) — aucun modèle n'a alors
+      // été réellement "démonté", `quantity` est une notion distincte du
+      // travail de montage/peinture déjà accompli.
+      final wasComplete = before.assembled == before.quantity;
+      final stillComplete = after.assembled == after.quantity;
+      await xpService.revokeAssembly(
+        datasheetId: after.datasheetId,
+        delta: -assembledDelta,
+        squadUncompleted: wasComplete && !stillComplete,
+      );
     }
 
     final paintedDelta = after.painted - before.painted;
@@ -86,6 +109,17 @@ class CollectionRepository {
         datasheetId: after.datasheetId,
         delta: paintedDelta > 0 ? paintedDelta : 0,
         squadCompleted: paintedJustCompleted,
+      );
+    } else if (paintedDelta < 0 && painted != null) {
+      // Voir le commentaire équivalent pour l'assemblage ci-dessus : on ne
+      // reprend l'XP que sur une baisse explicite de `painted`, jamais sur
+      // un clamp induit par une réduction de `quantity`.
+      final wasComplete = before.painted == before.quantity;
+      final stillComplete = after.painted == after.quantity;
+      await xpService.revokePainting(
+        datasheetId: after.datasheetId,
+        delta: -paintedDelta,
+        squadUncompleted: wasComplete && !stillComplete,
       );
     }
   }

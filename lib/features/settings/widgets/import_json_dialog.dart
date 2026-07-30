@@ -72,6 +72,11 @@ class _ImportJsonDialogState extends ConsumerState<ImportJsonDialog> {
       ref.invalidate(catalogSearchResultsProvider);
       ref.invalidate(keywordsListProvider);
       ref.invalidate(selectedDatasheetProvider);
+      // Invalide TOUTE la famille (pas un id précis) : un import peut
+      // mettre à jour n'importe quelle fiche déjà ouverte via "Voir la
+      // fiche complète" ailleurs dans la session, dont le cache ne
+      // s'expire sinon jamais tout seul.
+      ref.invalidate(datasheetByIdProvider);
 
       if (!mounted) return;
       Navigator.of(context).pop();
