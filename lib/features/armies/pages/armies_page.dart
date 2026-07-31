@@ -2203,6 +2203,34 @@ class _UnitDetailsBody extends ConsumerWidget {
                   ),
                 ),
               ),
+              IconButton(
+                tooltip: l10n.armyBuilderRemoveUnit,
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                icon: const Icon(Icons.delete_outline_rounded, size: 20),
+                color: AppColors.error,
+                onPressed: () async {
+                  final confirmed = await _confirmDelete(
+                    context,
+                    title: l10n.armyBuilderRemoveUnitConfirmTitle,
+                    message: l10n.armyBuilderRemoveUnitConfirmMessage(
+                      currentUnit.datasheetName,
+                    ),
+                    confirmLabel: l10n.armyBuilderRemoveUnit,
+                  );
+                  if (!confirmed || !context.mounted) return;
+                  await ref
+                      .read(armyRepositoryProvider)
+                      .removeUnit(currentUnit.id);
+                  if (ref.read(selectedUnitIdProvider) == currentUnit.id) {
+                    ref.read(selectedUnitIdProvider.notifier).state = null;
+                  }
+                  ref.invalidate(selectedArmyProvider);
+                  ref.invalidate(armiesListProvider);
+                  ref.invalidate(armyByIdProvider(army.id));
+                },
+              ),
             ],
           ),
           Consumer(
