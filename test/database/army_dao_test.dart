@@ -428,4 +428,47 @@ void main() {
       expect(army.units.single.attachedToUnitId, isNull);
     },
   );
+
+  test(
+    'reorderUnits persists a new display order (drag-and-drop reorder in '
+    'the grid)',
+    () async {
+      final armyId = await database.armyDao.createArmy(
+        name: 'Escouade test',
+        factionId: seedFactionId,
+      );
+      final captain = await database.datasheetDao.search('Captain');
+      final squad = await database.datasheetDao.search('Death Company');
+      final guard = await database.datasheetDao.search('Sanguinary Guard');
+      final captainUnitId = await database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: captain.single.id,
+        modelCount: 1,
+      );
+      final squadUnitId = await database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: squad.single.id,
+        modelCount: 5,
+      );
+      final guardUnitId = await database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: guard.single.id,
+        modelCount: 3,
+      );
+
+      final before = await database.armyDao.getArmy(armyId);
+      expect(before!.units.map((u) => u.id),
+          [captainUnitId, squadUnitId, guardUnitId]);
+
+      // Glisse le Captain pour le déposer juste après la Sanguinary Guard.
+      await database.armyDao.reorderUnits(
+        armyId,
+        [squadUnitId, guardUnitId, captainUnitId],
+      );
+
+      final after = await database.armyDao.getArmy(armyId);
+      expect(after!.units.map((u) => u.id),
+          [squadUnitId, guardUnitId, captainUnitId]);
+    },
+  );
 }

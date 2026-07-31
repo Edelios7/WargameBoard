@@ -1471,15 +1471,40 @@ class _UnitRosterRow extends StatelessWidget {
   }
 }
 
-class _GroupedUnitGrid extends StatelessWidget {
+/// Grille des unités groupées par rôle — chaque carte se glisse (clic
+/// maintenu) sur une autre pour : attacher/détacher un personnage sur une
+/// escouade (glisser un Character sur une non-Character, ou l'inverse pour
+/// re-cibler), ou réordonner l'affichage (glisser deux unités de même
+/// catégorie l'une sur l'autre). Les attachements actifs sont en plus
+/// reliés par un trait visuel (voir [_AttachmentLinesPainter]).
+class _GroupedUnitGrid extends StatefulWidget {
   final ArmyDetails army;
   final ArmyUnitDetails? selectedUnit;
 
   const _GroupedUnitGrid({required this.army, required this.selectedUnit});
 
   @override
+  State<_GroupedUnitGrid> createState() => _GroupedUnitGridState();
+}
+
+class _GroupedUnitGridState extends State<_GroupedUnitGrid> {
+  // Une GlobalKey stable par unité (le CustomPainter en a besoin pour
+  // retrouver la position de chaque carte à l'écran) — recréer les clés à
+  // chaque build casserait leur identité et ferait clignoter les cartes.
+  final Map<String, GlobalKey> _cardKeys = {};
+  final GlobalKey _stackKey = GlobalKey();
+
+  GlobalKey _keyFor(String unitId) =>
+      _cardKeys.putIfAbsent(unitId, GlobalKey.new);
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final army = widget.army;
+    _cardKeys.removeWhere(
+      (id, _) => !army.units.any((u) => u.id == id),
+    );
+
     final groups = <String, List<ArmyUnitDetails>>{};
     for (final unit in army.units) {
       final role = unit.battlefieldRole.isEmpty
@@ -1488,184 +1513,406 @@ class _GroupedUnitGrid extends StatelessWidget {
       groups.putIfAbsent(role, () => []).add(unit);
     }
 
+    final attachedPairs = [
+      for (final leader in army.units)
+        if (leader.attachedToUnitId != null)
+          (leaderId: leader.id, targetId: leader.attachedToUnitId!),
+    ];
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
+        key: _stackKey,
         children: [
-          for (final entry in groups.entries) ...[
-            Text(
-              entry.key.toUpperCase(),
-              style: AppTextStyles.eyebrow.copyWith(color: AppColors.primary),
-            ),
-            const SizedBox(height: 10),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final columns = (constraints.maxWidth / 220).floor().clamp(
-                  1,
-                  4,
-                );
-                return GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: columns,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1.15,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final entry in groups.entries) ...[
+                Text(
+                  entry.key.toUpperCase(),
+                  style: AppTextStyles.eyebrow.copyWith(
+                    color: AppColors.primary,
                   ),
-                  itemCount: entry.value.length,
-                  itemBuilder: (context, index) {
-                    final unit = entry.value[index];
-                    return _UnitCard(
-                      unit: unit,
-                      attachedLeaderNames: army
-                          .leadersAttachedTo(unit.id)
-                          .map((leader) => leader.datasheetName)
-                          .toList(),
+                ),
+                const SizedBox(height: 10),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final columns = (constraints.maxWidth / 220)
+                        .floor()
+                        .clamp(1, 4);
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: columns,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 1.15,
+                      ),
+                      itemCount: entry.value.length,
+                      itemBuilder: (context, index) {
+                        final unit = entry.value[index];
+                        return _UnitCard(
+                          key: _keyFor(unit.id),
+                          army: army,
+                          unit: unit,
+                          attachedLeaderNames: army
+                              .leadersAttachedTo(unit.id)
+                              .map((leader) => leader.datasheetName)
+                              .toList(),
+                        );
+                      },
                     );
                   },
-                );
-              },
+                ),
+                const SizedBox(height: 24),
+              ],
+            ],
+          ),
+          if (attachedPairs.isNotEmpty)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: CustomPaint(
+                  painter: _AttachmentLinesPainter(
+                    stackKey: _stackKey,
+                    cardKeys: _cardKeys,
+                    pairs: attachedPairs,
+                    lineColor: AppColors.primary,
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(height: 24),
-          ],
         ],
       ),
     );
   }
 }
 
+/// Dessine un trait entre chaque personnage attaché et son escouade hôte,
+/// avec un petit médaillon "maillon de chaîne" au milieu — calculé à partir
+/// des positions réelles des cartes (via leurs [GlobalKey]) à chaque
+/// repaint, donc toujours à jour même quand la grille change de colonnes.
+class _AttachmentLinesPainter extends CustomPainter {
+  final GlobalKey stackKey;
+  final Map<String, GlobalKey> cardKeys;
+  final List<({String leaderId, String targetId})> pairs;
+  final Color lineColor;
+
+  _AttachmentLinesPainter({
+    required this.stackKey,
+    required this.cardKeys,
+    required this.pairs,
+    required this.lineColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final stackBox =
+        stackKey.currentContext?.findRenderObject() as RenderBox?;
+    if (stackBox == null || !stackBox.attached) return;
+
+    final linePaint = Paint()
+      ..color = lineColor.withValues(alpha: .75)
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+    final badgeBgPaint = Paint()..color = lineColor;
+
+    for (final pair in pairs) {
+      final leaderBox =
+          cardKeys[pair.leaderId]?.currentContext?.findRenderObject()
+              as RenderBox?;
+      final targetBox =
+          cardKeys[pair.targetId]?.currentContext?.findRenderObject()
+              as RenderBox?;
+      if (leaderBox == null ||
+          targetBox == null ||
+          !leaderBox.attached ||
+          !targetBox.attached) {
+        continue;
+      }
+
+      final from = leaderBox.localToGlobal(
+        leaderBox.size.center(Offset.zero),
+        ancestor: stackBox,
+      );
+      final to = targetBox.localToGlobal(
+        targetBox.size.center(Offset.zero),
+        ancestor: stackBox,
+      );
+      canvas.drawLine(from, to, linePaint);
+
+      final mid = Offset((from.dx + to.dx) / 2, (from.dy + to.dy) / 2);
+      canvas.drawCircle(mid, 11, badgeBgPaint);
+      const icon = Icons.link_rounded;
+      final textPainter = TextPainter(
+        text: TextSpan(
+          text: String.fromCharCode(icon.codePoint),
+          style: TextStyle(
+            fontSize: 13,
+            fontFamily: icon.fontFamily,
+            package: icon.fontPackage,
+            color: Colors.white,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      textPainter.paint(
+        canvas,
+        mid - Offset(textPainter.width / 2, textPainter.height / 2),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _AttachmentLinesPainter oldDelegate) {
+    return true;
+  }
+}
+
 class _UnitCard extends ConsumerWidget {
+  final ArmyDetails army;
   final ArmyUnitDetails unit;
   final List<String> attachedLeaderNames;
 
-  const _UnitCard({required this.unit, this.attachedLeaderNames = const []});
+  const _UnitCard({
+    super.key,
+    required this.army,
+    required this.unit,
+    this.attachedLeaderNames = const [],
+  });
+
+  /// Décide de l'action à effectuer quand `dragged` est lâchée sur `unit` :
+  /// attacher/détacher si l'une des deux est un personnage et l'autre non,
+  /// sinon réordonner l'affichage. Rien de pertinent à faire si les deux
+  /// sont des personnages déposés sur une non-personnage inverse... — les
+  /// deux branches gèrent chaque combinaison explicitement plutôt que de
+  /// deviner.
+  Future<void> _handleDrop(WidgetRef ref, ArmyUnitDetails dragged) async {
+    if (dragged.id == unit.id) return;
+    final repository = ref.read(armyRepositoryProvider);
+
+    if (dragged.isCharacter && !unit.isCharacter) {
+      // Redéposer un chef sur l'escouade à laquelle il est déjà attaché
+      // détache (glisser = "lâcher prise") ; sur une autre escouade, ça
+      // (ré)attache.
+      if (dragged.attachedToUnitId == unit.id) {
+        await repository.detachCharacter(dragged.id);
+      } else {
+        await repository.attachCharacter(dragged.id, unit.id);
+      }
+    } else if (!dragged.isCharacter && unit.isCharacter) {
+      // Déposer une escouade sur un personnage n'a pas de sens (on n'attache
+      // pas un personnage à une autre unité de cette façon) : pas d'action.
+      return;
+    } else {
+      final orderedIds = army.units.map((u) => u.id).toList();
+      orderedIds.remove(dragged.id);
+      final targetIndex = orderedIds.indexOf(unit.id);
+      orderedIds.insert(targetIndex, dragged.id);
+      await repository.reorderUnits(army.id, orderedIds);
+    }
+
+    ref.invalidate(selectedArmyProvider);
+    ref.invalidate(armyByIdProvider(army.id));
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
     final selectedUnitId = ref.watch(selectedUnitIdProvider);
     final selected = unit.id == selectedUnitId;
+
+    return DragTarget<ArmyUnitDetails>(
+      onWillAcceptWithDetails: (details) => details.data.id != unit.id,
+      onAcceptWithDetails: (details) => _handleDrop(ref, details.data),
+      builder: (context, candidateData, rejectedData) {
+        final isDropTarget = candidateData.isNotEmpty;
+        return LongPressDraggable<ArmyUnitDetails>(
+          data: unit,
+          feedback: _UnitCardVisual(
+            unit: unit,
+            attachedLeaderNames: attachedLeaderNames,
+            selected: false,
+            width: 160,
+            opacity: .9,
+          ),
+          childWhenDragging: Opacity(
+            opacity: .3,
+            child: _UnitCardVisual(
+              unit: unit,
+              attachedLeaderNames: attachedLeaderNames,
+              selected: selected,
+            ),
+          ),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 120),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: isDropTarget
+                  ? Border.all(color: AppColors.primary, width: 2.4)
+                  : null,
+            ),
+            child: Material(
+              type: MaterialType.transparency,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(14),
+                onTap: () =>
+                    ref.read(selectedUnitIdProvider.notifier).state = unit.id,
+                child: _UnitCardVisual(
+                  unit: unit,
+                  attachedLeaderNames: attachedLeaderNames,
+                  selected: selected,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Contenu visuel d'une carte d'unité, séparé de [_UnitCard] pour être
+/// réutilisé tel quel comme aperçu (`feedback`) pendant le glisser-déposer.
+class _UnitCardVisual extends StatelessWidget {
+  final ArmyUnitDetails unit;
+  final List<String> attachedLeaderNames;
+  final bool selected;
+  final double? width;
+  final double opacity;
+
+  const _UnitCardVisual({
+    required this.unit,
+    required this.attachedLeaderNames,
+    required this.selected,
+    this.width,
+    this.opacity = 1,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final imageFile = LocalCatalogImages.unitPhoto(unit.datasheetId);
 
-    return Material(
+    final card = Material(
       color: AppColors.surfaceElevated,
       borderRadius: BorderRadius.circular(14),
       clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => ref.read(selectedUnitIdProvider.notifier).state = unit.id,
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: selected ? AppColors.primary : AppColors.border,
-              width: selected ? 1.6 : 1,
-            ),
-            borderRadius: BorderRadius.circular(14),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: selected ? AppColors.primary : AppColors.border,
+            width: selected ? 1.6 : 1,
           ),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              if (imageFile != null)
-                Image.file(imageFile, fit: BoxFit.cover)
-              else
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [AppColors.surface, AppColors.surfaceElevated],
-                    ),
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.shield_moon_rounded,
-                      size: 36,
-                      color: AppColors.textSecondary,
-                    ),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (imageFile != null)
+              Image.file(imageFile, fit: BoxFit.cover)
+            else
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppColors.surface, AppColors.surfaceElevated],
                   ),
                 ),
+                child: const Center(
+                  child: Icon(
+                    Icons.shield_moon_rounded,
+                    size: 36,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
+            Positioned(
+              top: 6,
+              right: 6,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: unit.hasUnknownCost
+                      ? AppColors.warning.withValues(alpha: .85)
+                      : Colors.black.withValues(alpha: .55),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  unit.hasUnknownCost
+                      ? l10n.unknownCost
+                      : l10n.pointsSuffix(unit.points),
+                  style: AppTextStyles.eyebrow.copyWith(color: Colors.white),
+                ),
+              ),
+            ),
+            if (unit.isCharacter && unit.attachedToUnitName != null ||
+                attachedLeaderNames.isNotEmpty)
               Positioned(
                 top: 6,
-                right: 6,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: unit.hasUnknownCost
-                        ? AppColors.warning.withValues(alpha: .85)
-                        : Colors.black.withValues(alpha: .55),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    unit.hasUnknownCost
-                        ? l10n.unknownCost
-                        : l10n.pointsSuffix(unit.points),
-                    style: AppTextStyles.eyebrow.copyWith(color: Colors.white),
-                  ),
-                ),
-              ),
-              if (unit.isCharacter && unit.attachedToUnitName != null ||
-                  attachedLeaderNames.isNotEmpty)
-                Positioned(
-                  top: 6,
-                  left: 6,
-                  child: Tooltip(
-                    message: unit.isCharacter
-                        ? l10n.armyBuilderAttachedTo(unit.attachedToUnitName!)
-                        : attachedLeaderNames.join(', '),
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: .55),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Icon(
-                        unit.isCharacter
-                            ? Icons.link_rounded
-                            : Icons.star_rounded,
-                        size: 13,
-                        color: Colors.white,
-                      ),
+                left: 6,
+                child: Tooltip(
+                  message: unit.isCharacter
+                      ? l10n.armyBuilderAttachedTo(unit.attachedToUnitName!)
+                      : attachedLeaderNames.join(', '),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: .55),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                  ),
-                ),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(10, 16, 10, 8),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withValues(alpha: .75),
-                      ],
-                    ),
-                  ),
-                  child: Text(
-                    unit.modelCount > 1
-                        ? '${unit.datasheetName} x${unit.modelCount}'
-                        : unit.datasheetName,
-                    style: AppTextStyles.body.copyWith(
+                    child: Icon(
+                      unit.isCharacter
+                          ? Icons.link_rounded
+                          : Icons.star_rounded,
+                      size: 13,
                       color: Colors.white,
-                      fontWeight: FontWeight.w600,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
-            ],
-          ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(10, 16, 10, 8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: .75),
+                    ],
+                  ),
+                ),
+                child: Text(
+                  unit.modelCount > 1
+                      ? '${unit.datasheetName} x${unit.modelCount}'
+                      : unit.datasheetName,
+                  style: AppTextStyles.body.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
+
+    final sized = width == null
+        ? AspectRatio(aspectRatio: 1.15, child: card)
+        : SizedBox(width: width, height: width! / 1.15, child: card);
+
+    return opacity == 1 ? sized : Opacity(opacity: opacity, child: sized);
   }
 }
 

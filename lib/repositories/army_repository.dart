@@ -179,6 +179,10 @@ class ArmyRepository {
     );
   }
 
+  Future<void> reorderUnits(String armyId, List<String> orderedUnitIds) {
+    return database.armyDao.reorderUnits(armyId, orderedUnitIds);
+  }
+
   Future<void> attachCharacter(String characterUnitId, String targetUnitId) {
     return database.armyDao.attachCharacter(characterUnitId, targetUnitId);
   }

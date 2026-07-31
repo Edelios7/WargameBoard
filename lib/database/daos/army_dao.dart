@@ -141,6 +141,19 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     return id;
   }
 
+  /// Réordonne les unités d'une armée (glisser-déposer d'une carte sur une
+  /// autre dans l'army builder) — réécrit `displayOrder` en séquence
+  /// 0..n-1 pour toute l'armée en une fois. Le regroupement par rôle à
+  /// l'affichage n'est qu'un tri client-side sur cet ordre global : pas
+  /// besoin de gérer un ordre séparé par groupe.
+  Future<void> reorderUnits(String armyId, List<String> orderedUnitIds) async {
+    for (var i = 0; i < orderedUnitIds.length; i++) {
+      await (update(armyUnits)..where((t) => t.id.equals(orderedUnitIds[i])))
+          .write(ArmyUnitsCompanion(displayOrder: Value(i)));
+    }
+    await _touchArmy(armyId);
+  }
+
   Future<void> removeUnit(String armyUnitId) async {
     final unit = await (select(armyUnits)
           ..where((t) => t.id.equals(armyUnitId)))
