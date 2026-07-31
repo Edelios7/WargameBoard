@@ -77,13 +77,12 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
   /// dépendre d'un enum de rôle strict, la donnée source (import PDF) étant
   /// encore en texte libre.
   Future<DatasheetXpClass?> getXpClassification(String datasheetId) async {
-    final row = await (select(datasheets)
-          ..where((t) => t.id.equals(datasheetId)))
-        .getSingleOrNull();
+    final row = await (select(
+      datasheets,
+    )..where((t) => t.id.equals(datasheetId))).getSingleOrNull();
     if (row == null) return null;
 
-    final typeAndRole =
-        '${row.unitType} ${row.battlefieldRole}'.toLowerCase();
+    final typeAndRole = '${row.unitType} ${row.battlefieldRole}'.toLowerCase();
     const vehicleKeywords = [
       'vehicle',
       'véhicule',
@@ -108,10 +107,7 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
   /// Datasheets les plus utilisées à travers toutes les armées (favoris).
   Future<List<SearchResult>> mostUsedDatasheets({int limit = 5}) async {
     final query = select(armyUnits).join([
-      innerJoin(
-        datasheets,
-        datasheets.id.equalsExp(armyUnits.datasheetId),
-      ),
+      innerJoin(datasheets, datasheets.id.equalsExp(armyUnits.datasheetId)),
       innerJoin(factions, factions.id.equalsExp(datasheets.factionId)),
     ]);
 
@@ -172,8 +168,7 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
                 ? editions.id.equals(editionId)
                 : editions.isCurrent.equals(true)),
       ),
-    ])
-      ..where(datasheets.name.like(pattern));
+    ])..where(datasheets.name.like(pattern));
 
     if (factionId != null) {
       final matchIds = includeCompatibleSpaceMarines
@@ -205,7 +200,8 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
       final points = row.read(costPoints);
       final existing = byDatasheetId[datasheet.id];
       if (existing != null &&
-          (existing.points ?? _maxSearchPoints) <= (points ?? _maxSearchPoints)) {
+          (existing.points ?? _maxSearchPoints) <=
+              (points ?? _maxSearchPoints)) {
         continue;
       }
       byDatasheetId[datasheet.id] = SearchResult(
@@ -232,11 +228,13 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
       // les lignes, comme pour les paliers de coût ci-dessus).
       final candidateIds = results.map((r) => r.id).toList();
       if (candidateIds.isEmpty) return const [];
-      final linkRows = await (select(datasheetKeywordLinks)
-            ..where((t) =>
-                t.datasheetId.isIn(candidateIds) &
-                t.keywordId.isIn(keywordIds.toList())))
-          .get();
+      final linkRows =
+          await (select(datasheetKeywordLinks)..where(
+                (t) =>
+                    t.datasheetId.isIn(candidateIds) &
+                    t.keywordId.isIn(keywordIds.toList()),
+              ))
+              .get();
       final matchedKeywordsByDatasheet = <String, Set<String>>{};
       for (final link in linkRows) {
         matchedKeywordsByDatasheet
@@ -244,9 +242,11 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
             .add(link.keywordId);
       }
       results = results
-          .where((r) =>
-              (matchedKeywordsByDatasheet[r.id]?.length ?? 0) ==
-              keywordIds.length)
+          .where(
+            (r) =>
+                (matchedKeywordsByDatasheet[r.id]?.length ?? 0) ==
+                keywordIds.length,
+          )
           .toList();
     }
 
@@ -289,9 +289,9 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
   /// générique ne doit pas voir apparaître les unités propres à un
   /// chapitre (ex. personnages nommés Blood Angels).
   Future<List<String>> _resolveFactionIdsForFilter(String factionId) async {
-    final target = await (select(factions)
-          ..where((t) => t.id.equals(factionId)))
-        .getSingleOrNull();
+    final target = await (select(
+      factions,
+    )..where((t) => t.id.equals(factionId))).getSingleOrNull();
     if (target == null || !isSpaceMarineFactionName(target.name)) {
       return [factionId];
     }
@@ -338,8 +338,7 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
   Future<DatasheetDetails?> getDatasheet(String id) async {
     final query = select(datasheets).join([
       innerJoin(factions, factions.id.equalsExp(datasheets.factionId)),
-    ])
-      ..where(datasheets.id.equals(id));
+    ])..where(datasheets.id.equals(id));
 
     final row = await query.getSingleOrNull();
     if (row == null) return null;
@@ -347,8 +346,8 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     final datasheet = row.readTable(datasheets);
     final faction = row.readTable(factions);
 
-    final unit = await _getUnitDetails(id);
     final costs = await _getCostBrackets(id);
+    final unit = await _getUnitDetails(id, costBrackets: costs.brackets);
     final points = resolveCostForModelCount(costs.brackets, unit.defaultSize);
     final keywordNames = await _getKeywordNames(id);
     final abilityDetails = await _getAbilityDetails(id);
@@ -387,12 +386,15 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<({List<CostBracket> brackets, String editionId})> _getCostBrackets(
-      String datasheetId) async {
-    final query = select(datasheetCosts).join([
-      innerJoin(editions, editions.id.equalsExp(datasheetCosts.editionId)),
-    ])
-      ..where(datasheetCosts.datasheetId.equals(datasheetId) &
-          editions.isCurrent.equals(true));
+    String datasheetId,
+  ) async {
+    final query =
+        select(datasheetCosts).join([
+          innerJoin(editions, editions.id.equalsExp(datasheetCosts.editionId)),
+        ])..where(
+          datasheetCosts.datasheetId.equals(datasheetId) &
+              editions.isCurrent.equals(true),
+        );
 
     final currentRows = await query.get();
     if (currentRows.isNotEmpty) {
@@ -411,17 +413,20 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     // éditions non courantes pourrait retourner un `editionId`/coût
     // différent d'un appel à l'autre (et différent de celui choisi par
     // ArmyDao._getCostBracketsByDatasheet, qui applique le même repli).
-    final fallbackRows = await (select(datasheetCosts)
-          ..where((t) => t.datasheetId.equals(datasheetId))
-          ..orderBy([(t) => OrderingTerm.asc(t.editionId)]))
-        .get();
+    final fallbackRows =
+        await (select(datasheetCosts)
+              ..where((t) => t.datasheetId.equals(datasheetId))
+              ..orderBy([(t) => OrderingTerm.asc(t.editionId)]))
+            .get();
     if (fallbackRows.isEmpty) {
       return (brackets: const <CostBracket>[], editionId: '');
     }
     final editionId = fallbackRows.first.editionId;
     final brackets = fallbackRows
         .where((row) => row.editionId == editionId)
-        .map((row) => CostBracket(modelCount: row.modelCount, points: row.points))
+        .map(
+          (row) => CostBracket(modelCount: row.modelCount, points: row.points),
+        )
         .toList();
     return (brackets: brackets, editionId: editionId);
   }
@@ -429,20 +434,24 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
   Future<List<String>> _getKeywordNames(String datasheetId) async {
     final query = select(datasheetKeywordLinks).join([
       innerJoin(
-          keywords, keywords.id.equalsExp(datasheetKeywordLinks.keywordId)),
-    ])
-      ..where(datasheetKeywordLinks.datasheetId.equals(datasheetId));
+        keywords,
+        keywords.id.equalsExp(datasheetKeywordLinks.keywordId),
+      ),
+    ])..where(datasheetKeywordLinks.datasheetId.equals(datasheetId));
     final rows = await query.get();
     return rows.map((r) => r.readTable(keywords).name).toList();
   }
 
   Future<List<AbilityDetails>> _getAbilityDetails(String datasheetId) async {
-    final query = select(datasheetAbilityLinks).join([
-      innerJoin(
-          abilities, abilities.id.equalsExp(datasheetAbilityLinks.abilityId)),
-    ])
-      ..where(datasheetAbilityLinks.datasheetId.equals(datasheetId))
-      ..orderBy([OrderingTerm.asc(abilities.name)]);
+    final query =
+        select(datasheetAbilityLinks).join([
+            innerJoin(
+              abilities,
+              abilities.id.equalsExp(datasheetAbilityLinks.abilityId),
+            ),
+          ])
+          ..where(datasheetAbilityLinks.datasheetId.equals(datasheetId))
+          ..orderBy([OrderingTerm.asc(abilities.name)]);
     final rows = await query.get();
     return rows.map((r) {
       final ability = r.readTable(abilities);
@@ -458,10 +467,11 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<ModelDetails>> _getModels(String datasheetId) async {
     final query = select(modelProfiles).join([
-      innerJoin(datasheetModels,
-          datasheetModels.id.equalsExp(modelProfiles.datasheetModelId)),
-    ])
-      ..where(datasheetModels.datasheetId.equals(datasheetId));
+      innerJoin(
+        datasheetModels,
+        datasheetModels.id.equalsExp(modelProfiles.datasheetModelId),
+      ),
+    ])..where(datasheetModels.datasheetId.equals(datasheetId));
 
     final rows = await query.get();
     return rows.map((row) {
@@ -481,11 +491,12 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<WeaponDetails>> _getWeapons(String datasheetId) async {
     final query = select(datasheetWeapons).join([
-      innerJoin(datasheetModels,
-          datasheetModels.id.equalsExp(datasheetWeapons.datasheetModelId)),
+      innerJoin(
+        datasheetModels,
+        datasheetModels.id.equalsExp(datasheetWeapons.datasheetModelId),
+      ),
       innerJoin(weapons, weapons.id.equalsExp(datasheetWeapons.weaponId)),
-    ])
-      ..where(datasheetModels.datasheetId.equals(datasheetId));
+    ])..where(datasheetModels.datasheetId.equals(datasheetId));
 
     final rows = await query.get();
     final seen = <String>{};
@@ -493,14 +504,16 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     for (final row in rows) {
       final weapon = row.readTable(weapons);
       if (!seen.add(weapon.id)) continue;
-      result.add(WeaponDetails(
-        id: weapon.id,
-        name: weapon.name,
-        type: weapon.isMelee ? 'Melee' : 'Ranged',
-        keywords: await _weaponKeywordNames(weapon.id),
-        abilities: await _weaponAbilityNames(weapon.id),
-        profiles: await _weaponProfiles(weapon.id, isMelee: weapon.isMelee),
-      ));
+      result.add(
+        WeaponDetails(
+          id: weapon.id,
+          name: weapon.name,
+          type: weapon.isMelee ? 'Melee' : 'Ranged',
+          keywords: await _weaponKeywordNames(weapon.id),
+          abilities: await _weaponAbilityNames(weapon.id),
+          profiles: await _weaponProfiles(weapon.id, isMelee: weapon.isMelee),
+        ),
+      );
     }
     return result;
   }
@@ -509,31 +522,32 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     String weaponId, {
     required bool isMelee,
   }) async {
-    final rows = await (select(weaponProfiles)
-          ..where((t) => t.weaponId.equals(weaponId))
-          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
-        .get();
+    final rows =
+        await (select(weaponProfiles)
+              ..where((t) => t.weaponId.equals(weaponId))
+              ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+            .get();
     return rows
-        .map((p) => WeaponProfileDetails(
-              name: p.name,
-              range: p.range,
-              attacks: p.attacks,
-              ballisticSkill: p.ballisticSkill,
-              weaponSkill: p.weaponSkill,
-              strength: p.strength,
-              armorPenetration: p.armorPenetration,
-              damage: p.damage,
-              isMelee: isMelee,
-            ))
+        .map(
+          (p) => WeaponProfileDetails(
+            name: p.name,
+            range: p.range,
+            attacks: p.attacks,
+            ballisticSkill: p.ballisticSkill,
+            weaponSkill: p.weaponSkill,
+            strength: p.strength,
+            armorPenetration: p.armorPenetration,
+            damage: p.damage,
+            isMelee: isMelee,
+          ),
+        )
         .toList();
   }
 
   Future<List<String>> _weaponKeywordNames(String weaponId) async {
     final query = select(weaponKeywordLinks).join([
-      innerJoin(
-          keywords, keywords.id.equalsExp(weaponKeywordLinks.keywordId)),
-    ])
-      ..where(weaponKeywordLinks.weaponId.equals(weaponId));
+      innerJoin(keywords, keywords.id.equalsExp(weaponKeywordLinks.keywordId)),
+    ])..where(weaponKeywordLinks.weaponId.equals(weaponId));
     final rows = await query.get();
     return rows.map((r) => r.readTable(keywords).name).toList();
   }
@@ -541,29 +555,34 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
   Future<List<String>> _weaponAbilityNames(String weaponId) async {
     final query = select(weaponAbilityLinks).join([
       innerJoin(
-          abilities, abilities.id.equalsExp(weaponAbilityLinks.abilityId)),
-    ])
-      ..where(weaponAbilityLinks.weaponId.equals(weaponId));
+        abilities,
+        abilities.id.equalsExp(weaponAbilityLinks.abilityId),
+      ),
+    ])..where(weaponAbilityLinks.weaponId.equals(weaponId));
     final rows = await query.get();
     return rows.map((r) => r.readTable(abilities).name).toList();
   }
 
   Future<List<EquipmentDetails>> _getEquipment(String datasheetId) async {
-    final groups = await (select(equipmentGroups)
-          ..where((t) => t.datasheetId.equals(datasheetId))
-          ..orderBy([(t) => OrderingTerm.asc(t.displayOrder)]))
-        .get();
+    final groups =
+        await (select(equipmentGroups)
+              ..where((t) => t.datasheetId.equals(datasheetId))
+              ..orderBy([(t) => OrderingTerm.asc(t.displayOrder)]))
+            .get();
 
     final result = <EquipmentDetails>[];
     for (final group in groups) {
-      final options = await (select(equipmentOptions)
-            ..where((t) => t.groupId.equals(group.id))
-            ..orderBy([(t) => OrderingTerm.asc(t.displayOrder)]))
-          .get();
-      result.add(EquipmentDetails(
-        groupName: group.name,
-        options: options.map((o) => o.name).toList(),
-      ));
+      final options =
+          await (select(equipmentOptions)
+                ..where((t) => t.groupId.equals(group.id))
+                ..orderBy([(t) => OrderingTerm.asc(t.displayOrder)]))
+              .get();
+      result.add(
+        EquipmentDetails(
+          groupName: group.name,
+          options: options.map((o) => o.name).toList(),
+        ),
+      );
     }
     return result;
   }
@@ -572,60 +591,92 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
   /// [EquipmentGroupDetails]) — utilisé par l'army builder pour piloter
   /// les choix d'armes par unité sans repasser par [getDatasheet] (qui
   /// recharge aussi modèles/armes/aptitudes, inutiles ici).
-  Future<List<EquipmentGroupDetails>> getEquipmentGroups(
-    String datasheetId,
-  ) {
+  Future<List<EquipmentGroupDetails>> getEquipmentGroups(String datasheetId) {
     return _getEquipmentGroups(datasheetId);
   }
 
   Future<List<EquipmentGroupDetails>> _getEquipmentGroups(
-      String datasheetId) async {
-    final groups = await (select(equipmentGroups)
-          ..where((t) => t.datasheetId.equals(datasheetId))
-          ..orderBy([(t) => OrderingTerm.asc(t.displayOrder)]))
-        .get();
+    String datasheetId,
+  ) async {
+    final groups =
+        await (select(equipmentGroups)
+              ..where((t) => t.datasheetId.equals(datasheetId))
+              ..orderBy([(t) => OrderingTerm.asc(t.displayOrder)]))
+            .get();
 
     final result = <EquipmentGroupDetails>[];
     for (final group in groups) {
-      final options = await (select(equipmentOptions)
-            ..where((t) => t.groupId.equals(group.id))
-            ..orderBy([(t) => OrderingTerm.asc(t.displayOrder)]))
-          .get();
-      final choice = await (select(equipmentChoices)
-            ..where((t) => t.groupId.equals(group.id))
-            ..limit(1))
-          .getSingleOrNull();
-      result.add(EquipmentGroupDetails(
-        id: group.id,
-        name: group.name,
-        minimumChoices: choice?.minimumChoices ?? 1,
-        maximumChoices: choice?.maximumChoices ?? 1,
-        options: options
-            .map((o) => EquipmentOptionDetails(
+      final options =
+          await (select(equipmentOptions)
+                ..where((t) => t.groupId.equals(group.id))
+                ..orderBy([(t) => OrderingTerm.asc(t.displayOrder)]))
+              .get();
+      final choice =
+          await (select(equipmentChoices)
+                ..where((t) => t.groupId.equals(group.id))
+                ..limit(1))
+              .getSingleOrNull();
+      result.add(
+        EquipmentGroupDetails(
+          id: group.id,
+          name: group.name,
+          minimumChoices: choice?.minimumChoices ?? 1,
+          maximumChoices: choice?.maximumChoices ?? 1,
+          options: options
+              .map(
+                (o) => EquipmentOptionDetails(
                   id: o.id,
                   name: o.name,
                   weaponId: o.weaponId,
                   isDefault: o.isDefault,
-                ))
-            .toList(),
-      ));
+                ),
+              )
+              .toList(),
+        ),
+      );
     }
     return result;
   }
 
-  Future<UnitDetails> _getUnitDetails(String datasheetId) async {
-    final size = await (select(unitSizes)
-          ..where((t) => t.datasheetId.equals(datasheetId))
-          ..limit(1))
-        .getSingleOrNull();
-    if (size == null) {
-      return const UnitDetails(minimumSize: 1, maximumSize: 1, defaultSize: 1);
+  /// `unit_sizes` n'est renseignée que pour une poignée de fiches (import
+  /// incomplet à ce jour) : à défaut, on déduit les tailles valides des
+  /// paliers de coût connus (`costBrackets`, ex. 5 et 10 figurines) — bien
+  /// plus souvent disponibles, et ce sont justement les seules tailles qui
+  /// ont un coût officiel associé, donc les seules pertinentes à proposer
+  /// dans le sélecteur de taille de l'army builder.
+  Future<UnitDetails> _getUnitDetails(
+    String datasheetId, {
+    required List<CostBracket> costBrackets,
+  }) async {
+    final size =
+        await (select(unitSizes)
+              ..where((t) => t.datasheetId.equals(datasheetId))
+              ..limit(1))
+            .getSingleOrNull();
+    if (size != null) {
+      return UnitDetails(
+        minimumSize: size.minimumModels,
+        maximumSize: size.maximumModels,
+        defaultSize: size.defaultModels,
+      );
     }
-    return UnitDetails(
-      minimumSize: size.minimumModels,
-      maximumSize: size.maximumModels,
-      defaultSize: size.defaultModels,
-    );
+
+    final sizedBrackets =
+        costBrackets
+            .where((b) => b.modelCount != null)
+            .map((b) => b.modelCount!)
+            .toSet()
+            .toList()
+          ..sort();
+    if (sizedBrackets.isNotEmpty) {
+      return UnitDetails(
+        minimumSize: sizedBrackets.first,
+        maximumSize: sizedBrackets.last,
+        defaultSize: sizedBrackets.first,
+      );
+    }
+
+    return const UnitDetails(minimumSize: 1, maximumSize: 1, defaultSize: 1);
   }
 
   // =========================
@@ -635,20 +686,20 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
   /// Épingle ou désépingle une fiche — la présence d'une ligne vaut
   /// favori, pas besoin de lire l'état actuel côté appelant.
   Future<void> toggleFavorite(String datasheetId) async {
-    final existing = await (select(favoriteDatasheets)
-          ..where((t) => t.datasheetId.equals(datasheetId)))
-        .getSingleOrNull();
+    final existing = await (select(
+      favoriteDatasheets,
+    )..where((t) => t.datasheetId.equals(datasheetId))).getSingleOrNull();
 
     if (existing != null) {
-      await (delete(favoriteDatasheets)
-            ..where((t) => t.datasheetId.equals(datasheetId)))
-          .go();
+      await (delete(
+        favoriteDatasheets,
+      )..where((t) => t.datasheetId.equals(datasheetId))).go();
       return;
     }
 
-    await into(favoriteDatasheets).insert(
-      FavoriteDatasheetsCompanion.insert(datasheetId: datasheetId),
-    );
+    await into(
+      favoriteDatasheets,
+    ).insert(FavoriteDatasheetsCompanion.insert(datasheetId: datasheetId));
   }
 
   Future<Set<String>> listFavoriteIds() async {

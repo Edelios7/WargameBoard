@@ -325,6 +325,12 @@
     }
   },
   "armyBuilderUnitSize": "Figurines",
+  "armyBuilderModelsCount": "{count} fig.",
+  "@armyBuilderModelsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "armyBuilderSquadCount": "Escouades",
   "armyBuilderClose": "Fermer",
   "armyBuilderUnitAdded": "Ajouté : {name}",

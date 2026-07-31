@@ -325,6 +325,12 @@
     }
   },
   "armyBuilderUnitSize": "Models",
+  "armyBuilderModelsCount": "{count} models",
+  "@armyBuilderModelsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "armyBuilderSquadCount": "Squads",
   "armyBuilderClose": "Close",
   "armyBuilderUnitAdded": "Added: {name}",

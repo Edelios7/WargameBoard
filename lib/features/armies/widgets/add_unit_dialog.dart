@@ -253,10 +253,27 @@ class _ResultTileState extends ConsumerState<_ResultTile> {
 
     final canResize =
         sheet != null && sheet.unit.maximumSize > sheet.unit.minimumSize;
+    // Tailles officiellement chiffrées (ex. 5 et 10 figurines) — quand il y
+    // en a peu, des puces à toucher sont bien plus explicites qu'un
+    // stepper +/- discret pour répondre à "comment je fais une escouade de
+    // 10 ?".
+    final knownSizes = sheet == null
+        ? const <int>[]
+        : (sheet.costBrackets
+              .where((b) => b.modelCount != null)
+              .map((b) => b.modelCount!)
+              .toSet()
+              .toList()
+            ..sort());
+    final useSizeChips =
+        canResize && knownSizes.length >= 2 && knownSizes.length <= 4;
     final unitPoints = sheet == null
         ? result.points
-        : (resolveCostForModelCount(sheet.costBrackets, _modelCount ?? sheet.unit.defaultSize) ??
-            sheet.points);
+        : (resolveCostForModelCount(
+                sheet.costBrackets,
+                _modelCount ?? sheet.unit.defaultSize,
+              ) ??
+              sheet.points);
 
     return Opacity(
       opacity: widget.owned ? 1 : 0.5,
@@ -313,19 +330,44 @@ class _ResultTileState extends ConsumerState<_ResultTile> {
                   ),
               ],
             ),
-            const SizedBox(height: 6),
+            if (canResize) ...[
+              const SizedBox(height: 8),
+              Text(
+                l10n.armyBuilderUnitSize,
+                style: AppTextStyles.caption.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 4),
+              if (useSizeChips)
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [
+                    for (final size in knownSizes)
+                      _SizeChip(
+                        size: size,
+                        points: resolveCostForModelCount(
+                          sheet.costBrackets,
+                          size,
+                        ),
+                        selected: _modelCount == size,
+                        onTap: () => setState(() => _modelCount = size),
+                      ),
+                  ],
+                )
+              else
+                _LabeledStepper(
+                  label: '',
+                  value: _modelCount!,
+                  min: sheet.unit.minimumSize,
+                  max: sheet.unit.maximumSize,
+                  onChanged: (value) => setState(() => _modelCount = value),
+                ),
+            ],
+            const SizedBox(height: 10),
             Row(
               children: [
-                if (canResize) ...[
-                  _LabeledStepper(
-                    label: l10n.armyBuilderUnitSize,
-                    value: _modelCount!,
-                    min: sheet.unit.minimumSize,
-                    max: sheet.unit.maximumSize,
-                    onChanged: (value) => setState(() => _modelCount = value),
-                  ),
-                  const SizedBox(width: 14),
-                ],
                 _LabeledStepper(
                   label: l10n.armyBuilderSquadCount,
                   value: _quantity,
@@ -347,6 +389,63 @@ class _ResultTileState extends ConsumerState<_ResultTile> {
                 ),
               ],
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Puce "5 figurines — 90 pts" tapable pour choisir directement une taille
+/// d'escouade chiffrée, plus explicite qu'un stepper +/- pour répondre à
+/// "comment je fais une escouade de 10 ?".
+class _SizeChip extends StatelessWidget {
+  final int size;
+  final int? points;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _SizeChip({
+    required this.size,
+    required this.points,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return InkWell(
+      borderRadius: BorderRadius.circular(10),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primary : AppColors.surface,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: selected ? AppColors.primary : AppColors.border,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              l10n.armyBuilderModelsCount(size),
+              style: AppTextStyles.body.copyWith(
+                fontWeight: FontWeight.w700,
+                color: selected ? Colors.white : AppColors.textPrimary,
+              ),
+            ),
+            if (points != null)
+              Text(
+                l10n.pointsSuffix(points!),
+                style: AppTextStyles.caption.copyWith(
+                  color: selected
+                      ? Colors.white.withValues(alpha: .85)
+                      : AppColors.textSecondary,
+                ),
+              ),
           ],
         ),
       ),
@@ -377,8 +476,10 @@ class _LabeledStepper extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(label, style: AppTextStyles.caption),
-        const SizedBox(height: 2),
+        if (label.isNotEmpty) ...[
+          Text(label, style: AppTextStyles.caption),
+          const SizedBox(height: 2),
+        ],
         Container(
           decoration: BoxDecoration(
             color: AppColors.surface,

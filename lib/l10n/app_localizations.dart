@@ -1292,6 +1292,12 @@ abstract class AppLocalizations {
   /// **'Figurines'**
   String get armyBuilderUnitSize;
 
+  /// No description provided for @armyBuilderModelsCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} fig.'**
+  String armyBuilderModelsCount(int count);
+
   /// No description provided for @armyBuilderSquadCount.
   ///
   /// In fr, this message translates to:

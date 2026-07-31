@@ -674,6 +674,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get armyBuilderUnitSize => 'Figurines';
 
   @override
+  String armyBuilderModelsCount(int count) {
+    return '$count fig.';
+  }
+
+  @override
   String get armyBuilderSquadCount => 'Escouades';
 
   @override

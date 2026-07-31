@@ -298,11 +298,10 @@ class _ArmyListPage extends ConsumerWidget {
                                       children: [
                                         Text(
                                           army.pointsLimit != null
-                                              ? l10n
-                                                  .armyBuilderPointsWithLimit(
-                                                    army.totalPoints,
-                                                    army.pointsLimit!,
-                                                  )
+                                              ? l10n.armyBuilderPointsWithLimit(
+                                                  army.totalPoints,
+                                                  army.pointsLimit!,
+                                                )
                                               : l10n.pointsSuffix(
                                                   army.totalPoints,
                                                 ),
@@ -1349,7 +1348,7 @@ class _UnitRosterRow extends StatelessWidget {
       child: Material(
         color: selected
             ? AppColors.primary.withValues(alpha: .12)
-            : Colors.transparent,
+            : AppColors.surface,
         borderRadius: BorderRadius.circular(10),
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
@@ -1501,9 +1500,7 @@ class _GroupedUnitGridState extends State<_GroupedUnitGrid> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final army = widget.army;
-    _cardKeys.removeWhere(
-      (id, _) => !army.units.any((u) => u.id == id),
-    );
+    _cardKeys.removeWhere((id, _) => !army.units.any((u) => u.id == id));
 
     final groups = <String, List<ArmyUnitDetails>>{};
     for (final unit in army.units) {
@@ -1537,17 +1534,18 @@ class _GroupedUnitGridState extends State<_GroupedUnitGrid> {
                 const SizedBox(height: 10),
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    final columns = (constraints.maxWidth / 220)
-                        .floor()
-                        .clamp(1, 4);
+                    final columns = (constraints.maxWidth / 160).floor().clamp(
+                      2,
+                      6,
+                    );
                     return GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: columns,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 1.15,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 1,
                       ),
                       itemCount: entry.value.length,
                       itemBuilder: (context, index) {
@@ -1607,8 +1605,7 @@ class _AttachmentLinesPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final stackBox =
-        stackKey.currentContext?.findRenderObject() as RenderBox?;
+    final stackBox = stackKey.currentContext?.findRenderObject() as RenderBox?;
     if (stackBox == null || !stackBox.attached) return;
 
     final linePaint = Paint()
@@ -1830,23 +1827,55 @@ class _UnitCardVisual extends StatelessWidget {
             Positioned(
               top: 6,
               right: 6,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 3,
-                ),
-                decoration: BoxDecoration(
-                  color: unit.hasUnknownCost
-                      ? AppColors.warning.withValues(alpha: .85)
-                      : Colors.black.withValues(alpha: .55),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  unit.hasUnknownCost
-                      ? l10n.unknownCost
-                      : l10n.pointsSuffix(unit.points),
-                  style: AppTextStyles.eyebrow.copyWith(color: Colors.white),
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Nombre de figurines : toujours son propre badge, jamais
+                  // accolé au nom en bas de carte — un nom de fiche long
+                  // (fréquent en 40k) tronquait ce chiffre en dehors de la
+                  // zone visible, le rendant invisible (cause du "on ne
+                  // sait pas de combien est faite l'escouade").
+                  if (unit.maximumModels > 1 || unit.modelCount > 1) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 7,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '×${unit.modelCount}',
+                        style: AppTextStyles.eyebrow.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                  ],
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: unit.hasUnknownCost
+                          ? AppColors.warning.withValues(alpha: .85)
+                          : Colors.black.withValues(alpha: .55),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      unit.hasUnknownCost
+                          ? l10n.unknownCost
+                          : l10n.pointsSuffix(unit.points),
+                      style: AppTextStyles.eyebrow.copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             if (unit.isCharacter && unit.attachedToUnitName != null ||
@@ -1891,14 +1920,12 @@ class _UnitCardVisual extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  unit.modelCount > 1
-                      ? '${unit.datasheetName} x${unit.modelCount}'
-                      : unit.datasheetName,
+                  unit.datasheetName,
                   style: AppTextStyles.body.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -1909,8 +1936,8 @@ class _UnitCardVisual extends StatelessWidget {
     );
 
     final sized = width == null
-        ? AspectRatio(aspectRatio: 1.15, child: card)
-        : SizedBox(width: width, height: width! / 1.15, child: card);
+        ? AspectRatio(aspectRatio: 1, child: card)
+        : SizedBox(width: width, height: width, child: card);
 
     return opacity == 1 ? sized : Opacity(opacity: opacity, child: sized);
   }
@@ -1920,11 +1947,7 @@ class _UnitDetailsPanel extends ConsumerStatefulWidget {
   final ArmyDetails army;
   final ArmyUnitDetails? unit;
 
-  const _UnitDetailsPanel({
-    super.key,
-    required this.army,
-    required this.unit,
-  });
+  const _UnitDetailsPanel({super.key, required this.army, required this.unit});
 
   @override
   ConsumerState<_UnitDetailsPanel> createState() => _UnitDetailsPanelState();
@@ -2028,7 +2051,9 @@ class _PanelTabButton extends StatelessWidget {
         ? AppColors.textSecondary.withValues(alpha: .4)
         : (selected ? AppColors.primary : AppColors.textSecondary);
     return Material(
-      color: selected ? AppColors.primary.withValues(alpha: .12) : Colors.transparent,
+      color: selected
+          ? AppColors.primary.withValues(alpha: .12)
+          : Colors.transparent,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onTap,
@@ -2379,10 +2404,8 @@ class _UnitDetailsBody extends ConsumerWidget {
                 ),
                 onPressed: () => showDialog(
                   context: context,
-                  builder: (_) => _AttachLeaderDialog(
-                    army: army,
-                    character: currentUnit,
-                  ),
+                  builder: (_) =>
+                      _AttachLeaderDialog(army: army, character: currentUnit),
                 ),
                 icon: const Icon(Icons.link_rounded, size: 18),
                 label: Text(l10n.armyBuilderAttachLeader),
@@ -2396,10 +2419,10 @@ class _UnitDetailsBody extends ConsumerWidget {
             const SizedBox(height: 10),
             ...army
                 .leadersAttachedTo(currentUnit.id)
-                .map((leader) => _AttachedLeaderTile(
-                      armyId: army.id,
-                      leader: leader,
-                    )),
+                .map(
+                  (leader) =>
+                      _AttachedLeaderTile(armyId: army.id, leader: leader),
+                ),
           ],
           if (army.detachmentId != null) ...[
             const SizedBox(height: 8),
@@ -2478,9 +2501,8 @@ class _AttachedLeaderTile extends ConsumerWidget {
     // génériques comme "Leader") — c'est `type` ("Core"/"Faction"/...)
     // qui distingue réellement une règle générique d'un vrai bonus
     // propre à ce personnage.
-    final bonuses = sheetAsync.value?.abilities
-            .where((a) => a.type != 'Core')
-            .toList() ??
+    final bonuses =
+        sheetAsync.value?.abilities.where((a) => a.type != 'Core').toList() ??
         const [];
 
     return Padding(
@@ -2490,11 +2512,7 @@ class _AttachedLeaderTile extends ConsumerWidget {
         children: [
           const Padding(
             padding: EdgeInsets.only(top: 2),
-            child: Icon(
-              Icons.star_rounded,
-              size: 15,
-              color: AppColors.warning,
-            ),
+            child: Icon(Icons.star_rounded, size: 15, color: AppColors.warning),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -2548,9 +2566,7 @@ class _AttachedLeaderTile extends ConsumerWidget {
             icon: const Icon(Icons.link_off_rounded, size: 16),
             color: AppColors.textSecondary,
             onPressed: () async {
-              await ref.read(armyRepositoryProvider).detachCharacter(
-                    leader.id,
-                  );
+              await ref.read(armyRepositoryProvider).detachCharacter(leader.id);
               ref.invalidate(selectedArmyProvider);
               ref.invalidate(armyByIdProvider(armyId));
             },
@@ -2665,7 +2681,9 @@ class _ArmyOverviewCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final catalogAsync = ref.watch(factionCatalogDetailsProvider(army.factionId));
+    final catalogAsync = ref.watch(
+      factionCatalogDetailsProvider(army.factionId),
+    );
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -2676,8 +2694,7 @@ class _ArmyOverviewCard extends ConsumerWidget {
             child: CircularProgressIndicator(color: AppColors.primary),
           ),
         ),
-        error: (error, _) =>
-            Text('$error', style: AppTextStyles.caption),
+        error: (error, _) => Text('$error', style: AppTextStyles.caption),
         data: (catalog) {
           final catalogById = {for (final d in catalog) d.id: d};
           final scores = computeArmyProfile(army, catalogById);
@@ -2829,7 +2846,8 @@ class _RecommendationsBlock extends ConsumerWidget {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                suggestion.reason == UnitSuggestionReason.synergy
+                                suggestion.reason ==
+                                        UnitSuggestionReason.synergy
                                     ? l10n.armyRecommendationReasonSynergy(
                                         suggestion.synergyPartnerName ?? '',
                                       )
@@ -2878,42 +2896,45 @@ class _StatBlock extends StatelessWidget {
       l10n.statObjectiveControl: '${model.objectiveControl}',
     };
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: stats.entries
-            .map(
-              (entry) => Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
+    return Row(
+      children: stats.entries
+          .map(
+            (entry) => Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceElevated,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.border),
+                  ),
                   child: Column(
                     children: [
                       Text(
                         entry.key,
-                        style: AppTextStyles.eyebrow,
+                        style: AppTextStyles.eyebrow.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                         textAlign: TextAlign.center,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       Text(
                         entry.value,
-                        style: AppTextStyles.body.copyWith(
-                          fontWeight: FontWeight.w700,
+                        style: AppTextStyles.title.copyWith(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 18,
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-            )
-            .toList(),
-      ),
+            ),
+          )
+          .toList(),
     );
   }
 }
@@ -3331,10 +3352,10 @@ class _ArmyNotesFieldState extends ConsumerState<_ArmyNotesField> {
           .read(armyRepositoryProvider)
           .updateNotes(widget.armyId, text.isEmpty ? null : text)
           .then((_) {
-        container.invalidate(selectedArmyProvider);
-        container.invalidate(armiesListProvider);
-        container.invalidate(armyByIdProvider(widget.armyId));
-      });
+            container.invalidate(selectedArmyProvider);
+            container.invalidate(armiesListProvider);
+            container.invalidate(armyByIdProvider(widget.armyId));
+          });
     }
     _focusNode.dispose();
     _controller.dispose();
@@ -3508,10 +3529,7 @@ final _detachmentTagPattern = RegExp(r'^\[(\d+)\s*PDD\s*·\s*(.+)\]$');
 ) {
   final match = _detachmentTagPattern.firstMatch(description.trim());
   if (match == null) return null;
-  return (
-    commandPoints: int.parse(match.group(1)!),
-    category: match.group(2)!,
-  );
+  return (commandPoints: int.parse(match.group(1)!), category: match.group(2)!);
 }
 
 class _StratagemsDialog extends ConsumerWidget {
