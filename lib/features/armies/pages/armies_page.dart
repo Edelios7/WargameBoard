@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/army_list_formatter.dart';
 import '../../../core/utils/local_catalog_images.dart';
+import '../../../core/utils/search_normalize.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/decor_separator.dart';
@@ -180,9 +181,8 @@ class ArmiesPage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: detailAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
-        ),
+        loading: () =>
+            Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (error, _) =>
             Center(child: Text('$error', style: AppTextStyles.caption)),
         data: (army) {
@@ -259,7 +259,7 @@ class _ArmyListPage extends ConsumerWidget {
                 const SizedBox(height: 24),
                 Expanded(
                   child: armiesAsync.when(
-                    loading: () => const Center(
+                    loading: () => Center(
                       child: CircularProgressIndicator(
                         color: AppColors.primary,
                       ),
@@ -1143,13 +1143,14 @@ class _BuilderSidebarState extends ConsumerState<_BuilderSidebar> {
     final army = widget.army;
     final l10n = AppLocalizations.of(context)!;
     final selectedUnitId = ref.watch(selectedUnitIdProvider);
-    final filteredUnits = _rosterFilter.isEmpty
+    final normalizedRosterFilter = normalizeForSearch(_rosterFilter);
+    final filteredUnits = normalizedRosterFilter.isEmpty
         ? army.units
         : army.units
               .where(
-                (unit) => unit.datasheetName.toLowerCase().contains(
-                  _rosterFilter.toLowerCase(),
-                ),
+                (unit) => normalizeForSearch(
+                  unit.datasheetName,
+                ).contains(normalizedRosterFilter),
               )
               .toList();
 
@@ -1187,7 +1188,7 @@ class _BuilderSidebarState extends ConsumerState<_BuilderSidebar> {
                         color: AppColors.primary.withValues(alpha: .16),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.shield_rounded,
                         size: 18,
                         color: AppColors.primary,
@@ -1382,7 +1383,9 @@ class _UnitRosterRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final imageFile = LocalCatalogImages.unitPhoto(unit.datasheetId);
-    final catalogAsync = ref.watch(factionCatalogDetailsProvider(army.factionId));
+    final catalogAsync = ref.watch(
+      factionCatalogDetailsProvider(army.factionId),
+    );
     final archetype = catalogAsync.value
         ?.where((d) => d.id == unit.datasheetId)
         .firstOrNull
@@ -1779,7 +1782,9 @@ class _UnitCard extends ConsumerWidget {
     // pour une icône de repli plus précise qu'un symbole générique —
     // même donnée que le radar de profil d'armée, déjà mise en cache par
     // ce même provider quand l'onglet Vue d'ensemble a été ouvert.
-    final catalogAsync = ref.watch(factionCatalogDetailsProvider(army.factionId));
+    final catalogAsync = ref.watch(
+      factionCatalogDetailsProvider(army.factionId),
+    );
     final archetype = catalogAsync.value
         ?.where((d) => d.id == unit.datasheetId)
         .firstOrNull
@@ -2192,9 +2197,7 @@ class _UnitDetailsBody extends ConsumerWidget {
     );
 
     if (datasheetAsync.isLoading || selectionsAsync.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      );
+      return Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
     if (datasheetAsync.hasError) {
       return Center(
@@ -2445,8 +2448,8 @@ class _UnitDetailsBody extends ConsumerWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.only(top: 2),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
                       child: Icon(
                         Icons.auto_awesome_rounded,
                         size: 15,
@@ -2825,8 +2828,8 @@ class _ArmyOverviewCard extends ConsumerWidget {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
       child: catalogAsync.when(
-        loading: () => const Padding(
-          padding: EdgeInsets.only(top: 40),
+        loading: () => Padding(
+          padding: const EdgeInsets.only(top: 40),
           child: Center(
             child: CircularProgressIndicator(color: AppColors.primary),
           ),
@@ -2943,7 +2946,7 @@ class _RecommendationsBlock extends ConsumerWidget {
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.lightbulb_outline_rounded,
                   size: 15,
                   color: AppColors.primary,
@@ -2999,7 +3002,7 @@ class _RecommendationsBlock extends ConsumerWidget {
                             ],
                           ),
                         ),
-                        const Icon(
+                        Icon(
                           Icons.add_circle_outline_rounded,
                           size: 20,
                           color: AppColors.primary,
@@ -3732,7 +3735,7 @@ class _StratagemsDialog extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Expanded(
                   child: stratagemsAsync.when(
-                    loading: () => const Center(
+                    loading: () => Center(
                       child: CircularProgressIndicator(
                         color: AppColors.primary,
                       ),

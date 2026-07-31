@@ -225,9 +225,8 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
                     ),
                     const SizedBox(height: 12),
                     armiesAsync.when(
-                      loading: () => const LinearProgressIndicator(
-                        color: AppColors.primary,
-                      ),
+                      loading: () =>
+                          LinearProgressIndicator(color: AppColors.primary),
                       error: (_, __) => const SizedBox.shrink(),
                       data: (armies) => DropdownButtonFormField<String?>(
                         initialValue: _armyId,

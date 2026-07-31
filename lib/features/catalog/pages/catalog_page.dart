@@ -146,8 +146,12 @@ class CatalogPage extends ConsumerWidget {
                   );
                 }
 
-                final filtersWidth = constraints.maxWidth < 1100 ? 200.0 : 232.0;
-                final resultsWidth = constraints.maxWidth < 1100 ? 260.0 : 320.0;
+                final filtersWidth = constraints.maxWidth < 1100
+                    ? 200.0
+                    : 232.0;
+                final resultsWidth = constraints.maxWidth < 1100
+                    ? 260.0
+                    : 320.0;
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -755,9 +759,8 @@ class _ResultsList extends ConsumerWidget {
     final favoriteIds = ref.watch(catalogFavoritesProvider).value ?? const {};
 
     return resultsAsync.when(
-      loading: () => const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      ),
+      loading: () =>
+          Center(child: CircularProgressIndicator(color: AppColors.primary)),
       error: (error, _) => Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -802,9 +805,11 @@ class _ResultsList extends ConsumerWidget {
                       color: favoritesOnly
                           ? AppColors.warning
                           : AppColors.textSecondary,
-                      onPressed: () => ref
-                          .read(catalogFavoritesOnlyProvider.notifier)
-                          .state = !favoritesOnly,
+                      onPressed: () =>
+                          ref
+                                  .read(catalogFavoritesOnlyProvider.notifier)
+                                  .state =
+                              !favoritesOnly,
                     ),
                   ),
                   const SizedBox(width: 4),

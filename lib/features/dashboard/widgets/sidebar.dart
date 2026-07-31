@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/widgets/hoverable.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shell/navigation.dart';
@@ -28,112 +29,137 @@ class Sidebar extends ConsumerWidget {
         ? titleParts.sublist(1).join(' ')
         : '';
 
+    final wallpaper = AppWallpapers.sidebar;
+
     return Container(
       width: 232,
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: wallpaper == null ? AppColors.background : null,
         border: Border(right: BorderSide(color: AppColors.border)),
       ),
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
+          if (wallpaper != null)
+            Positioned.fill(child: Image.file(wallpaper, fit: BoxFit.cover)),
+          if (wallpaper != null)
+            // Voile sombre pour garder le texte et les icônes lisibles
+            // par-dessus une image arbitraire choisie par l'utilisateur.
+            Positioned.fill(
+              child: ColoredBox(
+                color: AppColors.background.withValues(alpha: .78),
+              ),
+            ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Row(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.primaryLight, AppColors.primary],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.4),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [AppColors.primaryLight, AppColors.primary],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.4),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.shield_moon_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              titleTop.toUpperCase(),
+                              style: AppTextStyles.title.copyWith(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.5,
+                                height: 1.1,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (titleBottom.isNotEmpty)
+                              Text(
+                                titleBottom.toUpperCase(),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 2,
+                                  color: AppColors.primaryLight,
+                                  height: 1.2,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                          ],
+                        ),
                       ),
                     ],
-                  ),
-                  child: const Icon(
-                    Icons.shield_moon_rounded,
-                    color: Colors.white,
-                    size: 20,
                   ),
                 ),
-                const SizedBox(width: 12),
+
+                const SizedBox(height: 28),
+
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        titleTop.toUpperCase(),
-                        style: AppTextStyles.title.copyWith(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                          height: 1.1,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _item(0, Icons.home_rounded, l10n.navDashboard),
+                        _item(1, Icons.auto_stories_rounded, l10n.navCatalog),
+                        _item(2, Icons.menu_book_rounded, l10n.navRules),
+                        _item(3, Icons.groups_rounded, l10n.navArmies),
+                        _item(
+                          4,
+                          Icons.sports_martial_arts_rounded,
+                          l10n.navBattles,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      if (titleBottom.isNotEmpty)
-                        Text(
-                          titleBottom.toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 2,
-                            color: AppColors.primaryLight,
-                            height: 1.2,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                    ],
+                        _item(5, Icons.inventory_2_rounded, l10n.navCollection),
+                        _item(6, Icons.bar_chart_rounded, l10n.navStatistics),
+                        const SizedBox(height: 12),
+                        Divider(color: AppColors.border, height: 1),
+                        const SizedBox(height: 12),
+                        _item(7, Icons.settings_rounded, l10n.navSettings),
+                        _item(8, Icons.palette_rounded, l10n.navCustomization),
+                      ],
+                    ),
                   ),
+                ),
+
+                const SizedBox(height: 12),
+                CommandantFooter(
+                  selected:
+                      selectedIndex == AppTab.values.indexOf(AppTab.profile),
+                  onTap: () =>
+                      onItemSelected(AppTab.values.indexOf(AppTab.profile)),
+                ),
+
+                const SizedBox(height: 12),
+                Opacity(
+                  opacity: .45,
+                  child: Text(l10n.versionLabel, style: AppTextStyles.body),
                 ),
               ],
             ),
-          ),
-
-          const SizedBox(height: 28),
-
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _item(0, Icons.home_rounded, l10n.navDashboard),
-                  _item(1, Icons.auto_stories_rounded, l10n.navCatalog),
-                  _item(2, Icons.menu_book_rounded, l10n.navRules),
-                  _item(3, Icons.groups_rounded, l10n.navArmies),
-                  _item(4, Icons.sports_martial_arts_rounded, l10n.navBattles),
-                  _item(5, Icons.inventory_2_rounded, l10n.navCollection),
-                  _item(6, Icons.bar_chart_rounded, l10n.navStatistics),
-                  const SizedBox(height: 12),
-                  Divider(color: AppColors.border, height: 1),
-                  const SizedBox(height: 12),
-                  _item(7, Icons.settings_rounded, l10n.navSettings),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-          CommandantFooter(
-            selected: selectedIndex == AppTab.values.indexOf(AppTab.profile),
-            onTap: () => onItemSelected(AppTab.values.indexOf(AppTab.profile)),
-          ),
-
-          const SizedBox(height: 12),
-          Opacity(
-            opacity: .45,
-            child: Text(l10n.versionLabel, style: AppTextStyles.body),
           ),
         ],
       ),

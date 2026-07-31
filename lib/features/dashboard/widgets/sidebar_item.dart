@@ -21,7 +21,7 @@ class SidebarItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         gradient: selected
-            ? const LinearGradient(
+            ? LinearGradient(
                 colors: [AppColors.primary, AppColors.primaryDark],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,

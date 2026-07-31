@@ -31,25 +31,22 @@ class _TexturedButtonState extends State<TexturedButton> {
   bool _hovered = false;
 
   List<Color> get _gradient => switch (widget.variant) {
-        TexturedButtonVariant.primary => const [
-            AppColors.primaryDark,
-            AppColors.primary,
-          ],
-        TexturedButtonVariant.danger => [
-            AppColors.error.withValues(alpha: .55),
-            AppColors.error,
-          ],
-        TexturedButtonVariant.neutral => const [
-            AppColors.surfaceElevated,
-            AppColors.surface,
-          ],
-      };
+    TexturedButtonVariant.primary => [AppColors.primaryDark, AppColors.primary],
+    TexturedButtonVariant.danger => [
+      AppColors.error.withValues(alpha: .55),
+      AppColors.error,
+    ],
+    TexturedButtonVariant.neutral => const [
+      AppColors.surfaceElevated,
+      AppColors.surface,
+    ],
+  };
 
   Color get _glow => switch (widget.variant) {
-        TexturedButtonVariant.primary => AppColors.primaryLight,
-        TexturedButtonVariant.danger => AppColors.error,
-        TexturedButtonVariant.neutral => AppColors.textSecondary,
-      };
+    TexturedButtonVariant.primary => AppColors.primaryLight,
+    TexturedButtonVariant.danger => AppColors.error,
+    TexturedButtonVariant.neutral => AppColors.textSecondary,
+  };
 
   @override
   Widget build(BuildContext context) {

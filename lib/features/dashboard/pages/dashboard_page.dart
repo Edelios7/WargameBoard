@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/decor_separator.dart';
@@ -367,6 +368,7 @@ class _WelcomeBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return AppCard(
+      wallpaperOverride: AppWallpapers.banner,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -526,7 +528,7 @@ class _DashboardHeaderState extends ConsumerState<_DashboardHeader> {
                 child: Container(
                   width: 38,
                   height: 38,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.primary,
                     shape: BoxShape.circle,
                   ),
@@ -695,7 +697,7 @@ class _LastBattleTile extends ConsumerWidget {
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.sports_martial_arts_rounded,
                   size: 16,
                   color: AppColors.primary,
@@ -777,7 +779,7 @@ class _LastBattleTile extends ConsumerWidget {
             children: [
               Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.sports_martial_arts_rounded,
                     size: 16,
                     color: AppColors.primary,
@@ -1062,7 +1064,7 @@ class _FactionBreakdownCard extends StatelessWidget {
       factionTotals[entry.factionName] =
           (factionTotals[entry.factionName] ?? 0) + entry.quantity;
     }
-    const factionColors = [
+    final factionColors = [
       AppColors.primary,
       AppColors.primaryLight,
       AppColors.warning,
@@ -1715,9 +1717,7 @@ class _ProjectRow extends ConsumerWidget {
                     ),
                   );
                   if (confirmed != true) return;
-                  await ref
-                      .read(projectRepositoryProvider)
-                      .deleteProject(id);
+                  await ref.read(projectRepositoryProvider).deleteProject(id);
                   ref.invalidate(projectsListProvider);
                 },
               ),
@@ -1731,7 +1731,7 @@ class _ProjectRow extends ConsumerWidget {
                 value: progressPercent / 100,
                 minHeight: 5,
                 backgroundColor: AppColors.background,
-                valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                valueColor: AlwaysStoppedAnimation(AppColors.primary),
               ),
             ),
           ],

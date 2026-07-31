@@ -33,7 +33,12 @@ class AppTheme {
 
   static ThemeData get darkTheme {
     final buttonOverlay = _overlay(base: AppColors.primary);
-    final neutralOverlay = _overlay(base: Colors.white, hovered: .06, pressed: .12, focused: .08);
+    final neutralOverlay = _overlay(
+      base: Colors.white,
+      hovered: .06,
+      pressed: .12,
+      focused: .08,
+    );
 
     return ThemeData(
       useMaterial3: true,
@@ -48,10 +53,10 @@ class AppTheme {
       splashFactory: NoSplash.splashFactory,
       highlightColor: Colors.transparent,
       dividerColor: AppColors.border,
-      progressIndicatorTheme: const ProgressIndicatorThemeData(
+      progressIndicatorTheme: ProgressIndicatorThemeData(
         color: AppColors.primary,
       ),
-      textSelectionTheme: const TextSelectionThemeData(
+      textSelectionTheme: TextSelectionThemeData(
         cursorColor: AppColors.primary,
         selectionColor: Color(0x33C81E3A),
         selectionHandleColor: AppColors.primary,

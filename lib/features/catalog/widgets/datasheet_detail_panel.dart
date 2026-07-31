@@ -26,9 +26,7 @@ class DatasheetDetailPanel extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     if (loading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      );
+      return Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
 
     final sheet = datasheet;

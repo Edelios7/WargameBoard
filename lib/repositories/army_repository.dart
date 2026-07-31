@@ -28,24 +28,26 @@ class ArmyRepository {
 
     final updatedUnits = <ArmyUnitDetails>[];
     for (final unit in army.units) {
-      final groups =
-          await database.datasheetDao.getEquipmentGroups(unit.datasheetId);
+      final groups = await database.datasheetDao.getEquipmentGroups(
+        unit.datasheetId,
+      );
       if (groups.isEmpty) {
         updatedUnits.add(unit);
         continue;
       }
 
-      final selections =
-          await database.armyDao.getUnitEquipmentSelections(unit.id);
+      final selections = await database.armyDao.getUnitEquipmentSelections(
+        unit.id,
+      );
       final choices = <String>[];
       for (final group in groups) {
         final selected = selections[group.id];
         final chosenOptionIds = (selected != null && selected.isNotEmpty)
             ? selected
             : group.options
-                .where((option) => option.isDefault)
-                .map((option) => option.id)
-                .toList();
+                  .where((option) => option.isDefault)
+                  .map((option) => option.id)
+                  .toList();
         final chosenNames = group.options
             .where((option) => chosenOptionIds.contains(option.id))
             .map((option) => option.name)
@@ -55,24 +57,26 @@ class ArmyRepository {
         }
       }
 
-      updatedUnits.add(ArmyUnitDetails(
-        id: unit.id,
-        datasheetId: unit.datasheetId,
-        datasheetName: unit.datasheetName,
-        battlefieldRole: unit.battlefieldRole,
-        modelCount: unit.modelCount,
-        minimumModels: unit.minimumModels,
-        maximumModels: unit.maximumModels,
-        datasheetPoints: unit.datasheetPoints,
-        enhancementId: unit.enhancementId,
-        enhancementName: unit.enhancementName,
-        enhancementPoints: unit.enhancementPoints,
-        equipmentChoices: choices,
-        isWarlord: unit.isWarlord,
-        isCharacter: unit.isCharacter,
-        attachedToUnitId: unit.attachedToUnitId,
-        attachedToUnitName: unit.attachedToUnitName,
-      ));
+      updatedUnits.add(
+        ArmyUnitDetails(
+          id: unit.id,
+          datasheetId: unit.datasheetId,
+          datasheetName: unit.datasheetName,
+          battlefieldRole: unit.battlefieldRole,
+          modelCount: unit.modelCount,
+          minimumModels: unit.minimumModels,
+          maximumModels: unit.maximumModels,
+          datasheetPoints: unit.datasheetPoints,
+          enhancementId: unit.enhancementId,
+          enhancementName: unit.enhancementName,
+          enhancementPoints: unit.enhancementPoints,
+          equipmentChoices: choices,
+          isWarlord: unit.isWarlord,
+          isCharacter: unit.isCharacter,
+          attachedToUnitId: unit.attachedToUnitId,
+          attachedToUnitName: unit.attachedToUnitName,
+        ),
+      );
     }
 
     return ArmyDetails(

@@ -91,10 +91,7 @@ class _AddCollectionEntryDialogState
       );
       ref.invalidate(wishlistItemsProvider);
     } else {
-      await repository.addEntry(
-        datasheetId: selected.id,
-        quantity: quantity,
-      );
+      await repository.addEntry(datasheetId: selected.id, quantity: quantity);
       ref.invalidate(collectionEntriesProvider);
       ref.invalidate(collectionSummaryProvider);
       ref.invalidate(recentlyAddedProvider);
@@ -151,7 +148,7 @@ class _AddCollectionEntryDialogState
                   const SizedBox(height: 12),
                   Expanded(
                     child: _loading
-                        ? const Center(
+                        ? Center(
                             child: CircularProgressIndicator(
                               color: AppColors.primary,
                             ),

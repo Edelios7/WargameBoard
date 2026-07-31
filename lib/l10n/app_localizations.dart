@@ -152,11 +152,119 @@ abstract class AppLocalizations {
   /// **'Paramètres'**
   String get navSettings;
 
+  /// No description provided for @navCustomization.
+  ///
+  /// In fr, this message translates to:
+  /// **'Personnalisation'**
+  String get navCustomization;
+
   /// No description provided for @versionLabel.
   ///
   /// In fr, this message translates to:
   /// **'Version 0.1'**
   String get versionLabel;
+
+  /// No description provided for @customizationTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Personnaliser l\'application'**
+  String get customizationTitle;
+
+  /// No description provided for @customizationAccentSection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Couleur d\'accent'**
+  String get customizationAccentSection;
+
+  /// No description provided for @customizationAccentHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisis une couleur dans la palette ou compose la tienne — elle remplace l\'accent violet sur toute l\'application (boutons, liens, sélections...).'**
+  String get customizationAccentHint;
+
+  /// No description provided for @customizationRecommendedColors.
+  ///
+  /// In fr, this message translates to:
+  /// **'Couleurs conseillées'**
+  String get customizationRecommendedColors;
+
+  /// No description provided for @customizationCustomColor.
+  ///
+  /// In fr, this message translates to:
+  /// **'Couleur personnalisée'**
+  String get customizationCustomColor;
+
+  /// No description provided for @customizationResetColor.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réinitialiser la couleur'**
+  String get customizationResetColor;
+
+  /// No description provided for @customizationWallpapersSection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fonds d\'écran'**
+  String get customizationWallpapersSection;
+
+  /// No description provided for @customizationWallpapersHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoute une image de fond sur les zones de ton choix — un léger voile sombre est posé dessus pour garder le texte lisible.'**
+  String get customizationWallpapersHint;
+
+  /// No description provided for @customizationWallpaperApp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fond général de l\'application'**
+  String get customizationWallpaperApp;
+
+  /// No description provided for @customizationWallpaperSidebar.
+  ///
+  /// In fr, this message translates to:
+  /// **'Menu de gauche'**
+  String get customizationWallpaperSidebar;
+
+  /// No description provided for @customizationWallpaperCards.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cartes et cases'**
+  String get customizationWallpaperCards;
+
+  /// No description provided for @customizationWallpaperBanner.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bannière du tableau de bord'**
+  String get customizationWallpaperBanner;
+
+  /// No description provided for @customizationChooseImage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir une image'**
+  String get customizationChooseImage;
+
+  /// No description provided for @customizationChangeImage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Changer l\'image'**
+  String get customizationChangeImage;
+
+  /// No description provided for @customizationRemoveImage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer'**
+  String get customizationRemoveImage;
+
+  /// No description provided for @customizationNoImage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune image'**
+  String get customizationNoImage;
+
+  /// No description provided for @customizationUnsupportedFormat.
+  ///
+  /// In fr, this message translates to:
+  /// **'Format d\'image non pris en charge (essaie .png, .jpg ou .webp).'**
+  String get customizationUnsupportedFormat;
 
   /// No description provided for @settingsProfileTitle.
   ///
@@ -2605,6 +2713,84 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'En savoir plus'**
   String get foodChainMoreDetails;
+
+  /// No description provided for @combatSimAttacker.
+  ///
+  /// In fr, this message translates to:
+  /// **'Attaquant'**
+  String get combatSimAttacker;
+
+  /// No description provided for @combatSimDefender.
+  ///
+  /// In fr, this message translates to:
+  /// **'Défenseur'**
+  String get combatSimDefender;
+
+  /// No description provided for @combatSimSelectFaction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Faction'**
+  String get combatSimSelectFaction;
+
+  /// No description provided for @combatSimSelectUnit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Unité'**
+  String get combatSimSelectUnit;
+
+  /// No description provided for @combatSimSelectWeapon.
+  ///
+  /// In fr, this message translates to:
+  /// **'Arme'**
+  String get combatSimSelectWeapon;
+
+  /// No description provided for @combatSimModelCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nombre de modèles'**
+  String get combatSimModelCount;
+
+  /// No description provided for @combatSimTrials.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nombre de vagues d\'attaques simulées'**
+  String get combatSimTrials;
+
+  /// No description provided for @combatSimRun.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lancer la simulation'**
+  String get combatSimRun;
+
+  /// No description provided for @combatSimResultsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résultats'**
+  String get combatSimResultsTitle;
+
+  /// No description provided for @combatSimAvgKills.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} / {total} modèles tués en moyenne'**
+  String combatSimAvgKills(String count, String total);
+
+  /// No description provided for @combatSimDestroyProbability.
+  ///
+  /// In fr, this message translates to:
+  /// **'Probabilité de destruction totale : {percent}'**
+  String combatSimDestroyProbability(String percent);
+
+  /// No description provided for @combatSimAvgDamage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dégâts bruts moyens infligés : {value}'**
+  String combatSimAvgDamage(String value);
+
+  /// No description provided for @combatSimEmptyState.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez une unité attaquante avec une arme et une unité défenseure pour lancer une simulation.'**
+  String get combatSimEmptyState;
 
   /// No description provided for @armyProfileAxisTir.
   ///

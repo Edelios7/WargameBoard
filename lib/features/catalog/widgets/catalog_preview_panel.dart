@@ -44,9 +44,7 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
     final l10n = AppLocalizations.of(context)!;
 
     if (widget.loading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      );
+      return Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
 
     final sheet = widget.datasheet;
@@ -229,7 +227,7 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(
+                      Icon(
                         Icons.arrow_forward_rounded,
                         size: 16,
                         color: AppColors.primary,

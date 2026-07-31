@@ -32,9 +32,9 @@ class ProfilePage extends ConsumerWidget {
             Text(l10n.profilePageSubtitle, style: AppTextStyles.caption),
             const SizedBox(height: 24),
             summaryAsync.when(
-              loading: () => const Center(
+              loading: () => Center(
                 child: Padding(
-                  padding: EdgeInsets.all(40),
+                  padding: const EdgeInsets.all(40),
                   child: CircularProgressIndicator(color: AppColors.primary),
                 ),
               ),
@@ -71,8 +71,8 @@ class _ProfileContent extends StatelessWidget {
             final columns = constraints.maxWidth > 900
                 ? 3
                 : constraints.maxWidth > 560
-                    ? 2
-                    : 1;
+                ? 2
+                : 1;
             return GridView.count(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -91,10 +91,7 @@ class _ProfileContent extends StatelessWidget {
         const SizedBox(height: 12),
         if (summary.factions.isEmpty)
           AppCard(
-            child: Text(
-              l10n.profileNoFactionXp,
-              style: AppTextStyles.caption,
-            ),
+            child: Text(l10n.profileNoFactionXp, style: AppTextStyles.caption),
           )
         else
           AppCard(
@@ -144,7 +141,7 @@ class _CommandantHeader extends StatelessWidget {
               Container(
                 width: 48,
                 height: 48,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),
@@ -174,7 +171,7 @@ class _CommandantHeader extends StatelessWidget {
               value: level.progress,
               minHeight: 8,
               backgroundColor: AppColors.background,
-              valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+              valueColor: AlwaysStoppedAnimation(AppColors.primary),
             ),
           ),
           const SizedBox(height: 8),
@@ -232,7 +229,7 @@ class _CategoryCard extends StatelessWidget {
               value: category.level.progress,
               minHeight: 5,
               backgroundColor: AppColors.background,
-              valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+              valueColor: AlwaysStoppedAnimation(AppColors.primary),
             ),
           ),
         ],
@@ -258,8 +255,9 @@ class _FactionRow extends StatelessWidget {
           child: Text(
             faction.factionName,
             style: AppTextStyles.body.copyWith(
-              fontWeight:
-                  bannerFile != null ? FontWeight.w700 : FontWeight.w400,
+              fontWeight: bannerFile != null
+                  ? FontWeight.w700
+                  : FontWeight.w400,
               shadows: bannerFile != null
                   ? const [Shadow(blurRadius: 4, color: Colors.black)]
                   : null,
@@ -293,7 +291,7 @@ class _FactionRow extends StatelessWidget {
               backgroundColor: bannerFile != null
                   ? Colors.white.withValues(alpha: .2)
                   : AppColors.background,
-              valueColor: const AlwaysStoppedAnimation(AppColors.primaryLight),
+              valueColor: AlwaysStoppedAnimation(AppColors.primaryLight),
             ),
           ),
         ),

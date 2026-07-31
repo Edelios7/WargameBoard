@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_wallpapers.dart';
 
 /// Carte de base de l'app. Quand [onTap] est fourni (carte "ouvrable" —
 /// navigation, sélection, dialogue...), elle grossit légèrement et
@@ -13,12 +16,19 @@ class AppCard extends StatefulWidget {
   final EdgeInsetsGeometry padding;
   final bool selected;
 
+  /// Fond d'écran à utiliser à la place de [AppWallpapers.cards] — pour
+  /// les cartes qui ont leur propre emplacement dédié dans la page
+  /// Personnalisation (ex. la bannière d'accueil du Dashboard, qui lit
+  /// [AppWallpapers.banner]) plutôt que le réglage générique "Cartes".
+  final File? wallpaperOverride;
+
   const AppCard({
     super.key,
     required this.child,
     this.onTap,
     this.padding = const EdgeInsets.all(20),
     this.selected = false,
+    this.wallpaperOverride,
   });
 
   @override
@@ -32,6 +42,7 @@ class _AppCardState extends State<AppCard> {
   Widget build(BuildContext context) {
     final interactive = widget.onTap != null;
     final hovered = interactive && _hovered;
+    final wallpaper = widget.wallpaperOverride ?? AppWallpapers.cards;
 
     return MouseRegion(
       onEnter: interactive ? (_) => setState(() => _hovered = true) : null,
@@ -41,37 +52,55 @@ class _AppCardState extends State<AppCard> {
         duration: const Duration(milliseconds: 140),
         curve: Curves.easeOut,
         child: Material(
-          color: AppColors.surfaceElevated,
+          color: wallpaper == null ? AppColors.surfaceElevated : null,
           borderRadius: BorderRadius.circular(14),
+          clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: widget.onTap,
             borderRadius: BorderRadius.circular(14),
             hoverColor: Colors.white.withValues(alpha: .05),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 140),
-              curve: Curves.easeOut,
-              padding: widget.padding,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: widget.selected
-                      ? AppColors.primary
-                      : hovered
-                      ? AppColors.primary.withValues(alpha: .5)
-                      : AppColors.border,
-                  width: widget.selected ? 1.4 : 1,
+            child: Stack(
+              children: [
+                if (wallpaper != null)
+                  Positioned.fill(
+                    child: Image.file(wallpaper, fit: BoxFit.cover),
+                  ),
+                if (wallpaper != null)
+                  // Voile pour garder le contenu de la carte lisible
+                  // par-dessus une image arbitraire choisie par
+                  // l'utilisateur.
+                  Positioned.fill(
+                    child: ColoredBox(
+                      color: AppColors.surfaceElevated.withValues(alpha: .82),
+                    ),
+                  ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 140),
+                  curve: Curves.easeOut,
+                  padding: widget.padding,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: widget.selected
+                          ? AppColors.primary
+                          : hovered
+                          ? AppColors.primary.withValues(alpha: .5)
+                          : AppColors.border,
+                      width: widget.selected ? 1.4 : 1,
+                    ),
+                    boxShadow: hovered
+                        ? [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: .18),
+                              blurRadius: 16,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                        : const [],
+                  ),
+                  child: widget.child,
                 ),
-                boxShadow: hovered
-                    ? [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: .18),
-                          blurRadius: 16,
-                          offset: const Offset(0, 4),
-                        ),
-                      ]
-                    : const [],
-              ),
-              child: widget.child,
+              ],
             ),
           ),
         ),

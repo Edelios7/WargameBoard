@@ -26,9 +26,8 @@ class BattlePage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: activeBattleAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
-        ),
+        loading: () =>
+            Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (error, _) =>
             Center(child: Text('$error', style: AppTextStyles.caption)),
         data: (activeBattle) => activeBattle != null
@@ -121,7 +120,7 @@ class _BattleHistoryView extends ConsumerWidget {
           const SizedBox(height: 24),
           Expanded(
             child: battlesAsync.when(
-              loading: () => const Center(
+              loading: () => Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
               ),
               error: (error, _) =>

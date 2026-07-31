@@ -36,7 +36,64 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navSettings => 'Paramètres';
 
   @override
+  String get navCustomization => 'Personnalisation';
+
+  @override
   String get versionLabel => 'Version 0.1';
+
+  @override
+  String get customizationTitle => 'Personnaliser l\'application';
+
+  @override
+  String get customizationAccentSection => 'Couleur d\'accent';
+
+  @override
+  String get customizationAccentHint =>
+      'Choisis une couleur dans la palette ou compose la tienne — elle remplace l\'accent violet sur toute l\'application (boutons, liens, sélections...).';
+
+  @override
+  String get customizationRecommendedColors => 'Couleurs conseillées';
+
+  @override
+  String get customizationCustomColor => 'Couleur personnalisée';
+
+  @override
+  String get customizationResetColor => 'Réinitialiser la couleur';
+
+  @override
+  String get customizationWallpapersSection => 'Fonds d\'écran';
+
+  @override
+  String get customizationWallpapersHint =>
+      'Ajoute une image de fond sur les zones de ton choix — un léger voile sombre est posé dessus pour garder le texte lisible.';
+
+  @override
+  String get customizationWallpaperApp => 'Fond général de l\'application';
+
+  @override
+  String get customizationWallpaperSidebar => 'Menu de gauche';
+
+  @override
+  String get customizationWallpaperCards => 'Cartes et cases';
+
+  @override
+  String get customizationWallpaperBanner => 'Bannière du tableau de bord';
+
+  @override
+  String get customizationChooseImage => 'Choisir une image';
+
+  @override
+  String get customizationChangeImage => 'Changer l\'image';
+
+  @override
+  String get customizationRemoveImage => 'Retirer';
+
+  @override
+  String get customizationNoImage => 'Aucune image';
+
+  @override
+  String get customizationUnsupportedFormat =>
+      'Format d\'image non pris en charge (essaie .png, .jpg ou .webp).';
 
   @override
   String get settingsProfileTitle => 'Profil';
@@ -1399,6 +1456,52 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get foodChainMoreDetails => 'En savoir plus';
+
+  @override
+  String get combatSimAttacker => 'Attaquant';
+
+  @override
+  String get combatSimDefender => 'Défenseur';
+
+  @override
+  String get combatSimSelectFaction => 'Faction';
+
+  @override
+  String get combatSimSelectUnit => 'Unité';
+
+  @override
+  String get combatSimSelectWeapon => 'Arme';
+
+  @override
+  String get combatSimModelCount => 'Nombre de modèles';
+
+  @override
+  String get combatSimTrials => 'Nombre de vagues d\'attaques simulées';
+
+  @override
+  String get combatSimRun => 'Lancer la simulation';
+
+  @override
+  String get combatSimResultsTitle => 'Résultats';
+
+  @override
+  String combatSimAvgKills(String count, String total) {
+    return '$count / $total modèles tués en moyenne';
+  }
+
+  @override
+  String combatSimDestroyProbability(String percent) {
+    return 'Probabilité de destruction totale : $percent';
+  }
+
+  @override
+  String combatSimAvgDamage(String value) {
+    return 'Dégâts bruts moyens infligés : $value';
+  }
+
+  @override
+  String get combatSimEmptyState =>
+      'Choisissez une unité attaquante avec une arme et une unité défenseure pour lancer une simulation.';
 
   @override
   String get armyProfileAxisTir => 'Tir';

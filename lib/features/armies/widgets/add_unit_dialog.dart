@@ -173,7 +173,7 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
                 const SizedBox(height: 8),
                 Expanded(
                   child: _loading
-                      ? const Center(
+                      ? Center(
                           child: CircularProgressIndicator(
                             color: AppColors.primary,
                           ),

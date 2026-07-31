@@ -7,6 +7,7 @@ import 'core/utils/user_content_paths.dart';
 import 'providers/dashboard_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/shared_preferences_provider.dart';
+import 'services/customization_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,7 @@ void main() async {
   final savedDisplayName = prefs.getString(displayNamePreferenceKey);
   final savedRecentlyViewed =
       prefs.getStringList(recentlyViewedPreferenceKey) ?? const [];
+  CustomizationService(prefs).loadIntoStatics();
 
   runApp(
     ProviderScope(

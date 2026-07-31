@@ -7,6 +7,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/collection_export_formatter.dart';
 import '../../../core/utils/faction_iconography.dart';
 import '../../../core/utils/local_catalog_images.dart';
+import '../../../core/utils/search_normalize.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/unit_photo_thumbnail.dart';
@@ -376,9 +377,9 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
 
   bool _matches(CollectionItemDetails entry) {
     if (widget.searchQuery.isNotEmpty &&
-        !entry.datasheetName.toLowerCase().contains(
-          widget.searchQuery.toLowerCase(),
-        )) {
+        !normalizeForSearch(
+          entry.datasheetName,
+        ).contains(normalizeForSearch(widget.searchQuery))) {
       return false;
     }
     if (_factionFilter != null) {
@@ -414,9 +415,7 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
     final recent = recentAsync.value ?? const <CollectionItemDetails>[];
 
     if (entriesAsync.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      );
+      return Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
     if (entriesAsync.hasError) {
       return Center(
@@ -1412,9 +1411,8 @@ class _WishlistTab extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: itemsAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
-        ),
+        loading: () =>
+            Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (error, _) =>
             Center(child: Text('$error', style: AppTextStyles.caption)),
         data: (items) {

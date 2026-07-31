@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+import '../../core/utils/search_normalize.dart';
 import '../../domain/catalog/common/unit_archetype.dart';
 import '../../domain/catalog/factions/space_marine_chapters.dart';
 import '../../domain/xp/xp_awards.dart';
@@ -152,8 +153,12 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     // s'attend à ne voir QUE les unités propres au chapitre choisi.
     bool includeCompatibleSpaceMarines = true,
   }) async {
-    final pattern = '%$text%';
     final costPoints = datasheetCosts.points;
+    // Le filtrage par texte se fait en Dart plus bas (normalizeForSearch),
+    // pas via un LIKE SQL : le repliement de casse de SQLite ne couvre que
+    // l'ASCII, donc "vetereans"/"vétérans" tapé sans le bon accent/casse ne
+    // matchait jamais un nom accentué comme "Escouade de Vétérans".
+    final normalizedQuery = normalizeForSearch(text);
 
     final query = select(datasheets).join([
       innerJoin(factions, factions.id.equalsExp(datasheets.factionId)),
@@ -168,7 +173,7 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
                 ? editions.id.equals(editionId)
                 : editions.isCurrent.equals(true)),
       ),
-    ])..where(datasheets.name.like(pattern));
+    ]);
 
     if (factionId != null) {
       final matchIds = includeCompatibleSpaceMarines
@@ -196,6 +201,10 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     final byDatasheetId = <String, SearchResult>{};
     for (final row in rows) {
       final datasheet = row.readTable(datasheets);
+      if (normalizedQuery.isNotEmpty &&
+          !normalizeForSearch(datasheet.name).contains(normalizedQuery)) {
+        continue;
+      }
       final faction = row.readTable(factions);
       final points = row.read(costPoints);
       final existing = byDatasheetId[datasheet.id];

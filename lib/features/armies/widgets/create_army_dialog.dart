@@ -98,7 +98,7 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
                   const SizedBox(height: 16),
                   factionsAsync.when(
                     loading: () =>
-                        const LinearProgressIndicator(color: AppColors.primary),
+                        LinearProgressIndicator(color: AppColors.primary),
                     error: (error, _) =>
                         Text('$error', style: AppTextStyles.caption),
                     data: (factions) {
@@ -146,9 +146,8 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
                           detachmentsForFactionProvider(_factionId!),
                         );
                         return detachmentsAsync.when(
-                          loading: () => const LinearProgressIndicator(
-                            color: AppColors.primary,
-                          ),
+                          loading: () =>
+                              LinearProgressIndicator(color: AppColors.primary),
                           error: (_, __) => const SizedBox.shrink(),
                           data: (detachments) {
                             if (detachments.isEmpty)

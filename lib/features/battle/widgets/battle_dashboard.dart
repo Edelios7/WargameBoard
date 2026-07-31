@@ -569,7 +569,7 @@ class _PhaseBlockState extends ConsumerState<_PhaseBlock> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.lightbulb_outline_rounded,
                     size: 18,
                     color: AppColors.primary,
@@ -598,7 +598,8 @@ class _PhaseBlockState extends ConsumerState<_PhaseBlock> {
                       vertical: 16,
                     ),
                   ),
-                  onPressed: currentIndex == 0 && (battle.currentRound ?? 1) <= 1
+                  onPressed:
+                      currentIndex == 0 && (battle.currentRound ?? 1) <= 1
                       ? null
                       : () async {
                           await ref
@@ -709,7 +710,7 @@ class _EndOfRoundReminderDialog extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.flag_rounded, color: AppColors.primary),
+                Icon(Icons.flag_rounded, color: AppColors.primary),
                 const SizedBox(width: 10),
                 Text(l10n.battleEndOfRoundTitle, style: AppTextStyles.title),
               ],
@@ -878,8 +879,7 @@ class RosterBlock extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           armyAsync.when(
-            loading: () =>
-                const LinearProgressIndicator(color: AppColors.primary),
+            loading: () => LinearProgressIndicator(color: AppColors.primary),
             error: (_, __) => const SizedBox.shrink(),
             data: (army) {
               if (army == null || army.units.isEmpty) {
@@ -1298,15 +1298,13 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
                             ),
                           ),
                           for (final profile in weapon.profiles)
-                            Text(
-                              profile.summary,
-                              style: AppTextStyles.caption,
-                            ),
+                            Text(profile.summary, style: AppTextStyles.caption),
                         ],
                       ),
                     ),
                 ],
-                if ((datasheetAsync.value?.abilities ?? const []).isNotEmpty) ...[
+                if ((datasheetAsync.value?.abilities ?? const [])
+                    .isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text(
                     l10n.battleUnitAbilitiesTitle.toUpperCase(),
@@ -1603,10 +1601,12 @@ class _DiceRollerBlockState extends ConsumerState<DiceRollerBlock> {
     final results = _results;
     if (results == null) return;
     final total = results.fold<int>(0, (sum, value) => sum + value);
-    await ref.read(battleRepositoryProvider).logEvent(
-      widget.battleId,
-      label: '${results.length}D6 : ${results.join(', ')} (total $total)',
-    );
+    await ref
+        .read(battleRepositoryProvider)
+        .logEvent(
+          widget.battleId,
+          label: '${results.length}D6 : ${results.join(', ')} (total $total)',
+        );
     ref.invalidate(battleEventsProvider(widget.battleId));
   }
 
@@ -1620,7 +1620,10 @@ class _DiceRollerBlockState extends ConsumerState<DiceRollerBlock> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.battleDiceTitle.toUpperCase(), style: AppTextStyles.eyebrow),
+          Text(
+            l10n.battleDiceTitle.toUpperCase(),
+            style: AppTextStyles.eyebrow,
+          ),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -1630,10 +1633,7 @@ class _DiceRollerBlockState extends ConsumerState<DiceRollerBlock> {
                 icon: const Icon(Icons.remove_circle_outline, size: 20),
                 color: AppColors.textSecondary,
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(
-                  minWidth: 32,
-                  minHeight: 32,
-                ),
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                 onPressed: _diceCount > 1
                     ? () => setState(() => _diceCount--)
                     : null,
@@ -1653,10 +1653,7 @@ class _DiceRollerBlockState extends ConsumerState<DiceRollerBlock> {
                 icon: const Icon(Icons.add_circle_outline, size: 20),
                 color: AppColors.textSecondary,
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(
-                  minWidth: 32,
-                  minHeight: 32,
-                ),
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                 onPressed: _diceCount < 20
                     ? () => setState(() => _diceCount++)
                     : null,

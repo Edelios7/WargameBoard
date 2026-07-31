@@ -120,7 +120,7 @@ class _UnitPhotoThumbnailState extends ConsumerState<UnitPhotoThumbnail> {
               child: Container(
                 width: 20,
                 height: 20,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),

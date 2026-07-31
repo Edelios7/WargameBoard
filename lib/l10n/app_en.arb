@@ -11,7 +11,26 @@
   "navCollection": "Collection",
   "navStatistics": "Statistics",
   "navSettings": "Settings",
+  "navCustomization": "Customization",
   "versionLabel": "Version 0.1",
+
+  "customizationTitle": "Customize the app",
+  "customizationAccentSection": "Accent color",
+  "customizationAccentHint": "Pick a color from the palette or mix your own — it replaces the purple accent across the whole app (buttons, links, selections...).",
+  "customizationRecommendedColors": "Recommended colors",
+  "customizationCustomColor": "Custom color",
+  "customizationResetColor": "Reset color",
+  "customizationWallpapersSection": "Wallpapers",
+  "customizationWallpapersHint": "Add a background image to the areas you choose — a light dark overlay is applied on top to keep text readable.",
+  "customizationWallpaperApp": "Overall app background",
+  "customizationWallpaperSidebar": "Left menu",
+  "customizationWallpaperCards": "Cards and tiles",
+  "customizationWallpaperBanner": "Dashboard banner",
+  "customizationChooseImage": "Choose an image",
+  "customizationChangeImage": "Change image",
+  "customizationRemoveImage": "Remove",
+  "customizationNoImage": "No image",
+  "customizationUnsupportedFormat": "Unsupported image format (try .png, .jpg or .webp).",
 
   "settingsProfileTitle": "Profile",
   "settingsDisplayNameLabel": "Your name",
@@ -669,6 +688,35 @@
   },
   "foodChainVerdictBalanced": "Balanced",
   "foodChainMoreDetails": "Learn more",
+  "combatSimAttacker": "Attacker",
+  "combatSimDefender": "Defender",
+  "combatSimSelectFaction": "Faction",
+  "combatSimSelectUnit": "Unit",
+  "combatSimSelectWeapon": "Weapon",
+  "combatSimModelCount": "Number of models",
+  "combatSimTrials": "Number of simulated attack waves",
+  "combatSimRun": "Run simulation",
+  "combatSimResultsTitle": "Results",
+  "combatSimAvgKills": "{count} / {total} models killed on average",
+  "@combatSimAvgKills": {
+    "placeholders": {
+      "count": { "type": "String" },
+      "total": { "type": "String" }
+    }
+  },
+  "combatSimDestroyProbability": "Probability of total destruction: {percent}",
+  "@combatSimDestroyProbability": {
+    "placeholders": {
+      "percent": { "type": "String" }
+    }
+  },
+  "combatSimAvgDamage": "Average raw damage dealt: {value}",
+  "@combatSimAvgDamage": {
+    "placeholders": {
+      "value": { "type": "String" }
+    }
+  },
+  "combatSimEmptyState": "Choose an attacking unit with a weapon and a defending unit to run a simulation.",
   "armyProfileAxisTir": "Shooting",
   "armyProfileAxisCorpsACorps": "Melee",
   "armyProfileAxisResilience": "Resilience",

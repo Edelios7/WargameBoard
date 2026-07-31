@@ -36,7 +36,64 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navSettings => 'Settings';
 
   @override
+  String get navCustomization => 'Customization';
+
+  @override
   String get versionLabel => 'Version 0.1';
+
+  @override
+  String get customizationTitle => 'Customize the app';
+
+  @override
+  String get customizationAccentSection => 'Accent color';
+
+  @override
+  String get customizationAccentHint =>
+      'Pick a color from the palette or mix your own — it replaces the purple accent across the whole app (buttons, links, selections...).';
+
+  @override
+  String get customizationRecommendedColors => 'Recommended colors';
+
+  @override
+  String get customizationCustomColor => 'Custom color';
+
+  @override
+  String get customizationResetColor => 'Reset color';
+
+  @override
+  String get customizationWallpapersSection => 'Wallpapers';
+
+  @override
+  String get customizationWallpapersHint =>
+      'Add a background image to the areas you choose — a light dark overlay is applied on top to keep text readable.';
+
+  @override
+  String get customizationWallpaperApp => 'Overall app background';
+
+  @override
+  String get customizationWallpaperSidebar => 'Left menu';
+
+  @override
+  String get customizationWallpaperCards => 'Cards and tiles';
+
+  @override
+  String get customizationWallpaperBanner => 'Dashboard banner';
+
+  @override
+  String get customizationChooseImage => 'Choose an image';
+
+  @override
+  String get customizationChangeImage => 'Change image';
+
+  @override
+  String get customizationRemoveImage => 'Remove';
+
+  @override
+  String get customizationNoImage => 'No image';
+
+  @override
+  String get customizationUnsupportedFormat =>
+      'Unsupported image format (try .png, .jpg or .webp).';
 
   @override
   String get settingsProfileTitle => 'Profile';
@@ -1385,6 +1442,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get foodChainMoreDetails => 'Learn more';
+
+  @override
+  String get combatSimAttacker => 'Attacker';
+
+  @override
+  String get combatSimDefender => 'Defender';
+
+  @override
+  String get combatSimSelectFaction => 'Faction';
+
+  @override
+  String get combatSimSelectUnit => 'Unit';
+
+  @override
+  String get combatSimSelectWeapon => 'Weapon';
+
+  @override
+  String get combatSimModelCount => 'Number of models';
+
+  @override
+  String get combatSimTrials => 'Number of simulated attack waves';
+
+  @override
+  String get combatSimRun => 'Run simulation';
+
+  @override
+  String get combatSimResultsTitle => 'Results';
+
+  @override
+  String combatSimAvgKills(String count, String total) {
+    return '$count / $total models killed on average';
+  }
+
+  @override
+  String combatSimDestroyProbability(String percent) {
+    return 'Probability of total destruction: $percent';
+  }
+
+  @override
+  String combatSimAvgDamage(String value) {
+    return 'Average raw damage dealt: $value';
+  }
+
+  @override
+  String get combatSimEmptyState =>
+      'Choose an attacking unit with a weapon and a defending unit to run a simulation.';
 
   @override
   String get armyProfileAxisTir => 'Shooting';

@@ -66,8 +66,7 @@ class StatisticsPage extends ConsumerWidget {
                         _StatTile(
                           label: l10n.statsCollectionModels,
                           value:
-                              summaryAsync.value?.totalModels.toString() ??
-                              '—',
+                              summaryAsync.value?.totalModels.toString() ?? '—',
                         ),
                         _StatTile(
                           label: l10n.statsCollectionPainted,
@@ -100,7 +99,8 @@ class StatisticsPage extends ConsumerWidget {
                         ),
                         _StatTile(
                           label: l10n.statsWinRate,
-                          value: battleStats == null || battleStats.totalGames == 0
+                          value:
+                              battleStats == null || battleStats.totalGames == 0
                               ? '—'
                               : '${(battleStats.winRate * 100).round()} %',
                         ),
@@ -158,7 +158,10 @@ class StatisticsPage extends ConsumerWidget {
                     const DecorSeparator(
                       padding: EdgeInsets.symmetric(vertical: 14),
                     ),
-                    Text(l10n.statsProgressionTitle, style: AppTextStyles.title),
+                    Text(
+                      l10n.statsProgressionTitle,
+                      style: AppTextStyles.title,
+                    ),
                     const SizedBox(height: 16),
                     xpAsync.when(
                       loading: () => const SizedBox.shrink(),
@@ -168,16 +171,16 @@ class StatisticsPage extends ConsumerWidget {
                     const DecorSeparator(
                       padding: EdgeInsets.symmetric(vertical: 14),
                     ),
-                    Text(
-                      l10n.statsRecentFormTitle,
-                      style: AppTextStyles.title,
-                    ),
+                    Text(l10n.statsRecentFormTitle, style: AppTextStyles.title),
                     const SizedBox(height: 16),
                     // Une bataille "pas encore jouée" (result == null)
                     // n'a pas sa place dans la forme récente : elle n'a
                     // pas encore d'issue à afficher.
                     battles.every((b) => b.result == null)
-                        ? Text(l10n.battleEmptyList, style: AppTextStyles.caption)
+                        ? Text(
+                            l10n.battleEmptyList,
+                            style: AppTextStyles.caption,
+                          )
                         : _RecentFormRow(l10n: l10n, battles: battles),
                     const DecorSeparator(
                       padding: EdgeInsets.symmetric(vertical: 14),
@@ -218,7 +221,7 @@ class StatisticsPage extends ConsumerWidget {
                     Text(l10n.statsPointsByArmy, style: AppTextStyles.title),
                     const SizedBox(height: 16),
                     armiesAsync.when(
-                      loading: () => const Center(
+                      loading: () => Center(
                         child: CircularProgressIndicator(
                           color: AppColors.primary,
                         ),
@@ -358,8 +361,7 @@ class _ProgressionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final level = xp.commandantLevel;
-    final topFactions = [...xp.factions]
-      ..sort((a, b) => b.xp.compareTo(a.xp));
+    final topFactions = [...xp.factions]..sort((a, b) => b.xp.compareTo(a.xp));
 
     return AppCard(
       child: Column(
@@ -576,7 +578,7 @@ class _BattlesByFactionCard extends StatelessWidget {
 
   const _BattlesByFactionCard({required this.l10n, required this.battles});
 
-  static const _palette = [
+  static final _palette = [
     AppColors.primary,
     AppColors.info,
     AppColors.success,

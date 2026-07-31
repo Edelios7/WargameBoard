@@ -9,6 +9,7 @@ import '../../../domain/rules/rule_document.dart';
 import '../../../domain/rules/rules_data.dart';
 import '../../../l10n/app_localizations.dart';
 import 'army_lists_guide_page.dart';
+import 'combat_simulator_page.dart';
 import 'food_chain_guide_page.dart';
 import 'rule_document_detail_page.dart';
 import 'rule_pdf_viewer_page.dart';
@@ -70,6 +71,14 @@ class _RulesPageState extends State<RulesPage> {
     if (doc.id == 'guide-listes-d-armee') {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => ArmyListsGuidePage(document: doc)),
+      );
+      return;
+    }
+    if (doc.id == 'simulateur-de-combat') {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => CombatSimulatorPage(document: doc),
+        ),
       );
       return;
     }
@@ -347,7 +356,7 @@ class _HeroCard extends StatelessWidget {
                 ],
               ),
             ),
-            child: const Center(
+            child: Center(
               child: Icon(
                 Icons.shield_moon_rounded,
                 size: 56,
@@ -732,7 +741,7 @@ class _RecentDocumentsCardState extends State<_RecentDocumentsCard> {
                           borderRadius: BorderRadius.circular(8),
                           color: AppColors.surface,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.description_rounded,
                           size: 18,
                           color: AppColors.primaryLight,
@@ -861,7 +870,7 @@ class _PopularRulesCardState extends State<_PopularRulesCard> {
                           borderRadius: BorderRadius.circular(8),
                           color: AppColors.surface,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.description_rounded,
                           size: 16,
                           color: AppColors.primaryLight,

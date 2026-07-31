@@ -1,13 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/theme/app_colors.dart';
+import '../core/theme/app_wallpapers.dart';
 import '../features/dashboard/pages/dashboard_page.dart';
 import '../features/dashboard/widgets/sidebar.dart';
 import '../features/armies/pages/armies_page.dart';
 import '../features/battle/pages/battle_page.dart';
 import '../features/catalog/pages/catalog_page.dart';
 import '../features/collection/pages/collection_page.dart';
+import '../features/customization/pages/customization_page.dart';
 import '../features/profile/pages/profile_page.dart';
 import '../features/rules/pages/rules_page.dart';
 import '../l10n/app_localizations.dart';
@@ -32,6 +36,7 @@ class AppShell extends ConsumerWidget {
     AppTab.collection: CollectionPage(),
     AppTab.statistics: StatisticsPage(),
     AppTab.settings: SettingsPage(),
+    AppTab.customization: CustomizationPage(),
     AppTab.profile: ProfilePage(),
   };
 
@@ -53,6 +58,8 @@ class AppShell extends ConsumerWidget {
         return l10n.navStatistics;
       case AppTab.settings:
         return l10n.navSettings;
+      case AppTab.customization:
+        return l10n.navCustomization;
       case AppTab.profile:
         return l10n.appTitle;
     }
@@ -75,24 +82,32 @@ class AppShell extends ConsumerWidget {
       ),
     );
 
+    final appWallpaper = AppWallpapers.app;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth >= _narrowLayoutBreakpoint) {
           return Scaffold(
-            body: Row(
-              children: [
-                Sidebar(
-                  selectedIndex: AppTab.values.indexOf(selectedTab),
-                  onItemSelected: selectTab,
-                ),
-                Expanded(child: content),
-              ],
+            backgroundColor: appWallpaper == null ? null : Colors.transparent,
+            body: _withAppWallpaper(
+              appWallpaper,
+              Row(
+                children: [
+                  Sidebar(
+                    selectedIndex: AppTab.values.indexOf(selectedTab),
+                    onItemSelected: selectTab,
+                  ),
+                  Expanded(child: content),
+                ],
+              ),
             ),
           );
         }
 
         return Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: appWallpaper == null
+              ? AppColors.background
+              : Colors.transparent,
           appBar: AppBar(
             backgroundColor: AppColors.background,
             foregroundColor: AppColors.textPrimary,
@@ -108,9 +123,27 @@ class AppShell extends ConsumerWidget {
               },
             ),
           ),
-          body: content,
+          body: _withAppWallpaper(appWallpaper, content),
         );
       },
+    );
+  }
+
+  /// Pose le fond d'écran "Application" (voir page Personnalisation)
+  /// derrière `child`, avec un voile sombre pour la lisibilité — visible
+  /// dans les interstices que les pages ne recouvrent pas déjà de leur
+  /// propre fond opaque (la plupart le font aujourd'hui ; ce fond global
+  /// reste donc surtout visible sur le Dashboard et derrière le menu).
+  Widget _withAppWallpaper(File? wallpaper, Widget child) {
+    if (wallpaper == null) return child;
+    return Stack(
+      children: [
+        Positioned.fill(child: Image.file(wallpaper, fit: BoxFit.cover)),
+        Positioned.fill(
+          child: ColoredBox(color: AppColors.background.withValues(alpha: .74)),
+        ),
+        child,
+      ],
     );
   }
 }

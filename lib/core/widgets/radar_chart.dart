@@ -20,13 +20,13 @@ class RadarAxis {
 /// répartis uniformément autour du centre, avec une grille de repère.
 class RadarChart extends StatelessWidget {
   final List<RadarAxis> axes;
-  final Color color;
+  final Color? color;
   final double size;
 
   const RadarChart({
     super.key,
     required this.axes,
-    this.color = AppColors.primary,
+    this.color,
     this.size = 260,
   });
 
@@ -35,7 +35,12 @@ class RadarChart extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: CustomPaint(painter: _RadarChartPainter(axes: axes, color: color)),
+      child: CustomPaint(
+        painter: _RadarChartPainter(
+          axes: axes,
+          color: color ?? AppColors.primary,
+        ),
+      ),
     );
   }
 }

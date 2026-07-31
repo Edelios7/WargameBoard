@@ -13,6 +13,7 @@ enum AppTab {
   collection,
   statistics,
   settings,
+  customization,
   profile,
 }
 

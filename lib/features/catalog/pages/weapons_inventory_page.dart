@@ -146,7 +146,7 @@ class _WeaponsInventoryPageState extends ConsumerState<WeaponsInventoryPage> {
             const SizedBox(height: 16),
             Expanded(
               child: weaponsAsync.when(
-                loading: () => const Center(
+                loading: () => Center(
                   child: CircularProgressIndicator(color: AppColors.primary),
                 ),
                 error: (_, __) => RetryErrorState(
@@ -219,17 +219,18 @@ class _TypeChip extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  final Color accentColor;
+  final Color? accentColor;
 
   const _TypeChip({
     required this.label,
     required this.selected,
     required this.onTap,
-    this.accentColor = AppColors.primary,
+    this.accentColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final resolvedAccentColor = accentColor ?? AppColors.primary;
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: onTap,
@@ -237,15 +238,17 @@ class _TypeChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: selected
-              ? accentColor.withValues(alpha: .16)
+              ? resolvedAccentColor.withValues(alpha: .16)
               : AppColors.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: selected ? accentColor : AppColors.border),
+          border: Border.all(
+            color: selected ? resolvedAccentColor : AppColors.border,
+          ),
         ),
         child: Text(
           label,
           style: AppTextStyles.caption.copyWith(
-            color: selected ? accentColor : AppColors.textSecondary,
+            color: selected ? resolvedAccentColor : AppColors.textSecondary,
             fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
           ),
         ),

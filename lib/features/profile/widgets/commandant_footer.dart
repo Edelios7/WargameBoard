@@ -50,7 +50,7 @@ class CommandantFooter extends ConsumerWidget {
                     Container(
                       width: 26,
                       height: 26,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
@@ -94,9 +94,7 @@ class CommandantFooter extends ConsumerWidget {
                       value: value,
                       minHeight: 5,
                       backgroundColor: AppColors.background,
-                      valueColor: const AlwaysStoppedAnimation(
-                        AppColors.primary,
-                      ),
+                      valueColor: AlwaysStoppedAnimation(AppColors.primary),
                     ),
                   ),
                 ),

@@ -11,7 +11,26 @@
   "navCollection": "Collection",
   "navStatistics": "Statistiques",
   "navSettings": "Paramètres",
+  "navCustomization": "Personnalisation",
   "versionLabel": "Version 0.1",
+
+  "customizationTitle": "Personnaliser l'application",
+  "customizationAccentSection": "Couleur d'accent",
+  "customizationAccentHint": "Choisis une couleur dans la palette ou compose la tienne — elle remplace l'accent violet sur toute l'application (boutons, liens, sélections...).",
+  "customizationRecommendedColors": "Couleurs conseillées",
+  "customizationCustomColor": "Couleur personnalisée",
+  "customizationResetColor": "Réinitialiser la couleur",
+  "customizationWallpapersSection": "Fonds d'écran",
+  "customizationWallpapersHint": "Ajoute une image de fond sur les zones de ton choix — un léger voile sombre est posé dessus pour garder le texte lisible.",
+  "customizationWallpaperApp": "Fond général de l'application",
+  "customizationWallpaperSidebar": "Menu de gauche",
+  "customizationWallpaperCards": "Cartes et cases",
+  "customizationWallpaperBanner": "Bannière du tableau de bord",
+  "customizationChooseImage": "Choisir une image",
+  "customizationChangeImage": "Changer l'image",
+  "customizationRemoveImage": "Retirer",
+  "customizationNoImage": "Aucune image",
+  "customizationUnsupportedFormat": "Format d'image non pris en charge (essaie .png, .jpg ou .webp).",
 
   "settingsProfileTitle": "Profil",
   "settingsDisplayNameLabel": "Ton nom",
@@ -669,6 +688,35 @@
   },
   "foodChainVerdictBalanced": "Équilibré",
   "foodChainMoreDetails": "En savoir plus",
+  "combatSimAttacker": "Attaquant",
+  "combatSimDefender": "Défenseur",
+  "combatSimSelectFaction": "Faction",
+  "combatSimSelectUnit": "Unité",
+  "combatSimSelectWeapon": "Arme",
+  "combatSimModelCount": "Nombre de modèles",
+  "combatSimTrials": "Nombre de vagues d'attaques simulées",
+  "combatSimRun": "Lancer la simulation",
+  "combatSimResultsTitle": "Résultats",
+  "combatSimAvgKills": "{count} / {total} modèles tués en moyenne",
+  "@combatSimAvgKills": {
+    "placeholders": {
+      "count": { "type": "String" },
+      "total": { "type": "String" }
+    }
+  },
+  "combatSimDestroyProbability": "Probabilité de destruction totale : {percent}",
+  "@combatSimDestroyProbability": {
+    "placeholders": {
+      "percent": { "type": "String" }
+    }
+  },
+  "combatSimAvgDamage": "Dégâts bruts moyens infligés : {value}",
+  "@combatSimAvgDamage": {
+    "placeholders": {
+      "value": { "type": "String" }
+    }
+  },
+  "combatSimEmptyState": "Choisissez une unité attaquante avec une arme et une unité défenseure pour lancer une simulation.",
   "armyProfileAxisTir": "Tir",
   "armyProfileAxisCorpsACorps": "Corps-à-corps",
   "armyProfileAxisResilience": "Résilience",

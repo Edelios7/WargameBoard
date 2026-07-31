@@ -154,9 +154,8 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
                     Text(l10n.battleSetupHint, style: AppTextStyles.caption),
                     const SizedBox(height: 20),
                     armiesAsync.when(
-                      loading: () => const LinearProgressIndicator(
-                        color: AppColors.primary,
-                      ),
+                      loading: () =>
+                          LinearProgressIndicator(color: AppColors.primary),
                       error: (_, __) => const SizedBox.shrink(),
                       data: (armies) => DropdownButtonFormField<String?>(
                         initialValue: _armyId,
