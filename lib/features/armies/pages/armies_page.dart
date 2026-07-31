@@ -13,6 +13,7 @@ import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/discard_guard.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../core/widgets/radar_chart.dart';
+import '../../../core/widgets/unit_fallback_visual.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/datasheet_details.dart';
 import '../../../database/models/equipment_details.dart';
@@ -1381,6 +1382,11 @@ class _UnitRosterRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final imageFile = LocalCatalogImages.unitPhoto(unit.datasheetId);
+    final catalogAsync = ref.watch(factionCatalogDetailsProvider(army.factionId));
+    final archetype = catalogAsync.value
+        ?.where((d) => d.id == unit.datasheetId)
+        .firstOrNull
+        ?.archetype;
 
     final row = DragTarget<ArmyUnitDetails>(
       onWillAcceptWithDetails: (details) => details.data.id != unit.id,
@@ -1410,7 +1416,7 @@ class _UnitRosterRow extends ConsumerWidget {
           ),
           childWhenDragging: Opacity(
             opacity: .3,
-            child: _rowContent(l10n, imageFile),
+            child: _rowContent(l10n, imageFile, archetype),
           ),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 120),
@@ -1420,7 +1426,7 @@ class _UnitRosterRow extends ConsumerWidget {
                   ? Border.all(color: AppColors.primary, width: 2)
                   : null,
             ),
-            child: _rowContent(l10n, imageFile),
+            child: _rowContent(l10n, imageFile, archetype),
           ),
         );
       },
@@ -1429,7 +1435,11 @@ class _UnitRosterRow extends ConsumerWidget {
     return Padding(padding: const EdgeInsets.only(bottom: 6), child: row);
   }
 
-  Widget _rowContent(AppLocalizations l10n, dynamic imageFile) {
+  Widget _rowContent(
+    AppLocalizations l10n,
+    dynamic imageFile,
+    UnitArchetype? archetype,
+  ) {
     return Material(
       color: selected
           ? AppColors.primary.withValues(alpha: .12)
@@ -1449,13 +1459,15 @@ class _UnitRosterRow extends ConsumerWidget {
                   height: 32,
                   child: imageFile != null
                       ? Image.file(imageFile, fit: BoxFit.cover)
-                      : Container(
-                          color: AppColors.surfaceElevated,
-                          child: const Icon(
-                            Icons.shield_rounded,
-                            size: 16,
-                            color: AppColors.textSecondary,
+                      : UnitFallbackVisual(
+                          factionName: army.factionName,
+                          roleIcon: unitRoleIcon(
+                            isWarlord: unit.isWarlord,
+                            isCharacter: unit.isCharacter,
+                            archetype: archetype,
+                            battlefieldRole: unit.battlefieldRole,
                           ),
+                          size: 32,
                         ),
                 ),
               ),
@@ -1763,6 +1775,15 @@ class _UnitCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedUnitId = ref.watch(selectedUnitIdProvider);
     final selected = unit.id == selectedUnitId;
+    // Archétype réel de la fiche (horde/élite/blindé/anti-char/soutien),
+    // pour une icône de repli plus précise qu'un symbole générique —
+    // même donnée que le radar de profil d'armée, déjà mise en cache par
+    // ce même provider quand l'onglet Vue d'ensemble a été ouvert.
+    final catalogAsync = ref.watch(factionCatalogDetailsProvider(army.factionId));
+    final archetype = catalogAsync.value
+        ?.where((d) => d.id == unit.datasheetId)
+        .firstOrNull
+        ?.archetype;
 
     return DragTarget<ArmyUnitDetails>(
       onWillAcceptWithDetails: (details) => details.data.id != unit.id,
@@ -1780,6 +1801,8 @@ class _UnitCard extends ConsumerWidget {
           data: unit,
           feedback: _UnitCardVisual(
             unit: unit,
+            factionName: army.factionName,
+            archetype: archetype,
             attachedLeaderNames: attachedLeaderNames,
             selected: false,
             width: 160,
@@ -1789,6 +1812,8 @@ class _UnitCard extends ConsumerWidget {
             opacity: .3,
             child: _UnitCardVisual(
               unit: unit,
+              factionName: army.factionName,
+              archetype: archetype,
               attachedLeaderNames: attachedLeaderNames,
               selected: selected,
             ),
@@ -1809,6 +1834,8 @@ class _UnitCard extends ConsumerWidget {
                     ref.read(selectedUnitIdProvider.notifier).state = unit.id,
                 child: _UnitCardVisual(
                   unit: unit,
+                  factionName: army.factionName,
+                  archetype: archetype,
                   attachedLeaderNames: attachedLeaderNames,
                   selected: selected,
                 ),
@@ -1825,6 +1852,8 @@ class _UnitCard extends ConsumerWidget {
 /// réutilisé tel quel comme aperçu (`feedback`) pendant le glisser-déposer.
 class _UnitCardVisual extends StatelessWidget {
   final ArmyUnitDetails unit;
+  final String factionName;
+  final UnitArchetype? archetype;
   final List<String> attachedLeaderNames;
   final bool selected;
   final double? width;
@@ -1832,6 +1861,8 @@ class _UnitCardVisual extends StatelessWidget {
 
   const _UnitCardVisual({
     required this.unit,
+    required this.factionName,
+    required this.archetype,
     required this.attachedLeaderNames,
     required this.selected,
     this.width,
@@ -1869,11 +1900,13 @@ class _UnitCardVisual extends StatelessWidget {
                     colors: [AppColors.surface, AppColors.surfaceElevated],
                   ),
                 ),
-                child: const Center(
-                  child: Icon(
-                    Icons.shield_moon_rounded,
-                    size: 36,
-                    color: AppColors.textSecondary,
+                child: UnitFallbackVisual(
+                  factionName: factionName,
+                  roleIcon: unitRoleIcon(
+                    isWarlord: unit.isWarlord,
+                    isCharacter: unit.isCharacter,
+                    archetype: archetype,
+                    battlefieldRole: unit.battlefieldRole,
                   ),
                 ),
               ),
@@ -2203,10 +2236,15 @@ class _UnitDetailsBody extends ConsumerWidget {
                     height: 150,
                     width: double.infinity,
                     color: AppColors.surfaceElevated,
-                    child: const Icon(
-                      Icons.shield_moon_rounded,
-                      size: 40,
-                      color: AppColors.textSecondary,
+                    child: UnitFallbackVisual(
+                      factionName: army.factionName,
+                      roleIcon: unitRoleIcon(
+                        isWarlord: currentUnit.isWarlord,
+                        isCharacter: currentUnit.isCharacter,
+                        archetype: sheet.archetype,
+                        battlefieldRole: currentUnit.battlefieldRole,
+                      ),
+                      size: 150,
                     ),
                   ),
           ),
