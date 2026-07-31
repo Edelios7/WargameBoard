@@ -243,6 +243,36 @@ void main() {
   );
 
   testWidgets(
+    'the unit details panel offers a button to add/change a personal photo',
+    (tester) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final armyId = await database.armyDao.createArmy(
+        name: 'Ma liste',
+        factionId: 'fac-blood-angels',
+      );
+      final captain = await database.datasheetDao.search('Captain');
+      await database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: captain.single.id,
+        modelCount: 1,
+      );
+
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Ma liste'));
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.camera_alt_rounded), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
     'a unit can be removed straight from the top of its details panel, '
     'without going through the edit dialog',
     (tester) async {
