@@ -1,17 +1,34 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:wargameboard/database/app_database.dart';
 import 'package:wargameboard/features/rules/pages/rules_page.dart';
 import 'package:wargameboard/l10n/app_localizations.dart';
+import 'package:wargameboard/providers/database_provider.dart';
 
 void main() {
+  late AppDatabase database;
+
   Widget wrap() {
-    return MaterialApp(
-      locale: const Locale('fr'),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: const RulesPage(),
+    return ProviderScope(
+      overrides: [databaseProvider.overrideWithValue(database)],
+      child: MaterialApp(
+        locale: const Locale('fr'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: const RulesPage(),
+      ),
     );
   }
+
+  setUp(() {
+    database = AppDatabase.forTesting(NativeDatabase.memory());
+  });
+
+  tearDown(() async {
+    await database.close();
+  });
 
   testWidgets('shows the recent documents and lets categories be filtered', (
     tester,
@@ -143,6 +160,22 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Qui a l\'avantage ?'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'opening the combat simulator document opens the interactive simulator page',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(1400, 2200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Simulateur de combat').first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Lancer la simulation'), findsOneWidget);
     },
   );
 

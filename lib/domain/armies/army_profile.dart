@@ -1,6 +1,7 @@
 import '../../database/models/army_details.dart';
 import '../../database/models/datasheet_details.dart';
 import '../../l10n/app_localizations.dart';
+import '../combat/dice_notation.dart';
 
 /// Les 5 axes utilisés pour le radar de forces/faiblesses d'une armée
 /// (voir [RadarChart] dans `lib/core/widgets/radar_chart.dart`).
@@ -101,7 +102,9 @@ ArmyProfileScores computeArmyProfile(
 
     for (final weapon in sheet.weapons) {
       for (final profile in weapon.profiles) {
-        final power = _diceAverage(profile.attacks) * _diceAverage(profile.damage);
+        final power =
+            diceNotationAverage(profile.attacks) *
+            diceNotationAverage(profile.damage);
         if (profile.isMelee) {
           corpsACorpsRaw += power * modelCount;
         } else {
@@ -145,26 +148,6 @@ ArmyProfileScores computeArmyProfile(
 double _normalize(double value, double ceiling) {
   if (ceiling <= 0) return 0;
   return (value / ceiling * 100).clamp(0, 100);
-}
-
-/// Moyenne d'une notation de dés simple (`"3"`, `"D6"`, `"2D6"`,
-/// `"D3+1"`) — repli conservateur à 1 si le format n'est pas reconnu,
-/// ne doit jamais lancer d'exception sur une donnée de catalogue.
-double _diceAverage(String expr) {
-  final trimmed = expr.trim();
-  final plain = int.tryParse(trimmed);
-  if (plain != null) return plain.toDouble();
-
-  final match = RegExp(
-    r'^(\d+)?D(\d+)(?:\+(\d+))?$',
-    caseSensitive: false,
-  ).firstMatch(trimmed);
-  if (match == null) return 1;
-
-  final count = int.tryParse(match.group(1) ?? '1') ?? 1;
-  final die = int.tryParse(match.group(2) ?? '0') ?? 0;
-  final bonus = int.tryParse(match.group(3) ?? '0') ?? 0;
-  return count * (die + 1) / 2 + bonus;
 }
 
 /// Le ou les axes dominants d'un profil — voir [ArmyProfileResult].

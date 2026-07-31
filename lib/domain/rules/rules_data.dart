@@ -240,6 +240,29 @@ final List<RuleDocument> kRuleDocuments = [
     ],
   ),
   RuleDocument(
+    id: 'simulateur-de-combat',
+    title: 'Simulateur de combat',
+    category: RuleCategory.tacticalGuides,
+    version: '1.0',
+    releaseDate: DateTime(2026, 7, 31),
+    lastUpdate: DateTime(2026, 7, 31),
+    language: 'Français',
+    isCurrent: false,
+    isUpToDate: true,
+    publisher: 'Wargame Board',
+    downloads: 0,
+    errataCount: 0,
+    intro:
+        "Choisissez une unité attaquante avec une arme, une unité "
+        "défenseure, puis simulez plusieurs vagues d'attaques pour estimer "
+        "vos chances. Ce simulateur couvre le cœur du combat (Toucher, "
+        "Blesser, Sauvegarde, Dégâts) avec les vraies caractéristiques du "
+        "catalogue, mais ne prend pas en compte les règles spéciales "
+        "(Sustained Hits, Lethal Hits, Devastating Wounds, Anti-X, Feel No "
+        "Pain, sauvegarde invulnérable...) : un résultat indicatif, pas une "
+        "prédiction exacte.",
+  ),
+  RuleDocument(
     id: 'guide-listes-d-armee',
     title: "Exemples de listes d'armée",
     category: RuleCategory.armyLists,
