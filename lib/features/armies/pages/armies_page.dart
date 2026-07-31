@@ -1264,9 +1264,14 @@ class _BuilderSidebarState extends ConsumerState<_BuilderSidebar> {
                     itemCount: filteredUnits.length,
                     itemBuilder: (context, index) {
                       final unit = filteredUnits[index];
+                      final attachedLeaderNames = army
+                          .leadersAttachedTo(unit.id)
+                          .map((leader) => leader.datasheetName)
+                          .toList();
                       return _UnitRosterRow(
                         unit: unit,
                         selected: unit.id == selectedUnitId,
+                        attachedLeaderNames: attachedLeaderNames,
                         onTap: () =>
                             ref.read(selectedUnitIdProvider.notifier).state =
                                 unit.id,
@@ -1321,11 +1326,17 @@ class _UnitRosterRow extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onDelete;
 
+  /// Noms des personnages actuellement attachés à cette unité (voir
+  /// [ArmyDetails.leadersAttachedTo]) — vide si `unit` n'est pas une
+  /// escouade hôte ou n'a aucun chef attaché.
+  final List<String> attachedLeaderNames;
+
   const _UnitRosterRow({
     required this.unit,
     required this.selected,
     required this.onTap,
     required this.onDelete,
+    this.attachedLeaderNames = const [],
   });
 
   @override
@@ -1402,6 +1413,24 @@ class _UnitRosterRow extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
+                        ),
+                      if (unit.isCharacter && unit.attachedToUnitName != null)
+                        Text(
+                          '→ ${unit.attachedToUnitName}',
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppColors.primary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      if (attachedLeaderNames.isNotEmpty)
+                        Text(
+                          '★ ${attachedLeaderNames.join(', ')}',
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppColors.primary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                     ],
                   ),
@@ -1487,7 +1516,14 @@ class _GroupedUnitGrid extends StatelessWidget {
                   ),
                   itemCount: entry.value.length,
                   itemBuilder: (context, index) {
-                    return _UnitCard(unit: entry.value[index]);
+                    final unit = entry.value[index];
+                    return _UnitCard(
+                      unit: unit,
+                      attachedLeaderNames: army
+                          .leadersAttachedTo(unit.id)
+                          .map((leader) => leader.datasheetName)
+                          .toList(),
+                    );
                   },
                 );
               },
@@ -1502,8 +1538,9 @@ class _GroupedUnitGrid extends StatelessWidget {
 
 class _UnitCard extends ConsumerWidget {
   final ArmyUnitDetails unit;
+  final List<String> attachedLeaderNames;
 
-  const _UnitCard({required this.unit});
+  const _UnitCard({required this.unit, this.attachedLeaderNames = const []});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1570,6 +1607,31 @@ class _UnitCard extends ConsumerWidget {
                   ),
                 ),
               ),
+              if (unit.isCharacter && unit.attachedToUnitName != null ||
+                  attachedLeaderNames.isNotEmpty)
+                Positioned(
+                  top: 6,
+                  left: 6,
+                  child: Tooltip(
+                    message: unit.isCharacter
+                        ? l10n.armyBuilderAttachedTo(unit.attachedToUnitName!)
+                        : attachedLeaderNames.join(', '),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: .55),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Icon(
+                        unit.isCharacter
+                            ? Icons.link_rounded
+                            : Icons.star_rounded,
+                        size: 13,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
               Positioned(
                 left: 0,
                 right: 0,
@@ -2021,6 +2083,77 @@ class _UnitDetailsBody extends ConsumerWidget {
               ),
             ),
           ],
+          if (currentUnit.isCharacter) ...[
+            const SizedBox(height: 24),
+            Text(
+              l10n.armyBuilderAttachedToSection,
+              style: AppTextStyles.eyebrow,
+            ),
+            const SizedBox(height: 10),
+            if (currentUnit.attachedToUnitId != null)
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.armyBuilderAttachedTo(
+                        currentUnit.attachedToUnitName ?? '',
+                      ),
+                      style: AppTextStyles.body.copyWith(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (_) => _AttachLeaderDialog(
+                        army: army,
+                        character: currentUnit,
+                      ),
+                    ),
+                    child: Text(l10n.armyBuilderChangeAttachment),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      await ref
+                          .read(armyRepositoryProvider)
+                          .detachCharacter(currentUnit.id);
+                      ref.invalidate(selectedArmyProvider);
+                      ref.invalidate(armyByIdProvider(army.id));
+                    },
+                    child: Text(l10n.armyBuilderDetachLeader),
+                  ),
+                ],
+              )
+            else
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.border),
+                ),
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (_) => _AttachLeaderDialog(
+                    army: army,
+                    character: currentUnit,
+                  ),
+                ),
+                icon: const Icon(Icons.link_rounded, size: 18),
+                label: Text(l10n.armyBuilderAttachLeader),
+              ),
+          ] else if (army.leadersAttachedTo(currentUnit.id).isNotEmpty) ...[
+            const SizedBox(height: 24),
+            Text(
+              l10n.armyBuilderAttachedLeadersSection,
+              style: AppTextStyles.eyebrow,
+            ),
+            const SizedBox(height: 10),
+            ...army
+                .leadersAttachedTo(currentUnit.id)
+                .map((leader) => _AttachedLeaderTile(
+                      armyId: army.id,
+                      leader: leader,
+                    )),
+          ],
           if (army.detachmentId != null) ...[
             const SizedBox(height: 8),
             InkWell(
@@ -2071,6 +2204,203 @@ class _UnitDetailsBody extends ConsumerWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Une ligne "chef attaché" dans le panneau de détails d'une escouade —
+/// affiche le nom du personnage et les aptitudes qu'il apporte à l'unité
+/// tant qu'il y est attaché (concept de "Leader" 10e/11e édition : les
+/// aptitudes propres du personnage s'appliquent à toute l'unité). Seules
+/// les aptitudes non-core sont montrées : les aptitudes core (Leader,
+/// Infiltration...) sont des règles génériques déjà connues, pas un bonus
+/// spécifique à ce chef.
+class _AttachedLeaderTile extends ConsumerWidget {
+  final String armyId;
+  final ArmyUnitDetails leader;
+
+  const _AttachedLeaderTile({required this.armyId, required this.leader});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final sheetAsync = ref.watch(datasheetByIdProvider(leader.datasheetId));
+    // `AbilityDetails.isCore` n'est jamais renseigné par le pipeline
+    // d'import actuel (toujours `false`, y compris pour des aptitudes
+    // génériques comme "Leader") — c'est `type` ("Core"/"Faction"/...)
+    // qui distingue réellement une règle générique d'un vrai bonus
+    // propre à ce personnage.
+    final bonuses = sheetAsync.value?.abilities
+            .where((a) => a.type != 'Core')
+            .toList() ??
+        const [];
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 2),
+            child: Icon(
+              Icons.star_rounded,
+              size: 15,
+              color: AppColors.warning,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  leader.datasheetName,
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (bonuses.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      l10n.armyBuilderLeaderBonusesNone,
+                      style: AppTextStyles.caption,
+                    ),
+                  )
+                else
+                  ...bonuses.map(
+                    (ability) => Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            ability.name,
+                            style: AppTextStyles.caption.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          if (ability.description.isNotEmpty)
+                            Text(
+                              ability.description,
+                              style: AppTextStyles.caption,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          IconButton(
+            tooltip: l10n.armyBuilderDetachLeader,
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+            icon: const Icon(Icons.link_off_rounded, size: 16),
+            color: AppColors.textSecondary,
+            onPressed: () async {
+              await ref.read(armyRepositoryProvider).detachCharacter(
+                    leader.id,
+                  );
+              ref.invalidate(selectedArmyProvider);
+              ref.invalidate(armyByIdProvider(armyId));
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Fenêtre de choix de l'escouade à laquelle attacher un personnage — le
+/// catalogue ne recense pas quel personnage a le droit de rejoindre quelle
+/// escouade selon les règles officielles, donc le choix est laissé libre
+/// parmi toutes les unités non-personnage de l'armée plutôt que bloqué sur
+/// une éligibilité qu'on ne peut pas vérifier fiablement.
+class _AttachLeaderDialog extends ConsumerWidget {
+  final ArmyDetails army;
+  final ArmyUnitDetails character;
+
+  const _AttachLeaderDialog({required this.army, required this.character});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final eligible = army.units.where((u) => !u.isCharacter).toList();
+
+    return AppDialogShortcuts(
+      child: Dialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        child: SizedBox(
+          width: 380,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.armyBuilderPickUnitToAttach,
+                  style: AppTextStyles.title,
+                ),
+                const SizedBox(height: 16),
+                if (eligible.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Text(
+                      l10n.armyBuilderNoEligibleUnits,
+                      style: AppTextStyles.caption,
+                    ),
+                  )
+                else
+                  Flexible(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 360),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: eligible.length,
+                        itemBuilder: (context, index) {
+                          final target = eligible[index];
+                          return ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(
+                              target.datasheetName,
+                              style: AppTextStyles.body,
+                            ),
+                            subtitle: target.modelCount > 1
+                                ? Text(
+                                    'x${target.modelCount}',
+                                    style: AppTextStyles.caption,
+                                  )
+                                : null,
+                            onTap: () async {
+                              await ref
+                                  .read(armyRepositoryProvider)
+                                  .attachCharacter(character.id, target.id);
+                              ref.invalidate(selectedArmyProvider);
+                              ref.invalidate(armyByIdProvider(army.id));
+                              if (context.mounted) Navigator.of(context).pop();
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text(l10n.armyBuilderCancel),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

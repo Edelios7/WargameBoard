@@ -64,6 +64,22 @@ class ArmyUnitDetails {
   /// obligatoire des règles de tournoi 10e/11e édition.
   final bool isWarlord;
 
+  /// `true` si la datasheet porte le mot-clé Character/Personnage —
+  /// seules ces unités peuvent être attachées à une escouade (concept de
+  /// "Leader" 10e/11e édition), voir [attachedToUnitId].
+  final bool isCharacter;
+
+  /// Unité de la même armée à laquelle cette figurine-personnage est
+  /// attachée, `null` si elle ne l'est pas. Toujours `null` pour une
+  /// unité qui n'est pas un Character (voir [isCharacter]) : une escouade
+  /// hôte ne porte pas ce champ, elle est retrouvée par les autres unités
+  /// de l'armée qui pointent vers elle.
+  final String? attachedToUnitId;
+
+  /// Nom d'affichage résolu de [attachedToUnitId], pour ne pas devoir
+  /// reparcourir la liste des unités de l'armée à chaque affichage.
+  final String? attachedToUnitName;
+
   const ArmyUnitDetails({
     required this.id,
     required this.datasheetId,
@@ -78,6 +94,9 @@ class ArmyUnitDetails {
     this.enhancementPoints = 0,
     this.equipmentChoices = const [],
     this.isWarlord = false,
+    this.isCharacter = false,
+    this.attachedToUnitId,
+    this.attachedToUnitName,
   });
 
   bool get hasUnknownCost => datasheetPoints == null;
@@ -116,6 +135,12 @@ class ArmyDetails {
   /// [totalPoints] est alors une sous-estimation (ces unités comptent
   /// pour 0), pas un total fiable.
   bool get hasUnitsWithUnknownCost => units.any((u) => u.hasUnknownCost);
+
+  /// Personnages actuellement attachés à l'unité [unitId] (voir
+  /// [ArmyUnitDetails.attachedToUnitId]) — vide si aucun.
+  List<ArmyUnitDetails> leadersAttachedTo(String unitId) {
+    return units.where((u) => u.attachedToUnitId == unitId).toList();
+  }
 }
 
 class DetachmentOption {

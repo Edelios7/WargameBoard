@@ -65,7 +65,10 @@ void main() {
     await tester.tap(find.text('Ajouter une unité'));
     await tester.pumpAndSettle();
 
-    final captainTile = find.widgetWithText(ListTile, 'Captain');
+    final captainTile = find.ancestor(
+      of: find.text('Captain'),
+      matching: find.byType(Container),
+    );
     expect(captainTile, findsOneWidget);
     await tester.tap(
       find.descendant(
@@ -98,9 +101,15 @@ void main() {
     await tester.tap(find.text('Ajouter une unité'));
     await tester.pumpAndSettle();
 
-    final captainTile = find.widgetWithText(ListTile, 'Captain');
+    final captainTile = find.ancestor(
+      of: find.text('Captain'),
+      matching: find.byType(Container),
+    );
     expect(captainTile, findsOneWidget);
 
+    // Captain n'a pas de taille variable (1 seule figurine) : seul le
+    // stepper "Escouades" est affiché, pas de doublon avec le stepper de
+    // taille — l'icône add_rounded est donc sans ambiguïté ici.
     final incrementButton = find.descendant(
       of: captainTile,
       matching: find.byIcon(Icons.add_rounded),

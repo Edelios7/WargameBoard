@@ -210,7 +210,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 21;
+  int get schemaVersion => 22;
 
   // =========================
   // Migrations
@@ -405,6 +405,11 @@ class AppDatabase extends _$AppDatabase {
       if (from < 21) {
         if (!await _hasColumn('datasheets', 'archetype')) {
           await m.addColumn(datasheets, datasheets.archetype);
+        }
+      }
+      if (from < 22) {
+        if (!await _hasColumn('army_units', 'attached_to_unit_id')) {
+          await m.addColumn(armyUnits, armyUnits.attachedToUnitId);
         }
       }
     },

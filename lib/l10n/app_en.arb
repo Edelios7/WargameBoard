@@ -324,6 +324,35 @@
       "name": { "type": "String" }
     }
   },
+  "armyBuilderUnitSize": "Models",
+  "armyBuilderSquadCount": "Squads",
+  "armyBuilderClose": "Close",
+  "armyBuilderUnitAdded": "Added: {name}",
+  "@armyBuilderUnitAdded": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "armyBuilderPointsPerSquad": "{points} pts / squad",
+  "@armyBuilderPointsPerSquad": {
+    "placeholders": {
+      "points": { "type": "int" }
+    }
+  },
+  "armyBuilderAttachedToSection": "ATTACHMENT",
+  "armyBuilderAttachedTo": "Attached to: {name}",
+  "@armyBuilderAttachedTo": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "armyBuilderAttachLeader": "Attach to a unit",
+  "armyBuilderChangeAttachment": "Change unit",
+  "armyBuilderDetachLeader": "Detach",
+  "armyBuilderPickUnitToAttach": "Choose a unit",
+  "armyBuilderNoEligibleUnits": "No eligible unit in this army. Add a non-character unit first.",
+  "armyBuilderAttachedLeadersSection": "ATTACHED LEADER(S)",
+  "armyBuilderLeaderBonusesNone": "No special ability to add to the unit.",
 
   "collectionAddEntry": "Add to collection",
   "collectionExportTooltip": "Export",

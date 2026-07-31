@@ -14,6 +14,13 @@ class ArmyUnits extends Table {
   TextColumn get enhancementId =>
       text().nullable().references(Enhancements, #id)();
 
+  /// Unité de la même armée à laquelle cette figurine-personnage est
+  /// attachée (concept de "Leader" 10e/11e édition) — `null` pour une
+  /// unité non attachée. Auto-référence : uniquement rempli sur la ligne
+  /// du personnage, jamais sur celle de l'escouade hôte.
+  TextColumn get attachedToUnitId =>
+      text().nullable().references(ArmyUnits, #id)();
+
   IntColumn get modelCount => integer()();
 
   /// Une seule unité par armée peut être le Warlord (concept obligatoire

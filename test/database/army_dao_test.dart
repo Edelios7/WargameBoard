@@ -327,4 +327,105 @@ void main() {
       );
     },
   );
+
+  test('getArmy flags Character datasheets via isCharacter', () async {
+    final armyId = await database.armyDao.createArmy(
+      name: 'Escouade test',
+      factionId: seedFactionId,
+    );
+    final captain = await database.datasheetDao.search('Captain');
+    final squad = await database.datasheetDao.search('Death Company');
+    final captainUnitId = await database.armyDao.addUnit(
+      armyId: armyId,
+      datasheetId: captain.single.id,
+      modelCount: 1,
+    );
+    final squadUnitId = await database.armyDao.addUnit(
+      armyId: armyId,
+      datasheetId: squad.single.id,
+      modelCount: 5,
+    );
+
+    final army = await database.armyDao.getArmy(armyId);
+    final captainUnit =
+        army!.units.firstWhere((u) => u.id == captainUnitId);
+    final squadUnit = army.units.firstWhere((u) => u.id == squadUnitId);
+
+    expect(captainUnit.isCharacter, isTrue);
+    expect(squadUnit.isCharacter, isFalse);
+  });
+
+  test(
+    'attachCharacter links a Character unit to another unit of the same '
+    'army, resolved back with its display name; detachCharacter clears it',
+    () async {
+      final armyId = await database.armyDao.createArmy(
+        name: 'Escouade test',
+        factionId: seedFactionId,
+      );
+      final captain = await database.datasheetDao.search('Captain');
+      final squad = await database.datasheetDao.search('Death Company');
+      final captainUnitId = await database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: captain.single.id,
+        modelCount: 1,
+      );
+      final squadUnitId = await database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: squad.single.id,
+        modelCount: 5,
+      );
+
+      await database.armyDao.attachCharacter(captainUnitId, squadUnitId);
+
+      final attached = await database.armyDao.getArmy(armyId);
+      final captainUnit =
+          attached!.units.firstWhere((u) => u.id == captainUnitId);
+      expect(captainUnit.attachedToUnitId, squadUnitId);
+      expect(captainUnit.attachedToUnitName, 'Death Company Marines');
+      expect(
+        attached.leadersAttachedTo(squadUnitId).map((u) => u.id),
+        [captainUnitId],
+      );
+
+      await database.armyDao.detachCharacter(captainUnitId);
+
+      final detached = await database.armyDao.getArmy(armyId);
+      final detachedCaptain =
+          detached!.units.firstWhere((u) => u.id == captainUnitId);
+      expect(detachedCaptain.attachedToUnitId, isNull);
+      expect(detached.leadersAttachedTo(squadUnitId), isEmpty);
+    },
+  );
+
+  test(
+    'removing the host unit detaches any Character that was attached to '
+    'it, instead of leaving a dangling reference',
+    () async {
+      final armyId = await database.armyDao.createArmy(
+        name: 'Escouade test',
+        factionId: seedFactionId,
+      );
+      final captain = await database.datasheetDao.search('Captain');
+      final squad = await database.datasheetDao.search('Death Company');
+      final captainUnitId = await database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: captain.single.id,
+        modelCount: 1,
+      );
+      final squadUnitId = await database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: squad.single.id,
+        modelCount: 5,
+      );
+      await database.armyDao.attachCharacter(captainUnitId, squadUnitId);
+
+      await database.armyDao.removeUnit(squadUnitId);
+
+      final army = await database.armyDao.getArmy(armyId);
+      expect(army!.units, hasLength(1));
+      expect(army.units.single.id, captainUnitId);
+      expect(army.units.single.attachedToUnitId, isNull);
+    },
+  );
 }

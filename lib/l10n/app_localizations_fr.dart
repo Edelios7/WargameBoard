@@ -671,6 +671,56 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get armyBuilderUnitSize => 'Figurines';
+
+  @override
+  String get armyBuilderSquadCount => 'Escouades';
+
+  @override
+  String get armyBuilderClose => 'Fermer';
+
+  @override
+  String armyBuilderUnitAdded(String name) {
+    return 'Ajouté : $name';
+  }
+
+  @override
+  String armyBuilderPointsPerSquad(int points) {
+    return '$points pts / escouade';
+  }
+
+  @override
+  String get armyBuilderAttachedToSection => 'ATTACHEMENT';
+
+  @override
+  String armyBuilderAttachedTo(String name) {
+    return 'Attaché à : $name';
+  }
+
+  @override
+  String get armyBuilderAttachLeader => 'Attacher à une escouade';
+
+  @override
+  String get armyBuilderChangeAttachment => 'Changer d\'escouade';
+
+  @override
+  String get armyBuilderDetachLeader => 'Détacher';
+
+  @override
+  String get armyBuilderPickUnitToAttach => 'Choisir une escouade';
+
+  @override
+  String get armyBuilderNoEligibleUnits =>
+      'Aucune escouade éligible dans cette armée. Ajoute d\'abord une unité qui n\'est pas un personnage.';
+
+  @override
+  String get armyBuilderAttachedLeadersSection => 'CHEF(S) ATTACHÉ(S)';
+
+  @override
+  String get armyBuilderLeaderBonusesNone =>
+      'Aucune aptitude particulière à ajouter à l\'escouade.';
+
+  @override
   String get collectionAddEntry => 'Ajouter à la collection';
 
   @override

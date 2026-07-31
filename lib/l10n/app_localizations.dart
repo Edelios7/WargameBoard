@@ -1286,6 +1286,90 @@ abstract class AppLocalizations {
   /// **'{name} et toutes ses unités seront supprimées définitivement.'**
   String armyBuilderDeleteArmyConfirmMessage(String name);
 
+  /// No description provided for @armyBuilderUnitSize.
+  ///
+  /// In fr, this message translates to:
+  /// **'Figurines'**
+  String get armyBuilderUnitSize;
+
+  /// No description provided for @armyBuilderSquadCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Escouades'**
+  String get armyBuilderSquadCount;
+
+  /// No description provided for @armyBuilderClose.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fermer'**
+  String get armyBuilderClose;
+
+  /// No description provided for @armyBuilderUnitAdded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouté : {name}'**
+  String armyBuilderUnitAdded(String name);
+
+  /// No description provided for @armyBuilderPointsPerSquad.
+  ///
+  /// In fr, this message translates to:
+  /// **'{points} pts / escouade'**
+  String armyBuilderPointsPerSquad(int points);
+
+  /// No description provided for @armyBuilderAttachedToSection.
+  ///
+  /// In fr, this message translates to:
+  /// **'ATTACHEMENT'**
+  String get armyBuilderAttachedToSection;
+
+  /// No description provided for @armyBuilderAttachedTo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Attaché à : {name}'**
+  String armyBuilderAttachedTo(String name);
+
+  /// No description provided for @armyBuilderAttachLeader.
+  ///
+  /// In fr, this message translates to:
+  /// **'Attacher à une escouade'**
+  String get armyBuilderAttachLeader;
+
+  /// No description provided for @armyBuilderChangeAttachment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Changer d\'escouade'**
+  String get armyBuilderChangeAttachment;
+
+  /// No description provided for @armyBuilderDetachLeader.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détacher'**
+  String get armyBuilderDetachLeader;
+
+  /// No description provided for @armyBuilderPickUnitToAttach.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir une escouade'**
+  String get armyBuilderPickUnitToAttach;
+
+  /// No description provided for @armyBuilderNoEligibleUnits.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune escouade éligible dans cette armée. Ajoute d\'abord une unité qui n\'est pas un personnage.'**
+  String get armyBuilderNoEligibleUnits;
+
+  /// No description provided for @armyBuilderAttachedLeadersSection.
+  ///
+  /// In fr, this message translates to:
+  /// **'CHEF(S) ATTACHÉ(S)'**
+  String get armyBuilderAttachedLeadersSection;
+
+  /// No description provided for @armyBuilderLeaderBonusesNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune aptitude particulière à ajouter à l\'escouade.'**
+  String get armyBuilderLeaderBonusesNone;
+
   /// No description provided for @collectionAddEntry.
   ///
   /// In fr, this message translates to:

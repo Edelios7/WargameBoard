@@ -662,6 +662,56 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get armyBuilderUnitSize => 'Models';
+
+  @override
+  String get armyBuilderSquadCount => 'Squads';
+
+  @override
+  String get armyBuilderClose => 'Close';
+
+  @override
+  String armyBuilderUnitAdded(String name) {
+    return 'Added: $name';
+  }
+
+  @override
+  String armyBuilderPointsPerSquad(int points) {
+    return '$points pts / squad';
+  }
+
+  @override
+  String get armyBuilderAttachedToSection => 'ATTACHMENT';
+
+  @override
+  String armyBuilderAttachedTo(String name) {
+    return 'Attached to: $name';
+  }
+
+  @override
+  String get armyBuilderAttachLeader => 'Attach to a unit';
+
+  @override
+  String get armyBuilderChangeAttachment => 'Change unit';
+
+  @override
+  String get armyBuilderDetachLeader => 'Detach';
+
+  @override
+  String get armyBuilderPickUnitToAttach => 'Choose a unit';
+
+  @override
+  String get armyBuilderNoEligibleUnits =>
+      'No eligible unit in this army. Add a non-character unit first.';
+
+  @override
+  String get armyBuilderAttachedLeadersSection => 'ATTACHED LEADER(S)';
+
+  @override
+  String get armyBuilderLeaderBonusesNone =>
+      'No special ability to add to the unit.';
+
+  @override
   String get collectionAddEntry => 'Add to collection';
 
   @override

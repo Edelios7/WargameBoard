@@ -324,6 +324,35 @@
       "name": { "type": "String" }
     }
   },
+  "armyBuilderUnitSize": "Figurines",
+  "armyBuilderSquadCount": "Escouades",
+  "armyBuilderClose": "Fermer",
+  "armyBuilderUnitAdded": "Ajouté : {name}",
+  "@armyBuilderUnitAdded": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "armyBuilderPointsPerSquad": "{points} pts / escouade",
+  "@armyBuilderPointsPerSquad": {
+    "placeholders": {
+      "points": { "type": "int" }
+    }
+  },
+  "armyBuilderAttachedToSection": "ATTACHEMENT",
+  "armyBuilderAttachedTo": "Attaché à : {name}",
+  "@armyBuilderAttachedTo": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "armyBuilderAttachLeader": "Attacher à une escouade",
+  "armyBuilderChangeAttachment": "Changer d'escouade",
+  "armyBuilderDetachLeader": "Détacher",
+  "armyBuilderPickUnitToAttach": "Choisir une escouade",
+  "armyBuilderNoEligibleUnits": "Aucune escouade éligible dans cette armée. Ajoute d'abord une unité qui n'est pas un personnage.",
+  "armyBuilderAttachedLeadersSection": "CHEF(S) ATTACHÉ(S)",
+  "armyBuilderLeaderBonusesNone": "Aucune aptitude particulière à ajouter à l'escouade.",
 
   "collectionAddEntry": "Ajouter à la collection",
   "collectionExportTooltip": "Exporter",

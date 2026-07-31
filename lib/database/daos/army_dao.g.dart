@@ -11,6 +11,9 @@ mixin _$ArmyDaoMixin on DatabaseAccessor<AppDatabase> {
   $FactionsTable get factions => attachedDatabase.factions;
   $DatasheetsTable get datasheets => attachedDatabase.datasheets;
   $DatasheetCostsTable get datasheetCosts => attachedDatabase.datasheetCosts;
+  $DatasheetKeywordLinksTable get datasheetKeywordLinks =>
+      attachedDatabase.datasheetKeywordLinks;
+  $KeywordsTable get keywords => attachedDatabase.keywords;
   $EditionsTable get editions => attachedDatabase.editions;
   $UnitSizesTable get unitSizes => attachedDatabase.unitSizes;
   $DetachmentsTable get detachments => attachedDatabase.detachments;
@@ -48,6 +51,13 @@ class ArmyDaoManager {
         _db.attachedDatabase,
         _db.datasheetCosts,
       );
+  $$DatasheetKeywordLinksTableTableManager get datasheetKeywordLinks =>
+      $$DatasheetKeywordLinksTableTableManager(
+        _db.attachedDatabase,
+        _db.datasheetKeywordLinks,
+      );
+  $$KeywordsTableTableManager get keywords =>
+      $$KeywordsTableTableManager(_db.attachedDatabase, _db.keywords);
   $$EditionsTableTableManager get editions =>
       $$EditionsTableTableManager(_db.attachedDatabase, _db.editions);
   $$UnitSizesTableTableManager get unitSizes =>

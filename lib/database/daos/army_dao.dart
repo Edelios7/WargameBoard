@@ -12,11 +12,13 @@ import '../tables/battle_unit_states_table.dart';
 import '../tables/battle_unit_wounds_table.dart';
 import '../tables/battles_table.dart';
 import '../tables/datasheet_costs_table.dart';
+import '../tables/datasheet_keyword_links_table.dart';
 import '../tables/datasheets_table.dart';
 import '../tables/detachments_table.dart';
 import '../tables/editions_table.dart';
 import '../tables/enhancements_table.dart';
 import '../tables/factions_table.dart';
+import '../tables/keywords_table.dart';
 import '../tables/stratagems_table.dart';
 import '../tables/unit_sizes_table.dart';
 
@@ -30,6 +32,8 @@ part 'army_dao.g.dart';
     Factions,
     Datasheets,
     DatasheetCosts,
+    DatasheetKeywordLinks,
+    Keywords,
     Editions,
     UnitSizes,
     Detachments,
@@ -141,11 +145,45 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     final unit = await (select(armyUnits)
           ..where((t) => t.id.equals(armyUnitId)))
         .getSingleOrNull();
+    // Si cette unité est une escouade hôte, les personnages qui lui
+    // étaient attachés doivent être détachés — sinon leur
+    // `attachedToUnitId` pointerait vers une unité qui n'existe plus.
+    await (update(armyUnits)
+          ..where((t) => t.attachedToUnitId.equals(armyUnitId)))
+        .write(const ArmyUnitsCompanion(attachedToUnitId: Value(null)));
     await (delete(armyUnitEquipmentSelections)
           ..where((t) => t.armyUnitId.equals(armyUnitId)))
         .go();
     await (delete(armyUnits)..where((t) => t.id.equals(armyUnitId))).go();
     if (unit != null) await _touchArmy(unit.armyId);
+  }
+
+  /// Attache une figurine-personnage à une unité de la même armée pour la
+  /// diriger au combat (concept de "Leader" 10e/11e édition). Le
+  /// catalogue ne recense pas quelle escouade précise chaque personnage a
+  /// le droit de rejoindre selon les règles officielles : ce choix est
+  /// laissé libre à l'utilisateur plutôt que de le bloquer sur une
+  /// éligibilité qu'on ne peut pas vérifier fiablement.
+  Future<void> attachCharacter(
+    String characterUnitId,
+    String targetUnitId,
+  ) async {
+    final unit = await (select(armyUnits)
+          ..where((t) => t.id.equals(characterUnitId)))
+        .getSingle();
+    await (update(armyUnits)..where((t) => t.id.equals(characterUnitId)))
+        .write(ArmyUnitsCompanion(attachedToUnitId: Value(targetUnitId)));
+    await _touchArmy(unit.armyId);
+  }
+
+  /// Détache une figurine-personnage de l'unité qu'elle dirigeait.
+  Future<void> detachCharacter(String characterUnitId) async {
+    final unit = await (select(armyUnits)
+          ..where((t) => t.id.equals(characterUnitId)))
+        .getSingle();
+    await (update(armyUnits)..where((t) => t.id.equals(characterUnitId)))
+        .write(const ArmyUnitsCompanion(attachedToUnitId: Value(null)));
+    await _touchArmy(unit.armyId);
   }
 
   /// Met à jour le nombre de figurines d'une unité, borné par les
@@ -393,6 +431,17 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         unitRows.map((row) => row.readTable(armyUnits).datasheetId).toSet();
     final costsByDatasheet =
         await _getCostBracketsByDatasheet(datasheetIds.toList());
+    final characterDatasheetIds =
+        await _getCharacterDatasheetIds(datasheetIds.toList());
+
+    // Nom d'affichage de chaque unité par id, pour résoudre
+    // `attachedToUnitName` sans requête supplémentaire (l'unité cible est
+    // forcément déjà dans ce même lot, vu qu'elle appartient à la même
+    // armée).
+    final nameByUnitId = <String, String>{
+      for (final row in unitRows)
+        row.readTable(armyUnits).id: row.readTable(datasheets).name,
+    };
 
     final units = <ArmyUnitDetails>[];
     var totalPoints = 0;
@@ -419,6 +468,11 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
         enhancementName: enhancement?.name,
         enhancementPoints: enhancementPoints,
         isWarlord: unit.isWarlord,
+        isCharacter: characterDatasheetIds.contains(unit.datasheetId),
+        attachedToUnitId: unit.attachedToUnitId,
+        attachedToUnitName: unit.attachedToUnitId == null
+            ? null
+            : nameByUnitId[unit.attachedToUnitId],
       ));
     }
 
@@ -519,5 +573,32 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     }
 
     return result;
+  }
+
+  /// Sous-ensemble de [datasheetIds] portant le mot-clé Character (VF
+  /// "Personnage") — seules ces fiches peuvent être attachées à une
+  /// escouade (voir [attachCharacter]). Les deux libellés (EN et FR) sont
+  /// acceptés : le catalogue a historiquement les deux selon la source
+  /// d'import d'origine de la fiche.
+  Future<Set<String>> _getCharacterDatasheetIds(
+    List<String> datasheetIds,
+  ) async {
+    if (datasheetIds.isEmpty) return {};
+
+    final query = select(datasheetKeywordLinks).join([
+      innerJoin(
+        keywords,
+        keywords.id.equalsExp(datasheetKeywordLinks.keywordId),
+      ),
+    ])
+      ..where(
+        datasheetKeywordLinks.datasheetId.isIn(datasheetIds) &
+            keywords.name.isIn(const ['Character', 'Personnage']),
+      );
+
+    final rows = await query.get();
+    return rows
+        .map((row) => row.readTable(datasheetKeywordLinks).datasheetId)
+        .toSet();
   }
 }

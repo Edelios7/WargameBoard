@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../database/models/army_details.dart';
+import '../../../database/models/cost_bracket.dart';
 import '../../../database/models/search_result.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/army_provider.dart';
@@ -29,13 +30,6 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
   List<SearchResult> _results = const [];
   bool _loading = false;
   bool _onlyOwned = false;
-  final Map<String, int> _quantities = {};
-
-  int _quantityFor(String id) => _quantities[id] ?? 1;
-
-  void _setQuantity(String id, int value) {
-    setState(() => _quantities[id] = value.clamp(1, 20));
-  }
 
   @override
   void initState() {
@@ -54,27 +48,15 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
     });
   }
 
-  Future<void> _addUnit(SearchResult result, {int quantity = 1}) async {
-    final repository = ref.read(catalogRepositoryProvider);
-    final details = await repository.getDatasheet(result.id);
-    if (details == null) {
-      // Fiche introuvable (orpheline/corrompue) : mieux vaut ne rien
-      // ajouter que d'insérer une unité avec un modelCount de repli
-      // arbitraire (1) qui ne correspond à rien de réel.
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.armyBuilderAddUnitFailed(
-                result.name,
-              ),
-            ),
-          ),
-        );
-      }
-      return;
-    }
-    final modelCount = details.unit.defaultSize;
+  /// Ajoute `quantity` escouades de `modelCount` figurines chacune — reste
+  /// ouvert après l'ajout (contrairement au comportement historique qui
+  /// fermait la fenêtre) pour permettre d'enchaîner plusieurs unités sans
+  /// rouvrir "Ajouter une unité" à chaque fois.
+  Future<void> _addUnit(
+    SearchResult result, {
+    required int modelCount,
+    required int quantity,
+  }) async {
     final armyRepository = ref.read(armyRepositoryProvider);
 
     for (var i = 0; i < quantity; i++) {
@@ -89,7 +71,14 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
     ref.invalidate(armiesListProvider);
     ref.invalidate(armyByIdProvider(widget.armyId));
 
-    if (mounted) Navigator.of(context).pop();
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.armyBuilderUnitAdded(result.name)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
@@ -106,18 +95,12 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
         : _results;
 
     return AppDialogShortcuts(
-      onEnter: () {
-        if (visibleResults.isNotEmpty) {
-          final first = visibleResults.first;
-          _addUnit(first, quantity: _quantityFor(first.id));
-        }
-      },
       child: Dialog(
         backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         child: SizedBox(
-          width: 480,
-          height: 520,
+          width: 520,
+          height: 560,
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -131,20 +114,23 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
                         style: AppTextStyles.title,
                       ),
                     ),
-                    if (armyAsync.value != null)
+                    if (armyAsync.value != null) ...[
                       _PointsBadge(army: armyAsync.value!),
+                      const SizedBox(width: 8),
+                    ],
+                    IconButton(
+                      tooltip: l10n.armyBuilderClose,
+                      visualDensity: VisualDensity.compact,
+                      icon: const Icon(Icons.close_rounded),
+                      color: AppColors.textSecondary,
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   autofocus: true,
                   onChanged: _search,
-                  onSubmitted: (_) {
-                    if (visibleResults.isNotEmpty) {
-                      final first = visibleResults.first;
-                      _addUnit(first, quantity: _quantityFor(first.id));
-                    }
-                  },
                   style: AppTextStyles.body,
                   decoration: InputDecoration(
                     hintText: l10n.catalogSearchHint,
@@ -204,63 +190,14 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
                           itemBuilder: (context, index) {
                             final result = visibleResults[index];
                             final owned = ownedIds.contains(result.id);
-                            final quantity = _quantityFor(result.id);
-                            return Opacity(
-                              opacity: owned ? 1 : 0.5,
-                              child: ListTile(
-                                title: Text(
-                                  result.name,
-                                  style: AppTextStyles.body,
-                                ),
-                                subtitle: Row(
-                                  children: [
-                                    if (result.subtitle != null)
-                                      Expanded(
-                                        child: Text(
-                                          result.subtitle!,
-                                          style: AppTextStyles.caption,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    if (result.points != null)
-                                      Text(
-                                        l10n.pointsSuffix(result.points!),
-                                        style: AppTextStyles.caption.copyWith(
-                                          color: AppColors.primary,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    if (!owned) ...[
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        l10n.armyBuilderToBuy,
-                                        style: AppTextStyles.caption.copyWith(
-                                          color: AppColors.textSecondary,
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    _QuantityStepper(
-                                      quantity: quantity,
-                                      onChanged: (value) =>
-                                          _setQuantity(result.id, value),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    IconButton(
-                                      tooltip: l10n.armyBuilderAddUnit,
-                                      icon: const Icon(
-                                        Icons.add_circle_rounded,
-                                      ),
-                                      color: AppColors.primary,
-                                      onPressed: () =>
-                                          _addUnit(result, quantity: quantity),
-                                    ),
-                                  ],
-                                ),
+                            return _ResultTile(
+                              key: ValueKey(result.id),
+                              result: result,
+                              owned: owned,
+                              onAdd: (modelCount, quantity) => _addUnit(
+                                result,
+                                modelCount: modelCount,
+                                quantity: quantity,
                               ),
                             );
                           },
@@ -269,6 +206,223 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Une ligne de résultat : nom, taille d'escouade (avec coût résolu pour
+/// cette taille) et nombre d'escouades à ajouter — les deux notions sont
+/// distinctes et affichées séparément, pour ne plus avoir à "tricher" en
+/// ajoutant 2 escouades de 5 pour simuler 1 escouade de 10 à un coût
+/// différent.
+class _ResultTile extends ConsumerStatefulWidget {
+  final SearchResult result;
+  final bool owned;
+  final void Function(int modelCount, int quantity) onAdd;
+
+  const _ResultTile({
+    super.key,
+    required this.result,
+    required this.owned,
+    required this.onAdd,
+  });
+
+  @override
+  ConsumerState<_ResultTile> createState() => _ResultTileState();
+}
+
+class _ResultTileState extends ConsumerState<_ResultTile> {
+  int? _modelCount;
+  int _quantity = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final result = widget.result;
+    final detailsAsync = ref.watch(datasheetByIdProvider(result.id));
+    final sheet = detailsAsync.value;
+
+    // Une fois la fiche chargée, initialise la taille par défaut une
+    // seule fois (ne doit pas écraser un choix déjà fait par l'utilisateur
+    // sur un rebuild ultérieur du provider).
+    if (sheet != null && _modelCount == null) {
+      _modelCount = sheet.unit.defaultSize;
+    }
+
+    final canResize =
+        sheet != null && sheet.unit.maximumSize > sheet.unit.minimumSize;
+    final unitPoints = sheet == null
+        ? result.points
+        : (resolveCostForModelCount(sheet.costBrackets, _modelCount ?? sheet.unit.defaultSize) ??
+            sheet.points);
+
+    return Opacity(
+      opacity: widget.owned ? 1 : 0.5,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(result.name, style: AppTextStyles.body),
+                      Row(
+                        children: [
+                          if (result.subtitle != null)
+                            Expanded(
+                              child: Text(
+                                result.subtitle!,
+                                style: AppTextStyles.caption,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          if (!widget.owned)
+                            Text(
+                              l10n.armyBuilderToBuy,
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                if (unitPoints != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8, top: 2),
+                    child: Text(
+                      l10n.armyBuilderPointsPerSquad(unitPoints),
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                if (canResize) ...[
+                  _LabeledStepper(
+                    label: l10n.armyBuilderUnitSize,
+                    value: _modelCount!,
+                    min: sheet.unit.minimumSize,
+                    max: sheet.unit.maximumSize,
+                    onChanged: (value) => setState(() => _modelCount = value),
+                  ),
+                  const SizedBox(width: 14),
+                ],
+                _LabeledStepper(
+                  label: l10n.armyBuilderSquadCount,
+                  value: _quantity,
+                  min: 1,
+                  max: 20,
+                  onChanged: (value) => setState(() => _quantity = value),
+                ),
+                const Spacer(),
+                IconButton(
+                  tooltip: l10n.armyBuilderAddUnit,
+                  icon: const Icon(Icons.add_circle_rounded),
+                  color: AppColors.primary,
+                  onPressed: sheet == null
+                      ? null
+                      : () {
+                          widget.onAdd(_modelCount!, _quantity);
+                          setState(() => _quantity = 1);
+                        },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Petit stepper `[-] N [+]` avec un libellé au-dessus, utilisé pour la
+/// taille d'escouade et le nombre d'escouades dans [_ResultTile].
+class _LabeledStepper extends StatelessWidget {
+  final String label;
+  final int value;
+  final int min;
+  final int max;
+  final ValueChanged<int> onChanged;
+
+  const _LabeledStepper({
+    required this.label,
+    required this.value,
+    required this.min,
+    required this.max,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(label, style: AppTextStyles.caption),
+        const SizedBox(height: 2),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _stepperButton(
+                icon: Icons.remove_rounded,
+                onTap: value > min ? () => onChanged(value - 1) : null,
+              ),
+              SizedBox(
+                width: 26,
+                child: Text(
+                  '$value',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.body,
+                ),
+              ),
+              _stepperButton(
+                icon: Icons.add_rounded,
+                onTap: value < max ? () => onChanged(value + 1) : null,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _stepperButton({required IconData icon, VoidCallback? onTap}) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(8),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(6),
+        child: Icon(
+          icon,
+          size: 16,
+          color: onTap == null
+              ? AppColors.textSecondary.withValues(alpha: .4)
+              : AppColors.textSecondary,
         ),
       ),
     );
@@ -301,75 +455,6 @@ class _PointsBadge extends StatelessWidget {
         style: AppTextStyles.caption.copyWith(
           color: color,
           fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
-
-/// Petit stepper -/N/+ pour choisir combien de copies d'une unité
-/// ajouter d'un coup (ex. 3 escouades d'Intercessors) sans repasser par
-/// "Dupliquer l'unité" une fois l'unité déjà dans la liste.
-class _QuantityStepper extends StatelessWidget {
-  final int quantity;
-  final ValueChanged<int> onChanged;
-
-  const _QuantityStepper({required this.quantity, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _stepperButton(
-            tooltip: l10n.armyBuilderQuantityDecrease,
-            icon: Icons.remove_rounded,
-            onTap: quantity > 1 ? () => onChanged(quantity - 1) : null,
-          ),
-          SizedBox(
-            width: 22,
-            child: Text(
-              '$quantity',
-              textAlign: TextAlign.center,
-              style: AppTextStyles.body,
-            ),
-          ),
-          _stepperButton(
-            tooltip: l10n.armyBuilderQuantityIncrease,
-            icon: Icons.add_rounded,
-            onTap: () => onChanged(quantity + 1),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _stepperButton({
-    required String tooltip,
-    required IconData icon,
-    VoidCallback? onTap,
-  }) {
-    return Tooltip(
-      message: tooltip,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(8),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(6),
-          child: Icon(
-            icon,
-            size: 16,
-            color: onTap == null
-                ? AppColors.textSecondary.withValues(alpha: .4)
-                : AppColors.textSecondary,
-          ),
         ),
       ),
     );

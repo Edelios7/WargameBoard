@@ -69,6 +69,9 @@ class ArmyRepository {
         enhancementPoints: unit.enhancementPoints,
         equipmentChoices: choices,
         isWarlord: unit.isWarlord,
+        isCharacter: unit.isCharacter,
+        attachedToUnitId: unit.attachedToUnitId,
+        attachedToUnitName: unit.attachedToUnitName,
       ));
     }
 
@@ -174,5 +177,13 @@ class ArmyRepository {
       groupId,
       optionIds,
     );
+  }
+
+  Future<void> attachCharacter(String characterUnitId, String targetUnitId) {
+    return database.armyDao.attachCharacter(characterUnitId, targetUnitId);
+  }
+
+  Future<void> detachCharacter(String characterUnitId) {
+    return database.armyDao.detachCharacter(characterUnitId);
   }
 }

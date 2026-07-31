@@ -14287,6 +14287,17 @@ class $ArmyUnitsTable extends ArmyUnits
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _attachedToUnitIdMeta = const VerificationMeta(
+    'attachedToUnitId',
+  );
+  @override
+  late final GeneratedColumn<String> attachedToUnitId = GeneratedColumn<String>(
+    'attached_to_unit_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _modelCountMeta = const VerificationMeta(
     'modelCount',
   );
@@ -14343,6 +14354,7 @@ class $ArmyUnitsTable extends ArmyUnits
     armyId,
     datasheetId,
     enhancementId,
+    attachedToUnitId,
     modelCount,
     isWarlord,
     displayOrder,
@@ -14390,6 +14402,15 @@ class $ArmyUnitsTable extends ArmyUnits
         enhancementId.isAcceptableOrUnknown(
           data['enhancement_id']!,
           _enhancementIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('attached_to_unit_id')) {
+      context.handle(
+        _attachedToUnitIdMeta,
+        attachedToUnitId.isAcceptableOrUnknown(
+          data['attached_to_unit_id']!,
+          _attachedToUnitIdMeta,
         ),
       );
     }
@@ -14447,6 +14468,10 @@ class $ArmyUnitsTable extends ArmyUnits
         DriftSqlType.string,
         data['${effectivePrefix}enhancement_id'],
       ),
+      attachedToUnitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}attached_to_unit_id'],
+      ),
       modelCount: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}model_count'],
@@ -14477,6 +14502,12 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
   final String armyId;
   final String datasheetId;
   final String? enhancementId;
+
+  /// Unité de la même armée à laquelle cette figurine-personnage est
+  /// attachée (concept de "Leader" 10e/11e édition) — `null` pour une
+  /// unité non attachée. Auto-référence : uniquement rempli sur la ligne
+  /// du personnage, jamais sur celle de l'escouade hôte.
+  final String? attachedToUnitId;
   final int modelCount;
 
   /// Une seule unité par armée peut être le Warlord (concept obligatoire
@@ -14490,6 +14521,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
     required this.armyId,
     required this.datasheetId,
     this.enhancementId,
+    this.attachedToUnitId,
     required this.modelCount,
     required this.isWarlord,
     required this.displayOrder,
@@ -14503,6 +14535,9 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
     map['datasheet_id'] = Variable<String>(datasheetId);
     if (!nullToAbsent || enhancementId != null) {
       map['enhancement_id'] = Variable<String>(enhancementId);
+    }
+    if (!nullToAbsent || attachedToUnitId != null) {
+      map['attached_to_unit_id'] = Variable<String>(attachedToUnitId);
     }
     map['model_count'] = Variable<int>(modelCount);
     map['is_warlord'] = Variable<bool>(isWarlord);
@@ -14519,6 +14554,9 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
       enhancementId: enhancementId == null && nullToAbsent
           ? const Value.absent()
           : Value(enhancementId),
+      attachedToUnitId: attachedToUnitId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(attachedToUnitId),
       modelCount: Value(modelCount),
       isWarlord: Value(isWarlord),
       displayOrder: Value(displayOrder),
@@ -14536,6 +14574,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
       armyId: serializer.fromJson<String>(json['armyId']),
       datasheetId: serializer.fromJson<String>(json['datasheetId']),
       enhancementId: serializer.fromJson<String?>(json['enhancementId']),
+      attachedToUnitId: serializer.fromJson<String?>(json['attachedToUnitId']),
       modelCount: serializer.fromJson<int>(json['modelCount']),
       isWarlord: serializer.fromJson<bool>(json['isWarlord']),
       displayOrder: serializer.fromJson<int>(json['displayOrder']),
@@ -14550,6 +14589,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
       'armyId': serializer.toJson<String>(armyId),
       'datasheetId': serializer.toJson<String>(datasheetId),
       'enhancementId': serializer.toJson<String?>(enhancementId),
+      'attachedToUnitId': serializer.toJson<String?>(attachedToUnitId),
       'modelCount': serializer.toJson<int>(modelCount),
       'isWarlord': serializer.toJson<bool>(isWarlord),
       'displayOrder': serializer.toJson<int>(displayOrder),
@@ -14562,6 +14602,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
     String? armyId,
     String? datasheetId,
     Value<String?> enhancementId = const Value.absent(),
+    Value<String?> attachedToUnitId = const Value.absent(),
     int? modelCount,
     bool? isWarlord,
     int? displayOrder,
@@ -14573,6 +14614,9 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
     enhancementId: enhancementId.present
         ? enhancementId.value
         : this.enhancementId,
+    attachedToUnitId: attachedToUnitId.present
+        ? attachedToUnitId.value
+        : this.attachedToUnitId,
     modelCount: modelCount ?? this.modelCount,
     isWarlord: isWarlord ?? this.isWarlord,
     displayOrder: displayOrder ?? this.displayOrder,
@@ -14588,6 +14632,9 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
       enhancementId: data.enhancementId.present
           ? data.enhancementId.value
           : this.enhancementId,
+      attachedToUnitId: data.attachedToUnitId.present
+          ? data.attachedToUnitId.value
+          : this.attachedToUnitId,
       modelCount: data.modelCount.present
           ? data.modelCount.value
           : this.modelCount,
@@ -14606,6 +14653,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
           ..write('armyId: $armyId, ')
           ..write('datasheetId: $datasheetId, ')
           ..write('enhancementId: $enhancementId, ')
+          ..write('attachedToUnitId: $attachedToUnitId, ')
           ..write('modelCount: $modelCount, ')
           ..write('isWarlord: $isWarlord, ')
           ..write('displayOrder: $displayOrder, ')
@@ -14620,6 +14668,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
     armyId,
     datasheetId,
     enhancementId,
+    attachedToUnitId,
     modelCount,
     isWarlord,
     displayOrder,
@@ -14633,6 +14682,7 @@ class ArmyUnit extends DataClass implements Insertable<ArmyUnit> {
           other.armyId == this.armyId &&
           other.datasheetId == this.datasheetId &&
           other.enhancementId == this.enhancementId &&
+          other.attachedToUnitId == this.attachedToUnitId &&
           other.modelCount == this.modelCount &&
           other.isWarlord == this.isWarlord &&
           other.displayOrder == this.displayOrder &&
@@ -14644,6 +14694,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
   final Value<String> armyId;
   final Value<String> datasheetId;
   final Value<String?> enhancementId;
+  final Value<String?> attachedToUnitId;
   final Value<int> modelCount;
   final Value<bool> isWarlord;
   final Value<int> displayOrder;
@@ -14654,6 +14705,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
     this.armyId = const Value.absent(),
     this.datasheetId = const Value.absent(),
     this.enhancementId = const Value.absent(),
+    this.attachedToUnitId = const Value.absent(),
     this.modelCount = const Value.absent(),
     this.isWarlord = const Value.absent(),
     this.displayOrder = const Value.absent(),
@@ -14665,6 +14717,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
     required String armyId,
     required String datasheetId,
     this.enhancementId = const Value.absent(),
+    this.attachedToUnitId = const Value.absent(),
     required int modelCount,
     this.isWarlord = const Value.absent(),
     this.displayOrder = const Value.absent(),
@@ -14679,6 +14732,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
     Expression<String>? armyId,
     Expression<String>? datasheetId,
     Expression<String>? enhancementId,
+    Expression<String>? attachedToUnitId,
     Expression<int>? modelCount,
     Expression<bool>? isWarlord,
     Expression<int>? displayOrder,
@@ -14690,6 +14744,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
       if (armyId != null) 'army_id': armyId,
       if (datasheetId != null) 'datasheet_id': datasheetId,
       if (enhancementId != null) 'enhancement_id': enhancementId,
+      if (attachedToUnitId != null) 'attached_to_unit_id': attachedToUnitId,
       if (modelCount != null) 'model_count': modelCount,
       if (isWarlord != null) 'is_warlord': isWarlord,
       if (displayOrder != null) 'display_order': displayOrder,
@@ -14703,6 +14758,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
     Value<String>? armyId,
     Value<String>? datasheetId,
     Value<String?>? enhancementId,
+    Value<String?>? attachedToUnitId,
     Value<int>? modelCount,
     Value<bool>? isWarlord,
     Value<int>? displayOrder,
@@ -14714,6 +14770,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
       armyId: armyId ?? this.armyId,
       datasheetId: datasheetId ?? this.datasheetId,
       enhancementId: enhancementId ?? this.enhancementId,
+      attachedToUnitId: attachedToUnitId ?? this.attachedToUnitId,
       modelCount: modelCount ?? this.modelCount,
       isWarlord: isWarlord ?? this.isWarlord,
       displayOrder: displayOrder ?? this.displayOrder,
@@ -14736,6 +14793,9 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
     }
     if (enhancementId.present) {
       map['enhancement_id'] = Variable<String>(enhancementId.value);
+    }
+    if (attachedToUnitId.present) {
+      map['attached_to_unit_id'] = Variable<String>(attachedToUnitId.value);
     }
     if (modelCount.present) {
       map['model_count'] = Variable<int>(modelCount.value);
@@ -14762,6 +14822,7 @@ class ArmyUnitsCompanion extends UpdateCompanion<ArmyUnit> {
           ..write('armyId: $armyId, ')
           ..write('datasheetId: $datasheetId, ')
           ..write('enhancementId: $enhancementId, ')
+          ..write('attachedToUnitId: $attachedToUnitId, ')
           ..write('modelCount: $modelCount, ')
           ..write('isWarlord: $isWarlord, ')
           ..write('displayOrder: $displayOrder, ')
@@ -27960,6 +28021,7 @@ typedef $$ArmyUnitsTableCreateCompanionBuilder =
       required String armyId,
       required String datasheetId,
       Value<String?> enhancementId,
+      Value<String?> attachedToUnitId,
       required int modelCount,
       Value<bool> isWarlord,
       Value<int> displayOrder,
@@ -27972,6 +28034,7 @@ typedef $$ArmyUnitsTableUpdateCompanionBuilder =
       Value<String> armyId,
       Value<String> datasheetId,
       Value<String?> enhancementId,
+      Value<String?> attachedToUnitId,
       Value<int> modelCount,
       Value<bool> isWarlord,
       Value<int> displayOrder,
@@ -28005,6 +28068,11 @@ class $$ArmyUnitsTableFilterComposer
 
   ColumnFilters<String> get enhancementId => $composableBuilder(
     column: $table.enhancementId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get attachedToUnitId => $composableBuilder(
+    column: $table.attachedToUnitId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -28058,6 +28126,11 @@ class $$ArmyUnitsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get attachedToUnitId => $composableBuilder(
+    column: $table.attachedToUnitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get modelCount => $composableBuilder(
     column: $table.modelCount,
     builder: (column) => ColumnOrderings(column),
@@ -28101,6 +28174,11 @@ class $$ArmyUnitsTableAnnotationComposer
 
   GeneratedColumn<String> get enhancementId => $composableBuilder(
     column: $table.enhancementId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get attachedToUnitId => $composableBuilder(
+    column: $table.attachedToUnitId,
     builder: (column) => column,
   );
 
@@ -28153,6 +28231,7 @@ class $$ArmyUnitsTableTableManager
                 Value<String> armyId = const Value.absent(),
                 Value<String> datasheetId = const Value.absent(),
                 Value<String?> enhancementId = const Value.absent(),
+                Value<String?> attachedToUnitId = const Value.absent(),
                 Value<int> modelCount = const Value.absent(),
                 Value<bool> isWarlord = const Value.absent(),
                 Value<int> displayOrder = const Value.absent(),
@@ -28163,6 +28242,7 @@ class $$ArmyUnitsTableTableManager
                 armyId: armyId,
                 datasheetId: datasheetId,
                 enhancementId: enhancementId,
+                attachedToUnitId: attachedToUnitId,
                 modelCount: modelCount,
                 isWarlord: isWarlord,
                 displayOrder: displayOrder,
@@ -28175,6 +28255,7 @@ class $$ArmyUnitsTableTableManager
                 required String armyId,
                 required String datasheetId,
                 Value<String?> enhancementId = const Value.absent(),
+                Value<String?> attachedToUnitId = const Value.absent(),
                 required int modelCount,
                 Value<bool> isWarlord = const Value.absent(),
                 Value<int> displayOrder = const Value.absent(),
@@ -28185,6 +28266,7 @@ class $$ArmyUnitsTableTableManager
                 armyId: armyId,
                 datasheetId: datasheetId,
                 enhancementId: enhancementId,
+                attachedToUnitId: attachedToUnitId,
                 modelCount: modelCount,
                 isWarlord: isWarlord,
                 displayOrder: displayOrder,
