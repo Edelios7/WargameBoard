@@ -63,7 +63,13 @@ class DashboardPage extends ConsumerWidget {
     final ambianceFile = LocalCatalogImages.branding('hero-dashboard');
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      // Transparent quand un fond d'écran "Application" est réglé, pour
+      // laisser transparaître celui posé par AppShell derrière le contenu
+      // de l'onglet (voir _withAppWallpaper) — sinon ce fond opaque le
+      // recouvrirait entièrement.
+      backgroundColor: AppWallpapers.app == null
+          ? AppColors.background
+          : Colors.transparent,
       body: Stack(
         children: [
           // L'illustration d'ambiance n'est qu'un fond décoratif : on ne

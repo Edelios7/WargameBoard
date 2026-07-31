@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../database/models/battle_details.dart';
@@ -24,7 +25,9 @@ class BattlePage extends ConsumerWidget {
     final activeBattleAsync = ref.watch(activeBattleProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppWallpapers.app == null
+          ? AppColors.background
+          : Colors.transparent,
       body: activeBattleAsync.when(
         loading: () =>
             Center(child: CircularProgressIndicator(color: AppColors.primary)),

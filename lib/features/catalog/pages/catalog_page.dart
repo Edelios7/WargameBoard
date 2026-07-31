@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/theme/faction_colors.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
@@ -67,7 +68,9 @@ class CatalogPage extends ConsumerWidget {
         : null;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppWallpapers.app == null
+          ? AppColors.background
+          : Colors.transparent,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

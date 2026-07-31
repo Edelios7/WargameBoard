@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/utils/army_list_formatter.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/utils/search_normalize.dart';
@@ -15,6 +16,7 @@ import '../../../core/widgets/discard_guard.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../core/widgets/radar_chart.dart';
 import '../../../core/widgets/unit_fallback_visual.dart';
+import '../../../core/widgets/unit_photo_thumbnail.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/datasheet_details.dart';
 import '../../../database/models/equipment_details.dart';
@@ -179,7 +181,9 @@ class ArmiesPage extends ConsumerWidget {
     final detailAsync = ref.watch(selectedArmyProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppWallpapers.app == null
+          ? AppColors.background
+          : Colors.transparent,
       body: detailAsync.when(
         loading: () =>
             Center(child: CircularProgressIndicator(color: AppColors.primary)),
@@ -205,7 +209,9 @@ class _ArmyListPage extends ConsumerWidget {
     final ambianceFile = LocalCatalogImages.branding('hero-battle-siege');
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppWallpapers.app == null
+          ? AppColors.background
+          : Colors.transparent,
       body: Stack(
         children: [
           if (ambianceFile != null)
@@ -1382,7 +1388,6 @@ class _UnitRosterRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final imageFile = LocalCatalogImages.unitPhoto(unit.datasheetId);
     final catalogAsync = ref.watch(
       factionCatalogDetailsProvider(army.factionId),
     );
@@ -1419,7 +1424,7 @@ class _UnitRosterRow extends ConsumerWidget {
           ),
           childWhenDragging: Opacity(
             opacity: .3,
-            child: _rowContent(l10n, imageFile, archetype),
+            child: _rowContent(l10n, archetype),
           ),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 120),
@@ -1429,7 +1434,7 @@ class _UnitRosterRow extends ConsumerWidget {
                   ? Border.all(color: AppColors.primary, width: 2)
                   : null,
             ),
-            child: _rowContent(l10n, imageFile, archetype),
+            child: _rowContent(l10n, archetype),
           ),
         );
       },
@@ -1438,11 +1443,7 @@ class _UnitRosterRow extends ConsumerWidget {
     return Padding(padding: const EdgeInsets.only(bottom: 6), child: row);
   }
 
-  Widget _rowContent(
-    AppLocalizations l10n,
-    dynamic imageFile,
-    UnitArchetype? archetype,
-  ) {
+  Widget _rowContent(AppLocalizations l10n, UnitArchetype? archetype) {
     return Material(
       color: selected
           ? AppColors.primary.withValues(alpha: .12)
@@ -1455,23 +1456,21 @@ class _UnitRosterRow extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: Row(
             children: [
-              ClipRRect(
+              UnitPhotoThumbnail(
+                datasheetId: unit.datasheetId,
+                entryId: unit.id,
+                size: 32,
                 borderRadius: BorderRadius.circular(6),
-                child: SizedBox(
-                  width: 32,
-                  height: 32,
-                  child: imageFile != null
-                      ? Image.file(imageFile, fit: BoxFit.cover)
-                      : UnitFallbackVisual(
-                          factionName: army.factionName,
-                          roleIcon: unitRoleIcon(
-                            isWarlord: unit.isWarlord,
-                            isCharacter: unit.isCharacter,
-                            archetype: archetype,
-                            battlefieldRole: unit.battlefieldRole,
-                          ),
-                          size: 32,
-                        ),
+                editable: false,
+                fallback: UnitFallbackVisual(
+                  factionName: army.factionName,
+                  roleIcon: unitRoleIcon(
+                    isWarlord: unit.isWarlord,
+                    isCharacter: unit.isCharacter,
+                    archetype: archetype,
+                    battlefieldRole: unit.battlefieldRole,
+                  ),
+                  size: 32,
                 ),
               ),
               const SizedBox(width: 10),
@@ -1877,7 +1876,10 @@ class _UnitCardVisual extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final imageFile = LocalCatalogImages.unitPhoto(unit.datasheetId);
+    final imageFile = LocalCatalogImages.collectionPhoto(
+      unit.datasheetId,
+      unit.id,
+    );
 
     final card = Material(
       color: AppColors.surfaceElevated,
@@ -2213,7 +2215,6 @@ class _UnitDetailsBody extends ConsumerWidget {
     final sheet = datasheetAsync.value;
     final selections = selectionsAsync.value ?? const {};
     if (sheet == null) return const SizedBox.shrink();
-    final imageFile = LocalCatalogImages.unitPhoto(sheet.id);
     final effectiveWeapons = _effectiveWeapons(sheet, selections);
 
     return SingleChildScrollView(
@@ -2226,30 +2227,22 @@ class _UnitDetailsBody extends ConsumerWidget {
             style: AppTextStyles.eyebrow,
           ),
           const SizedBox(height: 12),
-          ClipRRect(
+          UnitPhotoThumbnail(
+            datasheetId: sheet.id,
+            entryId: currentUnit.id,
+            width: double.infinity,
+            height: 150,
             borderRadius: BorderRadius.circular(14),
-            child: imageFile != null
-                ? Image.file(
-                    imageFile,
-                    height: 150,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  )
-                : Container(
-                    height: 150,
-                    width: double.infinity,
-                    color: AppColors.surfaceElevated,
-                    child: UnitFallbackVisual(
-                      factionName: army.factionName,
-                      roleIcon: unitRoleIcon(
-                        isWarlord: currentUnit.isWarlord,
-                        isCharacter: currentUnit.isCharacter,
-                        archetype: sheet.archetype,
-                        battlefieldRole: currentUnit.battlefieldRole,
-                      ),
-                      size: 150,
-                    ),
-                  ),
+            fallback: UnitFallbackVisual(
+              factionName: army.factionName,
+              roleIcon: unitRoleIcon(
+                isWarlord: currentUnit.isWarlord,
+                isCharacter: currentUnit.isCharacter,
+                archetype: sheet.archetype,
+                battlefieldRole: currentUnit.battlefieldRole,
+              ),
+              size: 150,
+            ),
           ),
           const SizedBox(height: 14),
           Row(

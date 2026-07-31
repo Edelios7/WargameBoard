@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/utils/collection_export_formatter.dart';
 import '../../../core/utils/faction_iconography.dart';
 import '../../../core/utils/local_catalog_images.dart';
@@ -86,7 +87,9 @@ class _CollectionPageState extends ConsumerState<CollectionPage>
     final isWishlistTab = _tabController.index == 1;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppWallpapers.app == null
+          ? AppColors.background
+          : Colors.transparent,
       body: Padding(
         padding: const EdgeInsets.all(28),
         child: Column(

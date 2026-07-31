@@ -54,7 +54,9 @@ class CustomizationPage extends ConsumerWidget {
     final accent = ref.watch(accentColorProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppWallpapers.app == null
+          ? AppColors.background
+          : Colors.transparent,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(28),
         child: LayoutBuilder(

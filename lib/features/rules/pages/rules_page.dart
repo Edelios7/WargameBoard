@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/utils/rule_pdf_source.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/rules/rule_document.dart';
@@ -105,7 +106,9 @@ class _RulesPageState extends State<RulesPage> {
       ..sort((a, b) => b.downloads.compareTo(a.downloads));
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppWallpapers.app == null
+          ? AppColors.background
+          : Colors.transparent,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(28),
         child: Column(

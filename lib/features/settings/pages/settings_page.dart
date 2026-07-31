@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/textured_button.dart';
@@ -156,7 +157,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final pendingRestore = ref.watch(pendingRestoreProvider).value ?? false;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppWallpapers.app == null
+          ? AppColors.background
+          : Colors.transparent,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(28),
         child: LayoutBuilder(
