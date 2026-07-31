@@ -50,6 +50,42 @@ String _warningLabel(AppLocalizations l10n, ArmyValidationIssue issue) {
   }
 }
 
+/// Décide de l'action à effectuer quand `dragged` est lâchée sur `target`,
+/// partagé entre la grille ([_UnitCard]) et la liste latérale
+/// ([_UnitRosterRow]) : attacher/détacher si l'une des deux est un
+/// personnage et l'autre non (redéposer un chef sur l'escouade à laquelle
+/// il est déjà attaché détache — glisser = "lâcher prise" — sur une autre
+/// escouade ça (ré)attache), sinon réordonner l'affichage. Rien de
+/// pertinent à faire si une non-personnage est déposée sur un personnage.
+Future<void> _handleUnitDrop(
+  WidgetRef ref,
+  ArmyDetails army, {
+  required ArmyUnitDetails dragged,
+  required ArmyUnitDetails target,
+}) async {
+  if (dragged.id == target.id) return;
+  final repository = ref.read(armyRepositoryProvider);
+
+  if (dragged.isCharacter && !target.isCharacter) {
+    if (dragged.attachedToUnitId == target.id) {
+      await repository.detachCharacter(dragged.id);
+    } else {
+      await repository.attachCharacter(dragged.id, target.id);
+    }
+  } else if (!dragged.isCharacter && target.isCharacter) {
+    return;
+  } else {
+    final orderedIds = army.units.map((u) => u.id).toList();
+    orderedIds.remove(dragged.id);
+    final targetIndex = orderedIds.indexOf(target.id);
+    orderedIds.insert(targetIndex, dragged.id);
+    await repository.reorderUnits(army.id, orderedIds);
+  }
+
+  ref.invalidate(selectedArmyProvider);
+  ref.invalidate(armyByIdProvider(army.id));
+}
+
 /// Demande confirmation avant une suppression définitive (unité ou
 /// armée), pour éviter qu'un clic accidentel sur un bouton "facile
 /// d'accès" (croix de la sidebar, etc.) ne fasse disparaître quelque
@@ -1268,6 +1304,7 @@ class _BuilderSidebarState extends ConsumerState<_BuilderSidebar> {
                           .map((leader) => leader.datasheetName)
                           .toList();
                       return _UnitRosterRow(
+                        army: army,
                         unit: unit,
                         selected: unit.id == selectedUnitId,
                         attachedLeaderNames: attachedLeaderNames,
@@ -1319,7 +1356,8 @@ class _BuilderSidebarState extends ConsumerState<_BuilderSidebar> {
   }
 }
 
-class _UnitRosterRow extends StatelessWidget {
+class _UnitRosterRow extends ConsumerWidget {
+  final ArmyDetails army;
   final ArmyUnitDetails unit;
   final bool selected;
   final VoidCallback onTap;
@@ -1331,6 +1369,7 @@ class _UnitRosterRow extends StatelessWidget {
   final List<String> attachedLeaderNames;
 
   const _UnitRosterRow({
+    required this.army,
     required this.unit,
     required this.selected,
     required this.onTap,
@@ -1339,130 +1378,172 @@ class _UnitRosterRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final imageFile = LocalCatalogImages.unitPhoto(unit.datasheetId);
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Material(
-        color: selected
-            ? AppColors.primary.withValues(alpha: .12)
-            : AppColors.surface,
-        borderRadius: BorderRadius.circular(10),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(10),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: SizedBox(
-                    width: 32,
-                    height: 32,
-                    child: imageFile != null
-                        ? Image.file(imageFile, fit: BoxFit.cover)
-                        : Container(
-                            color: AppColors.surfaceElevated,
-                            child: const Icon(
-                              Icons.shield_rounded,
-                              size: 16,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (unit.isWarlord) ...[
-                            const Icon(
-                              Icons.star_rounded,
-                              size: 14,
-                              color: AppColors.warning,
-                            ),
-                            const SizedBox(width: 4),
-                          ],
-                          Flexible(
-                            child: Text(
-                              unit.datasheetName,
-                              style: AppTextStyles.body.copyWith(
-                                fontWeight: selected
-                                    ? FontWeight.w600
-                                    : FontWeight.w400,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (unit.modelCount > 1)
-                        Text(
-                          'x${unit.modelCount}',
-                          style: AppTextStyles.caption.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      if (unit.isCharacter && unit.attachedToUnitName != null)
-                        Text(
-                          '→ ${unit.attachedToUnitName}',
-                          style: AppTextStyles.caption.copyWith(
-                            color: AppColors.primary,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      if (attachedLeaderNames.isNotEmpty)
-                        Text(
-                          '★ ${attachedLeaderNames.join(', ')}',
-                          style: AppTextStyles.caption.copyWith(
-                            color: AppColors.primary,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                    ],
-                  ),
-                ),
-                Tooltip(
-                  message: unit.hasUnknownCost ? l10n.unknownCostTooltip : '',
-                  child: Text(
-                    unit.hasUnknownCost
-                        ? l10n.unknownCost
-                        : l10n.pointsSuffix(unit.points),
-                    style: AppTextStyles.body.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: unit.hasUnknownCost
-                          ? AppColors.warning
-                          : AppColors.primary,
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  tooltip: l10n.armyBuilderRemoveUnit,
-                  visualDensity: VisualDensity.compact,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(
-                    minWidth: 28,
-                    minHeight: 28,
-                  ),
-                  icon: const Icon(Icons.close_rounded, size: 16),
-                  color: AppColors.textSecondary,
-                  onPressed: onDelete,
-                ),
-              ],
+    final row = DragTarget<ArmyUnitDetails>(
+      onWillAcceptWithDetails: (details) => details.data.id != unit.id,
+      onAcceptWithDetails: (details) =>
+          _handleUnitDrop(ref, army, dragged: details.data, target: unit),
+      builder: (context, candidateData, rejectedData) {
+        final isDropTarget = candidateData.isNotEmpty;
+        return Draggable<ArmyUnitDetails>(
+          data: unit,
+          feedback: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: 220,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceElevated,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.primary, width: 1.6),
+              ),
+              child: Text(
+                unit.datasheetName,
+                style: AppTextStyles.body,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
+          ),
+          childWhenDragging: Opacity(
+            opacity: .3,
+            child: _rowContent(l10n, imageFile),
+          ),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 120),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: isDropTarget
+                  ? Border.all(color: AppColors.primary, width: 2)
+                  : null,
+            ),
+            child: _rowContent(l10n, imageFile),
+          ),
+        );
+      },
+    );
+
+    return Padding(padding: const EdgeInsets.only(bottom: 6), child: row);
+  }
+
+  Widget _rowContent(AppLocalizations l10n, dynamic imageFile) {
+    return Material(
+      color: selected
+          ? AppColors.primary.withValues(alpha: .12)
+          : AppColors.surface,
+      borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: SizedBox(
+                  width: 32,
+                  height: 32,
+                  child: imageFile != null
+                      ? Image.file(imageFile, fit: BoxFit.cover)
+                      : Container(
+                          color: AppColors.surfaceElevated,
+                          child: const Icon(
+                            Icons.shield_rounded,
+                            size: 16,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (unit.isWarlord) ...[
+                          const Icon(
+                            Icons.star_rounded,
+                            size: 14,
+                            color: AppColors.warning,
+                          ),
+                          const SizedBox(width: 4),
+                        ],
+                        Flexible(
+                          child: Text(
+                            unit.datasheetName,
+                            style: AppTextStyles.body.copyWith(
+                              fontWeight: selected
+                                  ? FontWeight.w600
+                                  : FontWeight.w400,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (unit.modelCount > 1)
+                      Text(
+                        'x${unit.modelCount}',
+                        style: AppTextStyles.caption.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    if (unit.isCharacter && unit.attachedToUnitName != null)
+                      Text(
+                        '→ ${unit.attachedToUnitName}',
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.primary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    if (attachedLeaderNames.isNotEmpty)
+                      Text(
+                        '★ ${attachedLeaderNames.join(', ')}',
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.primary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
+                ),
+              ),
+              Tooltip(
+                message: unit.hasUnknownCost ? l10n.unknownCostTooltip : '',
+                child: Text(
+                  unit.hasUnknownCost
+                      ? l10n.unknownCost
+                      : l10n.pointsSuffix(unit.points),
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: unit.hasUnknownCost
+                        ? AppColors.warning
+                        : AppColors.primary,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+              IconButton(
+                tooltip: l10n.armyBuilderRemoveUnit,
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                icon: const Icon(Icons.close_rounded, size: 16),
+                color: AppColors.textSecondary,
+                onPressed: onDelete,
+              ),
+            ],
           ),
         ),
       ),
@@ -1678,41 +1759,6 @@ class _UnitCard extends ConsumerWidget {
     this.attachedLeaderNames = const [],
   });
 
-  /// Décide de l'action à effectuer quand `dragged` est lâchée sur `unit` :
-  /// attacher/détacher si l'une des deux est un personnage et l'autre non,
-  /// sinon réordonner l'affichage. Rien de pertinent à faire si les deux
-  /// sont des personnages déposés sur une non-personnage inverse... — les
-  /// deux branches gèrent chaque combinaison explicitement plutôt que de
-  /// deviner.
-  Future<void> _handleDrop(WidgetRef ref, ArmyUnitDetails dragged) async {
-    if (dragged.id == unit.id) return;
-    final repository = ref.read(armyRepositoryProvider);
-
-    if (dragged.isCharacter && !unit.isCharacter) {
-      // Redéposer un chef sur l'escouade à laquelle il est déjà attaché
-      // détache (glisser = "lâcher prise") ; sur une autre escouade, ça
-      // (ré)attache.
-      if (dragged.attachedToUnitId == unit.id) {
-        await repository.detachCharacter(dragged.id);
-      } else {
-        await repository.attachCharacter(dragged.id, unit.id);
-      }
-    } else if (!dragged.isCharacter && unit.isCharacter) {
-      // Déposer une escouade sur un personnage n'a pas de sens (on n'attache
-      // pas un personnage à une autre unité de cette façon) : pas d'action.
-      return;
-    } else {
-      final orderedIds = army.units.map((u) => u.id).toList();
-      orderedIds.remove(dragged.id);
-      final targetIndex = orderedIds.indexOf(unit.id);
-      orderedIds.insert(targetIndex, dragged.id);
-      await repository.reorderUnits(army.id, orderedIds);
-    }
-
-    ref.invalidate(selectedArmyProvider);
-    ref.invalidate(armyByIdProvider(army.id));
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedUnitId = ref.watch(selectedUnitIdProvider);
@@ -1720,10 +1766,17 @@ class _UnitCard extends ConsumerWidget {
 
     return DragTarget<ArmyUnitDetails>(
       onWillAcceptWithDetails: (details) => details.data.id != unit.id,
-      onAcceptWithDetails: (details) => _handleDrop(ref, details.data),
+      onAcceptWithDetails: (details) =>
+          _handleUnitDrop(ref, army, dragged: details.data, target: unit),
       builder: (context, candidateData, rejectedData) {
         final isDropTarget = candidateData.isNotEmpty;
-        return LongPressDraggable<ArmyUnitDetails>(
+        // `Draggable` (pas `LongPressDraggable`) : sur desktop/souris, un
+        // clic-glissé démarre naturellement en bougeant le curseur — un
+        // seuil de maintien immobile façon "appui long tactile" est
+        // presque toujours annulé par ce mouvement avant même de se
+        // déclencher, ce qui rendait le glisser-déposer silencieusement
+        // inopérant.
+        return Draggable<ArmyUnitDetails>(
           data: unit,
           feedback: _UnitCardVisual(
             unit: unit,
@@ -2390,42 +2443,60 @@ class _UnitDetailsBody extends ConsumerWidget {
               style: AppTextStyles.eyebrow,
             ),
             const SizedBox(height: 10),
-            if (currentUnit.attachedToUnitId != null)
+            if (currentUnit.attachedToUnitId != null) ...[
+              Text(
+                l10n.armyBuilderAttachedTo(
+                  currentUnit.attachedToUnitName ?? '',
+                ),
+                style: AppTextStyles.body.copyWith(color: AppColors.primary),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
-                    child: Text(
-                      l10n.armyBuilderAttachedTo(
-                        currentUnit.attachedToUnitName ?? '',
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.border),
                       ),
-                      style: AppTextStyles.body.copyWith(
-                        color: AppColors.primary,
+                      onPressed: () => showDialog(
+                        context: context,
+                        builder: (_) => _AttachLeaderDialog(
+                          army: army,
+                          character: currentUnit,
+                        ),
+                      ),
+                      child: Text(
+                        l10n.armyBuilderChangeAttachment,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),
-                  TextButton(
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (_) => _AttachLeaderDialog(
-                        army: army,
-                        character: currentUnit,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.border),
+                      ),
+                      onPressed: () async {
+                        await ref
+                            .read(armyRepositoryProvider)
+                            .detachCharacter(currentUnit.id);
+                        ref.invalidate(selectedArmyProvider);
+                        ref.invalidate(armyByIdProvider(army.id));
+                      },
+                      child: Text(
+                        l10n.armyBuilderDetachLeader,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    child: Text(l10n.armyBuilderChangeAttachment),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      await ref
-                          .read(armyRepositoryProvider)
-                          .detachCharacter(currentUnit.id);
-                      ref.invalidate(selectedArmyProvider);
-                      ref.invalidate(armyByIdProvider(army.id));
-                    },
-                    child: Text(l10n.armyBuilderDetachLeader),
                   ),
                 ],
-              )
-            else
+              ),
+            ] else
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: AppColors.border),

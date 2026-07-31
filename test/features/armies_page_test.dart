@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wargameboard/database/app_database.dart';
+import 'package:wargameboard/database/models/army_details.dart';
 import 'package:wargameboard/features/armies/pages/armies_page.dart';
 import 'package:wargameboard/l10n/app_localizations.dart';
 import 'package:wargameboard/providers/database_provider.dart';
@@ -30,8 +31,9 @@ void main() {
     await database.close();
   });
 
-  testWidgets('creating an army from the dialog shows it in the list',
-      (tester) async {
+  testWidgets('creating an army from the dialog shows it in the list', (
+    tester,
+  ) async {
     await tester.pumpWidget(wrap());
     await tester.pumpAndSettle();
 
@@ -85,8 +87,9 @@ void main() {
     expect(army!.units, hasLength(1));
   });
 
-  testWidgets('the quantity stepper adds several copies of a unit at once',
-      (tester) async {
+  testWidgets('the quantity stepper adds several copies of a unit at once', (
+    tester,
+  ) async {
     final armyId = await database.armyDao.createArmy(
       name: 'Escouade test',
       factionId: 'fac-blood-angels',
@@ -119,8 +122,10 @@ void main() {
     await tester.tap(incrementButton);
     await tester.pump();
 
-    expect(find.descendant(of: captainTile, matching: find.text('3')),
-        findsOneWidget);
+    expect(
+      find.descendant(of: captainTile, matching: find.text('3')),
+      findsOneWidget,
+    );
 
     await tester.tap(
       find.descendant(
@@ -132,14 +137,155 @@ void main() {
 
     final army = await database.armyDao.getArmy(armyId);
     expect(army!.units, hasLength(3));
-    expect(army.units.every((u) => u.datasheetId == army.units.first.datasheetId),
-        isTrue);
+    expect(
+      army.units.every((u) => u.datasheetId == army.units.first.datasheetId),
+      isTrue,
+    );
   });
 
   testWidgets(
-      'the armies page renders without overflow on a phone-sized screen',
-      (tester) async {
-    tester.view.physicalSize = const Size(390, 844);
+    'the armies page renders without overflow on a phone-sized screen',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final armyId = await database.armyDao.createArmy(
+        name: 'Ma liste',
+        factionId: 'fac-blood-angels',
+      );
+      final captain = await database.datasheetDao.search('Captain');
+      await database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: captain.single.id,
+        modelCount: 1,
+      );
+
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Ma liste'), findsWidgets);
+      expect(tester.takeException(), isNull);
+
+      await tester.tap(find.text('Ma liste').first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Captain'), findsWidgets);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'the overview tab is shown by default on an empty army and shows the army profile',
+    (tester) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await database.armyDao.createArmy(
+        name: 'Armée vide',
+        factionId: 'fac-blood-angels',
+      );
+
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Armée vide'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('PROFIL D\'ARMÉE'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'adding a unit switches the default tab to Details, and Overview stays reachable',
+    (tester) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final armyId = await database.armyDao.createArmy(
+        name: 'Ma liste',
+        factionId: 'fac-blood-angels',
+      );
+      final captain = await database.datasheetDao.search('Captain');
+      await database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: captain.single.id,
+        modelCount: 1,
+      );
+
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Ma liste'));
+      await tester.pumpAndSettle();
+
+      // Une unité existe déjà : l'onglet Détails est affiché par défaut.
+      expect(find.text('PROFIL D\'ARMÉE'), findsNothing);
+
+      await tester.tap(find.text('Vue d\'ensemble'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('PROFIL D\'ARMÉE'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+
+      await tester.tap(find.text('Détails'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Captain'), findsWidgets);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'a unit can be removed straight from the top of its details panel, '
+    'without going through the edit dialog',
+    (tester) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final armyId = await database.armyDao.createArmy(
+        name: 'Ma liste',
+        factionId: 'fac-blood-angels',
+      );
+      final captain = await database.datasheetDao.search('Captain');
+      await database.armyDao.addUnit(
+        armyId: armyId,
+        datasheetId: captain.single.id,
+        modelCount: 1,
+      );
+
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Ma liste'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.delete_outline_rounded));
+      await tester.pumpAndSettle();
+
+      // Confirmation demandée avant suppression.
+      expect(find.text('Retirer cette unité ?'), findsOneWidget);
+      await tester.tap(find.text('Retirer l\'unité'));
+      await tester.pumpAndSettle();
+
+      final army = await database.armyDao.getArmy(armyId);
+      expect(army!.units, isEmpty);
+    },
+  );
+
+  testWidgets('dragging a Character card onto a squad card attaches it — plain '
+      'Draggable (not LongPressDraggable), since a mouse click-drag moves '
+      'the cursor immediately and cancels a long-press recognizer before '
+      'it fires', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -149,123 +295,53 @@ void main() {
       factionId: 'fac-blood-angels',
     );
     final captain = await database.datasheetDao.search('Captain');
+    final squad = await database.datasheetDao.search('Death Company');
     await database.armyDao.addUnit(
       armyId: armyId,
       datasheetId: captain.single.id,
       modelCount: 1,
     );
-
-    await tester.pumpWidget(wrap());
-    await tester.pumpAndSettle();
-
-    expect(find.text('Ma liste'), findsWidgets);
-    expect(tester.takeException(), isNull);
-
-    await tester.tap(find.text('Ma liste').first);
-    await tester.pumpAndSettle();
-
-    expect(find.text('Captain'), findsWidgets);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets(
-      'the overview tab is shown by default on an empty army and shows the army profile',
-      (tester) async {
-    tester.view.physicalSize = const Size(1400, 900);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    await database.armyDao.createArmy(
-      name: 'Armée vide',
-      factionId: 'fac-blood-angels',
-    );
-
-    await tester.pumpWidget(wrap());
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text('Armée vide'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('PROFIL D\'ARMÉE'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets(
-      'adding a unit switches the default tab to Details, and Overview stays reachable',
-      (tester) async {
-    tester.view.physicalSize = const Size(1400, 900);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    final armyId = await database.armyDao.createArmy(
-      name: 'Ma liste',
-      factionId: 'fac-blood-angels',
-    );
-    final captain = await database.datasheetDao.search('Captain');
-    await database.armyDao.addUnit(
+    final squadUnitId = await database.armyDao.addUnit(
       armyId: armyId,
-      datasheetId: captain.single.id,
-      modelCount: 1,
+      datasheetId: squad.single.id,
+      modelCount: 5,
     );
 
     await tester.pumpWidget(wrap());
     await tester.pumpAndSettle();
-
     await tester.tap(find.text('Ma liste'));
     await tester.pumpAndSettle();
 
-    // Une unité existe déjà : l'onglet Détails est affiché par défaut.
-    expect(find.text('PROFIL D\'ARMÉE'), findsNothing);
+    // Le nom apparaît à la fois dans la liste latérale et dans la grille :
+    // la première occurrence de chaque (ordre de construction du widget
+    // tree) correspond à la liste latérale, où le glisser est le plus
+    // simple à cibler de façon fiable dans un test.
+    final captainDraggable = find
+        .ancestor(
+          of: find.text('Captain').first,
+          matching: find.byType(Draggable<ArmyUnitDetails>),
+        )
+        .first;
+    final squadTarget = find
+        .ancestor(
+          of: find.text('Death Company Marines').first,
+          matching: find.byType(DragTarget<ArmyUnitDetails>),
+        )
+        .first;
 
-    await tester.tap(find.text('Vue d\'ensemble'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('PROFIL D\'ARMÉE'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-
-    await tester.tap(find.text('Détails'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Captain'), findsWidgets);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets(
-      'a unit can be removed straight from the top of its details panel, '
-      'without going through the edit dialog', (tester) async {
-    tester.view.physicalSize = const Size(1400, 900);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    final armyId = await database.armyDao.createArmy(
-      name: 'Ma liste',
-      factionId: 'fac-blood-angels',
-    );
-    final captain = await database.datasheetDao.search('Captain');
-    await database.armyDao.addUnit(
-      armyId: armyId,
-      datasheetId: captain.single.id,
-      modelCount: 1,
-    );
-
-    await tester.pumpWidget(wrap());
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text('Ma liste'));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byIcon(Icons.delete_outline_rounded));
-    await tester.pumpAndSettle();
-
-    // Confirmation demandée avant suppression.
-    expect(find.text('Retirer cette unité ?'), findsOneWidget);
-    await tester.tap(find.text('Retirer l\'unité'));
+    final start = tester.getCenter(captainDraggable);
+    final end = tester.getCenter(squadTarget);
+    final gesture = await tester.startGesture(start);
+    await tester.pump(const Duration(milliseconds: 50));
+    await gesture.moveTo(end);
+    await tester.pump(const Duration(milliseconds: 50));
+    await gesture.up();
     await tester.pumpAndSettle();
 
     final army = await database.armyDao.getArmy(armyId);
-    expect(army!.units, isEmpty);
+    final captainUnit = army!.units.firstWhere(
+      (u) => u.datasheetName == 'Captain',
+    );
+    expect(captainUnit.attachedToUnitId, squadUnitId);
   });
 }
