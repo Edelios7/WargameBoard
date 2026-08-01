@@ -70,6 +70,21 @@ CombatSimulationResult simulateCombat({
   required int trials,
   Random? random,
 }) {
+  assert(trials > 0, 'simulateCombat requires at least 1 trial');
+  assert(
+    defenderModelCount > 0,
+    'simulateCombat requires at least 1 defender model',
+  );
+  if (trials <= 0 || defenderModelCount <= 0) {
+    return const CombatSimulationResult(
+      trials: 0,
+      averageModelsKilled: 0,
+      destructionProbability: 0,
+      averageDamageDealt: 0,
+      averageModelsRemaining: 0,
+    );
+  }
+
   final rng = random ?? Random();
   final hitThreshold =
       (weaponProfile.isMelee

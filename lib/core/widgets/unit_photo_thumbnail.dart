@@ -59,12 +59,24 @@ class UnitPhotoThumbnail extends ConsumerStatefulWidget {
 class _UnitPhotoThumbnailState extends ConsumerState<UnitPhotoThumbnail> {
   bool _busy = false;
 
+  /// Une photo remplacée peut réutiliser le même chemin de fichier
+  /// (`{id}.{ext}` — voir `UserPhotoService._saveTo`), et `Image.file` met
+  /// en cache par `(File, scale)` sans vérifier la date de modification :
+  /// sans cette purge, un widget déjà construit avant le changement
+  /// continuerait d'afficher l'ancienne image après reconstruction.
+  void _invalidatePhotoCaches() {
+    PaintingBinding.instance.imageCache.clear();
+    PaintingBinding.instance.imageCache.clearLiveImages();
+    if (mounted) ref.read(photoVersionProvider.notifier).state++;
+  }
+
   Future<void> _choosePhoto() async {
     setState(() => _busy = true);
     try {
       await ref
           .read(userPhotoServiceProvider)
           .pickAndSave(widget.datasheetId, entryId: widget.entryId);
+      _invalidatePhotoCaches();
     } catch (_) {
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
@@ -85,11 +97,17 @@ class _UnitPhotoThumbnailState extends ConsumerState<UnitPhotoThumbnail> {
     } else {
       await service.remove(widget.datasheetId);
     }
+    _invalidatePhotoCaches();
     if (mounted) setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    // Force la reconstruction quand une photo change ailleurs dans
+    // l'appli (ex. depuis le panneau de détails de l'Army Builder,
+    // pendant que la vignette de la liste latérale reste affichée) —
+    // voir `photoVersionProvider`.
+    ref.watch(photoVersionProvider);
     final l10n = AppLocalizations.of(context)!;
     final entryId = widget.entryId;
     final userFile = entryId != null

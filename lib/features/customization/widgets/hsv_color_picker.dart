@@ -22,6 +22,15 @@ class HsvColorPicker extends StatefulWidget {
 class _HsvColorPickerState extends State<HsvColorPicker> {
   late HSVColor _hsv;
 
+  // `onPanUpdate` fires on essentially every pointer-move frame (60+/sec).
+  // `widget.onChanged` persists to disk and bumps a provider that rebuilds
+  // the whole app (see `themeVersionProvider`) — calling it unthrottled
+  // caused visible stutter while dragging and dozens of redundant prefs
+  // writes per second. Cap it to ~1 call per 60ms during the drag, and
+  // always fire once more on release so the final value is never dropped.
+  DateTime _lastNotify = DateTime.fromMillisecondsSinceEpoch(0);
+  static const _notifyInterval = Duration(milliseconds: 60);
+
   @override
   void initState() {
     super.initState();
@@ -36,7 +45,18 @@ class _HsvColorPickerState extends State<HsvColorPicker> {
     }
   }
 
-  void _updateSaturationValue(Offset localPosition, Size size) {
+  void _notify({required bool force}) {
+    final now = DateTime.now();
+    if (!force && now.difference(_lastNotify) < _notifyInterval) return;
+    _lastNotify = now;
+    widget.onChanged(_hsv.toColor());
+  }
+
+  void _updateSaturationValue(
+    Offset localPosition,
+    Size size, {
+    bool force = false,
+  }) {
     final dx = localPosition.dx.clamp(0.0, size.width);
     final dy = localPosition.dy.clamp(0.0, size.height);
     setState(() {
@@ -44,13 +64,13 @@ class _HsvColorPickerState extends State<HsvColorPicker> {
           .withSaturation(dx / size.width)
           .withValue(1 - dy / size.height);
     });
-    widget.onChanged(_hsv.toColor());
+    _notify(force: force);
   }
 
-  void _updateHue(double dx, double width) {
+  void _updateHue(double dx, double width, {bool force = false}) {
     final hue = ((dx.clamp(0.0, width) / width) * 360).clamp(0.0, 359.9);
     setState(() => _hsv = _hsv.withHue(hue));
-    widget.onChanged(_hsv.toColor());
+    _notify(force: force);
   }
 
   @override
@@ -69,6 +89,7 @@ class _HsvColorPickerState extends State<HsvColorPicker> {
                 onPanDown: (d) => _updateSaturationValue(d.localPosition, size),
                 onPanUpdate: (d) =>
                     _updateSaturationValue(d.localPosition, size),
+                onPanEnd: (_) => _notify(force: true),
                 child: SizedBox(
                   width: size.width,
                   height: size.height,
@@ -120,6 +141,7 @@ class _HsvColorPickerState extends State<HsvColorPicker> {
             return GestureDetector(
               onPanDown: (d) => _updateHue(d.localPosition.dx, width),
               onPanUpdate: (d) => _updateHue(d.localPosition.dx, width),
+              onPanEnd: (_) => _notify(force: true),
               child: SizedBox(
                 height: 24,
                 width: width,
