@@ -23,6 +23,7 @@ import '../../../domain/catalog/factions/space_marine_chapters.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/army_provider.dart';
 import '../../../providers/battle_provider.dart';
+import '../../../providers/catalog_provider.dart';
 import '../../../providers/collection_provider.dart';
 import '../../../providers/dashboard_provider.dart';
 import '../../../providers/xp_provider.dart';
@@ -379,11 +380,19 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
   }
 
   bool _matches(CollectionItemDetails entry) {
-    if (widget.searchQuery.isNotEmpty &&
-        !normalizeForSearch(
-          entry.datasheetName,
-        ).contains(normalizeForSearch(widget.searchQuery))) {
-      return false;
+    if (widget.searchQuery.isNotEmpty) {
+      final normalizedQuery = normalizeForSearch(widget.searchQuery);
+      final matchesName = normalizeForSearch(
+        entry.datasheetName,
+      ).contains(normalizedQuery);
+      final aliases = ref
+          .watch(datasheetAliasesProvider)
+          .maybeWhen(data: (m) => m, orElse: () => const {});
+      final matchesAlias = (aliases[entry.datasheetId] ?? const [])
+          .any((alias) => normalizeForSearch(alias).contains(normalizedQuery));
+      if (!matchesName && !matchesAlias) {
+        return false;
+      }
     }
     if (_factionFilter != null) {
       if (_factionFilter == _spaceMarinesGroupKey) {

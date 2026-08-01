@@ -44,6 +44,17 @@ final catalogFavoritesProvider = FutureProvider<Set<String>>((ref) {
   return repository.listFavoriteIds();
 });
 
+/// Noms alternatifs par datasheetId (voir DatasheetAliases) — utilisé par
+/// les filtres de recherche en mémoire (Collection, roster de bataille)
+/// pour qu'un nom anglais retrouve la fiche affichée en français, et
+/// inversement.
+final datasheetAliasesProvider = FutureProvider<Map<String, List<String>>>((
+  ref,
+) {
+  final repository = ref.watch(catalogRepositoryProvider);
+  return repository.getAliasesByDatasheetId();
+});
+
 /// Filtre "Favoris uniquement" sur la liste de résultats du Catalogue.
 final catalogFavoritesOnlyProvider = StateProvider<bool>((ref) => false);
 
