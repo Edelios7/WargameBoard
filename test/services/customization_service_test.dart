@@ -18,6 +18,7 @@ void main() {
     // partout ailleurs dans l'appli) : on les remet à l'état par défaut
     // pour ne pas faire fuiter un réglage d'un test à l'autre.
     AppColors.resetAccent();
+    AppWallpapers.dimming = 0.78;
     for (final slot in WallpaperSlot.values) {
       AppWallpapers.setSlot(slot, null);
     }
@@ -69,4 +70,44 @@ void main() {
       expect(prefs.getString('customization_wallpaper_cards'), isNull);
     },
   );
+
+  test(
+    'setWallpaperDimming mutates AppWallpapers.dimming and persists it',
+    () async {
+      final service = CustomizationService(prefs);
+
+      await service.setWallpaperDimming(0.5);
+
+      expect(AppWallpapers.dimming, 0.5);
+      expect(prefs.getDouble(wallpaperDimmingPreferenceKey), 0.5);
+    },
+  );
+
+  test('loadIntoStatics re-applies a previously saved dimming value on a '
+      'fresh service instance', () async {
+    await CustomizationService(prefs).setWallpaperDimming(0.4);
+    AppWallpapers.dimming = 0.78; // simule un redémarrage
+
+    CustomizationService(prefs).loadIntoStatics();
+
+    expect(AppWallpapers.dimming, 0.4);
+  });
+
+  test('resetAll restores the default accent color, clears every wallpaper '
+      'slot and the persisted dimming value, in a single call', () async {
+    final service = CustomizationService(prefs);
+    await service.setAccentColor(const Color(0xFFE0435C));
+    await prefs.setString('customization_wallpaper_app', '/tmp/a.png');
+    AppWallpapers.setSlot(WallpaperSlot.app, null); // pas de vrai fichier
+    await service.setWallpaperDimming(0.4);
+
+    await service.resetAll();
+
+    expect(AppColors.primary, const Color(0xFF7F31E6));
+    expect(prefs.getInt(accentColorPreferenceKey), isNull);
+    expect(AppWallpapers.app, isNull);
+    expect(prefs.getString('customization_wallpaper_app'), isNull);
+    expect(AppWallpapers.dimming, 0.78);
+    expect(prefs.getDouble(wallpaperDimmingPreferenceKey), 0.78);
+  });
 }

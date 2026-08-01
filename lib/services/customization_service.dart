@@ -10,6 +10,7 @@ import '../core/theme/app_wallpapers.dart';
 import '../core/utils/user_content_paths.dart';
 
 const String accentColorPreferenceKey = 'customization_accent_color';
+const String wallpaperDimmingPreferenceKey = 'customization_wallpaper_dimming';
 
 String _wallpaperPreferenceKey(WallpaperSlot slot) =>
     'customization_wallpaper_${slot.name}';
@@ -47,6 +48,26 @@ class CustomizationService {
         AppWallpapers.setSlot(slot, File(path));
       }
     }
+    final dimming = prefs.getDouble(wallpaperDimmingPreferenceKey);
+    if (dimming != null) {
+      AppWallpapers.dimming = dimming;
+    }
+  }
+
+  Future<void> setWallpaperDimming(double value) async {
+    AppWallpapers.dimming = value;
+    await prefs.setDouble(wallpaperDimmingPreferenceKey, value);
+  }
+
+  /// Remet la couleur d'accent et les 4 fonds d'écran à zéro en un seul
+  /// geste — plus pratique que de devoir retirer chaque zone une par une
+  /// pour repartir de la présentation par défaut.
+  Future<void> resetAll() async {
+    await resetAccentColor();
+    for (final slot in WallpaperSlot.values) {
+      await clearWallpaper(slot);
+    }
+    await setWallpaperDimming(0.78);
   }
 
   Future<void> setAccentColor(Color color) async {

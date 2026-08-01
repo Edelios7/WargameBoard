@@ -266,6 +266,36 @@ abstract class AppLocalizations {
   /// **'Format d\'image non pris en charge (essaie .png, .jpg ou .webp).'**
   String get customizationUnsupportedFormat;
 
+  /// No description provided for @customizationDimmingLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Intensité du voile sombre'**
+  String get customizationDimmingLabel;
+
+  /// No description provided for @customizationDimmingHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vers la gauche : l\'image ressort davantage. Vers la droite : le texte reste lisible plus facilement.'**
+  String get customizationDimmingHint;
+
+  /// No description provided for @customizationResetAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tout réinitialiser'**
+  String get customizationResetAll;
+
+  /// No description provided for @customizationResetAllConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tout réinitialiser ?'**
+  String get customizationResetAllConfirmTitle;
+
+  /// No description provided for @customizationResetAllConfirmMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'La couleur d\'accent et les 4 fonds d\'écran reviennent à leur valeur par défaut.'**
+  String get customizationResetAllConfirmMessage;
+
   /// No description provided for @settingsProfileTitle.
   ///
   /// In fr, this message translates to:

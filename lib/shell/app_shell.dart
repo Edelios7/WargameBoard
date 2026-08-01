@@ -140,7 +140,11 @@ class AppShell extends ConsumerWidget {
       children: [
         Positioned.fill(child: Image.file(wallpaper, fit: BoxFit.cover)),
         Positioned.fill(
-          child: ColoredBox(color: AppColors.background.withValues(alpha: .74)),
+          child: ColoredBox(
+            color: AppColors.background.withValues(
+              alpha: AppWallpapers.dimming,
+            ),
+          ),
         ),
         child,
       ],

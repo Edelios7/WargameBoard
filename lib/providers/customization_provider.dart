@@ -32,3 +32,8 @@ final wallpaperProvider = Provider.family<File?, WallpaperSlot>((ref, slot) {
   ref.watch(themeVersionProvider);
   return AppWallpapers.forSlot(slot);
 });
+
+final wallpaperDimmingProvider = Provider<double>((ref) {
+  ref.watch(themeVersionProvider);
+  return AppWallpapers.dimming;
+});

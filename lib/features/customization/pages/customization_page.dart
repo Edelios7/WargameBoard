@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/customization_provider.dart';
@@ -48,10 +49,51 @@ class CustomizationPage extends ConsumerWidget {
     ref.read(themeVersionProvider.notifier).state++;
   }
 
+  Future<void> _setDimming(WidgetRef ref, double value) async {
+    await ref.read(customizationServiceProvider).setWallpaperDimming(value);
+    ref.read(themeVersionProvider.notifier).state++;
+  }
+
+  Future<void> _resetAll(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AppDialogShortcuts(
+        onEnter: () => Navigator.of(dialogContext).pop(true),
+        child: AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text(
+            l10n.customizationResetAllConfirmTitle,
+            style: AppTextStyles.title,
+          ),
+          content: Text(
+            l10n.customizationResetAllConfirmMessage,
+            style: AppTextStyles.body,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.armyBuilderCancel),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(l10n.customizationResetAll),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmed != true) return;
+    await ref.read(customizationServiceProvider).resetAll();
+    ref.read(themeVersionProvider.notifier).state++;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final accent = ref.watch(accentColorProvider);
+    final dimming = ref.watch(wallpaperDimmingProvider);
 
     return Scaffold(
       backgroundColor: AppWallpapers.app == null
@@ -67,7 +109,24 @@ class CustomizationPage extends ConsumerWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.customizationTitle, style: AppTextStyles.heading),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        l10n.customizationTitle,
+                        style: AppTextStyles.heading,
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () => _resetAll(context, ref),
+                      icon: const Icon(
+                        Icons.settings_backup_restore_rounded,
+                        size: 18,
+                      ),
+                      label: Text(l10n.customizationResetAll),
+                    ),
+                  ],
+                ),
                 const DecorSeparator(
                   maxWidth: 200,
                   padding: EdgeInsets.only(top: 8, bottom: 20),
@@ -205,6 +264,39 @@ class CustomizationPage extends ConsumerWidget {
                           ),
                           onClear: () =>
                               _clearWallpaper(ref, WallpaperSlot.banner),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          l10n.customizationDimmingLabel,
+                          style: AppTextStyles.eyebrow,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          l10n.customizationDimmingHint,
+                          style: AppTextStyles.caption,
+                        ),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.image_rounded,
+                              size: 16,
+                              color: AppColors.textSecondary,
+                            ),
+                            Expanded(
+                              child: Slider(
+                                value: dimming,
+                                min: 0.3,
+                                max: 0.95,
+                                activeColor: AppColors.primary,
+                                onChanged: (value) => _setDimming(ref, value),
+                              ),
+                            ),
+                            const Icon(
+                              Icons.text_fields_rounded,
+                              size: 16,
+                              color: AppColors.textSecondary,
+                            ),
+                          ],
                         ),
                       ],
                     ),

@@ -46,7 +46,9 @@ class Sidebar extends ConsumerWidget {
             // par-dessus une image arbitraire choisie par l'utilisateur.
             Positioned.fill(
               child: ColoredBox(
-                color: AppColors.background.withValues(alpha: .78),
+                color: AppColors.background.withValues(
+                  alpha: AppWallpapers.dimming,
+                ),
               ),
             ),
           Padding(

@@ -96,6 +96,23 @@ class AppLocalizationsFr extends AppLocalizations {
       'Format d\'image non pris en charge (essaie .png, .jpg ou .webp).';
 
   @override
+  String get customizationDimmingLabel => 'Intensité du voile sombre';
+
+  @override
+  String get customizationDimmingHint =>
+      'Vers la gauche : l\'image ressort davantage. Vers la droite : le texte reste lisible plus facilement.';
+
+  @override
+  String get customizationResetAll => 'Tout réinitialiser';
+
+  @override
+  String get customizationResetAllConfirmTitle => 'Tout réinitialiser ?';
+
+  @override
+  String get customizationResetAllConfirmMessage =>
+      'La couleur d\'accent et les 4 fonds d\'écran reviennent à leur valeur par défaut.';
+
+  @override
   String get settingsProfileTitle => 'Profil';
 
   @override

@@ -71,7 +71,9 @@ class _AppCardState extends State<AppCard> {
                   // l'utilisateur.
                   Positioned.fill(
                     child: ColoredBox(
-                      color: AppColors.surfaceElevated.withValues(alpha: .82),
+                      color: AppColors.surfaceElevated.withValues(
+                        alpha: AppWallpapers.dimming,
+                      ),
                     ),
                   ),
                 AnimatedContainer(

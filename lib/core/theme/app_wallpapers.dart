@@ -20,6 +20,13 @@ class AppWallpapers {
   static File? cards;
   static File? banner;
 
+  /// Opacité du voile sombre posé sur chaque image de fond (0 = image
+  /// brute, difficile à lire par-dessus ; 1 = voile plein, l'image
+  /// disparaît). Un seul réglage global plutôt qu'un par zone — la page
+  /// Personnalisation reste simple, et les 4 zones veulent en pratique
+  /// toutes le même compromis lisibilité/décor.
+  static double dimming = 0.78;
+
   static File? forSlot(WallpaperSlot slot) {
     switch (slot) {
       case WallpaperSlot.app:

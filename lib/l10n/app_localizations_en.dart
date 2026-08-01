@@ -96,6 +96,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'Unsupported image format (try .png, .jpg or .webp).';
 
   @override
+  String get customizationDimmingLabel => 'Dark overlay intensity';
+
+  @override
+  String get customizationDimmingHint =>
+      'Toward the left: the image stands out more. Toward the right: text stays easier to read.';
+
+  @override
+  String get customizationResetAll => 'Reset everything';
+
+  @override
+  String get customizationResetAllConfirmTitle => 'Reset everything?';
+
+  @override
+  String get customizationResetAllConfirmMessage =>
+      'The accent color and all 4 wallpapers go back to their default value.';
+
+  @override
   String get settingsProfileTitle => 'Profile';
 
   @override

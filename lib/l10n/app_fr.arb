@@ -31,6 +31,11 @@
   "customizationRemoveImage": "Retirer",
   "customizationNoImage": "Aucune image",
   "customizationUnsupportedFormat": "Format d'image non pris en charge (essaie .png, .jpg ou .webp).",
+  "customizationDimmingLabel": "Intensité du voile sombre",
+  "customizationDimmingHint": "Vers la gauche : l'image ressort davantage. Vers la droite : le texte reste lisible plus facilement.",
+  "customizationResetAll": "Tout réinitialiser",
+  "customizationResetAllConfirmTitle": "Tout réinitialiser ?",
+  "customizationResetAllConfirmMessage": "La couleur d'accent et les 4 fonds d'écran reviennent à leur valeur par défaut.",
 
   "settingsProfileTitle": "Profil",
   "settingsDisplayNameLabel": "Ton nom",

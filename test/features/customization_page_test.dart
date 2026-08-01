@@ -75,4 +75,32 @@ void main() {
       expect(prefs.getInt('customization_accent_color'), isNotNull);
     },
   );
+
+  testWidgets('"Tout réinitialiser" asks for confirmation before clearing the '
+      'saved accent color', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await prefs.setInt('customization_accent_color', 0xFFE0435C);
+    AppColors.applyAccent(const Color(0xFFE0435C));
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Personnalisation'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Tout réinitialiser'));
+    await tester.pumpAndSettle();
+
+    // Confirmation demandée avant de tout effacer.
+    expect(find.text('Tout réinitialiser ?'), findsOneWidget);
+    await tester.tap(find.text('Tout réinitialiser').last);
+    await tester.pumpAndSettle();
+
+    expect(AppColors.primary, const Color(0xFF7F31E6));
+    expect(prefs.getInt('customization_accent_color'), isNull);
+  });
 }

@@ -31,6 +31,11 @@
   "customizationRemoveImage": "Remove",
   "customizationNoImage": "No image",
   "customizationUnsupportedFormat": "Unsupported image format (try .png, .jpg or .webp).",
+  "customizationDimmingLabel": "Dark overlay intensity",
+  "customizationDimmingHint": "Toward the left: the image stands out more. Toward the right: text stays easier to read.",
+  "customizationResetAll": "Reset everything",
+  "customizationResetAllConfirmTitle": "Reset everything?",
+  "customizationResetAllConfirmMessage": "The accent color and all 4 wallpapers go back to their default value.",
 
   "settingsProfileTitle": "Profile",
   "settingsDisplayNameLabel": "Your name",
