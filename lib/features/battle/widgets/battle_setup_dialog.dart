@@ -56,6 +56,15 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
   void _onArmyChanged(String? armyId, List<ArmyListItem> armies) {
     setState(() {
       _armyId = armyId;
+      // Une même armée ne peut pas jouer contre elle-même : sans ce
+      // garde-fou, choisir ici l'armée déjà sélectionnée côté adverse
+      // laissait `_opponentArmyId` pointer dessus, et le tableau de bord
+      // affichait deux rosters identiques mutant le même état partagé
+      // (unités détruites, modificateurs...) sous deux étiquettes "moi"/
+      // "adversaire" différentes.
+      if (armyId != null && armyId == _opponentArmyId) {
+        _opponentArmyId = null;
+      }
       final army = armies.where((a) => a.id == armyId).firstOrNull;
       if (army?.pointsLimit != null) {
         _pointsLimitController.text = army!.pointsLimit.toString();
@@ -82,7 +91,7 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
 
   Future<void> _start() async {
     if (_submitting) return;
-    _submitting = true;
+    setState(() => _submitting = true);
     final id = await ref
         .read(battleRepositoryProvider)
         .startBattle(
@@ -342,8 +351,17 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
                           style: FilledButton.styleFrom(
                             backgroundColor: AppColors.primary,
                           ),
-                          onPressed: _start,
-                          child: Text(l10n.battleSetupStart),
+                          onPressed: _submitting ? null : _start,
+                          child: _submitting
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(l10n.battleSetupStart),
                         ),
                       ],
                     ),

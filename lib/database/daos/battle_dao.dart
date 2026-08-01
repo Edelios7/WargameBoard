@@ -103,15 +103,11 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
 
   Future<void> deleteBattle(String id) async {
     await (delete(battleEvents)..where((t) => t.battleId.equals(id))).go();
-    await (delete(
-      battleUnitStates,
-    )..where((t) => t.battleId.equals(id))).go();
+    await (delete(battleUnitStates)..where((t) => t.battleId.equals(id))).go();
     await (delete(
       battleUnitModifiers,
     )..where((t) => t.battleId.equals(id))).go();
-    await (delete(
-      battleUnitWounds,
-    )..where((t) => t.battleId.equals(id))).go();
+    await (delete(battleUnitWounds)..where((t) => t.battleId.equals(id))).go();
     await (delete(battles)..where((t) => t.id.equals(id))).go();
   }
 
@@ -153,13 +149,12 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   /// suivi en direct (voir [getActiveBattle]), sans quoi une partie non
   /// finalisée polluerait l'historique et les statistiques.
   Future<List<BattleDetails>> listBattles() async {
-    final query =
-        select(battles).join(_baseJoins())
-          ..where(
-            battles.status.isNull() |
-                battles.status.equalsValue(BattleStatus.completed),
-          )
-          ..orderBy([OrderingTerm.desc(battles.playedAt)]);
+    final query = select(battles).join(_baseJoins())
+      ..where(
+        battles.status.isNull() |
+            battles.status.equalsValue(BattleStatus.completed),
+      )
+      ..orderBy([OrderingTerm.desc(battles.playedAt)]);
 
     final rows = await query.get();
     return rows.map(_fromRow).toList();
@@ -167,14 +162,13 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
 
   /// Prochaine partie programmée (date future, sans résultat renseigné).
   Future<BattleDetails?> getNextUpcoming() async {
-    final query =
-        select(battles).join(_baseJoins())
-          ..where(
-            battles.playedAt.isBiggerThanValue(DateTime.now()) &
-                battles.result.isNull(),
-          )
-          ..orderBy([OrderingTerm.asc(battles.playedAt)])
-          ..limit(1);
+    final query = select(battles).join(_baseJoins())
+      ..where(
+        battles.playedAt.isBiggerThanValue(DateTime.now()) &
+            battles.result.isNull(),
+      )
+      ..orderBy([OrderingTerm.asc(battles.playedAt)])
+      ..limit(1);
 
     final row = await query.getSingleOrNull();
     return row == null ? null : _fromRow(row);
@@ -182,11 +176,10 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
 
   /// Dernière partie jouée (résultat renseigné), la plus récente.
   Future<BattleDetails?> getLastPlayed() async {
-    final query =
-        select(battles).join(_baseJoins())
-          ..where(battles.result.isNotNull())
-          ..orderBy([OrderingTerm.desc(battles.playedAt)])
-          ..limit(1);
+    final query = select(battles).join(_baseJoins())
+      ..where(battles.result.isNotNull())
+      ..orderBy([OrderingTerm.desc(battles.playedAt)])
+      ..limit(1);
 
     final row = await query.getSingleOrNull();
     return row == null ? null : _fromRow(row);
@@ -237,14 +230,13 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   /// récente — permet de proposer de reprendre la partie au redémarrage
   /// de l'app.
   Future<BattleDetails?> getActiveBattle() async {
-    final query =
-        select(battles).join(_baseJoins())
-          ..where(
-            battles.status.equalsValue(BattleStatus.setup) |
-                battles.status.equalsValue(BattleStatus.active),
-          )
-          ..orderBy([OrderingTerm.desc(battles.createdAt)])
-          ..limit(1);
+    final query = select(battles).join(_baseJoins())
+      ..where(
+        battles.status.equalsValue(BattleStatus.setup) |
+            battles.status.equalsValue(BattleStatus.active),
+      )
+      ..orderBy([OrderingTerm.desc(battles.createdAt)])
+      ..limit(1);
 
     final row = await query.getSingleOrNull();
     return row == null ? null : _fromRow(row);
@@ -311,11 +303,16 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   /// il en était. Ne fait rien si déjà à la toute première phase du
   /// round 1 (rien à annuler).
   ///
-  /// Supprime aussi les événements du journal déjà logués dans la phase
-  /// qu'on quitte (et annule leur variation de CP éventuelle, comme
-  /// [deleteEvent]) — sinon le round/phase affichés reviendraient en
-  /// arrière alors que des PC dépensés pendant cette phase resteraient
-  /// décomptés, désynchronisant l'affichage et le journal.
+  /// Annule aussi la variation de PC des événements de la phase qu'on
+  /// quitte (comme [deleteEvent]) — sinon le round/phase affichés
+  /// reviendraient en arrière alors que des PC dépensés pendant cette
+  /// phase resteraient décomptés, désynchronisant l'affichage et le
+  /// journal. Ne supprime PAS l'événement lui-même quand il ne porte
+  /// aucune variation de PC (une simple note ou un jet de dés logué à la
+  /// main) : le journal de bataille est la seule trace de ce qui a été
+  /// fait pendant la partie, un retour en arrière de phase ne doit pas
+  /// faire disparaître silencieusement ce que le joueur a pris le temps
+  /// de noter.
   Future<void> previousPhase(String battleId) async {
     final battle = await (select(
       battles,
@@ -327,17 +324,20 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
     final isFirstPhase = currentIndex == 0;
     if (isFirstPhase && currentRound <= 1) return;
 
-    final eventsInLeavingPhase = await (select(battleEvents)..where(
-          (t) =>
-              t.battleId.equals(battleId) &
-              t.round.equals(currentRound) &
-              t.phase.equalsValue(currentPhase),
-        ))
-        .get();
-    // deleteEvent annule aussi la variation de CP de chaque événement
-    // supprimé, donc les PC affichés restent cohérents avec le journal.
+    final eventsInLeavingPhase =
+        await (select(battleEvents)..where(
+              (t) =>
+                  t.battleId.equals(battleId) &
+                  t.round.equals(currentRound) &
+                  t.phase.equalsValue(currentPhase),
+            ))
+            .get();
     for (final event in eventsInLeavingPhase) {
-      await deleteEvent(event.id);
+      if (event.cpDelta != null || event.opponentCpDelta != null) {
+        // deleteEvent annule la variation de CP de l'événement supprimé,
+        // donc les PC affichés restent cohérents avec le journal.
+        await deleteEvent(event.id);
+      }
     }
 
     await updateLiveState(
@@ -453,6 +453,81 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
     });
   }
 
+  /// Ajoute (ou retire) `delta` au score d'un camp, en relisant la valeur
+  /// actuelle en base à l'intérieur d'une transaction — pas depuis une
+  /// valeur déjà chargée côté widget, qui peut être périmée. Sans cette
+  /// relecture, deux clics rapprochés sur "+" (avant que le premier ait eu
+  /// le temps de se répercuter dans l'état Riverpod) partaient tous les
+  /// deux de la même valeur de départ et ne faisaient gagner qu'un seul
+  /// point net au lieu de deux.
+  Future<void> adjustScore(
+    String battleId, {
+    required bool mine,
+    required int delta,
+  }) {
+    return transaction(() async {
+      final battle = await (select(
+        battles,
+      )..where((t) => t.id.equals(battleId))).getSingle();
+      final current = mine
+          ? (battle.myScore ?? 0)
+          : (battle.opponentScore ?? 0);
+      final next = (current + delta).clamp(0, 1 << 30);
+
+      await (update(battles)..where((t) => t.id.equals(battleId))).write(
+        BattlesCompanion(
+          myScore: mine ? Value(next) : const Value.absent(),
+          opponentScore: mine ? const Value.absent() : Value(next),
+        ),
+      );
+    });
+  }
+
+  /// Ajoute (ou retire) `delta` aux PC d'un camp et journalise l'écart
+  /// réellement appliqué (borné à 0) — même relecture en transaction que
+  /// [adjustScore], pour la même raison (deux clics rapprochés sur "+1
+  /// PC" ne doivent pas partir de la même valeur de départ périmée).
+  Future<void> adjustCommandPoints(
+    String battleId, {
+    required bool mine,
+    required int delta,
+    required String label,
+    int? round,
+    BattlePhase? phase,
+  }) {
+    return transaction(() async {
+      final battle = await (select(
+        battles,
+      )..where((t) => t.id.equals(battleId))).getSingle();
+      final current = mine
+          ? (battle.myCommandPoints ?? 0)
+          : (battle.opponentCommandPoints ?? 0);
+      final next = (current + delta).clamp(0, 1 << 30);
+      final appliedDelta = next - current;
+
+      await (update(battles)..where((t) => t.id.equals(battleId))).write(
+        BattlesCompanion(
+          myCommandPoints: mine ? Value(next) : const Value.absent(),
+          opponentCommandPoints: mine ? const Value.absent() : Value(next),
+        ),
+      );
+
+      if (appliedDelta != 0) {
+        await into(battleEvents).insert(
+          BattleEventsCompanion.insert(
+            id: _uuid.v4(),
+            battleId: battleId,
+            round: Value(round),
+            phase: Value(phase),
+            label: label,
+            cpDelta: mine ? Value(appliedDelta) : const Value.absent(),
+            opponentCpDelta: mine ? const Value.absent() : Value(appliedDelta),
+          ),
+        );
+      }
+    });
+  }
+
   /// Supprime un événement du journal ("annuler") — si l'événement portait
   /// une variation de CP (mienne et/ou adverse), la variation est
   /// annulée en sens inverse sur la partie en cours, bornée à 0.
@@ -527,17 +602,13 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
     final existing =
         await (select(battleUnitStates)..where(
               (t) =>
-                  t.battleId.equals(battleId) &
-                  t.armyUnitId.equals(armyUnitId),
+                  t.battleId.equals(battleId) & t.armyUnitId.equals(armyUnitId),
             ))
             .getSingleOrNull();
 
     if (existing != null) {
-      await (update(
-        battleUnitStates,
-      )..where((t) => t.id.equals(existing.id))).write(
-        BattleUnitStatesCompanion(destroyed: Value(destroyed)),
-      );
+      await (update(battleUnitStates)..where((t) => t.id.equals(existing.id)))
+          .write(BattleUnitStatesCompanion(destroyed: Value(destroyed)));
       return;
     }
 
@@ -554,10 +625,11 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   /// Unités marquées détruites pour cette partie — les unités absentes de
   /// la liste sont considérées vivantes par défaut.
   Future<List<BattleUnitStateDetails>> getUnitStates(String battleId) async {
-    final rows = await (select(
-      battleUnitStates,
-    )..where((t) => t.battleId.equals(battleId) & t.destroyed.equals(true)))
-        .get();
+    final rows =
+        await (select(battleUnitStates)..where(
+              (t) => t.battleId.equals(battleId) & t.destroyed.equals(true),
+            ))
+            .get();
     return rows
         .map(
           (row) => BattleUnitStateDetails(
@@ -600,10 +672,11 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   Future<List<BattleUnitModifierDetails>> getUnitModifiers(
     String battleId,
   ) async {
-    final rows = await (select(battleUnitModifiers)
-          ..where((t) => t.battleId.equals(battleId))
-          ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
-        .get();
+    final rows =
+        await (select(battleUnitModifiers)
+              ..where((t) => t.battleId.equals(battleId))
+              ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
+            .get();
     return rows
         .map(
           (row) => BattleUnitModifierDetails(
@@ -635,13 +708,14 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
     required int maxWounds,
   }) async {
     final clamped = currentWounds.clamp(0, maxWounds);
-    final existing = await (select(battleUnitWounds)..where(
-          (t) =>
-              t.battleId.equals(battleId) &
-              t.armyUnitId.equals(armyUnitId) &
-              t.modelIndex.equals(modelIndex),
-        ))
-        .getSingleOrNull();
+    final existing =
+        await (select(battleUnitWounds)..where(
+              (t) =>
+                  t.battleId.equals(battleId) &
+                  t.armyUnitId.equals(armyUnitId) &
+                  t.modelIndex.equals(modelIndex),
+            ))
+            .getSingleOrNull();
 
     if (clamped >= maxWounds) {
       if (existing != null) {

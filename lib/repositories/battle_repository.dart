@@ -198,6 +198,35 @@ class BattleRepository {
     return database.battleDao.deleteEvent(eventId);
   }
 
+  /// Ajuste le score d'un camp de façon atomique — voir [BattleDao.adjustScore].
+  Future<void> adjustScore(
+    String battleId, {
+    required bool mine,
+    required int delta,
+  }) {
+    return database.battleDao.adjustScore(battleId, mine: mine, delta: delta);
+  }
+
+  /// Ajuste les PC d'un camp et journalise l'écart appliqué de façon
+  /// atomique — voir [BattleDao.adjustCommandPoints].
+  Future<void> adjustCommandPoints(
+    String battleId, {
+    required bool mine,
+    required int delta,
+    required String label,
+    int? round,
+    BattlePhase? phase,
+  }) {
+    return database.battleDao.adjustCommandPoints(
+      battleId,
+      mine: mine,
+      delta: delta,
+      label: label,
+      round: round,
+      phase: phase,
+    );
+  }
+
   /// Finalise une partie suivie en direct et crédite l'XP correspondante
   /// (même règles que [addBattle], la partie n'existait juste pas encore
   /// en base au moment où elle a été jouée).

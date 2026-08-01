@@ -377,14 +377,8 @@ class _ScoreBlock extends ConsumerWidget {
     required int delta,
   }) {
     final repo = ref.read(battleRepositoryProvider);
-    final current = mine ? (battle.myScore ?? 0) : (battle.opponentScore ?? 0);
-    final next = (current + delta).clamp(0, 1 << 30);
     return repo
-        .updateLiveState(
-          battle.id,
-          myScore: mine ? Value(next) : const Value.absent(),
-          opponentScore: mine ? const Value.absent() : Value(next),
-        )
+        .adjustScore(battle.id, mine: mine, delta: delta)
         .then((_) => ref.invalidate(activeBattleProvider));
   }
 
@@ -746,33 +740,21 @@ class _CommandPointsBlock extends ConsumerWidget {
     required int delta,
   }) async {
     final repo = ref.read(battleRepositoryProvider);
-    final current = mine
-        ? (battle.myCommandPoints ?? 0)
-        : (battle.opponentCommandPoints ?? 0);
-    final next = (current + delta).clamp(0, 1 << 30);
-    // On journalise l'écart réellement appliqué (next - current), pas le
-    // delta demandé : si les PC sont déjà à 0 et qu'on clique sur "-", le
-    // clamp absorbe le changement (écart réel = 0) — journaliser le -1
-    // demandé ferait qu'un "annuler" ultérieur ajouterait 1 PC qui n'a
-    // jamais été réellement retiré.
-    final appliedDelta = next - current;
-    await repo.updateLiveState(
+    // adjustCommandPoints relit la valeur actuelle en base à l'intérieur
+    // d'une transaction (voir BattleDao.adjustCommandPoints) et journalise
+    // lui-même l'écart réellement appliqué — pas le delta demandé, pour ne
+    // pas fausser un futur "annuler" si le clamp à 0 a absorbé le
+    // changement.
+    await repo.adjustCommandPoints(
       battle.id,
-      myCommandPoints: mine ? Value(next) : const Value.absent(),
-      opponentCommandPoints: mine ? const Value.absent() : Value(next),
+      mine: mine,
+      delta: delta,
+      label: mine
+          ? 'CP ${delta > 0 ? '+1' : '-1'}'
+          : 'Opponent CP ${delta > 0 ? '+1' : '-1'}',
+      round: battle.currentRound,
+      phase: battle.currentPhase,
     );
-    if (appliedDelta != 0) {
-      await repo.logEvent(
-        battle.id,
-        label: mine
-            ? 'CP ${delta > 0 ? '+1' : '-1'}'
-            : 'Opponent CP ${delta > 0 ? '+1' : '-1'}',
-        cpDelta: mine ? appliedDelta : null,
-        opponentCpDelta: mine ? null : appliedDelta,
-        round: battle.currentRound,
-        phase: battle.currentPhase,
-      );
-    }
     ref.invalidate(activeBattleProvider);
     ref.invalidate(battleEventsProvider(battle.id));
   }

@@ -581,7 +581,11 @@ class _BattlesByFactionCard extends StatelessWidget {
 
   const _BattlesByFactionCard({required this.l10n, required this.battles});
 
-  static final _palette = [
+  // Getter, pas `static final` : `AppColors.primary` est mutable (couleur
+  // d'accent personnalisable, voir customization_provider.dart) — un
+  // `static final` figerait la palette à sa toute première évaluation et
+  // ignorerait tout changement d'accent fait après coup dans l'appli.
+  static List<Color> get _palette => [
     AppColors.primary,
     AppColors.info,
     AppColors.success,

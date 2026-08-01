@@ -145,34 +145,63 @@ void main() {
     });
 
     test(
-        'previousPhase rewinds the phase/round and reverts CP logged in the '
-        'phase being left, so the display and the journal stay in sync',
-        () async {
+      'previousPhase rewinds the phase/round and reverts CP logged in the '
+      'phase being left, so the display and the journal stay in sync',
+      () async {
+        final id = await database.battleDao.startBattle(opponentName: 'Marc');
+        await database.battleDao.advancePhase(id); // command -> movement
+
+        // Un stratagème coûteux dépensé pendant Mouvement...
+        await database.battleDao.updateLiveState(
+          id,
+          myCommandPoints: const Value(2),
+        );
+        await database.battleDao.logEvent(
+          id,
+          label: 'Rapid Ingress',
+          cpDelta: -1,
+          round: 1,
+          phase: BattlePhase.movement,
+        );
+        await database.battleDao.updateLiveState(
+          id,
+          myCommandPoints: const Value(1),
+        );
+
+        // ...puis un tap de trop sur "Phase suivante" annulé.
+        await database.battleDao.previousPhase(id);
+
+        final active = await database.battleDao.getActiveBattle();
+        expect(active!.currentPhase, BattlePhase.command);
+        expect(active.currentRound, 1);
+        // Les PC dépensés pendant la phase annulée sont recrédités.
+        expect(active.myCommandPoints, 2);
+
+        final events = await database.battleDao.getEvents(id);
+        expect(events, isEmpty);
+      },
+    );
+
+    test('previousPhase keeps plain journal entries (no CP delta) from the '
+        "phase being left — a manual note or dice-roll log isn't discarded "
+        'just because the player rewound a phase', () async {
       final id = await database.battleDao.startBattle(opponentName: 'Marc');
       await database.battleDao.advancePhase(id); // command -> movement
 
-      // Un stratagème coûteux dépensé pendant Mouvement...
-      await database.battleDao.updateLiveState(id, myCommandPoints: const Value(2));
       await database.battleDao.logEvent(
         id,
-        label: 'Rapid Ingress',
-        cpDelta: -1,
+        label: '2D6: 4, 5 (total 9)',
         round: 1,
         phase: BattlePhase.movement,
       );
-      await database.battleDao.updateLiveState(id, myCommandPoints: const Value(1));
 
-      // ...puis un tap de trop sur "Phase suivante" annulé.
       await database.battleDao.previousPhase(id);
 
       final active = await database.battleDao.getActiveBattle();
       expect(active!.currentPhase, BattlePhase.command);
-      expect(active.currentRound, 1);
-      // Les PC dépensés pendant la phase annulée sont recrédités.
-      expect(active.myCommandPoints, 2);
-
       final events = await database.battleDao.getEvents(id);
-      expect(events, isEmpty);
+      expect(events, hasLength(1));
+      expect(events.single.label, '2D6: 4, 5 (total 9)');
     });
 
     test('logEvent records CP history readable via getEvents', () async {
@@ -364,15 +393,9 @@ void main() {
 
         var wounds = await database.battleDao.getUnitWounds(battleId);
         expect(wounds, hasLength(2));
-        expect(
-          wounds.firstWhere((w) => w.modelIndex == 1).currentWounds,
-          1,
-        );
+        expect(wounds.firstWhere((w) => w.modelIndex == 1).currentWounds, 1);
         // Clampée à 0, jamais négative.
-        expect(
-          wounds.firstWhere((w) => w.modelIndex == 2).currentWounds,
-          0,
-        );
+        expect(wounds.firstWhere((w) => w.modelIndex == 2).currentWounds, 0);
 
         // Revenir au maximum efface la ligne (absence = plein PV).
         await database.battleDao.setModelWounds(
@@ -388,107 +411,154 @@ void main() {
       },
     );
 
-    test(
-      'deleteBattle also clears its per-unit state (destroyed/modifiers/'
-      'wounds), not just the events journal',
-      () async {
-        final battleId = await database.battleDao.startBattle(
-          opponentName: 'Marc',
-        );
-        final armyUnitId = await seedArmyUnit(database);
+    test('deleteBattle also clears its per-unit state (destroyed/modifiers/'
+        'wounds), not just the events journal', () async {
+      final battleId = await database.battleDao.startBattle(
+        opponentName: 'Marc',
+      );
+      final armyUnitId = await seedArmyUnit(database);
 
-        await database.battleDao.setUnitDestroyed(
-          battleId,
-          armyUnitId,
-          destroyed: true,
-        );
-        await database.battleDao.addUnitModifier(
-          battleId,
-          armyUnitId,
-          statKey: BattleStatKey.toughness,
-          delta: 1,
-        );
-        await database.battleDao.setModelWounds(
-          battleId,
-          armyUnitId,
-          1,
-          currentWounds: 1,
-          maxWounds: 3,
-        );
+      await database.battleDao.setUnitDestroyed(
+        battleId,
+        armyUnitId,
+        destroyed: true,
+      );
+      await database.battleDao.addUnitModifier(
+        battleId,
+        armyUnitId,
+        statKey: BattleStatKey.toughness,
+        delta: 1,
+      );
+      await database.battleDao.setModelWounds(
+        battleId,
+        armyUnitId,
+        1,
+        currentWounds: 1,
+        maxWounds: 3,
+      );
 
-        await database.battleDao.deleteBattle(battleId);
+      await database.battleDao.deleteBattle(battleId);
 
-        expect(await database.battleDao.getUnitStates(battleId), isEmpty);
-        expect(await database.battleDao.getUnitModifiers(battleId), isEmpty);
-        expect(await database.battleDao.getUnitWounds(battleId), isEmpty);
-      },
-    );
+      expect(await database.battleDao.getUnitStates(battleId), isEmpty);
+      expect(await database.battleDao.getUnitModifiers(battleId), isEmpty);
+      expect(await database.battleDao.getUnitWounds(battleId), isEmpty);
+    });
+  });
+
+  test('two concurrent adjustScore calls both apply, instead of the second '
+      'one reading a stale pre-write value and net-ing only +1', () async {
+    final id = await database.battleDao.startBattle(opponentName: 'Marc');
+
+    await Future.wait([
+      database.battleDao.adjustScore(id, mine: true, delta: 1),
+      database.battleDao.adjustScore(id, mine: true, delta: 1),
+    ]);
+
+    final battle = await database.battleDao.getActiveBattle();
+    expect(battle!.myScore, 2);
   });
 
   test(
-    'two concurrent spendCommandPoints calls both apply and both log, '
-    'instead of one silently overwriting the other',
+    'two concurrent adjustCommandPoints calls both apply and both log',
     () async {
       final id = await database.battleDao.startBattle(opponentName: 'Marc');
-      await database.battleDao.updateLiveState(
-        id,
-        myCommandPoints: const Value(3),
-      );
 
-      // Deux dépenses de 1 CP lancées avant que l'une n'ait fini d'écrire
-      // (double-clic, ou deux stratagèmes cliqués coup sur coup) doivent
-      // se sérialiser : le total final doit refléter les DEUX dépenses,
-      // pas une seule appliquée deux fois en journal.
       await Future.wait([
-        database.battleDao.spendCommandPoints(
+        database.battleDao.adjustCommandPoints(
           id,
           mine: true,
-          amount: 1,
-          label: 'Stratagème A',
+          delta: 1,
+          label: 'CP +1',
         ),
-        database.battleDao.spendCommandPoints(
+        database.battleDao.adjustCommandPoints(
           id,
           mine: true,
-          amount: 1,
-          label: 'Stratagème B',
+          delta: 1,
+          label: 'CP +1',
         ),
       ]);
 
       final battle = await database.battleDao.getActiveBattle();
-      expect(battle!.myCommandPoints, 1);
+      expect(battle!.myCommandPoints, 2);
       expect(await database.battleDao.getEvents(id), hasLength(2));
     },
   );
 
-  test(
-    'spendCommandPoints rejects a spend that would exceed the current '
-    'balance instead of silently clamping to 0',
-    () async {
-      final id = await database.battleDao.startBattle(opponentName: 'Marc');
-      await database.battleDao.updateLiveState(
-        id,
-        myCommandPoints: const Value(1),
-      );
+  test('adjustCommandPoints logs the applied delta, not the requested one, '
+      'when the clamp to 0 absorbs part of the change', () async {
+    final id = await database.battleDao.startBattle(opponentName: 'Marc');
 
-      final firstSucceeded = await database.battleDao.spendCommandPoints(
+    await database.battleDao.adjustCommandPoints(
+      id,
+      mine: true,
+      delta: -1,
+      label: 'CP -1',
+    );
+
+    final battle = await database.battleDao.getActiveBattle();
+    expect(battle!.myCommandPoints, 0);
+    // Rien à journaliser : le delta réellement appliqué est 0.
+    expect(await database.battleDao.getEvents(id), isEmpty);
+  });
+
+  test('two concurrent spendCommandPoints calls both apply and both log, '
+      'instead of one silently overwriting the other', () async {
+    final id = await database.battleDao.startBattle(opponentName: 'Marc');
+    await database.battleDao.updateLiveState(
+      id,
+      myCommandPoints: const Value(3),
+    );
+
+    // Deux dépenses de 1 CP lancées avant que l'une n'ait fini d'écrire
+    // (double-clic, ou deux stratagèmes cliqués coup sur coup) doivent
+    // se sérialiser : le total final doit refléter les DEUX dépenses,
+    // pas une seule appliquée deux fois en journal.
+    await Future.wait([
+      database.battleDao.spendCommandPoints(
         id,
         mine: true,
         amount: 1,
         label: 'Stratagème A',
-      );
-      final secondSucceeded = await database.battleDao.spendCommandPoints(
+      ),
+      database.battleDao.spendCommandPoints(
         id,
         mine: true,
         amount: 1,
         label: 'Stratagème B',
-      );
+      ),
+    ]);
 
-      expect(firstSucceeded, isTrue);
-      expect(secondSucceeded, isFalse);
+    final battle = await database.battleDao.getActiveBattle();
+    expect(battle!.myCommandPoints, 1);
+    expect(await database.battleDao.getEvents(id), hasLength(2));
+  });
 
-      final battle = await database.battleDao.getActiveBattle();
-      expect(battle!.myCommandPoints, 0);
-      expect(await database.battleDao.getEvents(id), hasLength(1));
-    },
-  );
+  test('spendCommandPoints rejects a spend that would exceed the current '
+      'balance instead of silently clamping to 0', () async {
+    final id = await database.battleDao.startBattle(opponentName: 'Marc');
+    await database.battleDao.updateLiveState(
+      id,
+      myCommandPoints: const Value(1),
+    );
+
+    final firstSucceeded = await database.battleDao.spendCommandPoints(
+      id,
+      mine: true,
+      amount: 1,
+      label: 'Stratagème A',
+    );
+    final secondSucceeded = await database.battleDao.spendCommandPoints(
+      id,
+      mine: true,
+      amount: 1,
+      label: 'Stratagème B',
+    );
+
+    expect(firstSucceeded, isTrue);
+    expect(secondSucceeded, isFalse);
+
+    final battle = await database.battleDao.getActiveBattle();
+    expect(battle!.myCommandPoints, 0);
+    expect(await database.battleDao.getEvents(id), hasLength(1));
+  });
 }
