@@ -27,6 +27,7 @@ import 'tables/datasheet_costs_table.dart';
 import 'tables/datasheet_versions_table.dart';
 import 'tables/datasheet_sources_table.dart';
 import 'tables/favorite_datasheets_table.dart';
+import 'tables/datasheet_aliases_table.dart';
 
 import 'tables/equipment_groups_table.dart';
 import 'tables/equipment_options_table.dart';
@@ -113,6 +114,7 @@ part 'app_database.g.dart';
     DatasheetVersions,
     DatasheetSources,
     FavoriteDatasheets,
+    DatasheetAliases,
 
     // ===== EQUIPMENT =====
     EquipmentGroups,
@@ -210,7 +212,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 22;
+  int get schemaVersion => 23;
 
   // =========================
   // Migrations
@@ -410,6 +412,11 @@ class AppDatabase extends _$AppDatabase {
       if (from < 22) {
         if (!await _hasColumn('army_units', 'attached_to_unit_id')) {
           await m.addColumn(armyUnits, armyUnits.attachedToUnitId);
+        }
+      }
+      if (from < 23) {
+        if (!await _hasTable('datasheet_aliases')) {
+          await m.createTable(datasheetAliases);
         }
       }
     },

@@ -17,6 +17,7 @@ import '../models/weapon_details.dart';
 import '../tables/abilities_table.dart';
 import '../tables/army_units_table.dart';
 import '../tables/datasheet_ability_links_table.dart';
+import '../tables/datasheet_aliases_table.dart';
 import '../tables/datasheet_costs_table.dart';
 import '../tables/datasheet_keyword_links_table.dart';
 import '../tables/datasheet_models_table.dart';
@@ -61,6 +62,7 @@ part 'datasheet_dao.g.dart';
     UnitSizes,
     ArmyUnits,
     FavoriteDatasheets,
+    DatasheetAliases,
   ],
 )
 class DatasheetDao extends DatabaseAccessor<AppDatabase>
@@ -103,6 +105,19 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
 
   Future<int> countModelProfiles() async {
     return (await select(modelProfiles).get()).length;
+  }
+
+  /// Tous les noms alternatifs (voir DatasheetAliases), groupés par
+  /// datasheetId — utilisé par les filtres de recherche en mémoire
+  /// (Collection, roster de bataille) qui n'ont pas accès au DAO pour
+  /// chaque unité déjà chargée.
+  Future<Map<String, List<String>>> allAliasesByDatasheetId() async {
+    final rows = await select(datasheetAliases).get();
+    final byDatasheetId = <String, List<String>>{};
+    for (final row in rows) {
+      (byDatasheetId[row.datasheetId] ??= []).add(row.name);
+    }
+    return byDatasheetId;
   }
 
   /// Datasheets les plus utilisées à travers toutes les armées (favoris).
@@ -159,6 +174,17 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     // l'ASCII, donc "vetereans"/"vétérans" tapé sans le bon accent/casse ne
     // matchait jamais un nom accentué comme "Escouade de Vétérans".
     final normalizedQuery = normalizeForSearch(text);
+    // Un nom alternatif (ex. nom anglais officiel d'une fiche au nom
+    // affiché en français) doit aussi matcher — voir DatasheetAliases et
+    // le commentaire de la table : taper "veteran squad" doit retrouver
+    // "Escouade de Vétérans" et inversement.
+    final aliasMatchedIds = normalizedQuery.isEmpty
+        ? const <String>{}
+        : {
+            for (final alias in await select(datasheetAliases).get())
+              if (normalizeForSearch(alias.name).contains(normalizedQuery))
+                alias.datasheetId,
+          };
 
     final query = select(datasheets).join([
       innerJoin(factions, factions.id.equalsExp(datasheets.factionId)),
@@ -174,6 +200,22 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
                 : editions.isCurrent.equals(true)),
       ),
     ]);
+
+    // Le LEFT JOIN sur `editions` ci-dessus filtre seulement SA propre
+    // clause ON — une ligne dont l'édition ne correspond pas reste dans
+    // le résultat (avec les colonnes `editions` à null), donc sans ce
+    // WHERE explicite le filtre Édition n'excluait jamais aucun palier
+    // de coût : le moins cher toutes éditions confondues gagnait toujours
+    // à la déduplication plus bas. `datasheetCosts.id.isNull()` laisse
+    // passer les fiches qui n'ont carrément aucun palier de coût importé
+    // (points = null, un état valide, pas un 0-coût — voir
+    // `resolveCostForModelCount`), qui ne doivent pas disparaître du
+    // Catalogue juste parce qu'une édition précise est sélectionnée.
+    query.where(
+      editionId != null
+          ? editions.id.equals(editionId) | datasheetCosts.id.isNull()
+          : editions.isCurrent.equals(true) | datasheetCosts.id.isNull(),
+    );
 
     if (factionId != null) {
       final matchIds = includeCompatibleSpaceMarines
@@ -202,7 +244,8 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     for (final row in rows) {
       final datasheet = row.readTable(datasheets);
       if (normalizedQuery.isNotEmpty &&
-          !normalizeForSearch(datasheet.name).contains(normalizedQuery)) {
+          !normalizeForSearch(datasheet.name).contains(normalizedQuery) &&
+          !aliasMatchedIds.contains(datasheet.id)) {
         continue;
       }
       final faction = row.readTable(factions);

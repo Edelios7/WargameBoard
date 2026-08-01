@@ -33,6 +33,8 @@ mixin _$DatasheetDaoMixin on DatabaseAccessor<AppDatabase> {
   $ArmyUnitsTable get armyUnits => attachedDatabase.armyUnits;
   $FavoriteDatasheetsTable get favoriteDatasheets =>
       attachedDatabase.favoriteDatasheets;
+  $DatasheetAliasesTable get datasheetAliases =>
+      attachedDatabase.datasheetAliases;
   DatasheetDaoManager get managers => DatasheetDaoManager(this);
 }
 
@@ -116,5 +118,10 @@ class DatasheetDaoManager {
       $$FavoriteDatasheetsTableTableManager(
         _db.attachedDatabase,
         _db.favoriteDatasheets,
+      );
+  $$DatasheetAliasesTableTableManager get datasheetAliases =>
+      $$DatasheetAliasesTableTableManager(
+        _db.attachedDatabase,
+        _db.datasheetAliases,
       );
 }

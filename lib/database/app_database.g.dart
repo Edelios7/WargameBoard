@@ -8130,6 +8130,270 @@ class FavoriteDatasheetsCompanion extends UpdateCompanion<FavoriteDatasheet> {
   }
 }
 
+class $DatasheetAliasesTable extends DatasheetAliases
+    with TableInfo<$DatasheetAliasesTable, DatasheetAliase> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DatasheetAliasesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _datasheetIdMeta = const VerificationMeta(
+    'datasheetId',
+  );
+  @override
+  late final GeneratedColumn<String> datasheetId = GeneratedColumn<String>(
+    'datasheet_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, datasheetId, name];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'datasheet_aliases';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DatasheetAliase> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('datasheet_id')) {
+      context.handle(
+        _datasheetIdMeta,
+        datasheetId.isAcceptableOrUnknown(
+          data['datasheet_id']!,
+          _datasheetIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_datasheetIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DatasheetAliase map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DatasheetAliase(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      datasheetId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}datasheet_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+    );
+  }
+
+  @override
+  $DatasheetAliasesTable createAlias(String alias) {
+    return $DatasheetAliasesTable(attachedDatabase, alias);
+  }
+}
+
+class DatasheetAliase extends DataClass implements Insertable<DatasheetAliase> {
+  final String id;
+  final String datasheetId;
+  final String name;
+  const DatasheetAliase({
+    required this.id,
+    required this.datasheetId,
+    required this.name,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['datasheet_id'] = Variable<String>(datasheetId);
+    map['name'] = Variable<String>(name);
+    return map;
+  }
+
+  DatasheetAliasesCompanion toCompanion(bool nullToAbsent) {
+    return DatasheetAliasesCompanion(
+      id: Value(id),
+      datasheetId: Value(datasheetId),
+      name: Value(name),
+    );
+  }
+
+  factory DatasheetAliase.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DatasheetAliase(
+      id: serializer.fromJson<String>(json['id']),
+      datasheetId: serializer.fromJson<String>(json['datasheetId']),
+      name: serializer.fromJson<String>(json['name']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'datasheetId': serializer.toJson<String>(datasheetId),
+      'name': serializer.toJson<String>(name),
+    };
+  }
+
+  DatasheetAliase copyWith({String? id, String? datasheetId, String? name}) =>
+      DatasheetAliase(
+        id: id ?? this.id,
+        datasheetId: datasheetId ?? this.datasheetId,
+        name: name ?? this.name,
+      );
+  DatasheetAliase copyWithCompanion(DatasheetAliasesCompanion data) {
+    return DatasheetAliase(
+      id: data.id.present ? data.id.value : this.id,
+      datasheetId: data.datasheetId.present
+          ? data.datasheetId.value
+          : this.datasheetId,
+      name: data.name.present ? data.name.value : this.name,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DatasheetAliase(')
+          ..write('id: $id, ')
+          ..write('datasheetId: $datasheetId, ')
+          ..write('name: $name')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, datasheetId, name);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DatasheetAliase &&
+          other.id == this.id &&
+          other.datasheetId == this.datasheetId &&
+          other.name == this.name);
+}
+
+class DatasheetAliasesCompanion extends UpdateCompanion<DatasheetAliase> {
+  final Value<String> id;
+  final Value<String> datasheetId;
+  final Value<String> name;
+  final Value<int> rowid;
+  const DatasheetAliasesCompanion({
+    this.id = const Value.absent(),
+    this.datasheetId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DatasheetAliasesCompanion.insert({
+    required String id,
+    required String datasheetId,
+    required String name,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       datasheetId = Value(datasheetId),
+       name = Value(name);
+  static Insertable<DatasheetAliase> custom({
+    Expression<String>? id,
+    Expression<String>? datasheetId,
+    Expression<String>? name,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (datasheetId != null) 'datasheet_id': datasheetId,
+      if (name != null) 'name': name,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DatasheetAliasesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? datasheetId,
+    Value<String>? name,
+    Value<int>? rowid,
+  }) {
+    return DatasheetAliasesCompanion(
+      id: id ?? this.id,
+      datasheetId: datasheetId ?? this.datasheetId,
+      name: name ?? this.name,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (datasheetId.present) {
+      map['datasheet_id'] = Variable<String>(datasheetId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DatasheetAliasesCompanion(')
+          ..write('id: $id, ')
+          ..write('datasheetId: $datasheetId, ')
+          ..write('name: $name, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $EquipmentGroupsTable extends EquipmentGroups
     with TableInfo<$EquipmentGroupsTable, EquipmentGroup> {
   @override
@@ -20391,6 +20655,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $FavoriteDatasheetsTable favoriteDatasheets =
       $FavoriteDatasheetsTable(this);
+  late final $DatasheetAliasesTable datasheetAliases = $DatasheetAliasesTable(
+    this,
+  );
   late final $EquipmentGroupsTable equipmentGroups = $EquipmentGroupsTable(
     this,
   );
@@ -20476,6 +20743,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     datasheetVersions,
     datasheetSources,
     favoriteDatasheets,
+    datasheetAliases,
     equipmentGroups,
     equipmentOptions,
     equipmentChoices,
@@ -24645,6 +24913,176 @@ typedef $$FavoriteDatasheetsTableProcessedTableManager =
         >,
       ),
       FavoriteDatasheet,
+      PrefetchHooks Function()
+    >;
+typedef $$DatasheetAliasesTableCreateCompanionBuilder =
+    DatasheetAliasesCompanion Function({
+      required String id,
+      required String datasheetId,
+      required String name,
+      Value<int> rowid,
+    });
+typedef $$DatasheetAliasesTableUpdateCompanionBuilder =
+    DatasheetAliasesCompanion Function({
+      Value<String> id,
+      Value<String> datasheetId,
+      Value<String> name,
+      Value<int> rowid,
+    });
+
+class $$DatasheetAliasesTableFilterComposer
+    extends Composer<_$AppDatabase, $DatasheetAliasesTable> {
+  $$DatasheetAliasesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get datasheetId => $composableBuilder(
+    column: $table.datasheetId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DatasheetAliasesTableOrderingComposer
+    extends Composer<_$AppDatabase, $DatasheetAliasesTable> {
+  $$DatasheetAliasesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get datasheetId => $composableBuilder(
+    column: $table.datasheetId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DatasheetAliasesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DatasheetAliasesTable> {
+  $$DatasheetAliasesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get datasheetId => $composableBuilder(
+    column: $table.datasheetId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+}
+
+class $$DatasheetAliasesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DatasheetAliasesTable,
+          DatasheetAliase,
+          $$DatasheetAliasesTableFilterComposer,
+          $$DatasheetAliasesTableOrderingComposer,
+          $$DatasheetAliasesTableAnnotationComposer,
+          $$DatasheetAliasesTableCreateCompanionBuilder,
+          $$DatasheetAliasesTableUpdateCompanionBuilder,
+          (
+            DatasheetAliase,
+            BaseReferences<
+              _$AppDatabase,
+              $DatasheetAliasesTable,
+              DatasheetAliase
+            >,
+          ),
+          DatasheetAliase,
+          PrefetchHooks Function()
+        > {
+  $$DatasheetAliasesTableTableManager(
+    _$AppDatabase db,
+    $DatasheetAliasesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DatasheetAliasesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DatasheetAliasesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DatasheetAliasesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> datasheetId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DatasheetAliasesCompanion(
+                id: id,
+                datasheetId: datasheetId,
+                name: name,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String datasheetId,
+                required String name,
+                Value<int> rowid = const Value.absent(),
+              }) => DatasheetAliasesCompanion.insert(
+                id: id,
+                datasheetId: datasheetId,
+                name: name,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DatasheetAliasesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DatasheetAliasesTable,
+      DatasheetAliase,
+      $$DatasheetAliasesTableFilterComposer,
+      $$DatasheetAliasesTableOrderingComposer,
+      $$DatasheetAliasesTableAnnotationComposer,
+      $$DatasheetAliasesTableCreateCompanionBuilder,
+      $$DatasheetAliasesTableUpdateCompanionBuilder,
+      (
+        DatasheetAliase,
+        BaseReferences<_$AppDatabase, $DatasheetAliasesTable, DatasheetAliase>,
+      ),
+      DatasheetAliase,
       PrefetchHooks Function()
     >;
 typedef $$EquipmentGroupsTableCreateCompanionBuilder =
@@ -31242,6 +31680,8 @@ class $AppDatabaseManager {
       $$DatasheetSourcesTableTableManager(_db, _db.datasheetSources);
   $$FavoriteDatasheetsTableTableManager get favoriteDatasheets =>
       $$FavoriteDatasheetsTableTableManager(_db, _db.favoriteDatasheets);
+  $$DatasheetAliasesTableTableManager get datasheetAliases =>
+      $$DatasheetAliasesTableTableManager(_db, _db.datasheetAliases);
   $$EquipmentGroupsTableTableManager get equipmentGroups =>
       $$EquipmentGroupsTableTableManager(_db, _db.equipmentGroups);
   $$EquipmentOptionsTableTableManager get equipmentOptions =>

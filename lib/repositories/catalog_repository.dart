@@ -58,4 +58,7 @@ class CatalogRepository {
 
   Future<List<WeaponSummary>> listWeaponsWithUsage() =>
       database.weaponDao.listWeaponsWithUsage();
+
+  Future<Map<String, List<String>>> getAliasesByDatasheetId() =>
+      database.datasheetDao.allAliasesByDatasheetId();
 }
