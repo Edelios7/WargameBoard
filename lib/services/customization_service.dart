@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -127,6 +128,66 @@ class CustomizationService {
         p.join(_wallpapersFolder.path, '${slot.name}.$extension'),
       );
       if (file.existsSync()) await file.delete();
+    }
+  }
+
+  /// Sérialise la couleur d'accent, l'intensité du voile et chaque fond
+  /// d'écran (image encodée en base64, embarquée directement plutôt que
+  /// juste son chemin — un chemin local n'aurait aucun sens une fois
+  /// restauré sur une autre machine) — voir [BackupService], qui écrit ce
+  /// résultat à côté de la sauvegarde de la base de données. La base
+  /// elle-même ne connaît pas ces réglages : ils vivent dans
+  /// SharedPreferences, un stockage séparé.
+  Future<Map<String, dynamic>> exportSettings() async {
+    final wallpapers = <String, dynamic>{};
+    for (final slot in WallpaperSlot.values) {
+      final file = AppWallpapers.forSlot(slot);
+      if (file == null) continue;
+      wallpapers[slot.name] = {
+        'extension': p.extension(file.path).replaceFirst('.', ''),
+        'bytes': base64Encode(await file.readAsBytes()),
+      };
+    }
+    return {
+      'accentColor': AppColors.primary.toARGB32(),
+      'wallpaperDimming': AppWallpapers.dimming,
+      'wallpapers': wallpapers,
+    };
+  }
+
+  /// Réapplique un export produit par [exportSettings] — utilisé par
+  /// [BackupService.stageRestore] quand une sauvegarde a un fichier de
+  /// réglages associé. Contrairement à la restauration de la base (mise en
+  /// attente jusqu'au prochain lancement, voir [BackupService]), ces
+  /// réglages vivent dans SharedPreferences, pas dans la base verrouillée
+  /// par la connexion Drift active : rien n'empêche de les appliquer tout
+  /// de suite.
+  Future<void> importSettings(Map<String, dynamic> data) async {
+    final accentColor = data['accentColor'];
+    if (accentColor is int) {
+      await setAccentColor(Color(accentColor));
+    }
+    final dimming = data['wallpaperDimming'];
+    if (dimming is num) {
+      await setWallpaperDimming(dimming.toDouble());
+    }
+    final wallpapers = data['wallpapers'];
+    if (wallpapers is Map) {
+      await _wallpapersFolder.create(recursive: true);
+      for (final slot in WallpaperSlot.values) {
+        final entry = wallpapers[slot.name];
+        if (entry is! Map) continue;
+        final extension = entry['extension'];
+        final bytes = entry['bytes'];
+        if (extension is! String || bytes is! String) continue;
+        await _removeWallpaperFiles(slot);
+        final destination = File(
+          p.join(_wallpapersFolder.path, '${slot.name}.$extension'),
+        );
+        final saved = await destination.writeAsBytes(base64Decode(bytes));
+        AppWallpapers.setSlot(slot, saved);
+        await prefs.setString(_wallpaperPreferenceKey(slot), saved.path);
+      }
     }
   }
 }

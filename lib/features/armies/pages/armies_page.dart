@@ -1150,15 +1150,22 @@ class _BuilderSidebarState extends ConsumerState<_BuilderSidebar> {
     final l10n = AppLocalizations.of(context)!;
     final selectedUnitId = ref.watch(selectedUnitIdProvider);
     final normalizedRosterFilter = normalizeForSearch(_rosterFilter);
+    final datasheetAliases = ref
+        .watch(datasheetAliasesProvider)
+        .maybeWhen(data: (m) => m, orElse: () => const {});
     final filteredUnits = normalizedRosterFilter.isEmpty
         ? army.units
-        : army.units
-              .where(
-                (unit) => normalizeForSearch(
-                  unit.datasheetName,
-                ).contains(normalizedRosterFilter),
-              )
-              .toList();
+        : army.units.where((unit) {
+            if (normalizeForSearch(
+              unit.datasheetName,
+            ).contains(normalizedRosterFilter)) {
+              return true;
+            }
+            return (datasheetAliases[unit.datasheetId] ?? const []).any(
+              (alias) =>
+                  normalizeForSearch(alias).contains(normalizedRosterFilter),
+            );
+          }).toList();
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -1898,6 +1905,27 @@ class _UnitCardVisual extends StatelessWidget {
           children: [
             if (imageFile != null)
               Image.file(imageFile, fit: BoxFit.cover)
+            else if (AppWallpapers.cards != null)
+              Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.file(AppWallpapers.cards!, fit: BoxFit.cover),
+                  ColoredBox(
+                    color: AppColors.surfaceElevated.withValues(
+                      alpha: AppWallpapers.dimming,
+                    ),
+                  ),
+                  UnitFallbackVisual(
+                    factionName: factionName,
+                    roleIcon: unitRoleIcon(
+                      isWarlord: unit.isWarlord,
+                      isCharacter: unit.isCharacter,
+                      archetype: archetype,
+                      battlefieldRole: unit.battlefieldRole,
+                    ),
+                  ),
+                ],
+              )
             else
               Container(
                 decoration: BoxDecoration(

@@ -1,16 +1,35 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wargameboard/core/theme/app_colors.dart';
 import 'package:wargameboard/core/theme/app_wallpapers.dart';
+import 'package:wargameboard/core/utils/user_content_paths.dart';
 import 'package:wargameboard/services/customization_service.dart';
+
+class _FakePathProvider extends PathProviderPlatform {
+  _FakePathProvider(this.path);
+
+  final String path;
+
+  @override
+  Future<String?> getApplicationDocumentsPath() async => path;
+}
 
 void main() {
   late SharedPreferences prefs;
+  late Directory tempDirectory;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     prefs = await SharedPreferences.getInstance();
+    tempDirectory = Directory.systemTemp.createTempSync(
+      'customization_service_test',
+    );
+    PathProviderPlatform.instance = _FakePathProvider(tempDirectory.path);
+    await UserContentPaths.initialize();
   });
 
   tearDown(() {
@@ -21,6 +40,9 @@ void main() {
     AppWallpapers.dimming = 0.78;
     for (final slot in WallpaperSlot.values) {
       AppWallpapers.setSlot(slot, null);
+    }
+    if (tempDirectory.existsSync()) {
+      tempDirectory.deleteSync(recursive: true);
     }
   });
 
@@ -110,4 +132,38 @@ void main() {
     expect(AppWallpapers.dimming, 0.78);
     expect(prefs.getDouble(wallpaperDimmingPreferenceKey), 0.78);
   });
+
+  test(
+    'exportSettings/importSettings round-trip the accent color, the '
+    'dimming and a wallpaper image byte-for-byte — used by BackupService '
+    'to carry customization alongside a database backup',
+    () async {
+      final source = CustomizationService(prefs);
+      await source.setAccentColor(const Color(0xFF2FBF9E));
+      await source.setWallpaperDimming(0.42);
+      final sourceImage = File('${tempDirectory.path}/source.png')
+        ..writeAsBytesSync([1, 2, 3, 4, 5]);
+      AppWallpapers.setSlot(WallpaperSlot.cards, sourceImage);
+
+      final exported = await source.exportSettings();
+
+      // Simule une restauration sur une autre installation : statics et
+      // préférences repartent de zéro avant de réimporter l'export.
+      AppColors.resetAccent();
+      AppWallpapers.dimming = 0.78;
+      AppWallpapers.setSlot(WallpaperSlot.cards, null);
+      SharedPreferences.setMockInitialValues({});
+      final target = CustomizationService(await SharedPreferences.getInstance());
+
+      await target.importSettings(exported);
+
+      expect(AppColors.primary, const Color(0xFF2FBF9E));
+      expect(AppWallpapers.dimming, 0.42);
+      expect(AppWallpapers.cards, isNotNull);
+      expect(
+        AppWallpapers.cards!.readAsBytesSync(),
+        [1, 2, 3, 4, 5],
+      );
+    },
+  );
 }

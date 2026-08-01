@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -6,6 +7,14 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
 import '../database/app_database.dart';
+import 'customization_service.dart';
+
+/// Suffixe du fichier de réglages de personnalisation associé à une
+/// sauvegarde (voir [BackupService.exportBackup]/[BackupService.stageRestore])
+/// — couleur d'accent, fonds d'écran... Ces réglages vivent dans
+/// SharedPreferences, pas dans la base de données, donc une simple copie
+/// du `.sqlite` ne les emporterait pas.
+const _customizationSuffix = '.customization.json';
 
 /// Nom du fichier de base de données réel — voir
 /// `lib/database/database_connection.dart`.
@@ -28,14 +37,22 @@ enum RestoreStageResult { staged, cancelled, invalidFile, unsupportedSchema }
 /// copie des données du joueur (armées, collection, historique de
 /// parties...), jamais synchronisée ailleurs.
 class BackupService {
-  const BackupService(this.database);
+  const BackupService(this.database, {this.customizationService});
 
   final AppDatabase database;
+
+  /// `null` dans les contextes qui n'ont pas besoin d'exporter/restaurer
+  /// la personnalisation (ex. tests existants de sauvegarde de la base) —
+  /// dans ce cas [exportBackup] n'écrit pas de fichier de réglages, et
+  /// [stageRestore] ignore silencieusement celui d'une sauvegarde choisie.
+  final CustomizationService? customizationService;
 
   /// Ouvre un sélecteur de dossier et y écrit une copie complète et
   /// cohérente de la base (`VACUUM INTO`, qui inclut les écritures encore
   /// en journal — une simple copie du fichier .sqlite pourrait les
-  /// manquer). Retourne le chemin du fichier créé, `null` si annulé.
+  /// manquer), accompagnée d'un petit fichier `.customization.json` avec
+  /// la couleur d'accent et les fonds d'écran. Retourne le chemin du
+  /// fichier `.sqlite` créé, `null` si annulé.
   Future<String?> exportBackup() async {
     final directory = await FilePicker.getDirectoryPath(
       dialogTitle: 'Choisir où enregistrer la sauvegarde',
@@ -54,6 +71,15 @@ class BackupService {
     final file = File(destination);
     if (file.existsSync()) await file.delete();
     await database.customStatement('VACUUM INTO ?', [destination]);
+
+    final settingsService = customizationService;
+    if (settingsService != null) {
+      final settings = await settingsService.exportSettings();
+      await File(
+        '$destination$_customizationSuffix',
+      ).writeAsString(jsonEncode(settings));
+    }
+
     return destination;
   }
 
@@ -95,6 +121,29 @@ class BackupService {
       p.join(documentsDirectory.path, '$databaseFileName$_pendingRestoreSuffix'),
     );
     await picked.copy(staged.path);
+
+    // La personnalisation (SharedPreferences) n'est pas verrouillée par
+    // une connexion Drift active comme la base l'est : contrairement à
+    // celle-ci, rien n'empêche de l'appliquer tout de suite plutôt que de
+    // la mettre en attente jusqu'au prochain lancement.
+    final settingsService = customizationService;
+    if (settingsService != null) {
+      final settingsFile = File('$path$_customizationSuffix');
+      if (settingsFile.existsSync()) {
+        try {
+          final data = jsonDecode(await settingsFile.readAsString());
+          if (data is Map<String, dynamic>) {
+            await settingsService.importSettings(data);
+          }
+        } catch (_) {
+          // Fichier de réglages corrompu/illisible : la restauration de la
+          // base reste valable, seule la personnalisation est ignorée —
+          // ne doit jamais faire échouer une restauration par ailleurs
+          // valide pour un simple réglage cosmétique.
+        }
+      }
+    }
+
     return RestoreStageResult.staged;
   }
 

@@ -9,6 +9,7 @@ import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/textured_button.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/backup_provider.dart';
+import '../../../providers/customization_provider.dart';
 import '../../../providers/dashboard_provider.dart';
 import '../../../providers/locale_provider.dart';
 import '../../../providers/shared_preferences_provider.dart';
@@ -128,6 +129,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         return;
       case RestoreStageResult.staged:
         ref.invalidate(pendingRestoreProvider);
+        // La personnalisation (couleur d'accent, fonds d'écran) associée
+        // à la sauvegarde, elle, s'applique tout de suite — voir
+        // BackupService.stageRestore.
+        ref.read(themeVersionProvider.notifier).state++;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.settingsBackupRestoreStaged)),
         );
