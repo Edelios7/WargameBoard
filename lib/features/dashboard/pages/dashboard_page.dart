@@ -544,7 +544,7 @@ class _DashboardHeaderState extends ConsumerState<_DashboardHeader> {
                           ? widget.displayName![0].toUpperCase()
                           : '?',
                       style: AppTextStyles.body.copyWith(
-                        color: Colors.white,
+                        color: AppColors.onPrimary,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -1611,7 +1611,7 @@ class _ProjectsCardState extends ConsumerState<_ProjectsCard> {
                 tooltip: l10n.dashboardAddProjectAction,
                 style: IconButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.onPrimary,
                 ),
                 onPressed: _addProject,
                 icon: const Icon(Icons.add_rounded),

@@ -49,6 +49,14 @@ class AppColors {
 
   static void resetAccent() => applyAccent(_defaultPrimary);
 
+  /// Couleur de texte/icône lisible par-dessus [primary] — un accent
+  /// personnalisé peut être choisi pâle ou clair (rien ne l'empêche dans
+  /// le sélecteur de couleur), auquel cas du blanc fixe dessus devient
+  /// illisible. Même principe que `FactionColors.onColor`.
+  static Color get onPrimary => primary.computeLuminance() > 0.45
+      ? const Color(0xFF14171D)
+      : Colors.white;
+
   // Arrière-plans
   static const Color background = Color(0xFF0A0C10);
   static const Color surface = Color(0xFF14171D);

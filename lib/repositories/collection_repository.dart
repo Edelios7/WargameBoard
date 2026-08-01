@@ -1,5 +1,6 @@
 import '../database/app_database.dart';
 import '../database/models/collection_item_details.dart';
+import '../services/user_photo_service.dart';
 import '../services/xp_service.dart';
 
 class CollectionRepository {
@@ -43,6 +44,11 @@ class CollectionRepository {
     if (entry != null) {
       await xpService.revokeNewBox(entry.datasheetId);
     }
+    // La photo perso propre à cette entrée (voir UnitPhotoThumbnail) est
+    // fichier, pas une ligne de base — sans ce nettoyage, elle resterait
+    // orpheline sur le disque pour toujours (l'id d'entrée n'est jamais
+    // réutilisé).
+    await const UserPhotoService().removeEntry(id);
   }
 
   Future<void> setPurchasePrice(String id, double? purchasePrice) {
@@ -73,7 +79,8 @@ class CollectionRepository {
     // `CollectionDao.updateCounts`, ferait mécaniquement rejoindre
     // `assembled`/`painted` sans qu'aucun modèle n'ait été touché.
     final assembledDelta = after.assembled - before.assembled;
-    final assembledJustCompleted = assembledDelta > 0 &&
+    final assembledJustCompleted =
+        assembledDelta > 0 &&
         after.assembled == after.quantity &&
         before.assembled != before.quantity;
     if (assembledDelta > 0 || assembledJustCompleted) {
@@ -101,7 +108,8 @@ class CollectionRepository {
     }
 
     final paintedDelta = after.painted - before.painted;
-    final paintedJustCompleted = paintedDelta > 0 &&
+    final paintedJustCompleted =
+        paintedDelta > 0 &&
         after.painted == after.quantity &&
         before.painted != before.quantity;
     if (paintedDelta > 0 || paintedJustCompleted) {
@@ -145,8 +153,8 @@ class CollectionRepository {
   }
 
   Future<void> moveWishlistItemToCollection(String id) async {
-    final datasheetId =
-        await database.collectionDao.moveWishlistItemToCollection(id);
+    final datasheetId = await database.collectionDao
+        .moveWishlistItemToCollection(id);
     await xpService.awardNewBox(datasheetId);
   }
 

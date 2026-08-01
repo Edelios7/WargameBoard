@@ -16,6 +16,7 @@ class SidebarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onAccent = AppColors.onPrimary;
     return Container(
       margin: const EdgeInsets.only(bottom: 4),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -46,13 +47,13 @@ class SidebarItem extends StatelessWidget {
             height: 28,
             decoration: BoxDecoration(
               color: selected
-                  ? Colors.white.withValues(alpha: 0.16)
+                  ? onAccent.withValues(alpha: 0.16)
                   : AppColors.surfaceElevated,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               icon,
-              color: selected ? Colors.white : AppColors.textSecondary,
+              color: selected ? onAccent : AppColors.textSecondary,
               size: 16,
             ),
           ),
@@ -63,7 +64,7 @@ class SidebarItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
-                color: selected ? Colors.white : AppColors.textSecondary,
+                color: selected ? onAccent : AppColors.textSecondary,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
               ),
             ),

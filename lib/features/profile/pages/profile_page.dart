@@ -148,9 +148,9 @@ class _CommandantHeader extends StatelessWidget {
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.military_tech_rounded,
-                  color: Colors.white,
+                  color: AppColors.onPrimary,
                   size: 26,
                 ),
               ),

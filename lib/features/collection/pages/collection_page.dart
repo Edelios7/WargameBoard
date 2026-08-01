@@ -388,8 +388,9 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
       final aliases = ref
           .watch(datasheetAliasesProvider)
           .maybeWhen(data: (m) => m, orElse: () => const {});
-      final matchesAlias = (aliases[entry.datasheetId] ?? const [])
-          .any((alias) => normalizeForSearch(alias).contains(normalizedQuery));
+      final matchesAlias = (aliases[entry.datasheetId] ?? const []).any(
+        (alias) => normalizeForSearch(alias).contains(normalizedQuery),
+      );
       if (!matchesName && !matchesAlias) {
         return false;
       }
@@ -1486,6 +1487,12 @@ class _WishlistTab extends ConsumerWidget {
                           ref.invalidate(collectionEntriesProvider);
                           ref.invalidate(collectionSummaryProvider);
                           ref.invalidate(recentlyAddedProvider);
+                          // moveWishlistItemToCollection crédite de l'XP
+                          // (nouvelle boîte) comme un ajout normal à la
+                          // collection — sans cette invalidation, le niveau/
+                          // la barre de progression du Commandant restaient
+                          // figés jusqu'à une action sans rapport.
+                          ref.invalidate(xpSummaryProvider);
                         },
                       ),
                       IconButton(
