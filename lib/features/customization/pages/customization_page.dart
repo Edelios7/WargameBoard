@@ -9,6 +9,7 @@ import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/decor_separator.dart';
+import '../../../domain/customization/theme_preset.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/customization_provider.dart';
 import '../widgets/hsv_color_picker.dart';
@@ -54,6 +55,59 @@ class CustomizationPage extends ConsumerWidget {
     ref.read(themeVersionProvider.notifier).state++;
   }
 
+  Future<void> _savePreset(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
+    final controller = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AppDialogShortcuts(
+        onEnter: () => Navigator.of(dialogContext).pop(controller.text.trim()),
+        child: AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text(
+            l10n.customizationSavePresetDialogTitle,
+            style: AppTextStyles.title,
+          ),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            style: AppTextStyles.body,
+            decoration: InputDecoration(
+              hintText: l10n.customizationSavePresetDialogHint,
+              hintStyle: AppTextStyles.caption,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(l10n.armyBuilderCancel),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+              onPressed: () =>
+                  Navigator.of(dialogContext).pop(controller.text.trim()),
+              child: Text(l10n.armyBuilderSave),
+            ),
+          ],
+        ),
+      ),
+    );
+    controller.dispose();
+    if (name == null || name.isEmpty) return;
+    await ref.read(customizationServiceProvider).savePreset(name);
+    ref.read(themeVersionProvider.notifier).state++;
+  }
+
+  Future<void> _applyPreset(WidgetRef ref, ThemePreset preset) async {
+    await ref.read(customizationServiceProvider).applyPreset(preset);
+    ref.read(themeVersionProvider.notifier).state++;
+  }
+
+  Future<void> _deletePreset(WidgetRef ref, String name) async {
+    await ref.read(customizationServiceProvider).deletePreset(name);
+    ref.read(themeVersionProvider.notifier).state++;
+  }
+
   Future<void> _resetAll(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
@@ -94,6 +148,7 @@ class CustomizationPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final accent = ref.watch(accentColorProvider);
     final dimming = ref.watch(wallpaperDimmingProvider);
+    final presets = ref.watch(themePresetsProvider);
 
     return Scaffold(
       backgroundColor: AppWallpapers.app == null
@@ -131,6 +186,11 @@ class CustomizationPage extends ConsumerWidget {
                   maxWidth: 200,
                   padding: EdgeInsets.only(top: 8, bottom: 20),
                 ),
+                SizedBox(
+                  width: cardWidth,
+                  child: _LivePreviewStrip(accent: accent),
+                ),
+                const SizedBox(height: 20),
                 SizedBox(
                   width: cardWidth,
                   child: AppCard(
@@ -302,11 +362,194 @@ class CustomizationPage extends ConsumerWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: cardWidth,
+                  child: AppCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                l10n.customizationPresetsSection,
+                                style: AppTextStyles.title,
+                              ),
+                            ),
+                            TextButton.icon(
+                              onPressed: () => _savePreset(context, ref),
+                              icon: const Icon(
+                                Icons.bookmark_add_rounded,
+                                size: 18,
+                              ),
+                              label: Text(l10n.customizationSavePreset),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          l10n.customizationPresetsHint,
+                          style: AppTextStyles.caption,
+                        ),
+                        const SizedBox(height: 16),
+                        if (presets.isEmpty)
+                          Text(
+                            l10n.customizationNoPresets,
+                            style: AppTextStyles.caption,
+                          )
+                        else
+                          Column(
+                            children: [
+                              for (final preset in presets)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: _PresetRow(
+                                    preset: preset,
+                                    onApply: () => _applyPreset(ref, preset),
+                                    onDelete: () =>
+                                        _deletePreset(ref, preset.name),
+                                  ),
+                                ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             );
           },
         ),
       ),
+    );
+  }
+}
+
+class _LivePreviewStrip extends StatelessWidget {
+  final Color accent;
+
+  const _LivePreviewStrip({required this.accent});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.customizationPreviewLabel, style: AppTextStyles.eyebrow),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [accent, accent.withValues(alpha: .55)],
+                  ),
+                ),
+                child: const Icon(
+                  Icons.shield_rounded,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle_rounded,
+                        color: accent,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.customizationPreviewSelected,
+                          style: AppTextStyles.caption,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              FilledButton(
+                onPressed: null,
+                style: FilledButton.styleFrom(
+                  disabledBackgroundColor: accent,
+                  disabledForegroundColor: Colors.white,
+                ),
+                child: Text(l10n.customizationPreviewButton),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PresetRow extends StatelessWidget {
+  final ThemePreset preset;
+  final VoidCallback onApply;
+  final VoidCallback onDelete;
+
+  const _PresetRow({
+    required this.preset,
+    required this.onApply,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Row(
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: Color(preset.accentColor),
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white.withValues(alpha: .2)),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            preset.name,
+            style: AppTextStyles.body,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        TextButton(onPressed: onApply, child: Text(l10n.customizationPresetApply)),
+        IconButton(
+          tooltip: l10n.customizationPresetDelete,
+          icon: const Icon(Icons.close_rounded, size: 18),
+          color: AppColors.textSecondary,
+          onPressed: onDelete,
+        ),
+      ],
     );
   }
 }

@@ -9,9 +9,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_wallpapers.dart';
 import '../core/utils/user_content_paths.dart';
+import '../domain/customization/theme_preset.dart';
 
 const String accentColorPreferenceKey = 'customization_accent_color';
 const String wallpaperDimmingPreferenceKey = 'customization_wallpaper_dimming';
+const String themePresetsPreferenceKey = 'customization_theme_presets';
 
 String _wallpaperPreferenceKey(WallpaperSlot slot) =>
     'customization_wallpaper_${slot.name}';
@@ -188,6 +190,73 @@ class CustomizationService {
         AppWallpapers.setSlot(slot, saved);
         await prefs.setString(_wallpaperPreferenceKey(slot), saved.path);
       }
+    }
+  }
+
+  /// Lit la liste des thèmes enregistrés (couleur + fonds d'écran + voile),
+  /// dans l'ordre de sauvegarde. Les entrées corrompues ou d'un format
+  /// inconnu sont silencieusement ignorées plutôt que de faire planter
+  /// toute la page Personnalisation.
+  List<ThemePreset> loadPresets() {
+    final raw = prefs.getStringList(themePresetsPreferenceKey) ?? const [];
+    return raw
+        .map((entry) {
+          try {
+            return ThemePreset.fromJson(jsonDecode(entry));
+          } catch (_) {
+            return null;
+          }
+        })
+        .whereType<ThemePreset>()
+        .toList();
+  }
+
+  Future<void> _writePresets(List<ThemePreset> presets) async {
+    await prefs.setStringList(
+      themePresetsPreferenceKey,
+      [for (final preset in presets) jsonEncode(preset.toJson())],
+    );
+  }
+
+  /// Capture l'état actuel (couleur d'accent, voile, chemins des fonds
+  /// d'écran déjà en place) sous le nom donné. Si un préréglage porte déjà
+  /// ce nom, il est remplacé plutôt que dupliqué.
+  Future<void> savePreset(String name) async {
+    final wallpaperPaths = <WallpaperSlot, String>{};
+    for (final slot in WallpaperSlot.values) {
+      final file = AppWallpapers.forSlot(slot);
+      if (file != null) wallpaperPaths[slot] = file.path;
+    }
+    final preset = ThemePreset(
+      name: name,
+      accentColor: AppColors.primary.toARGB32(),
+      wallpaperDimming: AppWallpapers.dimming,
+      wallpaperPaths: wallpaperPaths,
+    );
+    final presets = loadPresets().where((p) => p.name != name).toList()
+      ..add(preset);
+    await _writePresets(presets);
+  }
+
+  Future<void> deletePreset(String name) async {
+    final presets = loadPresets().where((p) => p.name != name).toList();
+    await _writePresets(presets);
+  }
+
+  /// Réapplique un préréglage : couleur, voile, et chaque fond d'écran
+  /// dont le fichier référencé existe toujours sur le disque (un fichier
+  /// supprimé depuis l'enregistrement du préréglage laisse simplement cet
+  /// emplacement vide plutôt que d'échouer entièrement).
+  Future<void> applyPreset(ThemePreset preset) async {
+    await setAccentColor(Color(preset.accentColor));
+    await setWallpaperDimming(preset.wallpaperDimming);
+    for (final slot in WallpaperSlot.values) {
+      final path = preset.wallpaperPaths[slot];
+      if (path == null) continue;
+      final file = File(path);
+      if (!file.existsSync()) continue;
+      AppWallpapers.setSlot(slot, file);
+      await prefs.setString(_wallpaperPreferenceKey(slot), path);
     }
   }
 }

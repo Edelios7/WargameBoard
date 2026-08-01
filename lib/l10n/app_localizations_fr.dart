@@ -113,6 +113,44 @@ class AppLocalizationsFr extends AppLocalizations {
       'La couleur d\'accent et les 4 fonds d\'écran reviennent à leur valeur par défaut.';
 
   @override
+  String get customizationPreviewLabel => 'Aperçu';
+
+  @override
+  String get customizationPreviewButton => 'Bouton';
+
+  @override
+  String get customizationPreviewSelected => 'Sélection';
+
+  @override
+  String get customizationPreviewCard => 'Carte';
+
+  @override
+  String get customizationPresetsSection => 'Thèmes enregistrés';
+
+  @override
+  String get customizationPresetsHint =>
+      'Sauvegarde la combinaison actuelle (couleur, fonds d\'écran, voile) pour la retrouver en un clic.';
+
+  @override
+  String get customizationSavePreset => 'Enregistrer le thème actuel';
+
+  @override
+  String get customizationSavePresetDialogTitle => 'Nom du thème';
+
+  @override
+  String get customizationSavePresetDialogHint => 'ex. Sombre intense';
+
+  @override
+  String get customizationPresetApply => 'Appliquer';
+
+  @override
+  String get customizationPresetDelete => 'Supprimer ce thème';
+
+  @override
+  String get customizationNoPresets =>
+      'Aucun thème enregistré pour l\'instant.';
+
+  @override
   String get settingsProfileTitle => 'Profil';
 
   @override

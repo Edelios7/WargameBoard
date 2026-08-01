@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_wallpapers.dart';
+import '../domain/customization/theme_preset.dart';
 import '../services/customization_service.dart';
 import 'shared_preferences_provider.dart';
 
@@ -36,4 +37,13 @@ final wallpaperProvider = Provider.family<File?, WallpaperSlot>((ref, slot) {
 final wallpaperDimmingProvider = Provider<double>((ref) {
   ref.watch(themeVersionProvider);
   return AppWallpapers.dimming;
+});
+
+/// Liste des thèmes enregistrés par l'utilisateur — dépend de
+/// [themeVersionProvider] comme le reste (une sauvegarde/suppression de
+/// préréglage passe aussi par un incrément de ce compteur pour rafraîchir
+/// la page).
+final themePresetsProvider = Provider<List<ThemePreset>>((ref) {
+  ref.watch(themeVersionProvider);
+  return ref.watch(customizationServiceProvider).loadPresets();
 });

@@ -296,6 +296,78 @@ abstract class AppLocalizations {
   /// **'La couleur d\'accent et les 4 fonds d\'écran reviennent à leur valeur par défaut.'**
   String get customizationResetAllConfirmMessage;
 
+  /// No description provided for @customizationPreviewLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aperçu'**
+  String get customizationPreviewLabel;
+
+  /// No description provided for @customizationPreviewButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bouton'**
+  String get customizationPreviewButton;
+
+  /// No description provided for @customizationPreviewSelected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélection'**
+  String get customizationPreviewSelected;
+
+  /// No description provided for @customizationPreviewCard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Carte'**
+  String get customizationPreviewCard;
+
+  /// No description provided for @customizationPresetsSection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Thèmes enregistrés'**
+  String get customizationPresetsSection;
+
+  /// No description provided for @customizationPresetsHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sauvegarde la combinaison actuelle (couleur, fonds d\'écran, voile) pour la retrouver en un clic.'**
+  String get customizationPresetsHint;
+
+  /// No description provided for @customizationSavePreset.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer le thème actuel'**
+  String get customizationSavePreset;
+
+  /// No description provided for @customizationSavePresetDialogTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom du thème'**
+  String get customizationSavePresetDialogTitle;
+
+  /// No description provided for @customizationSavePresetDialogHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'ex. Sombre intense'**
+  String get customizationSavePresetDialogHint;
+
+  /// No description provided for @customizationPresetApply.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appliquer'**
+  String get customizationPresetApply;
+
+  /// No description provided for @customizationPresetDelete.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer ce thème'**
+  String get customizationPresetDelete;
+
+  /// No description provided for @customizationNoPresets.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun thème enregistré pour l\'instant.'**
+  String get customizationNoPresets;
+
   /// No description provided for @settingsProfileTitle.
   ///
   /// In fr, this message translates to:

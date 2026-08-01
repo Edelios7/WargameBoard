@@ -166,4 +166,34 @@ void main() {
       );
     },
   );
+
+  test(
+    'savePreset/applyPreset round-trip the accent color and dimming, and '
+    'a second savePreset under the same name replaces the first instead of '
+    'duplicating it',
+    () async {
+      final service = CustomizationService(prefs);
+      await service.setAccentColor(const Color(0xFFAA5533));
+      await service.setWallpaperDimming(0.6);
+
+      await service.savePreset('Mon thème');
+      expect(service.loadPresets(), hasLength(1));
+
+      // Change l'état courant puis réapplique le préréglage : l'état
+      // sauvegardé doit revenir tel quel.
+      await service.setAccentColor(const Color(0xFF112233));
+      await service.setWallpaperDimming(0.3);
+      await service.applyPreset(service.loadPresets().single);
+
+      expect(AppColors.primary, const Color(0xFFAA5533));
+      expect(AppWallpapers.dimming, 0.6);
+
+      // Resauvegarder sous le même nom remplace, ne duplique pas.
+      await service.savePreset('Mon thème');
+      expect(service.loadPresets(), hasLength(1));
+
+      await service.deletePreset('Mon thème');
+      expect(service.loadPresets(), isEmpty);
+    },
+  );
 }

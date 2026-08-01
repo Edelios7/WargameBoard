@@ -113,6 +113,43 @@ class AppLocalizationsEn extends AppLocalizations {
       'The accent color and all 4 wallpapers go back to their default value.';
 
   @override
+  String get customizationPreviewLabel => 'Preview';
+
+  @override
+  String get customizationPreviewButton => 'Button';
+
+  @override
+  String get customizationPreviewSelected => 'Selected';
+
+  @override
+  String get customizationPreviewCard => 'Card';
+
+  @override
+  String get customizationPresetsSection => 'Saved themes';
+
+  @override
+  String get customizationPresetsHint =>
+      'Save the current combination (color, wallpapers, veil) to reapply it in one click.';
+
+  @override
+  String get customizationSavePreset => 'Save current theme';
+
+  @override
+  String get customizationSavePresetDialogTitle => 'Theme name';
+
+  @override
+  String get customizationSavePresetDialogHint => 'e.g. Deep dark';
+
+  @override
+  String get customizationPresetApply => 'Apply';
+
+  @override
+  String get customizationPresetDelete => 'Delete this theme';
+
+  @override
+  String get customizationNoPresets => 'No saved themes yet.';
+
+  @override
   String get settingsProfileTitle => 'Profile';
 
   @override
