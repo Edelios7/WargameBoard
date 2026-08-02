@@ -58,24 +58,37 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
     required int quantity,
   }) async {
     final armyRepository = ref.read(armyRepositoryProvider);
+    Object? failure;
 
-    for (var i = 0; i < quantity; i++) {
-      await armyRepository.addUnit(
-        armyId: widget.armyId,
-        datasheetId: result.id,
-        modelCount: modelCount,
-      );
+    try {
+      for (var i = 0; i < quantity; i++) {
+        await armyRepository.addUnit(
+          armyId: widget.armyId,
+          datasheetId: result.id,
+          modelCount: modelCount,
+        );
+      }
+    } catch (e) {
+      failure = e;
+    } finally {
+      // Même si une escouade sur `quantity` échoue en cours de route, les
+      // précédentes ont bien été ajoutées en base — invalider pour que
+      // l'armée affichée reflète ce qui a réellement été écrit, plutôt que
+      // de rester figée sur l'état d'avant l'échec.
+      ref.invalidate(selectedArmyProvider);
+      ref.invalidate(armiesListProvider);
+      ref.invalidate(armyByIdProvider(widget.armyId));
     }
-
-    ref.invalidate(selectedArmyProvider);
-    ref.invalidate(armiesListProvider);
-    ref.invalidate(armyByIdProvider(widget.armyId));
 
     if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(l10n.armyBuilderUnitAdded(result.name)),
+        content: Text(
+          failure == null
+              ? l10n.armyBuilderUnitAdded(result.name)
+              : l10n.armyBuilderAddUnitError(result.name),
+        ),
         duration: const Duration(seconds: 2),
       ),
     );

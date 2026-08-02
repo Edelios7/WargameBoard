@@ -6,6 +6,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
+import '../core/utils/user_content_paths.dart';
 import '../database/app_database.dart';
 import 'customization_service.dart';
 
@@ -15,6 +16,14 @@ import 'customization_service.dart';
 /// SharedPreferences, pas dans la base de données, donc une simple copie
 /// du `.sqlite` ne les emporterait pas.
 const _customizationSuffix = '.customization.json';
+
+/// Suffixe du dossier des photos perso associé à une sauvegarde — voir
+/// [BackupService.exportBackup]/[BackupService.stageRestore]. Les photos
+/// (voir UserPhotoService) sont des fichiers indépendants de la base de
+/// données ; sans les emporter, une restauration sur une installation
+/// neuve ferait disparaître silencieusement toutes les photos perso du
+/// joueur alors que la base continue de les référencer.
+const _photosSuffix = '_photos';
 
 /// Nom du fichier de base de données réel — voir
 /// `lib/database/database_connection.dart`.
@@ -80,6 +89,16 @@ class BackupService {
       ).writeAsString(jsonEncode(settings));
     }
 
+    final photosDirectory = Directory(
+      p.join(UserContentPaths.baseDirectory, 'local_assets', 'user_photos'),
+    );
+    if (photosDirectory.existsSync()) {
+      await copyDirectoryRecursively(
+        photosDirectory,
+        Directory('$destination$_photosSuffix'),
+      );
+    }
+
     return destination;
   }
 
@@ -118,7 +137,10 @@ class BackupService {
 
     final documentsDirectory = await getApplicationDocumentsDirectory();
     final staged = File(
-      p.join(documentsDirectory.path, '$databaseFileName$_pendingRestoreSuffix'),
+      p.join(
+        documentsDirectory.path,
+        '$databaseFileName$_pendingRestoreSuffix',
+      ),
     );
     await picked.copy(staged.path);
 
@@ -144,6 +166,17 @@ class BackupService {
       }
     }
 
+    // Les photos ne sont pas verrouillées par une connexion Drift active
+    // comme la base — rien n'empêche de les restaurer tout de suite,
+    // même principe que la personnalisation ci-dessus.
+    final photosBackup = Directory('$path$_photosSuffix');
+    if (photosBackup.existsSync()) {
+      final photosDirectory = Directory(
+        p.join(UserContentPaths.baseDirectory, 'local_assets', 'user_photos'),
+      );
+      await copyDirectoryRecursively(photosBackup, photosDirectory);
+    }
+
     return RestoreStageResult.staged;
   }
 
@@ -151,7 +184,10 @@ class BackupService {
   Future<void> cancelPendingRestore() async {
     final documentsDirectory = await getApplicationDocumentsDirectory();
     final staged = File(
-      p.join(documentsDirectory.path, '$databaseFileName$_pendingRestoreSuffix'),
+      p.join(
+        documentsDirectory.path,
+        '$databaseFileName$_pendingRestoreSuffix',
+      ),
     );
     if (staged.existsSync()) await staged.delete();
   }
@@ -159,9 +195,36 @@ class BackupService {
   static Future<bool> hasPendingRestore() async {
     final documentsDirectory = await getApplicationDocumentsDirectory();
     final staged = File(
-      p.join(documentsDirectory.path, '$databaseFileName$_pendingRestoreSuffix'),
+      p.join(
+        documentsDirectory.path,
+        '$databaseFileName$_pendingRestoreSuffix',
+      ),
     );
     return staged.existsSync();
+  }
+}
+
+/// Copie récursivement le contenu de [source] vers [destination] (créé si
+/// besoin) — pas de dépendance à un package de zip pour un simple dossier
+/// de photos, une copie de fichiers plate suffit. Public (et non préfixé
+/// `_`) uniquement pour rester testable directement, sans passer par
+/// [BackupService.exportBackup]/[stageRestore] qui dépendent de
+/// `FilePicker` (non simulable dans les tests existants de ce projet).
+Future<void> copyDirectoryRecursively(
+  Directory source,
+  Directory destination,
+) async {
+  await destination.create(recursive: true);
+  await for (final entity in source.list(recursive: false)) {
+    final name = p.basename(entity.path);
+    if (entity is Directory) {
+      await copyDirectoryRecursively(
+        entity,
+        Directory(p.join(destination.path, name)),
+      );
+    } else if (entity is File) {
+      await entity.copy(p.join(destination.path, name));
+    }
   }
 }
 

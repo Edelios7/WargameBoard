@@ -187,9 +187,28 @@ class _WeaponsInventoryPageState extends ConsumerState<WeaponsInventoryPage> {
                       if (filtered.isEmpty)
                         Expanded(
                           child: Center(
-                            child: Text(
-                              l10n.catalogWeaponsEmpty,
-                              style: AppTextStyles.caption,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  l10n.catalogWeaponsEmpty,
+                                  style: AppTextStyles.caption,
+                                ),
+                                if (_query.isNotEmpty ||
+                                    _typeFilter != _WeaponTypeFilter.all ||
+                                    _missingProfileOnly) ...[
+                                  const SizedBox(height: 12),
+                                  TextButton(
+                                    onPressed: () => setState(() {
+                                      _query = '';
+                                      _searchController.clear();
+                                      _typeFilter = _WeaponTypeFilter.all;
+                                      _missingProfileOnly = false;
+                                    }),
+                                    child: Text(l10n.catalogResetFilters),
+                                  ),
+                                ],
+                              ],
                             ),
                           ),
                         )

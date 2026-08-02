@@ -567,8 +567,16 @@ List<WeaponDetails> _effectiveWeapons(
 
   final chosenWeaponIds = <String>{};
   for (final group in sheet.equipmentGroups) {
+    final currentOptionIds = group.options.map((o) => o.id).toSet();
     final selected = selections[group.id];
-    final chosenOptionIds = (selected != null && selected.isNotEmpty)
+    // Une sélection enregistrée dont plus aucun id ne correspond aux
+    // options actuelles du groupe (ex. ré-import du catalogue ayant
+    // régénéré les ids d'équipement) ne doit pas faire disparaître
+    // l'arme du groupe : repli sur l'option par défaut, comme si rien
+    // n'avait encore été choisi.
+    final hasValidSelection =
+        selected != null && selected.any(currentOptionIds.contains);
+    final chosenOptionIds = hasValidSelection
         ? selected
         : group.options
               .where((option) => option.isDefault)

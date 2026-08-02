@@ -33,81 +33,95 @@ void main() {
     }
   });
 
-  test('VACUUM INTO produces a standalone copy readable by a fresh connection',
-      () async {
-    await database.armyDao.createArmy(
-      name: 'Ma liste de sauvegarde',
-      factionId: seedFactionId,
-    );
-
-    final destination = '${tempDirectory.path}/backup.sqlite';
-    await database.customStatement('VACUUM INTO ?', [destination]);
-
-    expect(File(destination).existsSync(), isTrue);
-
-    final restored = AppDatabase.forTesting(
-      NativeDatabase(File(destination)),
-    );
-    final armies = await restored.armyDao.listArmies();
-    expect(armies.map((a) => a.name), contains('Ma liste de sauvegarde'));
-    await restored.close();
-  });
-
   test(
-    'applyPendingRestore rejects a corrupt/invalid staged file instead of '
-    'deleting the real database',
-    () async {
-      final realDbPath = '${tempDirectory.path}/$databaseFileName';
-      File(realDbPath).writeAsStringSync('not actually empty either');
-
-      final stagedPath = '${tempDirectory.path}/$databaseFileName.restore';
-      File(stagedPath).writeAsStringSync('this is not a sqlite database');
-
-      await applyPendingRestore();
-
-      expect(
-        File(realDbPath).existsSync(),
-        isTrue,
-        reason: 'the real database must survive an invalid restore attempt',
-      );
-      expect(
-        File(stagedPath).existsSync(),
-        isFalse,
-        reason: 'the rejected staged file should be cleaned up',
-      );
-    },
-  );
-
-  test(
-    'applyPendingRestore swaps in a valid staged database and keeps the '
-    'old one instead of deleting it outright',
+    'VACUUM INTO produces a standalone copy readable by a fresh connection',
     () async {
       await database.armyDao.createArmy(
-        name: 'Armée à restaurer',
+        name: 'Ma liste de sauvegarde',
         factionId: seedFactionId,
       );
-      final stagedPath = '${tempDirectory.path}/$databaseFileName.restore';
-      await database.customStatement('VACUUM INTO ?', [stagedPath]);
 
-      final realDbPath = '${tempDirectory.path}/$databaseFileName';
-      File(realDbPath).writeAsStringSync('old database content');
+      final destination = '${tempDirectory.path}/backup.sqlite';
+      await database.customStatement('VACUUM INTO ?', [destination]);
 
-      await applyPendingRestore();
-
-      expect(File(stagedPath).existsSync(), isFalse);
-      expect(File(realDbPath).existsSync(), isTrue);
-      expect(
-        File('$realDbPath.before-restore').existsSync(),
-        isTrue,
-        reason: 'the previous database should be kept aside, not deleted',
-      );
+      expect(File(destination).existsSync(), isTrue);
 
       final restored = AppDatabase.forTesting(
-        NativeDatabase(File(realDbPath)),
+        NativeDatabase(File(destination)),
       );
       final armies = await restored.armyDao.listArmies();
-      expect(armies.map((a) => a.name), contains('Armée à restaurer'));
+      expect(armies.map((a) => a.name), contains('Ma liste de sauvegarde'));
       await restored.close();
     },
   );
+
+  test('applyPendingRestore rejects a corrupt/invalid staged file instead of '
+      'deleting the real database', () async {
+    final realDbPath = '${tempDirectory.path}/$databaseFileName';
+    File(realDbPath).writeAsStringSync('not actually empty either');
+
+    final stagedPath = '${tempDirectory.path}/$databaseFileName.restore';
+    File(stagedPath).writeAsStringSync('this is not a sqlite database');
+
+    await applyPendingRestore();
+
+    expect(
+      File(realDbPath).existsSync(),
+      isTrue,
+      reason: 'the real database must survive an invalid restore attempt',
+    );
+    expect(
+      File(stagedPath).existsSync(),
+      isFalse,
+      reason: 'the rejected staged file should be cleaned up',
+    );
+  });
+
+  test('applyPendingRestore swaps in a valid staged database and keeps the '
+      'old one instead of deleting it outright', () async {
+    await database.armyDao.createArmy(
+      name: 'Armée à restaurer',
+      factionId: seedFactionId,
+    );
+    final stagedPath = '${tempDirectory.path}/$databaseFileName.restore';
+    await database.customStatement('VACUUM INTO ?', [stagedPath]);
+
+    final realDbPath = '${tempDirectory.path}/$databaseFileName';
+    File(realDbPath).writeAsStringSync('old database content');
+
+    await applyPendingRestore();
+
+    expect(File(stagedPath).existsSync(), isFalse);
+    expect(File(realDbPath).existsSync(), isTrue);
+    expect(
+      File('$realDbPath.before-restore').existsSync(),
+      isTrue,
+      reason: 'the previous database should be kept aside, not deleted',
+    );
+
+    final restored = AppDatabase.forTesting(NativeDatabase(File(realDbPath)));
+    final armies = await restored.armyDao.listArmies();
+    expect(armies.map((a) => a.name), contains('Armée à restaurer'));
+    await restored.close();
+  });
+
+  test('copyDirectoryRecursively copies nested files and subfolders — the '
+      "mechanism a backup uses to bring personal photos along, since "
+      'exportBackup only VACUUMs the .sqlite and would otherwise leave '
+      'them behind on a restore', () async {
+    final source = Directory('${tempDirectory.path}/user_photos')..createSync();
+    File('${source.path}/ds-1.png').writeAsBytesSync([1, 2, 3]);
+    final entries = Directory('${source.path}/entries')..createSync();
+    File('${entries.path}/entry-1.jpg').writeAsBytesSync([4, 5, 6]);
+
+    final destination = Directory('${tempDirectory.path}/photos_backup');
+    await copyDirectoryRecursively(source, destination);
+
+    expect(File('${destination.path}/ds-1.png').readAsBytesSync(), [1, 2, 3]);
+    expect(File('${destination.path}/entries/entry-1.jpg').readAsBytesSync(), [
+      4,
+      5,
+      6,
+    ]);
+  });
 }

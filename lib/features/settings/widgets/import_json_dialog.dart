@@ -77,6 +77,19 @@ class _ImportJsonDialogState extends ConsumerState<ImportJsonDialog> {
       // fiche complète" ailleurs dans la session, dont le cache ne
       // s'expire sinon jamais tout seul.
       ref.invalidate(datasheetByIdProvider);
+      // Un import peut aussi ajouter une nouvelle faction/édition/rôle/
+      // type d'unité/capacité, changer un profil d'arme, ou faire monter
+      // le coût max — sans ces invalidations, les filtres du Catalogue et
+      // l'inventaire des armes restaient figés sur l'ancien catalogue
+      // jusqu'à un redémarrage complet de l'appli.
+      ref.invalidate(factionsListProvider);
+      ref.invalidate(rolesListProvider);
+      ref.invalidate(unitTypesListProvider);
+      ref.invalidate(editionsListProvider);
+      ref.invalidate(abilitiesListProvider);
+      ref.invalidate(catalogMaxPointsProvider);
+      ref.invalidate(datasheetAliasesProvider);
+      ref.invalidate(weaponsInventoryProvider);
 
       if (!mounted) return;
       Navigator.of(context).pop();

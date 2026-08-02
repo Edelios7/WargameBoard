@@ -9,6 +9,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/battle_details.dart';
 import '../../../database/models/battle_event_details.dart';
@@ -693,36 +694,39 @@ class _EndOfRoundReminderDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: AppColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.flag_rounded, color: AppColors.primary),
-                const SizedBox(width: 10),
-                Text(l10n.battleEndOfRoundTitle, style: AppTextStyles.title),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(l10n.battleEndOfRoundReminder, style: AppTextStyles.body),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                ),
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(l10n.battleEndOfRoundDismiss),
+    return AppDialogShortcuts(
+      onEnter: () => Navigator.of(context).pop(),
+      child: Dialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.flag_rounded, color: AppColors.primary),
+                  const SizedBox(width: 10),
+                  Text(l10n.battleEndOfRoundTitle, style: AppTextStyles.title),
+                ],
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              Text(l10n.battleEndOfRoundReminder, style: AppTextStyles.body),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(l10n.battleEndOfRoundDismiss),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1135,360 +1139,370 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
         .where((m) => m.statKey == key)
         .fold(0, (sum, m) => sum + m.delta);
 
-    return Dialog(
-      backgroundColor: AppColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.85,
-        ),
-        child: SizedBox(
-          width: min(400, MediaQuery.of(context).size.width - 48),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: imageFile != null
-                          ? Image.file(
-                              imageFile,
-                              width: 52,
-                              height: 52,
-                              fit: BoxFit.cover,
-                            )
-                          : Container(
-                              width: 52,
-                              height: 52,
-                              color: AppColors.surfaceElevated,
-                              child: Icon(
-                                Icons.shield_outlined,
-                                color: AppColors.textSecondary,
-                                size: 24,
+    return AppDialogShortcuts(
+      child: Dialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.85,
+          ),
+          child: SizedBox(
+            width: min(400, MediaQuery.of(context).size.width - 48),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: imageFile != null
+                            ? Image.file(
+                                imageFile,
+                                width: 52,
+                                height: 52,
+                                fit: BoxFit.cover,
+                              )
+                            : Container(
+                                width: 52,
+                                height: 52,
+                                color: AppColors.surfaceElevated,
+                                child: Icon(
+                                  Icons.shield_outlined,
+                                  color: AppColors.textSecondary,
+                                  size: 24,
+                                ),
                               ),
-                            ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        widget.unit.datasheetName,
-                        style: AppTextStyles.title,
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                TextButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => DatasheetFullPage(
-                          datasheetId: widget.unit.datasheetId,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          widget.unit.datasheetName,
+                          style: AppTextStyles.title,
                         ),
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.open_in_new_rounded, size: 16),
-                  label: Text(l10n.battleUnitViewFullSheet),
-                ),
-                if (models.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.battleUnitStatsTitle.toUpperCase(),
-                    style: AppTextStyles.eyebrow,
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  for (final model in models)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (models.length > 1) ...[
+                  const SizedBox(height: 12),
+                  TextButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => DatasheetFullPage(
+                            datasheetId: widget.unit.datasheetId,
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.open_in_new_rounded, size: 16),
+                    label: Text(l10n.battleUnitViewFullSheet),
+                  ),
+                  if (models.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      l10n.battleUnitStatsTitle.toUpperCase(),
+                      style: AppTextStyles.eyebrow,
+                    ),
+                    const SizedBox(height: 8),
+                    for (final model in models)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (models.length > 1) ...[
+                              Text(
+                                model.name,
+                                style: AppTextStyles.body.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                            ],
+                            Row(
+                              children: [
+                                _StatChip(
+                                  label: l10n.statMovement,
+                                  base: model.movement,
+                                  delta: sumDelta(BattleStatKey.movement),
+                                  suffix: '"',
+                                ),
+                                _StatChip(
+                                  label: l10n.statToughness,
+                                  base: model.toughness,
+                                  delta: sumDelta(BattleStatKey.toughness),
+                                ),
+                                _StatChip(
+                                  label: l10n.statSave,
+                                  base: model.save,
+                                  delta: sumDelta(BattleStatKey.save),
+                                  suffix: '+',
+                                ),
+                                _StatChip(
+                                  label: l10n.statWounds,
+                                  base: model.wounds,
+                                  delta: sumDelta(BattleStatKey.wounds),
+                                ),
+                                _StatChip(
+                                  label: l10n.statLeadership,
+                                  base: model.leadership,
+                                  delta: sumDelta(BattleStatKey.leadership),
+                                  suffix: '+',
+                                ),
+                                _StatChip(
+                                  label: l10n.statObjectiveControl,
+                                  base: model.objectiveControl,
+                                  delta: sumDelta(
+                                    BattleStatKey.objectiveControl,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                  if (weapons.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.battleUnitWeaponsTitle.toUpperCase(),
+                      style: AppTextStyles.eyebrow,
+                    ),
+                    const SizedBox(height: 8),
+                    for (final weapon in weapons)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Text(
-                              model.name,
+                              weapon.name,
                               style: AppTextStyles.body.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            for (final profile in weapon.profiles)
+                              Text(
+                                profile.summary,
+                                style: AppTextStyles.caption,
+                              ),
                           ],
-                          Row(
-                            children: [
-                              _StatChip(
-                                label: l10n.statMovement,
-                                base: model.movement,
-                                delta: sumDelta(BattleStatKey.movement),
-                                suffix: '"',
-                              ),
-                              _StatChip(
-                                label: l10n.statToughness,
-                                base: model.toughness,
-                                delta: sumDelta(BattleStatKey.toughness),
-                              ),
-                              _StatChip(
-                                label: l10n.statSave,
-                                base: model.save,
-                                delta: sumDelta(BattleStatKey.save),
-                                suffix: '+',
-                              ),
-                              _StatChip(
-                                label: l10n.statWounds,
-                                base: model.wounds,
-                                delta: sumDelta(BattleStatKey.wounds),
-                              ),
-                              _StatChip(
-                                label: l10n.statLeadership,
-                                base: model.leadership,
-                                delta: sumDelta(BattleStatKey.leadership),
-                                suffix: '+',
-                              ),
-                              _StatChip(
-                                label: l10n.statObjectiveControl,
-                                base: model.objectiveControl,
-                                delta: sumDelta(BattleStatKey.objectiveControl),
-                              ),
-                            ],
-                          ),
-                        ],
+                        ),
                       ),
+                  ],
+                  if ((datasheetAsync.value?.abilities ?? const [])
+                      .isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.battleUnitAbilitiesTitle.toUpperCase(),
+                      style: AppTextStyles.eyebrow,
                     ),
-                ],
-                if (weapons.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.battleUnitWeaponsTitle.toUpperCase(),
-                    style: AppTextStyles.eyebrow,
-                  ),
-                  const SizedBox(height: 8),
-                  for (final weapon in weapons)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            weapon.name,
-                            style: AppTextStyles.body.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          for (final profile in weapon.profiles)
-                            Text(profile.summary, style: AppTextStyles.caption),
-                        ],
-                      ),
-                    ),
-                ],
-                if ((datasheetAsync.value?.abilities ?? const [])
-                    .isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.battleUnitAbilitiesTitle.toUpperCase(),
-                    style: AppTextStyles.eyebrow,
-                  ),
-                  const SizedBox(height: 8),
-                  for (final ability in datasheetAsync.value!.abilities)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            ability.name,
-                            style: AppTextStyles.body.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          if (ability.description.isNotEmpty)
+                    const SizedBox(height: 8),
+                    for (final ability in datasheetAsync.value!.abilities)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Text(
-                              ability.description,
-                              style: AppTextStyles.caption,
+                              ability.name,
+                              style: AppTextStyles.body.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                        ],
+                            if (ability.description.isNotEmpty)
+                              Text(
+                                ability.description,
+                                style: AppTextStyles.caption,
+                              ),
+                          ],
+                        ),
                       ),
+                  ],
+                  const SizedBox(height: 12),
+                  FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: widget.destroyed
+                          ? AppColors.success
+                          : AppColors.error,
                     ),
-                ],
-                const SizedBox(height: 12),
-                FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: widget.destroyed
-                        ? AppColors.success
-                        : AppColors.error,
-                  ),
-                  onPressed: () => _toggleDestroyed(!widget.destroyed),
-                  child: Text(
-                    widget.destroyed
-                        ? l10n.battleUnitRestore
-                        : l10n.battleUnitMarkDestroyed,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  l10n.battleUnitWoundsTitle.toUpperCase(),
-                  style: AppTextStyles.eyebrow,
-                ),
-                const SizedBox(height: 8),
-                for (var i = 1; i <= widget.unit.modelCount; i++)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            widget.unit.modelCount == 1
-                                ? l10n.battleUnitWoundsSingleLabel
-                                : l10n.battleUnitWoundsModelLabel(i),
-                            style: AppTextStyles.body,
-                          ),
-                        ),
-                        IconButton(
-                          tooltip: l10n.battleUnitWoundLose,
-                          icon: const Icon(
-                            Icons.remove_circle_outline_rounded,
-                            size: 20,
-                          ),
-                          color: AppColors.error,
-                          onPressed: () => _adjustWounds(
-                            i,
-                            maxWounds,
-                            currentWoundsByModel[i] ?? maxWounds,
-                            -1,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 52,
-                          child: Text(
-                            '${currentWoundsByModel[i] ?? maxWounds}/$maxWounds',
-                            textAlign: TextAlign.center,
-                            style: AppTextStyles.body.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          tooltip: l10n.battleUnitWoundRestore,
-                          icon: const Icon(
-                            Icons.add_circle_outline_rounded,
-                            size: 20,
-                          ),
-                          color: AppColors.success,
-                          onPressed: () => _adjustWounds(
-                            i,
-                            maxWounds,
-                            currentWoundsByModel[i] ?? maxWounds,
-                            1,
-                          ),
-                        ),
-                      ],
+                    onPressed: () => _toggleDestroyed(!widget.destroyed),
+                    child: Text(
+                      widget.destroyed
+                          ? l10n.battleUnitRestore
+                          : l10n.battleUnitMarkDestroyed,
                     ),
                   ),
-                const SizedBox(height: 12),
-                Text(
-                  l10n.battleUnitModifiersTitle.toUpperCase(),
-                  style: AppTextStyles.eyebrow,
-                ),
-                const SizedBox(height: 8),
-                if (unitModifiers.isEmpty)
-                  Text(l10n.battleUnitNoModifiers, style: AppTextStyles.caption)
-                else
-                  for (final modifier in unitModifiers)
+                  const SizedBox(height: 20),
+                  Text(
+                    l10n.battleUnitWoundsTitle.toUpperCase(),
+                    style: AppTextStyles.eyebrow,
+                  ),
+                  const SizedBox(height: 8),
+                  for (var i = 1; i <= widget.unit.modelCount; i++)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Row(
                         children: [
-                          Text(
-                            '${modifier.delta > 0 ? '+' : ''}${modifier.delta} ${statLabel(l10n, modifier.statKey)}',
-                            style: AppTextStyles.body.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: modifier.delta > 0
-                                  ? AppColors.success
-                                  : AppColors.error,
+                          Expanded(
+                            child: Text(
+                              widget.unit.modelCount == 1
+                                  ? l10n.battleUnitWoundsSingleLabel
+                                  : l10n.battleUnitWoundsModelLabel(i),
+                              style: AppTextStyles.body,
                             ),
                           ),
-                          if (modifier.label != null &&
-                              modifier.label!.isNotEmpty) ...[
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                modifier.label!,
-                                style: AppTextStyles.caption,
-                                overflow: TextOverflow.ellipsis,
+                          IconButton(
+                            tooltip: l10n.battleUnitWoundLose,
+                            icon: const Icon(
+                              Icons.remove_circle_outline_rounded,
+                              size: 20,
+                            ),
+                            color: AppColors.error,
+                            onPressed: () => _adjustWounds(
+                              i,
+                              maxWounds,
+                              currentWoundsByModel[i] ?? maxWounds,
+                              -1,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 52,
+                            child: Text(
+                              '${currentWoundsByModel[i] ?? maxWounds}/$maxWounds',
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.body.copyWith(
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
-                          ] else
-                            const Spacer(),
+                          ),
                           IconButton(
-                            tooltip: l10n.battleUnitRemoveModifier,
-                            icon: const Icon(Icons.close_rounded, size: 16),
-                            color: AppColors.textSecondary,
-                            onPressed: () => _removeModifier(modifier.id),
+                            tooltip: l10n.battleUnitWoundRestore,
+                            icon: const Icon(
+                              Icons.add_circle_outline_rounded,
+                              size: 20,
+                            ),
+                            color: AppColors.success,
+                            onPressed: () => _adjustWounds(
+                              i,
+                              maxWounds,
+                              currentWoundsByModel[i] ?? maxWounds,
+                              1,
+                            ),
                           ),
                         ],
                       ),
                     ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: DropdownButtonFormField<BattleStatKey>(
-                        initialValue: _statKey,
-                        isExpanded: true,
-                        dropdownColor: AppColors.surface,
-                        style: AppTextStyles.body,
-                        decoration: const InputDecoration(isDense: true),
-                        items: [
-                          for (final key in BattleStatKey.values)
-                            DropdownMenuItem(
-                              value: key,
-                              child: Text(statLabel(l10n, key)),
+                  const SizedBox(height: 12),
+                  Text(
+                    l10n.battleUnitModifiersTitle.toUpperCase(),
+                    style: AppTextStyles.eyebrow,
+                  ),
+                  const SizedBox(height: 8),
+                  if (unitModifiers.isEmpty)
+                    Text(
+                      l10n.battleUnitNoModifiers,
+                      style: AppTextStyles.caption,
+                    )
+                  else
+                    for (final modifier in unitModifiers)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            Text(
+                              '${modifier.delta > 0 ? '+' : ''}${modifier.delta} ${statLabel(l10n, modifier.statKey)}',
+                              style: AppTextStyles.body.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: modifier.delta > 0
+                                    ? AppColors.success
+                                    : AppColors.error,
+                              ),
                             ),
-                        ],
-                        onChanged: (value) =>
-                            setState(() => _statKey = value ?? _statKey),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: TextField(
-                        controller: _valueController,
-                        keyboardType: const TextInputType.numberWithOptions(
-                          signed: true,
+                            if (modifier.label != null &&
+                                modifier.label!.isNotEmpty) ...[
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  modifier.label!,
+                                  style: AppTextStyles.caption,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ] else
+                              const Spacer(),
+                            IconButton(
+                              tooltip: l10n.battleUnitRemoveModifier,
+                              icon: const Icon(Icons.close_rounded, size: 16),
+                              color: AppColors.textSecondary,
+                              onPressed: () => _removeModifier(modifier.id),
+                            ),
+                          ],
                         ),
-                        style: AppTextStyles.body,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          hintText: l10n.battleUnitModifierValueHint,
+                      ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: DropdownButtonFormField<BattleStatKey>(
+                          initialValue: _statKey,
+                          isExpanded: true,
+                          dropdownColor: AppColors.surface,
+                          style: AppTextStyles.body,
+                          decoration: const InputDecoration(isDense: true),
+                          items: [
+                            for (final key in BattleStatKey.values)
+                              DropdownMenuItem(
+                                value: key,
+                                child: Text(statLabel(l10n, key)),
+                              ),
+                          ],
+                          onChanged: (value) =>
+                              setState(() => _statKey = value ?? _statKey),
                         ),
                       ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: _valueController,
+                          keyboardType: const TextInputType.numberWithOptions(
+                            signed: true,
+                          ),
+                          style: AppTextStyles.body,
+                          decoration: InputDecoration(
+                            isDense: true,
+                            hintText: l10n.battleUnitModifierValueHint,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _labelController,
+                    style: AppTextStyles.body,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      hintText: l10n.battleUnitModifierLabelHint,
                     ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _labelController,
-                  style: AppTextStyles.body,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    hintText: l10n.battleUnitModifierLabelHint,
                   ),
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: _addModifier,
-                    icon: const Icon(Icons.add_rounded, size: 16),
-                    label: Text(l10n.battleUnitAddModifier),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: _addModifier,
+                      icon: const Icon(Icons.add_rounded, size: 16),
+                      label: Text(l10n.battleUnitAddModifier),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -2014,89 +2028,92 @@ class _FinishBattleDialogState extends ConsumerState<_FinishBattleDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Dialog(
-      backgroundColor: AppColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: SizedBox(
-        width: 380,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(l10n.battleDashboardFinish, style: AppTextStyles.title),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<BattleResult?>(
-                initialValue: _result,
-                isExpanded: true,
-                dropdownColor: AppColors.surface,
-                style: AppTextStyles.body,
-                decoration: InputDecoration(
-                  labelText: l10n.battleResultLabel,
-                  labelStyle: AppTextStyles.caption,
-                  filled: true,
-                  fillColor: AppColors.background,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                items: [
-                  DropdownMenuItem(
-                    value: BattleResult.victory,
-                    child: Text(l10n.battleResultVictory),
-                  ),
-                  DropdownMenuItem(
-                    value: BattleResult.defeat,
-                    child: Text(l10n.battleResultDefeat),
-                  ),
-                  DropdownMenuItem(
-                    value: BattleResult.draw,
-                    child: Text(l10n.battleResultDraw),
-                  ),
-                ],
-                onChanged: (value) => setState(() => _result = value),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _notesController,
-                maxLines: 3,
-                style: AppTextStyles.body,
-                decoration: InputDecoration(
-                  labelText: l10n.battleNotesLabel,
-                  labelStyle: AppTextStyles.caption,
-                  filled: true,
-                  fillColor: AppColors.background,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Wrap(
-                alignment: WrapAlignment.end,
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(
-                      l10n.armyBuilderCancel,
-                      style: AppTextStyles.body,
+    return AppDialogShortcuts(
+      onEnter: _finish,
+      child: Dialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        child: SizedBox(
+          width: 380,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(l10n.battleDashboardFinish, style: AppTextStyles.title),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<BattleResult?>(
+                  initialValue: _result,
+                  isExpanded: true,
+                  dropdownColor: AppColors.surface,
+                  style: AppTextStyles.body,
+                  decoration: InputDecoration(
+                    labelText: l10n.battleResultLabel,
+                    labelStyle: AppTextStyles.caption,
+                    filled: true,
+                    fillColor: AppColors.background,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
                     ),
                   ),
-                  FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                  items: [
+                    DropdownMenuItem(
+                      value: BattleResult.victory,
+                      child: Text(l10n.battleResultVictory),
                     ),
-                    onPressed: _finish,
-                    child: Text(l10n.battleDashboardFinish),
+                    DropdownMenuItem(
+                      value: BattleResult.defeat,
+                      child: Text(l10n.battleResultDefeat),
+                    ),
+                    DropdownMenuItem(
+                      value: BattleResult.draw,
+                      child: Text(l10n.battleResultDraw),
+                    ),
+                  ],
+                  onChanged: (value) => setState(() => _result = value),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _notesController,
+                  maxLines: 3,
+                  style: AppTextStyles.body,
+                  decoration: InputDecoration(
+                    labelText: l10n.battleNotesLabel,
+                    labelStyle: AppTextStyles.caption,
+                    filled: true,
+                    fillColor: AppColors.background,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 20),
+                Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(
+                        l10n.armyBuilderCancel,
+                        style: AppTextStyles.body,
+                      ),
+                    ),
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                      ),
+                      onPressed: _finish,
+                      child: Text(l10n.battleDashboardFinish),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

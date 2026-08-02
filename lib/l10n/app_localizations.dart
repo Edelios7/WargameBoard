@@ -1526,6 +1526,12 @@ abstract class AppLocalizations {
   /// **'Ajouté : {name}'**
   String armyBuilderUnitAdded(String name);
 
+  /// No description provided for @armyBuilderAddUnitError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors de l\'ajout de « {name} »'**
+  String armyBuilderAddUnitError(String name);
+
   /// No description provided for @armyBuilderPointsPerSquad.
   ///
   /// In fr, this message translates to:

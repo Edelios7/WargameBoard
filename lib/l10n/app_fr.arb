@@ -375,6 +375,12 @@
       "name": { "type": "String" }
     }
   },
+  "armyBuilderAddUnitError": "Erreur lors de l'ajout de « {name} »",
+  "@armyBuilderAddUnitError": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
   "armyBuilderPointsPerSquad": "{points} pts / escouade",
   "@armyBuilderPointsPerSquad": {
     "placeholders": {

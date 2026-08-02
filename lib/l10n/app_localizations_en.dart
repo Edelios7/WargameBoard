@@ -792,6 +792,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String armyBuilderAddUnitError(String name) {
+    return 'Error while adding \"$name\"';
+  }
+
+  @override
   String armyBuilderPointsPerSquad(int points) {
     return '$points pts / squad';
   }

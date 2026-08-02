@@ -802,6 +802,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String armyBuilderAddUnitError(String name) {
+    return 'Erreur lors de l\'ajout de « $name »';
+  }
+
+  @override
   String armyBuilderPointsPerSquad(int points) {
     return '$points pts / escouade';
   }
