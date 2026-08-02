@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/app_loading_indicator.dart';
 import '../../../core/widgets/back_link.dart';
 import '../../../core/widgets/retry_error_state.dart';
 import '../../../database/models/weapon_summary.dart';
@@ -146,9 +147,7 @@ class _WeaponsInventoryPageState extends ConsumerState<WeaponsInventoryPage> {
             const SizedBox(height: 16),
             Expanded(
               child: weaponsAsync.when(
-                loading: () => Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                ),
+                loading: () => const AppLoadingIndicator(),
                 error: (_, __) => RetryErrorState(
                   onRetry: () => ref.invalidate(weaponsInventoryProvider),
                 ),

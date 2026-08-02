@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
+import '../../../core/widgets/app_loading_indicator.dart';
 import '../../../core/widgets/archetype_badge.dart';
 import '../../../database/models/ability_details.dart';
 import '../../../database/models/cost_bracket.dart';
@@ -26,7 +27,7 @@ class DatasheetDetailPanel extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     if (loading) {
-      return Center(child: CircularProgressIndicator(color: AppColors.primary));
+      return const AppLoadingIndicator();
     }
 
     final sheet = datasheet;

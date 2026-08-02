@@ -202,7 +202,8 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
                     ),
                     const SizedBox(height: 12),
                     armiesAsync.when(
-                      loading: () => const SizedBox.shrink(),
+                      loading: () =>
+                          LinearProgressIndicator(color: AppColors.primary),
                       error: (_, __) => InlineRetryErrorHint(
                         onRetry: () => ref.invalidate(armiesListProvider),
                       ),
@@ -240,7 +241,8 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
                     ),
                     const SizedBox(height: 12),
                     factionsAsync.when(
-                      loading: () => const SizedBox.shrink(),
+                      loading: () =>
+                          LinearProgressIndicator(color: AppColors.primary),
                       error: (_, __) => InlineRetryErrorHint(
                         onRetry: () => ref.invalidate(factionsListProvider),
                       ),

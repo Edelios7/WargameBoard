@@ -181,7 +181,8 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
                     ),
                     const SizedBox(height: 12),
                     factionsAsync.when(
-                      loading: () => const SizedBox.shrink(),
+                      loading: () =>
+                          LinearProgressIndicator(color: AppColors.primary),
                       error: (_, __) => InlineRetryErrorHint(
                         onRetry: () => ref.invalidate(factionsListProvider),
                       ),

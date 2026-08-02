@@ -12,6 +12,7 @@ import '../../../core/utils/search_normalize.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/unit_photo_thumbnail.dart';
+import '../../../core/widgets/app_loading_indicator.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../core/widgets/retry_error_state.dart';
@@ -429,7 +430,7 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
     final recent = recentAsync.value ?? const <CollectionItemDetails>[];
 
     if (entriesAsync.isLoading) {
-      return Center(child: CircularProgressIndicator(color: AppColors.primary));
+      return const AppLoadingIndicator();
     }
     if (entriesAsync.hasError) {
       return RetryErrorState(
@@ -1425,10 +1426,10 @@ class _WishlistTab extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: itemsAsync.when(
-        loading: () =>
-            Center(child: CircularProgressIndicator(color: AppColors.primary)),
-        error: (error, _) =>
-            Center(child: Text('$error', style: AppTextStyles.caption)),
+        loading: () => const AppLoadingIndicator(),
+        error: (error, _) => RetryErrorState(
+          onRetry: () => ref.invalidate(wishlistItemsProvider),
+        ),
         data: (items) {
           if (items.isEmpty) {
             return Center(

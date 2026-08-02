@@ -11,6 +11,7 @@ import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/utils/search_normalize.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
+import '../../../core/widgets/app_loading_indicator.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/discard_guard.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
@@ -240,10 +241,10 @@ class ArmiesPage extends ConsumerWidget {
           ? AppColors.background
           : Colors.transparent,
       body: detailAsync.when(
-        loading: () =>
-            Center(child: CircularProgressIndicator(color: AppColors.primary)),
-        error: (error, _) =>
-            Center(child: Text('$error', style: AppTextStyles.caption)),
+        loading: () => const AppLoadingIndicator(),
+        error: (error, _) => RetryErrorState(
+          onRetry: () => ref.invalidate(selectedArmyProvider),
+        ),
         data: (army) {
           if (army == null) return const _ArmyListPage();
           return _ArmyBuilderPage(army: army);
@@ -2286,20 +2287,18 @@ class _UnitDetailsBody extends ConsumerWidget {
     );
 
     if (datasheetAsync.isLoading || selectionsAsync.isLoading) {
-      return Center(child: CircularProgressIndicator(color: AppColors.primary));
+      return const AppLoadingIndicator();
     }
     if (datasheetAsync.hasError) {
       return RetryErrorState(
-        onRetry: () => ref.invalidate(
-          datasheetByIdProvider(currentUnit.datasheetId),
-        ),
+        onRetry: () =>
+            ref.invalidate(datasheetByIdProvider(currentUnit.datasheetId)),
       );
     }
     if (selectionsAsync.hasError) {
       return RetryErrorState(
-        onRetry: () => ref.invalidate(
-          unitEquipmentSelectionsProvider(currentUnit.id),
-        ),
+        onRetry: () =>
+            ref.invalidate(unitEquipmentSelectionsProvider(currentUnit.id)),
       );
     }
 
@@ -2909,13 +2908,14 @@ class _ArmyOverviewCard extends ConsumerWidget {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
       child: catalogAsync.when(
-        loading: () => Padding(
-          padding: const EdgeInsets.only(top: 40),
-          child: Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
-          ),
+        loading: () => const Padding(
+          padding: EdgeInsets.only(top: 40),
+          child: AppLoadingIndicator(),
         ),
-        error: (error, _) => Text('$error', style: AppTextStyles.caption),
+        error: (error, _) => RetryErrorState(
+          onRetry: () =>
+              ref.invalidate(factionCatalogDetailsProvider(army.factionId)),
+        ),
         data: (catalog) {
           final catalogById = {for (final d in catalog) d.id: d};
           final scores = computeArmyProfile(army, catalogById);

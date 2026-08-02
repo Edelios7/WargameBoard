@@ -8,6 +8,7 @@ import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/theme/faction_colors.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
+import '../../../core/widgets/app_loading_indicator.dart';
 import '../../../core/widgets/archetype_badge.dart';
 import '../../../database/app_database.dart' show Faction, Keyword;
 import '../../../database/models/catalog_sort.dart';
@@ -775,8 +776,7 @@ class _ResultsList extends ConsumerWidget {
     final favoriteIds = ref.watch(catalogFavoritesProvider).value ?? const {};
 
     return resultsAsync.when(
-      loading: () =>
-          Center(child: CircularProgressIndicator(color: AppColors.primary)),
+      loading: () => const AppLoadingIndicator(),
       error: (error, _) => Center(
         child: Padding(
           padding: const EdgeInsets.all(24),

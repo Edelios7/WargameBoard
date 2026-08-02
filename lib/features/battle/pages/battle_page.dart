@@ -7,6 +7,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
+import '../../../core/widgets/app_loading_indicator.dart';
 import '../../../core/widgets/retry_error_state.dart';
 import '../../../database/models/battle_details.dart';
 import '../../../database/tables/battles_table.dart';
@@ -30,10 +31,10 @@ class BattlePage extends ConsumerWidget {
           ? AppColors.background
           : Colors.transparent,
       body: activeBattleAsync.when(
-        loading: () =>
-            Center(child: CircularProgressIndicator(color: AppColors.primary)),
-        error: (error, _) =>
-            RetryErrorState(onRetry: () => ref.invalidate(activeBattleProvider)),
+        loading: () => const AppLoadingIndicator(),
+        error: (error, _) => RetryErrorState(
+          onRetry: () => ref.invalidate(activeBattleProvider),
+        ),
         data: (activeBattle) => activeBattle != null
             ? BattleDashboard(battle: activeBattle)
             : const _BattleHistoryView(),
@@ -124,11 +125,10 @@ class _BattleHistoryView extends ConsumerWidget {
           const SizedBox(height: 24),
           Expanded(
             child: battlesAsync.when(
-              loading: () => Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
+              loading: () => const AppLoadingIndicator(),
+              error: (error, _) => RetryErrorState(
+                onRetry: () => ref.invalidate(battlesListProvider),
               ),
-              error: (error, _) =>
-                  RetryErrorState(onRetry: () => ref.invalidate(battlesListProvider)),
               data: (battles) {
                 if (battles.isEmpty) {
                   return Center(
