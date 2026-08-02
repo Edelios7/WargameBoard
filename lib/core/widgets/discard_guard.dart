@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
+import 'app_dialog_shortcuts.dart';
 
 /// Empêche de perdre une saisie en cours sans prévenir : un formulaire
 /// dans un dialogue (nom, notes, scores...) qui se ferme sur un simple
@@ -28,27 +29,32 @@ class DiscardGuard {
     final l10n = AppLocalizations.of(context)!;
     final discard = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: Text(
-          l10n.battleDiscardConfirmTitle,
-          style: AppTextStyles.title,
-        ),
-        content: Text(
-          l10n.battleDiscardConfirmMessage,
-          style: AppTextStyles.body,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n.battleDiscardKeepEditing),
+      builder: (dialogContext) => AppDialogShortcuts(
+        // Échap = "garder la saisie" (le choix sûr) : pas d'onEnter, une
+        // frappe accidentelle ne doit jamais jeter ce que l'utilisateur
+        // vient de taper.
+        child: AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text(
+            l10n.battleDiscardConfirmTitle,
+            style: AppTextStyles.title,
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(l10n.battleDiscardConfirmAction),
+          content: Text(
+            l10n.battleDiscardConfirmMessage,
+            style: AppTextStyles.body,
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.battleDiscardKeepEditing),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(l10n.battleDiscardConfirmAction),
+            ),
+          ],
+        ),
       ),
     );
     if (discard == true && context.mounted) {

@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/textured_button.dart';
 import '../../../l10n/app_localizations.dart';
@@ -87,27 +88,32 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: Text(
-          l10n.settingsBackupRestoreConfirmTitle,
-          style: AppTextStyles.title,
-        ),
-        content: Text(
-          l10n.settingsBackupRestoreConfirmBody,
-          style: AppTextStyles.body,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.armyBuilderCancel),
+      builder: (context) => AppDialogShortcuts(
+        // Pas d'onEnter ici : une frappe accidentelle ne doit jamais
+        // déclencher une action aussi lourde de conséquences que remplacer
+        // toute la base par une sauvegarde — Échap pour annuler reste sûr.
+        child: AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text(
+            l10n.settingsBackupRestoreConfirmTitle,
+            style: AppTextStyles.title,
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.settingsBackupRestoreConfirmAction),
+          content: Text(
+            l10n.settingsBackupRestoreConfirmBody,
+            style: AppTextStyles.body,
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l10n.armyBuilderCancel),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(l10n.settingsBackupRestoreConfirmAction),
+            ),
+          ],
+        ),
       ),
     );
     if (confirmed != true || !mounted) return;

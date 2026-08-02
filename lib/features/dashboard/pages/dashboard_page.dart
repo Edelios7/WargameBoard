@@ -6,6 +6,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../core/widgets/donut_chart.dart';
@@ -1706,31 +1707,33 @@ class _ProjectRow extends ConsumerWidget {
                   // collection) qui demande toujours confirmation.
                   final confirmed = await showDialog<bool>(
                     context: context,
-                    builder: (dialogContext) => AlertDialog(
-                      backgroundColor: AppColors.surface,
-                      title: Text(
-                        l10n.dashboardDeleteProjectConfirmTitle,
-                        style: AppTextStyles.title,
-                      ),
-                      content: Text(
-                        l10n.dashboardDeleteProjectConfirmMessage(title),
-                        style: AppTextStyles.body,
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () =>
-                              Navigator.of(dialogContext).pop(false),
-                          child: Text(l10n.armyBuilderCancel),
+                    builder: (dialogContext) => AppDialogShortcuts(
+                      child: AlertDialog(
+                        backgroundColor: AppColors.surface,
+                        title: Text(
+                          l10n.dashboardDeleteProjectConfirmTitle,
+                          style: AppTextStyles.title,
                         ),
-                        FilledButton(
-                          style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.error,
+                        content: Text(
+                          l10n.dashboardDeleteProjectConfirmMessage(title),
+                          style: AppTextStyles.body,
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () =>
+                                Navigator.of(dialogContext).pop(false),
+                            child: Text(l10n.armyBuilderCancel),
                           ),
-                          onPressed: () =>
-                              Navigator.of(dialogContext).pop(true),
-                          child: Text(l10n.dashboardDeleteProject),
-                        ),
-                      ],
+                          FilledButton(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: AppColors.error,
+                            ),
+                            onPressed: () =>
+                                Navigator.of(dialogContext).pop(true),
+                            child: Text(l10n.dashboardDeleteProject),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                   if (confirmed != true) return;

@@ -34,27 +34,31 @@ class _ImportJsonDialogState extends ConsumerState<ImportJsonDialog> {
     final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: Text(
-          l10n.settingsImportConfirmTitle,
-          style: AppTextStyles.title,
-        ),
-        content: Text(
-          l10n.settingsImportConfirmMessage,
-          style: AppTextStyles.body,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n.armyBuilderCancel),
+      builder: (dialogContext) => AppDialogShortcuts(
+        child: AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text(
+            l10n.settingsImportConfirmTitle,
+            style: AppTextStyles.title,
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(l10n.settingsImportRun),
+          content: Text(
+            l10n.settingsImportConfirmMessage,
+            style: AppTextStyles.body,
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.armyBuilderCancel),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.primary,
+              ),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(l10n.settingsImportRun),
+            ),
+          ],
+        ),
       ),
     );
     if (confirmed != true) return;
