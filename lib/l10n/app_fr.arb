@@ -337,6 +337,13 @@
   "armyBuilderSelectUnitPrompt": "Sélectionnez une unité pour voir ses détails",
   "armyBuilderEditUnit": "Modifier l'unité",
   "armyBuilderRemoveUnit": "Retirer l'unité",
+  "armyBuilderUnitRemoved": "{name} retirée",
+  "@armyBuilderUnitRemoved": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "armyBuilderUndoRemove": "Annuler",
   "armyBuilderModelCountLabel": "Nombre de figurines",
   "armyBuilderPickOne": "Choisis une option",
   "armyBuilderPickUpTo": "Choisis jusqu'à {count} options",
@@ -531,6 +538,7 @@
   "statsVictories": "Victoires",
   "statsDefeats": "Défaites",
   "statsWinRate": "Taux de victoire",
+  "statsEmptyHint": "Joue une partie ou ajoute des figurines à ta collection pour voir tes statistiques ici.",
   "statsBattleRecord": "Bilan {victories}V / {defeats}D / {draws}N",
   "@statsBattleRecord": {
     "placeholders": {
@@ -821,6 +829,7 @@
   "rulesRecentDocuments": "Documents récents",
   "rulesPopularRules": "Règles populaires",
   "rulesSeeAll": "Voir tout",
+  "rulesInteractiveTool": "Outil interactif",
   "rulesHelpTitle": "Besoin d'aide ?",
   "rulesHelpHowToPlay": "Comment jouer ?",
   "rulesHelpHowToPlaySub": "Apprendre les bases",

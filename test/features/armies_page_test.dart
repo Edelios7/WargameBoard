@@ -311,6 +311,49 @@ void main() {
     },
   );
 
+  testWidgets('removing a unit offers an Undo snackbar that re-adds it, so a '
+      "mis-click doesn't force re-configuring the unit from scratch", (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final armyId = await database.armyDao.createArmy(
+      name: 'Ma liste',
+      factionId: 'fac-blood-angels',
+    );
+    final captain = await database.datasheetDao.search('Captain');
+    await database.armyDao.addUnit(
+      armyId: armyId,
+      datasheetId: captain.single.id,
+      modelCount: 1,
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Ma liste'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.delete_outline_rounded));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Retirer l\'unité'));
+    await tester.pumpAndSettle();
+
+    final afterRemove = await database.armyDao.getArmy(armyId);
+    expect(afterRemove!.units, isEmpty);
+    expect(find.text('Annuler'), findsOneWidget);
+
+    await tester.tap(find.text('Annuler'));
+    await tester.pumpAndSettle();
+
+    final afterUndo = await database.armyDao.getArmy(armyId);
+    expect(afterUndo!.units, hasLength(1));
+    expect(afterUndo.units.single.datasheetName, 'Captain');
+  });
+
   testWidgets('dragging a Character card onto a squad card attaches it — plain '
       'Draggable (not LongPressDraggable), since a mouse click-drag moves '
       'the cursor immediately and cancels a long-press recognizer before '

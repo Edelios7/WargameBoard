@@ -753,6 +753,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get armyBuilderRemoveUnit => 'Retirer l\'unité';
 
   @override
+  String armyBuilderUnitRemoved(String name) {
+    return '$name retirée';
+  }
+
+  @override
+  String get armyBuilderUndoRemove => 'Annuler';
+
+  @override
   String get armyBuilderModelCountLabel => 'Nombre de figurines';
 
   @override
@@ -1104,6 +1112,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get statsWinRate => 'Taux de victoire';
+
+  @override
+  String get statsEmptyHint =>
+      'Joue une partie ou ajoute des figurines à ta collection pour voir tes statistiques ici.';
 
   @override
   String statsBattleRecord(int victories, int defeats, int draws) {
@@ -1703,6 +1715,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get rulesSeeAll => 'Voir tout';
+
+  @override
+  String get rulesInteractiveTool => 'Outil interactif';
 
   @override
   String get rulesHelpTitle => 'Besoin d\'aide ?';

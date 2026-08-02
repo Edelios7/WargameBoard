@@ -15,6 +15,19 @@ import 'food_chain_guide_page.dart';
 import 'rule_document_detail_page.dart';
 import 'rule_pdf_viewer_page.dart';
 
+/// Documents qui ouvrent un outil interactif plutôt qu'un simple texte à
+/// lire (voir _openDocument) — mis en avant différemment dans les listes
+/// ci-dessous (icône dédiée + libellé "Outil interactif" à la place de la
+/// ligne version/date), pour qu'ils ne se noient pas visuellement parmi
+/// les dizaines de documents PDF de la page, en particulier le simulateur
+/// de combat qui a `downloads: 0` et ne remonterait jamais dans "Popular"
+/// sans ce repère.
+const _interactiveToolIds = {
+  'guide-chaine-alimentaire',
+  'guide-listes-d-armee',
+  'simulateur-de-combat',
+};
+
 class RulesPage extends StatefulWidget {
   const RulesPage({super.key});
 
@@ -77,9 +90,7 @@ class _RulesPageState extends State<RulesPage> {
     }
     if (doc.id == 'simulateur-de-combat') {
       Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => CombatSimulatorPage(document: doc),
-        ),
+        MaterialPageRoute(builder: (_) => CombatSimulatorPage(document: doc)),
       );
       return;
     }
@@ -729,8 +740,9 @@ class _RecentDocumentsCardState extends State<_RecentDocumentsCard> {
               child: Text(l10n.rulesEmpty, style: AppTextStyles.caption),
             )
           else
-            ...documents.map(
-              (doc) => InkWell(
+            ...documents.map((doc) {
+              final isTool = _interactiveToolIds.contains(doc.id);
+              return InkWell(
                 borderRadius: BorderRadius.circular(8),
                 onTap: () => widget.onOpen(doc),
                 child: Padding(
@@ -742,12 +754,18 @@ class _RecentDocumentsCardState extends State<_RecentDocumentsCard> {
                         height: 44,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          color: AppColors.surface,
+                          color: isTool
+                              ? AppColors.primary.withValues(alpha: .16)
+                              : AppColors.surface,
                         ),
                         child: Icon(
-                          Icons.description_rounded,
+                          isTool
+                              ? Icons.bolt_rounded
+                              : Icons.description_rounded,
                           size: 18,
-                          color: AppColors.primaryLight,
+                          color: isTool
+                              ? AppColors.primary
+                              : AppColors.primaryLight,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -762,8 +780,17 @@ class _RecentDocumentsCardState extends State<_RecentDocumentsCard> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              'v${doc.version} • ${dateFormat.format(doc.lastUpdate)} • ${doc.language}',
-                              style: AppTextStyles.caption,
+                              isTool
+                                  ? l10n.rulesInteractiveTool
+                                  : 'v${doc.version} • ${dateFormat.format(doc.lastUpdate)} • ${doc.language}',
+                              style: AppTextStyles.caption.copyWith(
+                                color: isTool
+                                    ? AppColors.primary
+                                    : AppColors.textSecondary,
+                                fontWeight: isTool
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                              ),
                             ),
                           ],
                         ),
@@ -776,8 +803,8 @@ class _RecentDocumentsCardState extends State<_RecentDocumentsCard> {
                     ],
                   ),
                 ),
-              ),
-            ),
+              );
+            }),
         ],
       ),
     );

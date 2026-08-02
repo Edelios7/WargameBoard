@@ -743,6 +743,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get armyBuilderRemoveUnit => 'Remove unit';
 
   @override
+  String armyBuilderUnitRemoved(String name) {
+    return '$name removed';
+  }
+
+  @override
+  String get armyBuilderUndoRemove => 'Undo';
+
+  @override
   String get armyBuilderModelCountLabel => 'Model count';
 
   @override
@@ -1090,6 +1098,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statsWinRate => 'Win rate';
+
+  @override
+  String get statsEmptyHint =>
+      'Play a battle or add some models to your collection to see your stats here.';
 
   @override
   String statsBattleRecord(int victories, int defeats, int draws) {
@@ -1686,6 +1698,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rulesSeeAll => 'See all';
+
+  @override
+  String get rulesInteractiveTool => 'Interactive tool';
 
   @override
   String get rulesHelpTitle => 'Need help?';

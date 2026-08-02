@@ -337,6 +337,13 @@
   "armyBuilderSelectUnitPrompt": "Select a unit to see its details",
   "armyBuilderEditUnit": "Edit unit",
   "armyBuilderRemoveUnit": "Remove unit",
+  "armyBuilderUnitRemoved": "{name} removed",
+  "@armyBuilderUnitRemoved": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "armyBuilderUndoRemove": "Undo",
   "armyBuilderModelCountLabel": "Model count",
   "armyBuilderPickOne": "Pick an option",
   "armyBuilderPickUpTo": "Pick up to {count} options",
@@ -531,6 +538,7 @@
   "statsVictories": "Victories",
   "statsDefeats": "Defeats",
   "statsWinRate": "Win rate",
+  "statsEmptyHint": "Play a battle or add some models to your collection to see your stats here.",
   "statsBattleRecord": "Record {victories}W / {defeats}L / {draws}D",
   "@statsBattleRecord": {
     "placeholders": {
@@ -821,6 +829,7 @@
   "rulesRecentDocuments": "Recent documents",
   "rulesPopularRules": "Popular rules",
   "rulesSeeAll": "See all",
+  "rulesInteractiveTool": "Interactive tool",
   "rulesHelpTitle": "Need help?",
   "rulesHelpHowToPlay": "How to play?",
   "rulesHelpHowToPlaySub": "Learn the basics",

@@ -1177,43 +1177,46 @@ class _RecentAdditionsCard extends StatelessWidget {
                 .map(
                   (entry) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(8),
-                        onTap: () => onOpenEntry(entry.datasheetId),
-                        child: Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: _thumbnail(entry.datasheetId, 40),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    entry.datasheetName,
-                                    style: AppTextStyles.body,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Text(
-                                    entry.factionName,
-                                    style: AppTextStyles.caption,
-                                  ),
-                                ],
+                    child: Hoverable(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          onTap: () => onOpenEntry(entry.datasheetId),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: _thumbnail(entry.datasheetId, 40),
                               ),
-                            ),
-                            Text(
-                              l10n.collectionQuantityLabel(entry.quantity),
-                              style: AppTextStyles.caption.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.primary,
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      entry.datasheetName,
+                                      style: AppTextStyles.body,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Text(
+                                      entry.factionName,
+                                      style: AppTextStyles.caption,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                              Text(
+                                l10n.collectionQuantityLabel(entry.quantity),
+                                style: AppTextStyles.caption.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -1263,26 +1266,29 @@ class _RecentlyViewedCard extends StatelessWidget {
                 separatorBuilder: (_, __) => const SizedBox(width: 10),
                 itemBuilder: (context, index) {
                   final result = results[index];
-                  return InkWell(
+                  return Hoverable(
                     borderRadius: BorderRadius.circular(10),
-                    onTap: () => onSelect(result.id),
-                    child: SizedBox(
-                      width: 72,
-                      child: Column(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: _thumbnail(result.id, 64),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            result.name,
-                            style: AppTextStyles.caption,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () => onSelect(result.id),
+                      child: SizedBox(
+                        width: 72,
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: _thumbnail(result.id, 64),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              result.name,
+                              style: AppTextStyles.caption,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );

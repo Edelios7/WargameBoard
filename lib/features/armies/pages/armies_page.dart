@@ -126,6 +126,60 @@ Future<bool> _confirmDelete(
   return confirmed ?? false;
 }
 
+/// Retire une unité de l'armée et propose de revenir en arrière via un
+/// SnackBar — contrairement à d'autres suppressions de l'appli (dont la
+/// confirmation suffit), recréer une unité à la main coûte plus cher que
+/// juste "annuler" (retrouver la datasheet, resaisir le nombre de
+/// figurines). L'"annuler" ne restaure que la fiche et l'effectif — pas
+/// les choix d'armes/l'attachement/le statut Warlord de l'unité
+/// d'origine, une limite acceptée pour rester une action ponctuelle
+/// simple plutôt qu'un vrai historique d'annulation.
+Future<void> _removeUnitWithUndo(
+  BuildContext context,
+  WidgetRef ref, {
+  required ArmyDetails army,
+  required ArmyUnitDetails unit,
+}) async {
+  // Le retrait fait souvent disparaître le widget qui a déclenché cette
+  // action (ex. le panneau de détails, remplacé par la vue d'ensemble une
+  // fois l'armée vide) — son `ref` devient alors invalide. Le conteneur
+  // de providers, lui, survit tant que la page Armées reste affichée :
+  // c'est lui qu'utilise le bouton "Annuler" du SnackBar, potentiellement
+  // pressé bien après ce rebuild.
+  final container = ProviderScope.containerOf(context, listen: false);
+  final armyRepository = container.read(armyRepositoryProvider);
+
+  await armyRepository.removeUnit(unit.id);
+  if (container.read(selectedUnitIdProvider) == unit.id) {
+    container.read(selectedUnitIdProvider.notifier).state = null;
+  }
+  container.invalidate(selectedArmyProvider);
+  container.invalidate(armiesListProvider);
+  container.invalidate(armyByIdProvider(army.id));
+
+  if (!context.mounted) return;
+  final l10n = AppLocalizations.of(context)!;
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(l10n.armyBuilderUnitRemoved(unit.datasheetName)),
+      duration: const Duration(seconds: 5),
+      action: SnackBarAction(
+        label: l10n.armyBuilderUndoRemove,
+        onPressed: () async {
+          await armyRepository.addUnit(
+            armyId: army.id,
+            datasheetId: unit.datasheetId,
+            modelCount: unit.modelCount,
+          );
+          container.invalidate(selectedArmyProvider);
+          container.invalidate(armiesListProvider);
+          container.invalidate(armyByIdProvider(army.id));
+        },
+      ),
+    ),
+  );
+}
+
 /// Ajoute une copie d'une unité déjà présente dans l'armée (même
 /// datasheet, même nombre de figurines, mêmes choix d'armes
 /// optionnelles) — évite de tout reconfigurer à la main pour une 2e
@@ -1343,17 +1397,13 @@ class _BuilderSidebarState extends ConsumerState<_BuilderSidebar> {
                             ),
                             confirmLabel: l10n.armyBuilderRemoveUnit,
                           );
-                          if (!confirmed) return;
-                          await ref
-                              .read(armyRepositoryProvider)
-                              .removeUnit(unit.id);
-                          if (ref.read(selectedUnitIdProvider) == unit.id) {
-                            ref.read(selectedUnitIdProvider.notifier).state =
-                                null;
-                          }
-                          ref.invalidate(selectedArmyProvider);
-                          ref.invalidate(armiesListProvider);
-                          ref.invalidate(armyByIdProvider(army.id));
+                          if (!confirmed || !context.mounted) return;
+                          await _removeUnitWithUndo(
+                            context,
+                            ref,
+                            army: army,
+                            unit: unit,
+                          );
                         },
                       );
                     },
@@ -2343,15 +2393,12 @@ class _UnitDetailsBody extends ConsumerWidget {
                     confirmLabel: l10n.armyBuilderRemoveUnit,
                   );
                   if (!confirmed || !context.mounted) return;
-                  await ref
-                      .read(armyRepositoryProvider)
-                      .removeUnit(currentUnit.id);
-                  if (ref.read(selectedUnitIdProvider) == currentUnit.id) {
-                    ref.read(selectedUnitIdProvider.notifier).state = null;
-                  }
-                  ref.invalidate(selectedArmyProvider);
-                  ref.invalidate(armiesListProvider);
-                  ref.invalidate(armyByIdProvider(army.id));
+                  await _removeUnitWithUndo(
+                    context,
+                    ref,
+                    army: army,
+                    unit: currentUnit,
+                  );
                 },
               ),
             ],
@@ -3427,13 +3474,17 @@ class _EditUnitDialog extends ConsumerWidget {
                           confirmLabel: l10n.armyBuilderRemoveUnit,
                         );
                         if (!confirmed || !context.mounted) return;
-                        await ref
-                            .read(armyRepositoryProvider)
-                            .removeUnit(currentUnit.id);
-                        ref.invalidate(selectedArmyProvider);
-                        ref.invalidate(armiesListProvider);
-                        ref.invalidate(armyByIdProvider(army.id));
-                        ref.read(selectedUnitIdProvider.notifier).state = null;
+                        // Le SnackBar est affiché AVANT de fermer ce
+                        // dialogue (pas après) : une fois fermé, ce
+                        // `context` devient invalide et
+                        // ScaffoldMessenger.of ne retrouverait plus rien à
+                        // qui accrocher le message.
+                        await _removeUnitWithUndo(
+                          context,
+                          ref,
+                          army: army,
+                          unit: currentUnit,
+                        );
                         if (context.mounted) Navigator.of(context).pop();
                       },
                       style: TextButton.styleFrom(

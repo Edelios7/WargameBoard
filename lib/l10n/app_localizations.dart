@@ -1448,6 +1448,18 @@ abstract class AppLocalizations {
   /// **'Retirer l\'unité'**
   String get armyBuilderRemoveUnit;
 
+  /// No description provided for @armyBuilderUnitRemoved.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} retirée'**
+  String armyBuilderUnitRemoved(String name);
+
+  /// No description provided for @armyBuilderUndoRemove.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler'**
+  String get armyBuilderUndoRemove;
+
   /// No description provided for @armyBuilderModelCountLabel.
   ///
   /// In fr, this message translates to:
@@ -2059,6 +2071,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Taux de victoire'**
   String get statsWinRate;
+
+  /// No description provided for @statsEmptyHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Joue une partie ou ajoute des figurines à ta collection pour voir tes statistiques ici.'**
+  String get statsEmptyHint;
 
   /// No description provided for @statsBattleRecord.
   ///
@@ -3139,6 +3157,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Voir tout'**
   String get rulesSeeAll;
+
+  /// No description provided for @rulesInteractiveTool.
+  ///
+  /// In fr, this message translates to:
+  /// **'Outil interactif'**
+  String get rulesInteractiveTool;
 
   /// No description provided for @rulesHelpTitle.
   ///

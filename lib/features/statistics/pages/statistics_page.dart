@@ -48,66 +48,97 @@ class StatisticsPage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 4,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 1.4,
-                      children: [
-                        _StatTile(
-                          label: l10n.statsArmiesCount,
-                          value: armiesAsync.value?.length.toString() ?? '—',
-                        ),
-                        _StatTile(
-                          label: l10n.statsCollectionEntries,
-                          value:
-                              summaryAsync.value?.totalEntries.toString() ??
-                              '—',
-                        ),
-                        _StatTile(
-                          label: l10n.statsCollectionModels,
-                          value:
-                              summaryAsync.value?.totalModels.toString() ?? '—',
-                        ),
-                        _StatTile(
-                          label: l10n.statsCollectionPainted,
-                          value:
-                              summaryAsync.value?.totalPainted.toString() ??
-                              '—',
-                        ),
-                      ],
+                    // Contrairement au Dashboard (voir _WelcomeBanner), cette
+                    // page ne montrait qu'un mur de "—" à un nouveau joueur
+                    // sans armée/collection/partie — aucune indication que
+                    // les chiffres se rempliront une fois l'appli utilisée.
+                    if (armiesAsync.hasValue &&
+                        summaryAsync.hasValue &&
+                        battleStatsAsync.hasValue &&
+                        (armiesAsync.value?.isEmpty ?? true) &&
+                        (summaryAsync.value?.totalEntries ?? 0) == 0 &&
+                        (battleStats?.totalGames ?? 0) == 0) ...[
+                      Text(l10n.statsEmptyHint, style: AppTextStyles.caption),
+                      const SizedBox(height: 16),
+                    ],
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        // Même seuil que les autres grilles de l'appli
+                        // (Dashboard, Règles) — sans lui, ces tuiles se
+                        // retrouvaient écrasées sur 4 colonnes même en
+                        // fenêtre étroite ou tiroir mobile, avec un risque
+                        // de débordement des valeurs.
+                        final columns = constraints.maxWidth > 700 ? 4 : 2;
+                        return GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: columns,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 1.4,
+                          children: [
+                            _StatTile(
+                              label: l10n.statsArmiesCount,
+                              value:
+                                  armiesAsync.value?.length.toString() ?? '—',
+                            ),
+                            _StatTile(
+                              label: l10n.statsCollectionEntries,
+                              value:
+                                  summaryAsync.value?.totalEntries.toString() ??
+                                  '—',
+                            ),
+                            _StatTile(
+                              label: l10n.statsCollectionModels,
+                              value:
+                                  summaryAsync.value?.totalModels.toString() ??
+                                  '—',
+                            ),
+                            _StatTile(
+                              label: l10n.statsCollectionPainted,
+                              value:
+                                  summaryAsync.value?.totalPainted.toString() ??
+                                  '—',
+                            ),
+                          ],
+                        );
+                      },
                     ),
                     const SizedBox(height: 16),
-                    GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 4,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 1.4,
-                      children: [
-                        _StatTile(
-                          label: l10n.statsGamesPlayed,
-                          value: battleStats?.totalGames.toString() ?? '—',
-                        ),
-                        _StatTile(
-                          label: l10n.statsVictories,
-                          value: battleStats?.victories.toString() ?? '—',
-                        ),
-                        _StatTile(
-                          label: l10n.statsDefeats,
-                          value: battleStats?.defeats.toString() ?? '—',
-                        ),
-                        _StatTile(
-                          label: l10n.statsWinRate,
-                          value:
-                              battleStats == null || battleStats.totalGames == 0
-                              ? '—'
-                              : '${(battleStats.winRate * 100).round()} %',
-                        ),
-                      ],
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final columns = constraints.maxWidth > 700 ? 4 : 2;
+                        return GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: columns,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 1.4,
+                          children: [
+                            _StatTile(
+                              label: l10n.statsGamesPlayed,
+                              value: battleStats?.totalGames.toString() ?? '—',
+                            ),
+                            _StatTile(
+                              label: l10n.statsVictories,
+                              value: battleStats?.victories.toString() ?? '—',
+                            ),
+                            _StatTile(
+                              label: l10n.statsDefeats,
+                              value: battleStats?.defeats.toString() ?? '—',
+                            ),
+                            _StatTile(
+                              label: l10n.statsWinRate,
+                              value:
+                                  battleStats == null ||
+                                      battleStats.totalGames == 0
+                                  ? '—'
+                                  : '${(battleStats.winRate * 100).round()} %',
+                            ),
+                          ],
+                        );
+                      },
                     ),
                     if (battleStats != null && battleStats.totalGames > 0) ...[
                       const SizedBox(height: 8),
