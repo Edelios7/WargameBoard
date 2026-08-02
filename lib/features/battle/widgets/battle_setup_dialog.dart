@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/discard_guard.dart';
+import '../../../core/widgets/retry_error_state.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/tables/battles_table.dart';
 import '../../../l10n/app_localizations.dart';
@@ -165,7 +166,9 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
                     armiesAsync.when(
                       loading: () =>
                           LinearProgressIndicator(color: AppColors.primary),
-                      error: (_, __) => const SizedBox.shrink(),
+                      error: (_, __) => InlineRetryErrorHint(
+                        onRetry: () => ref.invalidate(armiesListProvider),
+                      ),
                       data: (armies) => DropdownButtonFormField<String?>(
                         initialValue: _armyId,
                         isExpanded: true,
@@ -200,7 +203,9 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
                     const SizedBox(height: 12),
                     armiesAsync.when(
                       loading: () => const SizedBox.shrink(),
-                      error: (_, __) => const SizedBox.shrink(),
+                      error: (_, __) => InlineRetryErrorHint(
+                        onRetry: () => ref.invalidate(armiesListProvider),
+                      ),
                       data: (armies) => DropdownButtonFormField<String?>(
                         initialValue: _opponentArmyId,
                         isExpanded: true,
@@ -236,7 +241,9 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
                     const SizedBox(height: 12),
                     factionsAsync.when(
                       loading: () => const SizedBox.shrink(),
-                      error: (_, __) => const SizedBox.shrink(),
+                      error: (_, __) => InlineRetryErrorHint(
+                        onRetry: () => ref.invalidate(factionsListProvider),
+                      ),
                       data: (factions) => DropdownButtonFormField<String?>(
                         initialValue: _opponentFactionId,
                         isExpanded: true,

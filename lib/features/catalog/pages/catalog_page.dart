@@ -319,7 +319,8 @@ class _FactionQuickAccessBar extends ConsumerWidget {
 
     return factionsAsync.when(
       loading: () => const SizedBox(height: 100),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) =>
+          RetryErrorState(onRetry: () => ref.invalidate(factionsListProvider)),
       data: (factions) {
         if (factions.isEmpty) return const SizedBox.shrink();
         final sorted = [...factions]..sort((a, b) => a.name.compareTo(b.name));
@@ -616,7 +617,9 @@ class _FiltersPanel extends ConsumerWidget {
           _FilterLabel(l10n.catalogFilterFaction),
           factionsAsync.when(
             loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
+            error: (_, __) => InlineRetryErrorHint(
+              onRetry: () => ref.invalidate(factionsListProvider),
+            ),
             data: (factions) => _FilterDropdown(
               value: factionFilter,
               allLabel: l10n.catalogFilterAllFactions,
@@ -629,7 +632,9 @@ class _FiltersPanel extends ConsumerWidget {
           _FilterLabel(l10n.catalogFilterRole),
           rolesAsync.when(
             loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
+            error: (_, __) => InlineRetryErrorHint(
+              onRetry: () => ref.invalidate(rolesListProvider),
+            ),
             data: (roles) => _FilterDropdown(
               value: roleFilter,
               allLabel: l10n.catalogFilterAllRoles,
@@ -642,7 +647,9 @@ class _FiltersPanel extends ConsumerWidget {
           _FilterLabel(l10n.catalogFilterKeywords),
           keywordsAsync.when(
             loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
+            error: (_, __) => InlineRetryErrorHint(
+              onRetry: () => ref.invalidate(keywordsListProvider),
+            ),
             data: (keywords) => _KeywordMultiSelect(
               keywords: keywords,
               selected: keywordFilter,
@@ -654,7 +661,9 @@ class _FiltersPanel extends ConsumerWidget {
           _FilterLabel(l10n.catalogFilterCost),
           maxPointsAsync.when(
             loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
+            error: (_, __) => InlineRetryErrorHint(
+              onRetry: () => ref.invalidate(catalogMaxPointsProvider),
+            ),
             data: (maxPoints) {
               final bound = maxPoints > 0 ? maxPoints.toDouble() : 500.0;
               final range = pointsRange ?? RangeValues(0, bound);
@@ -703,7 +712,9 @@ class _FiltersPanel extends ConsumerWidget {
           _FilterLabel(l10n.catalogFilterEdition),
           editionsAsync.when(
             loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
+            error: (_, __) => InlineRetryErrorHint(
+              onRetry: () => ref.invalidate(editionsListProvider),
+            ),
             data: (editions) => _FilterDropdown(
               value: editionFilter,
               allLabel: l10n.catalogFilterAllEditions,
@@ -716,7 +727,9 @@ class _FiltersPanel extends ConsumerWidget {
           _FilterLabel(l10n.catalogFilterUnitType),
           unitTypesAsync.when(
             loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
+            error: (_, __) => InlineRetryErrorHint(
+              onRetry: () => ref.invalidate(unitTypesListProvider),
+            ),
             data: (types) => _FilterDropdown(
               value: unitTypeFilter,
               allLabel: l10n.catalogFilterAllUnitTypes,

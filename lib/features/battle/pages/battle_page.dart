@@ -7,6 +7,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
+import '../../../core/widgets/retry_error_state.dart';
 import '../../../database/models/battle_details.dart';
 import '../../../database/tables/battles_table.dart';
 import '../../../l10n/app_localizations.dart';
@@ -32,7 +33,7 @@ class BattlePage extends ConsumerWidget {
         loading: () =>
             Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (error, _) =>
-            Center(child: Text('$error', style: AppTextStyles.caption)),
+            RetryErrorState(onRetry: () => ref.invalidate(activeBattleProvider)),
         data: (activeBattle) => activeBattle != null
             ? BattleDashboard(battle: activeBattle)
             : const _BattleHistoryView(),
@@ -127,7 +128,7 @@ class _BattleHistoryView extends ConsumerWidget {
                 child: CircularProgressIndicator(color: AppColors.primary),
               ),
               error: (error, _) =>
-                  Center(child: Text('$error', style: AppTextStyles.caption)),
+                  RetryErrorState(onRetry: () => ref.invalidate(battlesListProvider)),
               data: (battles) {
                 if (battles.isEmpty) {
                   return Center(

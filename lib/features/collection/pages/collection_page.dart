@@ -14,6 +14,7 @@ import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/unit_photo_thumbnail.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
+import '../../../core/widgets/retry_error_state.dart';
 import '../../catalog/pages/datasheet_full_page.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/battle_details.dart';
@@ -431,8 +432,8 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
       return Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
     if (entriesAsync.hasError) {
-      return Center(
-        child: Text('${entriesAsync.error}', style: AppTextStyles.caption),
+      return RetryErrorState(
+        onRetry: () => ref.invalidate(collectionEntriesProvider),
       );
     }
     if (entries.isEmpty) {

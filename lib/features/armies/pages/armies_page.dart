@@ -15,6 +15,7 @@ import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/discard_guard.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../core/widgets/radar_chart.dart';
+import '../../../core/widgets/retry_error_state.dart';
 import '../../../core/widgets/unit_fallback_visual.dart';
 import '../../../core/widgets/unit_photo_thumbnail.dart';
 import '../../../database/models/army_details.dart';
@@ -2288,13 +2289,17 @@ class _UnitDetailsBody extends ConsumerWidget {
       return Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
     if (datasheetAsync.hasError) {
-      return Center(
-        child: Text('${datasheetAsync.error}', style: AppTextStyles.caption),
+      return RetryErrorState(
+        onRetry: () => ref.invalidate(
+          datasheetByIdProvider(currentUnit.datasheetId),
+        ),
       );
     }
     if (selectionsAsync.hasError) {
-      return Center(
-        child: Text('${selectionsAsync.error}', style: AppTextStyles.caption),
+      return RetryErrorState(
+        onRetry: () => ref.invalidate(
+          unitEquipmentSelectionsProvider(currentUnit.id),
+        ),
       );
     }
 

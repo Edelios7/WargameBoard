@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/discard_guard.dart';
+import '../../../core/widgets/retry_error_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/army_provider.dart';
 import '../../../providers/catalog_provider.dart';
@@ -99,8 +100,9 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
                   factionsAsync.when(
                     loading: () =>
                         LinearProgressIndicator(color: AppColors.primary),
-                    error: (error, _) =>
-                        Text('$error', style: AppTextStyles.caption),
+                    error: (error, _) => RetryErrorState(
+                      onRetry: () => ref.invalidate(factionsListProvider),
+                    ),
                     data: (factions) {
                       _factionId ??= factions.isNotEmpty
                           ? factions.first.id
@@ -148,7 +150,11 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
                         return detachmentsAsync.when(
                           loading: () =>
                               LinearProgressIndicator(color: AppColors.primary),
-                          error: (_, __) => const SizedBox.shrink(),
+                          error: (error, _) => RetryErrorState(
+                            onRetry: () => ref.invalidate(
+                              detachmentsForFactionProvider(_factionId!),
+                            ),
+                          ),
                           data: (detachments) {
                             if (detachments.isEmpty)
                               return const SizedBox.shrink();

@@ -41,3 +41,38 @@ class RetryErrorState extends StatelessWidget {
     );
   }
 }
+
+/// Variante compacte de [RetryErrorState] pour un emplacement en ligne
+/// (ex. une section de filtre dans une liste) où le message + bouton
+/// pleine hauteur serait disproportionné — une seule ligne icône +
+/// message + bouton de réessai.
+class InlineRetryErrorHint extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const InlineRetryErrorHint({super.key, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Row(
+      children: [
+        Icon(Icons.error_outline_rounded, size: 16, color: AppColors.error),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            l10n.commonLoadError,
+            style: AppTextStyles.caption,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        IconButton(
+          tooltip: l10n.commonRetry,
+          icon: const Icon(Icons.refresh_rounded, size: 18),
+          onPressed: onRetry,
+          visualDensity: VisualDensity.compact,
+        ),
+      ],
+    );
+  }
+}
