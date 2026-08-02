@@ -2940,16 +2940,39 @@ class _RecommendationsBlock extends ConsumerWidget {
 
   const _RecommendationsBlock({required this.army, required this.catalog});
 
-  Future<void> _addSuggestion(WidgetRef ref, DatasheetDetails sheet) async {
+  Future<void> _addSuggestion(
+    BuildContext context,
+    WidgetRef ref,
+    DatasheetDetails sheet,
+  ) async {
     final armyRepository = ref.read(armyRepositoryProvider);
-    await armyRepository.addUnit(
-      armyId: army.id,
-      datasheetId: sheet.id,
-      modelCount: sheet.unit.defaultSize,
+    Object? failure;
+    try {
+      await armyRepository.addUnit(
+        armyId: army.id,
+        datasheetId: sheet.id,
+        modelCount: sheet.unit.defaultSize,
+      );
+    } catch (e) {
+      failure = e;
+    } finally {
+      ref.invalidate(selectedArmyProvider);
+      ref.invalidate(armiesListProvider);
+      ref.invalidate(armyByIdProvider(army.id));
+    }
+
+    if (!context.mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          failure == null
+              ? l10n.armyBuilderUnitAdded(sheet.name)
+              : l10n.armyBuilderAddUnitError(sheet.name),
+        ),
+        duration: const Duration(seconds: 2),
+      ),
     );
-    ref.invalidate(selectedArmyProvider);
-    ref.invalidate(armiesListProvider);
-    ref.invalidate(armyByIdProvider(army.id));
   }
 
   @override
@@ -3000,6 +3023,7 @@ class _RecommendationsBlock extends ConsumerWidget {
                       vertical: 10,
                     ),
                     onTap: () => _addSuggestion(
+                      context,
                       ref,
                       catalog.firstWhere((d) => d.id == suggestion.datasheetId),
                     ),
@@ -3201,24 +3225,33 @@ class _EquipmentGroupDialogState extends ConsumerState<_EquipmentGroupDialog> {
                 const SizedBox(height: 12),
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxHeight: 320),
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: widget.group.options.map((option) {
-                      return _isSingleChoice
-                          ? RadioListTile<String>(
-                              value: option.id,
-                              groupValue: _selected.isEmpty
-                                  ? null
-                                  : _selected.first,
-                              onChanged: (_) => _toggle(option.id, true),
-                              title: Text(
-                                option.name,
-                                style: AppTextStyles.body,
-                              ),
-                              activeColor: AppColors.primary,
-                              contentPadding: EdgeInsets.zero,
-                            )
-                          : CheckboxListTile(
+                  child: _isSingleChoice
+                      ? RadioGroup<String>(
+                          groupValue: _selected.isEmpty
+                              ? null
+                              : _selected.first,
+                          onChanged: (value) {
+                            if (value != null) _toggle(value, true);
+                          },
+                          child: ListView(
+                            shrinkWrap: true,
+                            children: widget.group.options.map((option) {
+                              return RadioListTile<String>(
+                                value: option.id,
+                                title: Text(
+                                  option.name,
+                                  style: AppTextStyles.body,
+                                ),
+                                activeColor: AppColors.primary,
+                                contentPadding: EdgeInsets.zero,
+                              );
+                            }).toList(),
+                          ),
+                        )
+                      : ListView(
+                          shrinkWrap: true,
+                          children: widget.group.options.map((option) {
+                            return CheckboxListTile(
                               value: _selected.contains(option.id),
                               onChanged: (value) =>
                                   _toggle(option.id, value ?? false),
@@ -3230,8 +3263,8 @@ class _EquipmentGroupDialogState extends ConsumerState<_EquipmentGroupDialog> {
                               contentPadding: EdgeInsets.zero,
                               controlAffinity: ListTileControlAffinity.leading,
                             );
-                    }).toList(),
-                  ),
+                          }).toList(),
+                        ),
                 ),
                 const SizedBox(height: 16),
                 Row(

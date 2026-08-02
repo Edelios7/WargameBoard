@@ -61,9 +61,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     _saveName();
     if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.settingsDisplayNameSaved)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.settingsDisplayNameSaved)));
   }
 
   Future<void> _exportBackup() async {
@@ -196,6 +196,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         TextField(
                           controller: _nameController,
                           style: AppTextStyles.body,
+                          maxLength: 40,
                           decoration: InputDecoration(
                             labelText: l10n.settingsDisplayNameLabel,
                             labelStyle: AppTextStyles.caption,

@@ -133,13 +133,19 @@ class FactionIconography {
       List<MapEntry<String, FactionBadge>>.from(_entries)
         ..sort((a, b) => b.key.length.compareTo(a.key.length));
 
-  static final List<Color> _fallbackPalette = [
+  // Getter, pas `static final` : `AppColors.primary` est mutable (couleur
+  // d'accent personnalisable) — un `static final` figerait la palette de
+  // repli à sa toute première évaluation (typiquement au démarrage, avant
+  // toute personnalisation) et ignorerait un changement d'accent fait
+  // ensuite, même principe que le correctif déjà appliqué à la palette du
+  // donut "Batailles par faction" dans statistics_page.dart.
+  static List<Color> get _fallbackPalette => [
     AppColors.primary,
     AppColors.info,
     AppColors.success,
     AppColors.warning,
-    Color(0xFF8E4FBF),
-    Color(0xFF3FBFA6),
+    const Color(0xFF8E4FBF),
+    const Color(0xFF3FBFA6),
   ];
 
   /// Retourne l'icône + couleur associées au nom de faction donné (recherche

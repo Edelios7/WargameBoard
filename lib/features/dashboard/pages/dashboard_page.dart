@@ -484,7 +484,12 @@ class _DashboardHeaderState extends ConsumerState<_DashboardHeader> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(greeting, style: AppTextStyles.heading),
+            Text(
+              greeting,
+              style: AppTextStyles.heading,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
             const SizedBox(height: 4),
             Text(
               l10n.dashboardEditionLine('Warhammer 40,000', 'Édition 11'),
