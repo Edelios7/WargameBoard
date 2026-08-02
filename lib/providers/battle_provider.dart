@@ -44,41 +44,38 @@ final activeBattleProvider = FutureProvider<BattleDetails?>((ref) {
   return repository.getActiveBattle();
 });
 
-final battleEventsProvider =
-    FutureProvider.family<List<BattleEventDetails>, String>((ref, battleId) {
+// `.autoDispose` sur ces 4 familles : sans lui, chaque partie ouverte au
+// cours d'une session (id unique) laissait ses entrées de cache (journal,
+// unités détruites, modificateurs, blessures) vivre indéfiniment — sans
+// borne naturelle comme le catalogue (nombre fini de factions/fiches),
+// une longue session avec beaucoup de parties accumulerait ces caches sans
+// jamais les libérer.
+final battleEventsProvider = FutureProvider.autoDispose
+    .family<List<BattleEventDetails>, String>((ref, battleId) {
       final repository = ref.watch(battleRepositoryProvider);
       return repository.getEvents(battleId);
     });
 
 /// Unités marquées détruites pour cette partie (id d'ArmyUnit) — voir
 /// [BattleRepository.getUnitStates].
-final battleUnitStatesProvider =
-    FutureProvider.family<List<BattleUnitStateDetails>, String>((
-      ref,
-      battleId,
-    ) {
+final battleUnitStatesProvider = FutureProvider.autoDispose
+    .family<List<BattleUnitStateDetails>, String>((ref, battleId) {
       final repository = ref.watch(battleRepositoryProvider);
       return repository.getUnitStates(battleId);
     });
 
 /// Bonus/malus actifs pour cette partie, toutes unités confondues — voir
 /// [BattleRepository.getUnitModifiers].
-final battleUnitModifiersProvider =
-    FutureProvider.family<List<BattleUnitModifierDetails>, String>((
-      ref,
-      battleId,
-    ) {
+final battleUnitModifiersProvider = FutureProvider.autoDispose
+    .family<List<BattleUnitModifierDetails>, String>((ref, battleId) {
       final repository = ref.watch(battleRepositoryProvider);
       return repository.getUnitModifiers(battleId);
     });
 
 /// Modèles blessés pour cette partie (tous, toutes unités confondues) —
 /// voir [BattleRepository.getUnitWounds].
-final battleUnitWoundsProvider =
-    FutureProvider.family<List<BattleUnitWoundDetails>, String>((
-      ref,
-      battleId,
-    ) {
+final battleUnitWoundsProvider = FutureProvider.autoDispose
+    .family<List<BattleUnitWoundDetails>, String>((ref, battleId) {
       final repository = ref.watch(battleRepositoryProvider);
       return repository.getUnitWounds(battleId);
     });

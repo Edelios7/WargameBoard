@@ -30,33 +30,46 @@ class XpDao extends DatabaseAccessor<AppDatabase> with _$XpDaoMixin {
 
   /// `delta` peut être négatif (reprise d'XP suite à l'annulation d'une
   /// action) — le total ne descend jamais sous 0.
+  ///
+  /// Relit la valeur actuelle à l'intérieur d'une transaction plutôt que
+  /// juste avant d'écrire : sans ça, deux actions qui créditent de l'XP
+  /// coup sur coup (ex. cocher plusieurs figurines montées/peintes très
+  /// vite) peuvent toutes les deux lire le même total de départ et n'en
+  /// faire gagner qu'un seul net au lieu des deux — même défaut déjà
+  /// corrigé pour le score/les PC de bataille (voir
+  /// BattleDao.adjustCommandPoints).
   Future<void> incrementCategory(XpCategory category, int delta) async {
     if (delta == 0) return;
-    final row = await (select(xpCategoryTotals)
-          ..where((t) => t.category.equals(category.name)))
-        .getSingleOrNull();
-    final current = row?.xp ?? 0;
-    await into(xpCategoryTotals).insertOnConflictUpdate(
-      XpCategoryTotalsCompanion.insert(
-        category: category.name,
-        xp: Value((current + delta).clamp(0, 1 << 30)),
-      ),
-    );
+    await transaction(() async {
+      final row = await (select(
+        xpCategoryTotals,
+      )..where((t) => t.category.equals(category.name))).getSingleOrNull();
+      final current = row?.xp ?? 0;
+      await into(xpCategoryTotals).insertOnConflictUpdate(
+        XpCategoryTotalsCompanion.insert(
+          category: category.name,
+          xp: Value((current + delta).clamp(0, 1 << 30)),
+        ),
+      );
+    });
   }
 
-  /// `delta` peut être négatif — voir [incrementCategory].
+  /// `delta` peut être négatif — voir [incrementCategory] (même relecture
+  /// en transaction, pour la même raison).
   Future<void> incrementFaction(String factionId, int delta) async {
     if (delta == 0) return;
-    final row = await (select(xpFactionTotals)
-          ..where((t) => t.factionId.equals(factionId)))
-        .getSingleOrNull();
-    final current = row?.xp ?? 0;
-    await into(xpFactionTotals).insertOnConflictUpdate(
-      XpFactionTotalsCompanion.insert(
-        factionId: factionId,
-        xp: Value((current + delta).clamp(0, 1 << 30)),
-      ),
-    );
+    await transaction(() async {
+      final row = await (select(
+        xpFactionTotals,
+      )..where((t) => t.factionId.equals(factionId))).getSingleOrNull();
+      final current = row?.xp ?? 0;
+      await into(xpFactionTotals).insertOnConflictUpdate(
+        XpFactionTotalsCompanion.insert(
+          factionId: factionId,
+          xp: Value((current + delta).clamp(0, 1 << 30)),
+        ),
+      );
+    });
   }
 
   /// Vérifie/marque un jalon XP "une seule fois, tous historiques
@@ -86,20 +99,21 @@ class XpDao extends DatabaseAccessor<AppDatabase> with _$XpDaoMixin {
   }
 
   Future<List<({String factionId, String factionName, int xp})>>
-      getFactionTotals() async {
+  getFactionTotals() async {
     final query = select(xpFactionTotals).join([
       innerJoin(factions, factions.id.equalsExp(xpFactionTotals.factionId)),
-    ])
-      ..orderBy([OrderingTerm.desc(xpFactionTotals.xp)]);
+    ])..orderBy([OrderingTerm.desc(xpFactionTotals.xp)]);
 
     final rows = await query.get();
     return rows
         .where((row) => row.readTable(xpFactionTotals).xp > 0)
-        .map((row) => (
-              factionId: row.readTable(xpFactionTotals).factionId,
-              factionName: row.readTable(factions).name,
-              xp: row.readTable(xpFactionTotals).xp,
-            ))
+        .map(
+          (row) => (
+            factionId: row.readTable(xpFactionTotals).factionId,
+            factionName: row.readTable(factions).name,
+            xp: row.readTable(xpFactionTotals).xp,
+          ),
+        )
         .toList();
   }
 }
