@@ -116,7 +116,7 @@ class _AddCollectionEntryDialogState
           ),
           child: SizedBox(
             width: 420,
-            height: 520,
+            height: 580,
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -252,13 +252,29 @@ class _AddCollectionEntryDialogState
                           ),
                         ),
                       ],
-                      const SizedBox(width: 12),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    alignment: WrapAlignment.end,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text(l10n.armyBuilderCancel),
+                      ),
                       FilledButton(
                         style: FilledButton.styleFrom(
                           backgroundColor: AppColors.primary,
                         ),
                         onPressed: _selected == null ? null : _add,
-                        child: Text(l10n.armyBuilderCreate),
+                        child: Text(
+                          widget.wishlist
+                              ? l10n.wishlistAddItem
+                              : l10n.collectionAddEntry,
+                        ),
                       ),
                     ],
                   ),

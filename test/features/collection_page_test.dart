@@ -43,7 +43,7 @@ void main() {
     await tester.tap(find.text('Death Company Marines'));
     // TextField 0 = recherche, 1 = quantité, 2 = prix (optionnel).
     await tester.enterText(find.byType(TextField).at(1), '5');
-    await tester.tap(find.text('Créer'));
+    await tester.tap(find.text('Ajouter à la collection').last);
     await tester.pumpAndSettle();
 
     // Apparaît à la fois dans "Ajouts récents" et dans la grille complète.
