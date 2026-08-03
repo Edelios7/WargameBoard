@@ -17,9 +17,20 @@ class CustomizationIds {
   static const String pageRules = 'page.rules';
 
   // Blocs structurels — cartes fixes de chaque page, hors listes générées.
+  static const String dashboardHeader = 'dashboard.header';
   static const String dashboardWelcomeBanner = 'dashboard.welcome_banner';
   static const String dashboardQuickActions = 'dashboard.quick_actions';
   static const String dashboardRecentAdditions = 'dashboard.recent_additions';
+  static const String dashboardStatPoints = 'dashboard.stat_points';
+  static const String dashboardStatModels = 'dashboard.stat_models';
+  static const String dashboardStatPainting = 'dashboard.stat_painting';
+  static const String dashboardLastBattle = 'dashboard.last_battle';
+  static const String dashboardYourArmies = 'dashboard.your_armies';
+  static const String dashboardPaintingDonut = 'dashboard.painting_donut';
+  static const String dashboardFactionBreakdown = 'dashboard.faction_breakdown';
+  static const String dashboardRecentlyViewed = 'dashboard.recently_viewed';
+  static const String dashboardNextBattle = 'dashboard.next_battle';
+  static const String dashboardProjects = 'dashboard.projects';
 
   static const String armiesProfileCard = 'armies.profile_card';
 

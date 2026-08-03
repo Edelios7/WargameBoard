@@ -8,6 +8,7 @@ import '../../../core/theme/customization_ids.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
+import '../../../core/widgets/customization_edit_badge.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../core/widgets/donut_chart.dart';
@@ -25,6 +26,7 @@ import '../../../providers/army_provider.dart';
 import '../../../providers/battle_provider.dart';
 import '../../../providers/catalog_provider.dart';
 import '../../../providers/collection_provider.dart';
+import '../../../providers/customization_provider.dart';
 import '../../../providers/dashboard_provider.dart';
 import '../../../providers/project_provider.dart';
 import '../../../shell/navigation.dart';
@@ -185,6 +187,8 @@ class DashboardPage extends ConsumerWidget {
                             value: totalArmyPoints.toString(),
                             sublabel: l10n.dashboardStatPointsSub,
                             onTap: () => goTo(AppTab.armies),
+                            customizationId:
+                                CustomizationIds.dashboardStatPoints,
                           ),
                           _StatTile(
                             icon: Icons.inventory_2_rounded,
@@ -193,6 +197,8 @@ class DashboardPage extends ConsumerWidget {
                             value: (summary?.totalModels ?? 0).toString(),
                             sublabel: l10n.dashboardStatModelsSub,
                             onTap: () => goTo(AppTab.collection),
+                            customizationId:
+                                CustomizationIds.dashboardStatModels,
                           ),
                           _StatTile(
                             icon: Icons.brush_rounded,
@@ -203,6 +209,8 @@ class DashboardPage extends ConsumerWidget {
                                 : '${(summary.paintedRatio * 100).round()}%',
                             sublabel: l10n.dashboardStatPaintingSub,
                             onTap: () => goTo(AppTab.statistics),
+                            customizationId:
+                                CustomizationIds.dashboardStatPainting,
                           ),
                           _LastBattleTile(
                             battle: lastBattleAsync.value,
@@ -489,6 +497,12 @@ class _DashboardHeaderState extends ConsumerState<_DashboardHeader> {
     final heroFile = heroImageId == null
         ? null
         : LocalCatalogImages.unitPhoto(heroImageId);
+    final blockOverride = ref.watch(
+      blockOverrideProvider(CustomizationIds.dashboardHeader),
+    );
+    final showEditBadge = ref.watch(customizationModeProvider);
+    final overrideImage = blockOverride?.image;
+    final overrideColor = overrideImage == null ? blockOverride?.color : null;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -590,27 +604,43 @@ class _DashboardHeaderState extends ConsumerState<_DashboardHeader> {
                 ],
               );
 
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceElevated,
-              image: heroFile == null
-                  ? null
-                  : DecorationImage(
-                      image: FileImage(heroFile),
-                      fit: BoxFit.cover,
-                      alignment: Alignment.topCenter,
-                      colorFilter: ColorFilter.mode(
-                        AppColors.background.withValues(alpha: .68),
-                        BlendMode.darken,
-                      ),
-                    ),
-              border: Border.all(color: AppColors.border),
+        final effectiveImage = overrideImage ?? heroFile;
+        // Stack externe non clippé, comme AppCard : le ClipRRect ci-dessous
+        // coupait net le badge d'édition positionné en négatif.
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: overrideColor ?? AppColors.surfaceElevated,
+                  image: effectiveImage == null
+                      ? null
+                      : DecorationImage(
+                          image: FileImage(effectiveImage),
+                          fit: BoxFit.cover,
+                          alignment: Alignment.topCenter,
+                          colorFilter: ColorFilter.mode(
+                            AppColors.background.withValues(alpha: .68),
+                            BlendMode.darken,
+                          ),
+                        ),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: content,
+              ),
             ),
-            child: content,
-          ),
+            if (showEditBadge)
+              Positioned(
+                right: -8,
+                bottom: -8,
+                child: CustomizationEditBadge(
+                  id: CustomizationIds.dashboardHeader,
+                ),
+              ),
+          ],
         );
       },
     );
@@ -624,6 +654,7 @@ class _StatTile extends StatelessWidget {
   final String value;
   final String sublabel;
   final VoidCallback onTap;
+  final String customizationId;
 
   const _StatTile({
     required this.icon,
@@ -632,12 +663,14 @@ class _StatTile extends StatelessWidget {
     required this.value,
     required this.sublabel,
     required this.onTap,
+    required this.customizationId,
   });
 
   @override
   Widget build(BuildContext context) {
     return AppCard(
       onTap: onTap,
+      customizationId: customizationId,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       child: Row(
         children: [
@@ -713,6 +746,7 @@ class _LastBattleTile extends ConsumerWidget {
     if (battle == null) {
       return AppCard(
         onTap: onTap,
+        customizationId: CustomizationIds.dashboardLastBattle,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -871,6 +905,7 @@ class _YourArmiesCard extends StatelessWidget {
     final shown = armies.take(4).toList();
 
     return AppCard(
+      customizationId: CustomizationIds.dashboardYourArmies,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -1043,6 +1078,7 @@ class _PaintingDonutCard extends StatelessWidget {
     }
 
     return AppCard(
+      customizationId: CustomizationIds.dashboardPaintingDonut,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -1109,6 +1145,7 @@ class _FactionBreakdownCard extends StatelessWidget {
     }
 
     return AppCard(
+      customizationId: CustomizationIds.dashboardFactionBreakdown,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -1261,6 +1298,7 @@ class _RecentlyViewedCard extends StatelessWidget {
     final results = resultsAsync.value ?? const <SearchResult>[];
 
     return AppCard(
+      customizationId: CustomizationIds.dashboardRecentlyViewed,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -1354,6 +1392,7 @@ class _NextBattleCard extends StatelessWidget {
 
     return AppCard(
       onTap: onTap,
+      customizationId: CustomizationIds.dashboardNextBattle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -1609,6 +1648,7 @@ class _ProjectsCardState extends ConsumerState<_ProjectsCard> {
     final projects = (widget.projectsAsync.value ?? const []) as List;
 
     return AppCard(
+      customizationId: CustomizationIds.dashboardProjects,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

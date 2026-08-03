@@ -18,7 +18,7 @@ class CustomizationEditBadge extends ConsumerStatefulWidget {
   final String id;
   final double size;
 
-  const CustomizationEditBadge({super.key, required this.id, this.size = 20});
+  const CustomizationEditBadge({super.key, required this.id, this.size = 32});
 
   @override
   ConsumerState<CustomizationEditBadge> createState() =>
@@ -124,6 +124,14 @@ class _CustomizationEditBadgeState
         decoration: BoxDecoration(
           color: AppColors.primary,
           shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: 2),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black54,
+              blurRadius: 6,
+              offset: Offset(0, 2),
+            ),
+          ],
         ),
         child: _busy
             ? Padding(

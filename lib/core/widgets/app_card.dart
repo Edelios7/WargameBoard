@@ -94,81 +94,91 @@ class _AppCardState extends ConsumerState<AppCard> {
     // (que la carte remplisse une case de grille ou s'ajuste à son
     // contenu ailleurs dans l'appli), donc la couleur/bordure suit
     // toujours la vraie taille de la carte.
-    return MouseRegion(
-      onEnter: interactive ? (_) => setState(() => _hovered = true) : null,
-      onExit: interactive ? (_) => setState(() => _hovered = false) : null,
-      child: AnimatedScale(
-        scale: hovered ? 1.02 : 1,
-        duration: const Duration(milliseconds: 140),
-        curve: Curves.easeOut,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 140),
-          curve: Curves.easeOut,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: hovered
-                ? [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: .18),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : const [],
-          ),
-          child: Material(
-            color: baseColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-              side: BorderSide(
-                color: widget.selected
-                    ? AppColors.primary
-                    : hovered
-                    ? AppColors.primary.withValues(alpha: .5)
-                    : accentColor?.withValues(alpha: .6) ?? AppColors.border,
-                width: widget.selected
-                    ? 1.4
-                    : accentColor != null
-                    ? 1.4
-                    : 1,
-              ),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              onTap: widget.onTap,
-              borderRadius: BorderRadius.circular(14),
-              hoverColor: Colors.white.withValues(alpha: .05),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  if (wallpaper != null)
-                    Positioned.fill(
-                      child: Image.file(wallpaper, fit: BoxFit.cover),
-                    ),
-                  if (wallpaper != null)
-                    // Voile pour garder le contenu de la carte lisible
-                    // par-dessus une image arbitraire choisie par
-                    // l'utilisateur.
-                    Positioned.fill(
-                      child: ColoredBox(
-                        color: AppColors.surfaceElevated.withValues(
-                          alpha: AppWallpapers.dimming,
+    // Le badge d'édition vit dans ce Stack externe (non clippé), pas dans
+    // celui à l'intérieur du Material plus bas : ce dernier a
+    // clipBehavior: Clip.antiAlias pour ses coins arrondis, qui coupait
+    // net un badge positionné en négatif (-6,-6) — il ne se voyait
+    // quasiment jamais.
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        MouseRegion(
+          onEnter: interactive ? (_) => setState(() => _hovered = true) : null,
+          onExit: interactive ? (_) => setState(() => _hovered = false) : null,
+          child: AnimatedScale(
+            scale: hovered ? 1.02 : 1,
+            duration: const Duration(milliseconds: 140),
+            curve: Curves.easeOut,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 140),
+              curve: Curves.easeOut,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: hovered
+                    ? [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: .18),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
                         ),
-                      ),
-                    ),
-                  Padding(padding: widget.padding, child: widget.child),
-                  if (showEditBadge)
-                    Positioned(
-                      right: -6,
-                      bottom: -6,
-                      child: CustomizationEditBadge(id: customizationId),
-                    ),
-                ],
+                      ]
+                    : const [],
+              ),
+              child: Material(
+                color: baseColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: BorderSide(
+                    color: widget.selected
+                        ? AppColors.primary
+                        : hovered
+                        ? AppColors.primary.withValues(alpha: .5)
+                        : accentColor?.withValues(alpha: .6) ??
+                              AppColors.border,
+                    width: widget.selected
+                        ? 1.4
+                        : accentColor != null
+                        ? 1.4
+                        : 1,
+                  ),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: widget.onTap,
+                  borderRadius: BorderRadius.circular(14),
+                  hoverColor: Colors.white.withValues(alpha: .05),
+                  child: Stack(
+                    children: [
+                      if (wallpaper != null)
+                        Positioned.fill(
+                          child: Image.file(wallpaper, fit: BoxFit.cover),
+                        ),
+                      if (wallpaper != null)
+                        // Voile pour garder le contenu de la carte lisible
+                        // par-dessus une image arbitraire choisie par
+                        // l'utilisateur.
+                        Positioned.fill(
+                          child: ColoredBox(
+                            color: AppColors.surfaceElevated.withValues(
+                              alpha: AppWallpapers.dimming,
+                            ),
+                          ),
+                        ),
+                      Padding(padding: widget.padding, child: widget.child),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
         ),
-      ),
+        if (showEditBadge)
+          Positioned(
+            right: -8,
+            bottom: -8,
+            child: CustomizationEditBadge(id: customizationId),
+          ),
+      ],
     );
   }
 }

@@ -46,7 +46,7 @@ class PageBackground extends ConsumerWidget {
           Positioned(
             right: 16,
             bottom: 16,
-            child: CustomizationEditBadge(id: 'page.$pageId', size: 30),
+            child: CustomizationEditBadge(id: 'page.$pageId', size: 36),
           ),
       ],
     );
