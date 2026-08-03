@@ -6659,6 +6659,17 @@ class $DatasheetCostsTable extends DatasheetCosts
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _minCopyIndexMeta = const VerificationMeta(
+    'minCopyIndex',
+  );
+  @override
+  late final GeneratedColumn<int> minCopyIndex = GeneratedColumn<int>(
+    'min_copy_index',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -6679,6 +6690,7 @@ class $DatasheetCostsTable extends DatasheetCosts
     points,
     modelCount,
     powerLevel,
+    minCopyIndex,
     createdAt,
   ];
   @override
@@ -6737,6 +6749,15 @@ class $DatasheetCostsTable extends DatasheetCosts
         powerLevel.isAcceptableOrUnknown(data['power_level']!, _powerLevelMeta),
       );
     }
+    if (data.containsKey('min_copy_index')) {
+      context.handle(
+        _minCopyIndexMeta,
+        minCopyIndex.isAcceptableOrUnknown(
+          data['min_copy_index']!,
+          _minCopyIndexMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -6776,6 +6797,10 @@ class $DatasheetCostsTable extends DatasheetCosts
         DriftSqlType.int,
         data['${effectivePrefix}power_level'],
       ),
+      minCopyIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}min_copy_index'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -6807,6 +6832,17 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
   /// un simple multiple du coût de base.
   final int? modelCount;
   final int? powerLevel;
+
+  /// À partir de quelle copie de cette datasheet (1re, 2e, 3e...) dans une
+  /// même liste d'armée ce palier s'applique. `null` signifie "s'applique
+  /// dès la 1re copie" (comportement historique, valeur par défaut).
+  ///
+  /// Beaucoup d'unités du MFM coûtent plus cher à partir d'un certain
+  /// nombre d'exemplaires dans la même liste (ex. "de la 1re à la 2e unité :
+  /// 150 pts", "3e unité et suivantes : 165 pts") : ce champ permet de
+  /// stocker ces deux paliers côte à côte pour un même `modelCount`,
+  /// distingués par leur seuil de déclenchement plutôt que par leur taille.
+  final int? minCopyIndex;
   final DateTime createdAt;
   const DatasheetCost({
     required this.id,
@@ -6815,6 +6851,7 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
     required this.points,
     this.modelCount,
     this.powerLevel,
+    this.minCopyIndex,
     required this.createdAt,
   });
   @override
@@ -6829,6 +6866,9 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
     }
     if (!nullToAbsent || powerLevel != null) {
       map['power_level'] = Variable<int>(powerLevel);
+    }
+    if (!nullToAbsent || minCopyIndex != null) {
+      map['min_copy_index'] = Variable<int>(minCopyIndex);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
@@ -6846,6 +6886,9 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
       powerLevel: powerLevel == null && nullToAbsent
           ? const Value.absent()
           : Value(powerLevel),
+      minCopyIndex: minCopyIndex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(minCopyIndex),
       createdAt: Value(createdAt),
     );
   }
@@ -6862,6 +6905,7 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
       points: serializer.fromJson<int>(json['points']),
       modelCount: serializer.fromJson<int?>(json['modelCount']),
       powerLevel: serializer.fromJson<int?>(json['powerLevel']),
+      minCopyIndex: serializer.fromJson<int?>(json['minCopyIndex']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -6875,6 +6919,7 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
       'points': serializer.toJson<int>(points),
       'modelCount': serializer.toJson<int?>(modelCount),
       'powerLevel': serializer.toJson<int?>(powerLevel),
+      'minCopyIndex': serializer.toJson<int?>(minCopyIndex),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -6886,6 +6931,7 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
     int? points,
     Value<int?> modelCount = const Value.absent(),
     Value<int?> powerLevel = const Value.absent(),
+    Value<int?> minCopyIndex = const Value.absent(),
     DateTime? createdAt,
   }) => DatasheetCost(
     id: id ?? this.id,
@@ -6894,6 +6940,7 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
     points: points ?? this.points,
     modelCount: modelCount.present ? modelCount.value : this.modelCount,
     powerLevel: powerLevel.present ? powerLevel.value : this.powerLevel,
+    minCopyIndex: minCopyIndex.present ? minCopyIndex.value : this.minCopyIndex,
     createdAt: createdAt ?? this.createdAt,
   );
   DatasheetCost copyWithCompanion(DatasheetCostsCompanion data) {
@@ -6910,6 +6957,9 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
       powerLevel: data.powerLevel.present
           ? data.powerLevel.value
           : this.powerLevel,
+      minCopyIndex: data.minCopyIndex.present
+          ? data.minCopyIndex.value
+          : this.minCopyIndex,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -6923,6 +6973,7 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
           ..write('points: $points, ')
           ..write('modelCount: $modelCount, ')
           ..write('powerLevel: $powerLevel, ')
+          ..write('minCopyIndex: $minCopyIndex, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -6936,6 +6987,7 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
     points,
     modelCount,
     powerLevel,
+    minCopyIndex,
     createdAt,
   );
   @override
@@ -6948,6 +7000,7 @@ class DatasheetCost extends DataClass implements Insertable<DatasheetCost> {
           other.points == this.points &&
           other.modelCount == this.modelCount &&
           other.powerLevel == this.powerLevel &&
+          other.minCopyIndex == this.minCopyIndex &&
           other.createdAt == this.createdAt);
 }
 
@@ -6958,6 +7011,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
   final Value<int> points;
   final Value<int?> modelCount;
   final Value<int?> powerLevel;
+  final Value<int?> minCopyIndex;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
   const DatasheetCostsCompanion({
@@ -6967,6 +7021,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
     this.points = const Value.absent(),
     this.modelCount = const Value.absent(),
     this.powerLevel = const Value.absent(),
+    this.minCopyIndex = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -6977,6 +7032,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
     required int points,
     this.modelCount = const Value.absent(),
     this.powerLevel = const Value.absent(),
+    this.minCopyIndex = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -6990,6 +7046,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
     Expression<int>? points,
     Expression<int>? modelCount,
     Expression<int>? powerLevel,
+    Expression<int>? minCopyIndex,
     Expression<DateTime>? createdAt,
     Expression<int>? rowid,
   }) {
@@ -7000,6 +7057,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
       if (points != null) 'points': points,
       if (modelCount != null) 'model_count': modelCount,
       if (powerLevel != null) 'power_level': powerLevel,
+      if (minCopyIndex != null) 'min_copy_index': minCopyIndex,
       if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -7012,6 +7070,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
     Value<int>? points,
     Value<int?>? modelCount,
     Value<int?>? powerLevel,
+    Value<int?>? minCopyIndex,
     Value<DateTime>? createdAt,
     Value<int>? rowid,
   }) {
@@ -7022,6 +7081,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
       points: points ?? this.points,
       modelCount: modelCount ?? this.modelCount,
       powerLevel: powerLevel ?? this.powerLevel,
+      minCopyIndex: minCopyIndex ?? this.minCopyIndex,
       createdAt: createdAt ?? this.createdAt,
       rowid: rowid ?? this.rowid,
     );
@@ -7048,6 +7108,9 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
     if (powerLevel.present) {
       map['power_level'] = Variable<int>(powerLevel.value);
     }
+    if (minCopyIndex.present) {
+      map['min_copy_index'] = Variable<int>(minCopyIndex.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -7066,6 +7129,7 @@ class DatasheetCostsCompanion extends UpdateCompanion<DatasheetCost> {
           ..write('points: $points, ')
           ..write('modelCount: $modelCount, ')
           ..write('powerLevel: $powerLevel, ')
+          ..write('minCopyIndex: $minCopyIndex, ')
           ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -24052,6 +24116,7 @@ typedef $$DatasheetCostsTableCreateCompanionBuilder =
       required int points,
       Value<int?> modelCount,
       Value<int?> powerLevel,
+      Value<int?> minCopyIndex,
       Value<DateTime> createdAt,
       Value<int> rowid,
     });
@@ -24063,6 +24128,7 @@ typedef $$DatasheetCostsTableUpdateCompanionBuilder =
       Value<int> points,
       Value<int?> modelCount,
       Value<int?> powerLevel,
+      Value<int?> minCopyIndex,
       Value<DateTime> createdAt,
       Value<int> rowid,
     });
@@ -24103,6 +24169,11 @@ class $$DatasheetCostsTableFilterComposer
 
   ColumnFilters<int> get powerLevel => $composableBuilder(
     column: $table.powerLevel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get minCopyIndex => $composableBuilder(
+    column: $table.minCopyIndex,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -24151,6 +24222,11 @@ class $$DatasheetCostsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get minCopyIndex => $composableBuilder(
+    column: $table.minCopyIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -24187,6 +24263,11 @@ class $$DatasheetCostsTableAnnotationComposer
 
   GeneratedColumn<int> get powerLevel => $composableBuilder(
     column: $table.powerLevel,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get minCopyIndex => $composableBuilder(
+    column: $table.minCopyIndex,
     builder: (column) => column,
   );
 
@@ -24233,6 +24314,7 @@ class $$DatasheetCostsTableTableManager
                 Value<int> points = const Value.absent(),
                 Value<int?> modelCount = const Value.absent(),
                 Value<int?> powerLevel = const Value.absent(),
+                Value<int?> minCopyIndex = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => DatasheetCostsCompanion(
@@ -24242,6 +24324,7 @@ class $$DatasheetCostsTableTableManager
                 points: points,
                 modelCount: modelCount,
                 powerLevel: powerLevel,
+                minCopyIndex: minCopyIndex,
                 createdAt: createdAt,
                 rowid: rowid,
               ),
@@ -24253,6 +24336,7 @@ class $$DatasheetCostsTableTableManager
                 required int points,
                 Value<int?> modelCount = const Value.absent(),
                 Value<int?> powerLevel = const Value.absent(),
+                Value<int?> minCopyIndex = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => DatasheetCostsCompanion.insert(
@@ -24262,6 +24346,7 @@ class $$DatasheetCostsTableTableManager
                 points: points,
                 modelCount: modelCount,
                 powerLevel: powerLevel,
+                minCopyIndex: minCopyIndex,
                 createdAt: createdAt,
                 rowid: rowid,
               ),

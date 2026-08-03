@@ -862,6 +862,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String armyBuilderBatchTotalPoints(int points) {
+    return 'Total pour ce lot : $points pts';
+  }
+
+  @override
   String get armyBuilderAttachedToSection => 'ATTACHEMENT';
 
   @override

@@ -417,6 +417,12 @@
       "points": { "type": "int" }
     }
   },
+  "armyBuilderBatchTotalPoints": "Total pour ce lot : {points} pts",
+  "@armyBuilderBatchTotalPoints": {
+    "placeholders": {
+      "points": { "type": "int" }
+    }
+  },
   "armyBuilderAttachedToSection": "ATTACHEMENT",
   "armyBuilderAttachedTo": "Attaché à : {name}",
   "@armyBuilderAttachedTo": {

@@ -284,8 +284,16 @@ class DatasheetDetailPanel extends StatelessWidget {
   /// palier de coût, ou un badge par palier (voir DatasheetCosts.modelCount)
   /// quand le coût dépend du nombre de figurines choisi.
   Widget _costDisplay(AppLocalizations l10n, DatasheetDetails sheet) {
-    final sized = sheet.costBrackets.where((b) => b.modelCount != null).toList()
-      ..sort((a, b) => a.modelCount!.compareTo(b.modelCount!));
+    // Cette vue n'est pas rattachée à une armée, donc sans notion de
+    // "combien j'en ai déjà" : uniquement le palier de base (voir
+    // CostBracket.minCopyIndex), pas les paliers de surcoût à partir de
+    // la Ne copie, qui ne feraient qu'afficher deux badges pour la même
+    // taille de figurines.
+    final sized =
+        sheet.costBrackets
+            .where((b) => b.modelCount != null && (b.minCopyIndex ?? 1) <= 1)
+            .toList()
+          ..sort((a, b) => a.modelCount!.compareTo(b.modelCount!));
     if (sized.length <= 1) {
       return _pointsBadge(l10n, sheet.points);
     }

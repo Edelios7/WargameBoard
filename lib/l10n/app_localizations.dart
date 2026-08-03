@@ -1622,6 +1622,12 @@ abstract class AppLocalizations {
   /// **'{points} pts / escouade'**
   String armyBuilderPointsPerSquad(int points);
 
+  /// No description provided for @armyBuilderBatchTotalPoints.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total pour ce lot : {points} pts'**
+  String armyBuilderBatchTotalPoints(int points);
+
   /// No description provided for @armyBuilderAttachedToSection.
   ///
   /// In fr, this message translates to:

@@ -24,6 +24,17 @@ class DatasheetCosts extends Table {
   IntColumn get powerLevel =>
       integer().nullable()();
 
+  /// À partir de quelle copie de cette datasheet (1re, 2e, 3e...) dans une
+  /// même liste d'armée ce palier s'applique. `null` signifie "s'applique
+  /// dès la 1re copie" (comportement historique, valeur par défaut).
+  ///
+  /// Beaucoup d'unités du MFM coûtent plus cher à partir d'un certain
+  /// nombre d'exemplaires dans la même liste (ex. "de la 1re à la 2e unité :
+  /// 150 pts", "3e unité et suivantes : 165 pts") : ce champ permet de
+  /// stocker ces deux paliers côte à côte pour un même `modelCount`,
+  /// distingués par leur seuil de déclenchement plutôt que par leur taille.
+  IntColumn get minCopyIndex => integer().nullable()();
+
   DateTimeColumn get createdAt =>
       dateTime().withDefault(currentDateAndTime)();
 
