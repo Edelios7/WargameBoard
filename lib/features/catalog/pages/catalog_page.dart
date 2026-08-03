@@ -14,11 +14,13 @@ import '../../../core/widgets/page_background.dart';
 import '../../../core/widgets/unit_fallback_visual.dart';
 import '../../../database/app_database.dart' show Faction, Keyword;
 import '../../../database/models/catalog_sort.dart';
+import '../../../database/models/datasheet_details.dart';
 import '../../../database/models/search_result.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/widgets/retry_error_state.dart';
 import '../../../providers/catalog_provider.dart';
-import '../widgets/catalog_preview_panel.dart';
+import '../../collection/widgets/add_collection_entry_dialog.dart';
+import '../widgets/datasheet_detail_panel.dart';
 import 'datasheet_full_page.dart';
 import 'weapons_inventory_page.dart';
 
@@ -41,6 +43,24 @@ bool _hasActiveCatalogFilters(WidgetRef ref) {
       editionFilter != null ||
       pointsRange != null ||
       favoritesOnlyFilter;
+}
+
+void _addToCollection(BuildContext context, DatasheetDetails sheet) {
+  showDialog(
+    context: context,
+    builder: (_) => AddCollectionEntryDialog(
+      initialResult: SearchResult(
+        id: sheet.id,
+        name: sheet.name,
+        type: 'datasheet',
+        factionId: sheet.factionId,
+        factionName: sheet.factionName,
+        gameSystemId: sheet.gameSystemId,
+        editionId: sheet.editionId,
+        points: sheet.points,
+      ),
+    ),
+  );
 }
 
 class CatalogPage extends ConsumerWidget {
@@ -187,15 +207,25 @@ class CatalogPage extends ConsumerWidget {
                       ),
                       Container(width: 1, color: AppColors.border),
                       Expanded(
-                        child: detailAsync.hasError
-                            ? RetryErrorState(
-                                onRetry: () =>
-                                    ref.invalidate(selectedDatasheetProvider),
-                              )
-                            : CatalogPreviewPanel(
-                                datasheet: detailAsync.value,
-                                loading: detailAsync.isLoading,
-                              ),
+                        child: Container(
+                          color: AppColors.surface,
+                          child: detailAsync.hasError
+                              ? RetryErrorState(
+                                  onRetry: () => ref.invalidate(
+                                    selectedDatasheetProvider,
+                                  ),
+                                )
+                              : DatasheetDetailPanel(
+                                  datasheet: detailAsync.value,
+                                  loading: detailAsync.isLoading,
+                                  onAddToCollection: detailAsync.value == null
+                                      ? null
+                                      : () => _addToCollection(
+                                          context,
+                                          detailAsync.value!,
+                                        ),
+                                ),
+                        ),
                       ),
                     ],
                   );

@@ -16,10 +16,17 @@ class DatasheetDetailPanel extends StatelessWidget {
   final DatasheetDetails? datasheet;
   final bool loading;
 
+  /// Affiche le bouton "Ajouter à la collection" juste sous l'en-tête
+  /// quand fourni — masqué par défaut (ex. `DatasheetFullPage`, où
+  /// l'ajout n'a pas sa place) pour ne pas dupliquer cette action
+  /// partout où ce panneau est réutilisé.
+  final VoidCallback? onAddToCollection;
+
   const DatasheetDetailPanel({
     super.key,
     required this.datasheet,
     required this.loading,
+    this.onAddToCollection,
   });
 
   @override
@@ -49,6 +56,27 @@ class DatasheetDetailPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _hero(sheet, imageFile, factionIcon, factionBanner, l10n),
+          if (onAddToCollection != null) ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: onAddToCollection,
+                icon: const Icon(Icons.add_rounded),
+                label: Text(
+                  l10n.collectionAddEntry,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 28),
           _section(
             l10n.sectionUnitSize,
