@@ -56,6 +56,14 @@
     }
   },
 
+  "customizationModeToggleLabel": "Customization mode",
+  "customizationModeToggleTooltip": "Toggle customization mode: personalize every block and page while browsing the app.",
+  "blockEditTooltip": "Customize this block",
+  "pageBackgroundEditTooltip": "Customize this page's background",
+  "blockEditChooseColor": "Choose a color",
+  "blockEditReset": "Reset",
+  "blockEditApply": "Apply",
+
   "settingsProfileTitle": "Profile",
   "settingsDisplayNameLabel": "Your name",
   "settingsLanguageTitle": "Language",

@@ -8,12 +8,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_wallpapers.dart';
+import '../core/theme/block_overrides.dart';
 import '../core/utils/user_content_paths.dart';
 import '../domain/customization/theme_preset.dart';
 
 const String accentColorPreferenceKey = 'customization_accent_color';
 const String wallpaperDimmingPreferenceKey = 'customization_wallpaper_dimming';
 const String themePresetsPreferenceKey = 'customization_theme_presets';
+const String blockOverridesPreferenceKey = 'customization_block_overrides';
 
 String _wallpaperPreferenceKey(WallpaperSlot slot) =>
     'customization_wallpaper_${slot.name}';
@@ -36,6 +38,12 @@ class CustomizationService {
     p.join(UserContentPaths.baseDirectory, 'local_assets', 'wallpapers'),
   );
 
+  /// Sous-dossier dédié aux fonds par bloc/page (mode personnalisation) —
+  /// distinct des 4 fonds globaux pour ne jamais mélanger leurs noms de
+  /// fichier, l'ensemble des identifiants de bloc étant ouvert.
+  Directory get _blockWallpapersFolder =>
+      Directory(p.join(_wallpapersFolder.path, 'blocks'));
+
   /// Recharge la couleur d'accent et les fonds d'écran déjà persistés —
   /// à appeler une fois au démarrage (voir main.dart), avant `runApp`, pour
   /// que le premier rendu reflète déjà les réglages du joueur au lieu de
@@ -55,6 +63,22 @@ class CustomizationService {
     if (dimming != null) {
       AppWallpapers.dimming = dimming;
     }
+    for (final entry in _readBlockOverridesRaw().entries) {
+      final value = entry.value;
+      if (value is! Map) continue;
+      switch (value['type']) {
+        case 'image':
+          final path = value['path'];
+          if (path is String && File(path).existsSync()) {
+            BlockOverrides.setImage(entry.key, File(path));
+          }
+        case 'color':
+          final colorValue = value['value'];
+          if (colorValue is int) {
+            BlockOverrides.setColor(entry.key, Color(colorValue));
+          }
+      }
+    }
   }
 
   Future<void> setWallpaperDimming(double value) async {
@@ -71,6 +95,11 @@ class CustomizationService {
       await clearWallpaper(slot);
     }
     await setWallpaperDimming(0.78);
+    BlockOverrides.clearAll();
+    if (_blockWallpapersFolder.existsSync()) {
+      await _blockWallpapersFolder.delete(recursive: true);
+    }
+    await prefs.remove(blockOverridesPreferenceKey);
   }
 
   Future<void> setAccentColor(Color color) async {
@@ -133,6 +162,79 @@ class CustomizationService {
     }
   }
 
+  Map<String, dynamic> _readBlockOverridesRaw() {
+    final raw = prefs.getString(blockOverridesPreferenceKey);
+    if (raw == null) return {};
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map) return Map<String, dynamic>.from(decoded);
+    } catch (_) {
+      // Pref corrompue (édition manuelle, ancien format...) : on repart
+      // d'une map vide plutôt que de faire planter tout le chargement.
+    }
+    return {};
+  }
+
+  Future<void> _writeBlockOverridesRaw(Map<String, dynamic> data) async {
+    await prefs.setString(blockOverridesPreferenceKey, jsonEncode(data));
+  }
+
+  Future<void> _removeBlockOverrideFiles(String id) async {
+    if (!_blockWallpapersFolder.existsSync()) return;
+    for (final extension in _extensions) {
+      final file = File(p.join(_blockWallpapersFolder.path, '$id.$extension'));
+      if (file.existsSync()) await file.delete();
+    }
+  }
+
+  /// Équivalent de [pickAndSetWallpaper] pour un bloc/page identifié par
+  /// [id] (mode personnalisation) — même convention de fichier, dans le
+  /// sous-dossier `blocks/` pour ne pas entrer en collision avec les 4
+  /// noms de fichier fixes des [WallpaperSlot].
+  Future<bool> pickAndSetBlockImage(String id) async {
+    final result = await FilePicker.pickFiles(
+      type: FileType.image,
+      dialogTitle: 'Choisir une image',
+    );
+    final sourcePath = result?.files.single.path;
+    if (sourcePath == null) return false;
+
+    final extension = p
+        .extension(sourcePath)
+        .replaceFirst('.', '')
+        .toLowerCase();
+    if (!_extensions.contains(extension)) return false;
+
+    await _blockWallpapersFolder.create(recursive: true);
+    await _removeBlockOverrideFiles(id);
+    final destination = File(
+      p.join(_blockWallpapersFolder.path, '$id.$extension'),
+    );
+    final saved = await File(sourcePath).copy(destination.path);
+
+    BlockOverrides.setImage(id, saved);
+    final raw = _readBlockOverridesRaw();
+    raw[id] = {'type': 'image', 'path': saved.path};
+    await _writeBlockOverridesRaw(raw);
+    return true;
+  }
+
+  Future<void> setBlockColor(String id, Color color) async {
+    await _removeBlockOverrideFiles(id);
+    BlockOverrides.setColor(id, color);
+    final raw = _readBlockOverridesRaw();
+    raw[id] = {'type': 'color', 'value': color.toARGB32()};
+    await _writeBlockOverridesRaw(raw);
+  }
+
+  Future<void> clearBlockOverride(String id) async {
+    await _removeBlockOverrideFiles(id);
+    BlockOverrides.clear(id);
+    final raw = _readBlockOverridesRaw();
+    raw.remove(id);
+    await _writeBlockOverridesRaw(raw);
+  }
+
   /// Sérialise la couleur d'accent, l'intensité du voile et chaque fond
   /// d'écran (image encodée en base64, embarquée directement plutôt que
   /// juste son chemin — un chemin local n'aurait aucun sens une fois
@@ -150,10 +252,32 @@ class CustomizationService {
         'bytes': base64Encode(await file.readAsBytes()),
       };
     }
+    final blockOverrides = <String, dynamic>{};
+    for (final entry in _readBlockOverridesRaw().entries) {
+      final value = entry.value;
+      if (value is! Map) continue;
+      if (value['type'] == 'color') {
+        blockOverrides[entry.key] = {'type': 'color', 'value': value['value']};
+        continue;
+      }
+      if (value['type'] == 'image') {
+        final path = value['path'];
+        if (path is! String) continue;
+        final file = File(path);
+        if (!file.existsSync()) continue;
+        blockOverrides[entry.key] = {
+          'type': 'image',
+          'extension': p.extension(file.path).replaceFirst('.', ''),
+          'bytes': base64Encode(await file.readAsBytes()),
+        };
+      }
+    }
+
     return {
       'accentColor': AppColors.primary.toARGB32(),
       'wallpaperDimming': AppWallpapers.dimming,
       'wallpapers': wallpapers,
+      'blockOverrides': blockOverrides,
     };
   }
 
@@ -191,6 +315,37 @@ class CustomizationService {
         await prefs.setString(_wallpaperPreferenceKey(slot), saved.path);
       }
     }
+    final blockOverrides = data['blockOverrides'];
+    if (blockOverrides is Map) {
+      final raw = <String, dynamic>{};
+      for (final entry in blockOverrides.entries) {
+        final id = entry.key.toString();
+        final value = entry.value;
+        if (value is! Map) continue;
+        if (value['type'] == 'color') {
+          final colorValue = value['value'];
+          if (colorValue is! int) continue;
+          BlockOverrides.setColor(id, Color(colorValue));
+          raw[id] = {'type': 'color', 'value': colorValue};
+        } else if (value['type'] == 'image') {
+          final extension = value['extension'];
+          final bytes = value['bytes'];
+          if (extension is! String || bytes is! String) continue;
+          await _blockWallpapersFolder.create(recursive: true);
+          await _removeBlockOverrideFiles(id);
+          final destination = File(
+            p.join(_blockWallpapersFolder.path, '$id.$extension'),
+          );
+          final saved = await destination.writeAsBytes(base64Decode(bytes));
+          BlockOverrides.setImage(id, saved);
+          raw[id] = {'type': 'image', 'path': saved.path};
+        }
+      }
+      if (raw.isNotEmpty) {
+        final merged = _readBlockOverridesRaw()..addAll(raw);
+        await _writeBlockOverridesRaw(merged);
+      }
+    }
   }
 
   /// Lit la liste des thèmes enregistrés (couleur + fonds d'écran + voile),
@@ -212,10 +367,9 @@ class CustomizationService {
   }
 
   Future<void> _writePresets(List<ThemePreset> presets) async {
-    await prefs.setStringList(
-      themePresetsPreferenceKey,
-      [for (final preset in presets) jsonEncode(preset.toJson())],
-    );
+    await prefs.setStringList(themePresetsPreferenceKey, [
+      for (final preset in presets) jsonEncode(preset.toJson()),
+    ]);
   }
 
   /// Capture l'état actuel (couleur d'accent, voile, chemins des fonds

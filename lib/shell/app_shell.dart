@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_wallpapers.dart';
+import '../providers/customization_provider.dart';
 import '../features/dashboard/pages/dashboard_page.dart';
 import '../features/dashboard/widgets/sidebar.dart';
 import '../features/armies/pages/armies_page.dart';
@@ -112,6 +113,26 @@ class AppShell extends ConsumerWidget {
             backgroundColor: AppColors.background,
             foregroundColor: AppColors.textPrimary,
             title: Text(_tabTitle(l10n, selectedTab)),
+            actions: [
+              // La sidebar (avec sa propre bascule) devient un tiroir sur
+              // cette largeur, donc pas toujours visible — sans ce bouton
+              // ici, le mode personnalisation resterait inaccessible tant
+              // qu'on n'ouvre pas explicitement le tiroir.
+              IconButton(
+                tooltip: l10n.customizationModeToggleTooltip,
+                icon: Icon(
+                  ref.watch(customizationModeProvider)
+                      ? Icons.edit_rounded
+                      : Icons.edit_outlined,
+                  color: ref.watch(customizationModeProvider)
+                      ? AppColors.primary
+                      : AppColors.textPrimary,
+                ),
+                onPressed: () =>
+                    ref.read(customizationModeProvider.notifier).state = !ref
+                        .read(customizationModeProvider),
+              ),
+            ],
           ),
           drawer: Drawer(
             backgroundColor: AppColors.background,

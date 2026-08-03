@@ -158,6 +158,28 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get customizationModeToggleLabel => 'Customization mode';
+
+  @override
+  String get customizationModeToggleTooltip =>
+      'Toggle customization mode: personalize every block and page while browsing the app.';
+
+  @override
+  String get blockEditTooltip => 'Customize this block';
+
+  @override
+  String get pageBackgroundEditTooltip => 'Customize this page\'s background';
+
+  @override
+  String get blockEditChooseColor => 'Choose a color';
+
+  @override
+  String get blockEditReset => 'Reset';
+
+  @override
+  String get blockEditApply => 'Apply';
+
+  @override
   String get settingsProfileTitle => 'Profile';
 
   @override

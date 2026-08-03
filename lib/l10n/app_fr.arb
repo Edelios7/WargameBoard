@@ -56,6 +56,14 @@
     }
   },
 
+  "customizationModeToggleLabel": "Mode personnalisation",
+  "customizationModeToggleTooltip": "Activer/désactiver le mode personnalisation : personnalise chaque bloc et chaque page en te baladant dans l'application.",
+  "blockEditTooltip": "Personnaliser ce bloc",
+  "pageBackgroundEditTooltip": "Personnaliser le fond de cette page",
+  "blockEditChooseColor": "Choisir une couleur",
+  "blockEditReset": "Réinitialiser",
+  "blockEditApply": "Appliquer",
+
   "settingsProfileTitle": "Profil",
   "settingsDisplayNameLabel": "Ton nom",
   "settingsLanguageTitle": "Langue",

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_wallpapers.dart';
+import '../../../core/theme/customization_ids.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
@@ -11,6 +12,7 @@ import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../core/widgets/donut_chart.dart';
 import '../../../core/widgets/hoverable.dart';
+import '../../../core/widgets/page_background.dart';
 import '../../../core/widgets/textured_button.dart';
 import '../../../core/widgets/unit_fallback_visual.dart';
 import '../../../database/models/army_details.dart';
@@ -72,241 +74,86 @@ class DashboardPage extends ConsumerWidget {
       backgroundColor: AppWallpapers.app == null
           ? AppColors.background
           : Colors.transparent,
-      body: Stack(
-        children: [
-          // L'illustration d'ambiance n'est qu'un fond décoratif : on ne
-          // montre qu'une bande réduite en haut de page (pas toute la
-          // hauteur défilable) pour limiter le morceau d'image visible, et
-          // le dégradé monte vite à une opacité quasi totale pour ne
-          // jamais laisser de détails de l'image se lire derrière le texte
-          // réel du Dashboard.
-          if (ambianceFile != null)
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 260,
-              child: Image.file(
-                ambianceFile,
-                fit: BoxFit.cover,
-                alignment: Alignment.topCenter,
-              ),
-            ),
-          if (ambianceFile != null)
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 260,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      AppColors.background.withValues(alpha: .82),
-                      AppColors.background.withValues(alpha: .96),
-                      AppColors.background,
-                    ],
-                    stops: const [0, 0.3, 0.55],
-                  ),
+      body: PageBackground(
+        pageId: 'dashboard',
+        child: Stack(
+          children: [
+            // L'illustration d'ambiance n'est qu'un fond décoratif : on ne
+            // montre qu'une bande réduite en haut de page (pas toute la
+            // hauteur défilable) pour limiter le morceau d'image visible, et
+            // le dégradé monte vite à une opacité quasi totale pour ne
+            // jamais laisser de détails de l'image se lire derrière le texte
+            // réel du Dashboard.
+            if (ambianceFile != null)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 260,
+                child: Image.file(
+                  ambianceFile,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
                 ),
               ),
-            ),
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(28),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _DashboardHeader(
-                  displayName: displayName,
-                  heroFactionId: heroFactionId,
-                  onOpenSettings: () => goTo(AppTab.settings),
-                  onOpenProfile: () => goTo(AppTab.profile),
-                  onSearch: (query) {
-                    // Les filtres du Catalogue sont des StateProvider
-                    // globaux qui survivent à la navigation entre onglets
-                    // — sans les réinitialiser, une recherche lancée
-                    // depuis le Dashboard peut atterrir sur "0 résultat"
-                    // à cause d'un filtre resté actif d'une précédente
-                    // visite, sans que rien n'indique que c'est lui (et
-                    // non la recherche) qui est en cause.
-                    ref.invalidate(catalogFactionFilterProvider);
-                    ref.invalidate(catalogKeywordFilterProvider);
-                    ref.invalidate(catalogRoleFilterProvider);
-                    ref.invalidate(catalogUnitTypeFilterProvider);
-                    ref.invalidate(catalogEditionFilterProvider);
-                    ref.invalidate(catalogPointsRangeProvider);
-                    ref.invalidate(catalogFavoritesOnlyProvider);
-                    ref.read(catalogSearchQueryProvider.notifier).state = query;
-                    goTo(AppTab.catalog);
-                  },
-                ),
-                if (armiesAsync.hasValue &&
-                    entriesAsync.hasValue &&
-                    armies.isEmpty &&
-                    entries.isEmpty) ...[
-                  const SizedBox(height: 20),
-                  _WelcomeBanner(
-                    onCreateArmy: () => showDialog(
-                      context: context,
-                      builder: (_) => const CreateArmyDialog(),
-                    ),
-                    onAddToCollection: () => showDialog(
-                      context: context,
-                      builder: (_) => const AddCollectionEntryDialog(),
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 24),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final columns = constraints.maxWidth > 900 ? 4 : 2;
-                    return GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: columns,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      // Des tuiles à 2 colonnes sont plus étroites, donc
-                      // proportionnellement plus hautes pour garder assez
-                      // de place aux 3 lignes de texte qu'elles affichent.
-                      childAspectRatio: columns == 4 ? 2.0 : 1.4,
-                      children: [
-                        _StatTile(
-                          icon: Icons.military_tech_rounded,
-                          accentColor: AppColors.primary,
-                          label: l10n.dashboardStatPoints,
-                          value: totalArmyPoints.toString(),
-                          sublabel: l10n.dashboardStatPointsSub,
-                          onTap: () => goTo(AppTab.armies),
-                        ),
-                        _StatTile(
-                          icon: Icons.inventory_2_rounded,
-                          accentColor: AppColors.info,
-                          label: l10n.dashboardStatModels,
-                          value: (summary?.totalModels ?? 0).toString(),
-                          sublabel: l10n.dashboardStatModelsSub,
-                          onTap: () => goTo(AppTab.collection),
-                        ),
-                        _StatTile(
-                          icon: Icons.brush_rounded,
-                          accentColor: AppColors.success,
-                          label: l10n.dashboardStatPainting,
-                          value: summary == null
-                              ? '—'
-                              : '${(summary.paintedRatio * 100).round()}%',
-                          sublabel: l10n.dashboardStatPaintingSub,
-                          onTap: () => goTo(AppTab.statistics),
-                        ),
-                        _LastBattleTile(
-                          battle: lastBattleAsync.value,
-                          onTap: () => goTo(AppTab.battles),
-                        ),
+            if (ambianceFile != null)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 260,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        AppColors.background.withValues(alpha: .82),
+                        AppColors.background.withValues(alpha: .96),
+                        AppColors.background,
                       ],
-                    );
-                  },
+                      stops: const [0, 0.3, 0.55],
+                    ),
+                  ),
                 ),
-                const DecorSeparator(),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final wide = constraints.maxWidth > 980;
-                    final cards = [
-                      _YourArmiesCard(
-                        armies: armies,
-                        onSeeAll: () => goTo(AppTab.armies),
-                        onOpenArmy: (id) {
-                          ref.read(selectedArmyIdProvider.notifier).state = id;
-                          goTo(AppTab.armies);
-                        },
-                      ),
-                      _PaintingDonutCard(entries: entries),
-                      _FactionBreakdownCard(entries: entries),
-                    ];
-                    if (!wide) {
-                      return Column(
-                        children: [
-                          for (final card in cards) ...[
-                            card,
-                            const SizedBox(height: 16),
-                          ],
-                        ],
-                      );
-                    }
-                    return IntrinsicHeight(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(flex: 3, child: cards[0]),
-                          const SizedBox(width: 16),
-                          Expanded(flex: 3, child: cards[1]),
-                          const SizedBox(width: 16),
-                          Expanded(flex: 3, child: cards[2]),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 16),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final wide = constraints.maxWidth > 980;
-                    final cards = [
-                      _RecentAdditionsCard(
-                        entriesAsync: recentlyAddedAsync,
-                        onSeeAll: () => goTo(AppTab.collection),
-                        onOpenEntry: (datasheetId) =>
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    DatasheetFullPage(datasheetId: datasheetId),
-                              ),
-                            ),
-                      ),
-                      _RecentlyViewedCard(
-                        resultsAsync: recentlyViewedAsync,
-                        onSelect: (id) {
-                          ref.read(selectedDatasheetIdProvider.notifier).state =
-                              id;
-                          goTo(AppTab.catalog);
-                        },
-                      ),
-                      _NextBattleCard(
-                        battle: nextBattleAsync.value,
-                        armies: armies,
-                        onTap: () => goTo(AppTab.battles),
-                      ),
-                    ];
-                    if (!wide) {
-                      return Column(
-                        children: [
-                          for (final card in cards) ...[
-                            card,
-                            const SizedBox(height: 16),
-                          ],
-                        ],
-                      );
-                    }
-                    return IntrinsicHeight(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(flex: 3, child: cards[0]),
-                          const SizedBox(width: 16),
-                          Expanded(flex: 3, child: cards[1]),
-                          const SizedBox(width: 16),
-                          Expanded(flex: 3, child: cards[2]),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 16),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final wide = constraints.maxWidth > 900;
-                    final quickActions = _QuickActionsCard(
-                      onNewArmy: () => showDialog(
+              ),
+            SingleChildScrollView(
+              padding: const EdgeInsets.all(28),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _DashboardHeader(
+                    displayName: displayName,
+                    heroFactionId: heroFactionId,
+                    onOpenSettings: () => goTo(AppTab.settings),
+                    onOpenProfile: () => goTo(AppTab.profile),
+                    onSearch: (query) {
+                      // Les filtres du Catalogue sont des StateProvider
+                      // globaux qui survivent à la navigation entre onglets
+                      // — sans les réinitialiser, une recherche lancée
+                      // depuis le Dashboard peut atterrir sur "0 résultat"
+                      // à cause d'un filtre resté actif d'une précédente
+                      // visite, sans que rien n'indique que c'est lui (et
+                      // non la recherche) qui est en cause.
+                      ref.invalidate(catalogFactionFilterProvider);
+                      ref.invalidate(catalogKeywordFilterProvider);
+                      ref.invalidate(catalogRoleFilterProvider);
+                      ref.invalidate(catalogUnitTypeFilterProvider);
+                      ref.invalidate(catalogEditionFilterProvider);
+                      ref.invalidate(catalogPointsRangeProvider);
+                      ref.invalidate(catalogFavoritesOnlyProvider);
+                      ref.read(catalogSearchQueryProvider.notifier).state =
+                          query;
+                      goTo(AppTab.catalog);
+                    },
+                  ),
+                  if (armiesAsync.hasValue &&
+                      entriesAsync.hasValue &&
+                      armies.isEmpty &&
+                      entries.isEmpty) ...[
+                    const SizedBox(height: 20),
+                    _WelcomeBanner(
+                      onCreateArmy: () => showDialog(
                         context: context,
                         builder: (_) => const CreateArmyDialog(),
                       ),
@@ -314,42 +161,205 @@ class DashboardPage extends ConsumerWidget {
                         context: context,
                         builder: (_) => const AddCollectionEntryDialog(),
                       ),
-                      onOpenCatalog: () => goTo(AppTab.catalog),
-                      onNewBattle: () => showDialog(
-                        context: context,
-                        builder: (_) => const LogBattleDialog(),
-                      ),
-                    );
-                    final projects = _ProjectsCard(
-                      projectsAsync: projectsAsync,
-                    );
-
-                    if (!wide) {
-                      return Column(
+                    ),
+                  ],
+                  const SizedBox(height: 24),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final columns = constraints.maxWidth > 900 ? 4 : 2;
+                      return GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: columns,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        // Des tuiles à 2 colonnes sont plus étroites, donc
+                        // proportionnellement plus hautes pour garder assez
+                        // de place aux 3 lignes de texte qu'elles affichent.
+                        childAspectRatio: columns == 4 ? 2.0 : 1.4,
                         children: [
-                          quickActions,
-                          const SizedBox(height: 16),
-                          projects,
+                          _StatTile(
+                            icon: Icons.military_tech_rounded,
+                            accentColor: AppColors.primary,
+                            label: l10n.dashboardStatPoints,
+                            value: totalArmyPoints.toString(),
+                            sublabel: l10n.dashboardStatPointsSub,
+                            onTap: () => goTo(AppTab.armies),
+                          ),
+                          _StatTile(
+                            icon: Icons.inventory_2_rounded,
+                            accentColor: AppColors.info,
+                            label: l10n.dashboardStatModels,
+                            value: (summary?.totalModels ?? 0).toString(),
+                            sublabel: l10n.dashboardStatModelsSub,
+                            onTap: () => goTo(AppTab.collection),
+                          ),
+                          _StatTile(
+                            icon: Icons.brush_rounded,
+                            accentColor: AppColors.success,
+                            label: l10n.dashboardStatPainting,
+                            value: summary == null
+                                ? '—'
+                                : '${(summary.paintedRatio * 100).round()}%',
+                            sublabel: l10n.dashboardStatPaintingSub,
+                            onTap: () => goTo(AppTab.statistics),
+                          ),
+                          _LastBattleTile(
+                            battle: lastBattleAsync.value,
+                            onTap: () => goTo(AppTab.battles),
+                          ),
                         ],
                       );
-                    }
-                    return IntrinsicHeight(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(flex: 2, child: quickActions),
-                          const SizedBox(width: 16),
-                          Expanded(flex: 3, child: projects),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-                const _DashboardFooterBanner(),
-              ],
+                    },
+                  ),
+                  const DecorSeparator(),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final wide = constraints.maxWidth > 980;
+                      final cards = [
+                        _YourArmiesCard(
+                          armies: armies,
+                          onSeeAll: () => goTo(AppTab.armies),
+                          onOpenArmy: (id) {
+                            ref.read(selectedArmyIdProvider.notifier).state =
+                                id;
+                            goTo(AppTab.armies);
+                          },
+                        ),
+                        _PaintingDonutCard(entries: entries),
+                        _FactionBreakdownCard(entries: entries),
+                      ];
+                      if (!wide) {
+                        return Column(
+                          children: [
+                            for (final card in cards) ...[
+                              card,
+                              const SizedBox(height: 16),
+                            ],
+                          ],
+                        );
+                      }
+                      return IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(flex: 3, child: cards[0]),
+                            const SizedBox(width: 16),
+                            Expanded(flex: 3, child: cards[1]),
+                            const SizedBox(width: 16),
+                            Expanded(flex: 3, child: cards[2]),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final wide = constraints.maxWidth > 980;
+                      final cards = [
+                        _RecentAdditionsCard(
+                          entriesAsync: recentlyAddedAsync,
+                          onSeeAll: () => goTo(AppTab.collection),
+                          onOpenEntry: (datasheetId) =>
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => DatasheetFullPage(
+                                    datasheetId: datasheetId,
+                                  ),
+                                ),
+                              ),
+                        ),
+                        _RecentlyViewedCard(
+                          resultsAsync: recentlyViewedAsync,
+                          onSelect: (id) {
+                            ref
+                                    .read(selectedDatasheetIdProvider.notifier)
+                                    .state =
+                                id;
+                            goTo(AppTab.catalog);
+                          },
+                        ),
+                        _NextBattleCard(
+                          battle: nextBattleAsync.value,
+                          armies: armies,
+                          onTap: () => goTo(AppTab.battles),
+                        ),
+                      ];
+                      if (!wide) {
+                        return Column(
+                          children: [
+                            for (final card in cards) ...[
+                              card,
+                              const SizedBox(height: 16),
+                            ],
+                          ],
+                        );
+                      }
+                      return IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(flex: 3, child: cards[0]),
+                            const SizedBox(width: 16),
+                            Expanded(flex: 3, child: cards[1]),
+                            const SizedBox(width: 16),
+                            Expanded(flex: 3, child: cards[2]),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final wide = constraints.maxWidth > 900;
+                      final quickActions = _QuickActionsCard(
+                        onNewArmy: () => showDialog(
+                          context: context,
+                          builder: (_) => const CreateArmyDialog(),
+                        ),
+                        onAddToCollection: () => showDialog(
+                          context: context,
+                          builder: (_) => const AddCollectionEntryDialog(),
+                        ),
+                        onOpenCatalog: () => goTo(AppTab.catalog),
+                        onNewBattle: () => showDialog(
+                          context: context,
+                          builder: (_) => const LogBattleDialog(),
+                        ),
+                      );
+                      final projects = _ProjectsCard(
+                        projectsAsync: projectsAsync,
+                      );
+
+                      if (!wide) {
+                        return Column(
+                          children: [
+                            quickActions,
+                            const SizedBox(height: 16),
+                            projects,
+                          ],
+                        );
+                      }
+                      return IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(flex: 2, child: quickActions),
+                            const SizedBox(width: 16),
+                            Expanded(flex: 3, child: projects),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const _DashboardFooterBanner(),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -377,6 +387,7 @@ class _WelcomeBanner extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return AppCard(
       wallpaperOverride: AppWallpapers.banner,
+      customizationId: CustomizationIds.dashboardWelcomeBanner,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -1137,6 +1148,7 @@ class _RecentAdditionsCard extends StatelessWidget {
     final entries = entriesAsync.value ?? const <CollectionItemDetails>[];
 
     return AppCard(
+      customizationId: CustomizationIds.dashboardRecentAdditions,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -1474,6 +1486,7 @@ class _QuickActionsCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return AppCard(
+      customizationId: CustomizationIds.dashboardQuickActions,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

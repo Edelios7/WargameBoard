@@ -10,6 +10,7 @@ import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
 import '../../../core/widgets/app_loading_indicator.dart';
 import '../../../core/widgets/archetype_badge.dart';
+import '../../../core/widgets/page_background.dart';
 import '../../../core/widgets/unit_fallback_visual.dart';
 import '../../../database/app_database.dart' show Faction, Keyword;
 import '../../../database/models/catalog_sort.dart';
@@ -73,131 +74,136 @@ class CatalogPage extends ConsumerWidget {
       backgroundColor: AppWallpapers.app == null
           ? AppColors.background
           : Colors.transparent,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            decoration: headerBannerFile != null
-                ? BoxDecoration(
-                    image: DecorationImage(
-                      image: FileImage(headerBannerFile),
-                      fit: BoxFit.cover,
-                    ),
-                  )
-                : null,
-            child: Container(
+      body: PageBackground(
+        pageId: 'catalog',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
               decoration: headerBannerFile != null
                   ? BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: [
-                          AppColors.background.withValues(alpha: .9),
-                          AppColors.background.withValues(alpha: .6),
-                        ],
+                      image: DecorationImage(
+                        image: FileImage(headerBannerFile),
+                        fit: BoxFit.cover,
                       ),
                     )
                   : null,
-              padding: const EdgeInsets.fromLTRB(28, 24, 28, 8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.navCatalog.toUpperCase(),
-                          style: AppTextStyles.heading,
+              child: Container(
+                decoration: headerBannerFile != null
+                    ? BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            AppColors.background.withValues(alpha: .9),
+                            AppColors.background.withValues(alpha: .6),
+                          ],
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          l10n.catalogBreadcrumbAllUnits,
-                          style: AppTextStyles.caption,
-                        ),
-                      ],
-                    ),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const WeaponsInventoryPage(),
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.textPrimary,
-                      side: const BorderSide(color: AppColors.border),
-                    ),
-                    icon: const Icon(Icons.hardware_rounded, size: 18),
-                    label: Text(l10n.catalogWeaponsButton),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const _FactionQuickAccessBar(),
-          const SizedBox(height: 4),
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                // En dessous de ce seuil, trois colonnes fixes ne laissent
-                // plus de place à rien — on repasse à un flux liste puis
-                // détail en plein écran (patron mobile), filtres derrière
-                // un bouton plutôt qu'une colonne toujours visible.
-                if (constraints.maxWidth < 900) {
-                  return _NarrowCatalogLayout(
-                    resultsAsync: resultsAsync,
-                    hasActiveFilters: hasActiveFilters,
-                  );
-                }
-
-                final filtersWidth = constraints.maxWidth < 1100
-                    ? 200.0
-                    : 232.0;
-                final resultsWidth = constraints.maxWidth < 1100
-                    ? 260.0
-                    : 320.0;
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                      )
+                    : null,
+                padding: const EdgeInsets.fromLTRB(28, 24, 28, 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    SizedBox(
-                      width: filtersWidth,
-                      child: _FiltersPanel(
-                        hasActiveFilters: hasActiveFilters,
-                        resultsCount: visibleResultsCount,
-                      ),
-                    ),
-                    Container(width: 1, color: AppColors.border),
-                    SizedBox(
-                      width: resultsWidth,
-                      child: _ResultsList(
-                        resultsAsync: resultsAsync,
-                        selectedId: selectedId,
-                        onSelect: (id) =>
-                            ref
-                                    .read(selectedDatasheetIdProvider.notifier)
-                                    .state =
-                                id,
-                      ),
-                    ),
-                    Container(width: 1, color: AppColors.border),
                     Expanded(
-                      child: detailAsync.hasError
-                          ? RetryErrorState(
-                              onRetry: () =>
-                                  ref.invalidate(selectedDatasheetProvider),
-                            )
-                          : CatalogPreviewPanel(
-                              datasheet: detailAsync.value,
-                              loading: detailAsync.isLoading,
-                            ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.navCatalog.toUpperCase(),
+                            style: AppTextStyles.heading,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            l10n.catalogBreadcrumbAllUnits,
+                            style: AppTextStyles.caption,
+                          ),
+                        ],
+                      ),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const WeaponsInventoryPage(),
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.textPrimary,
+                        side: const BorderSide(color: AppColors.border),
+                      ),
+                      icon: const Icon(Icons.hardware_rounded, size: 18),
+                      label: Text(l10n.catalogWeaponsButton),
                     ),
                   ],
-                );
-              },
+                ),
+              ),
             ),
-          ),
-        ],
+            const _FactionQuickAccessBar(),
+            const SizedBox(height: 4),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  // En dessous de ce seuil, trois colonnes fixes ne laissent
+                  // plus de place à rien — on repasse à un flux liste puis
+                  // détail en plein écran (patron mobile), filtres derrière
+                  // un bouton plutôt qu'une colonne toujours visible.
+                  if (constraints.maxWidth < 900) {
+                    return _NarrowCatalogLayout(
+                      resultsAsync: resultsAsync,
+                      hasActiveFilters: hasActiveFilters,
+                    );
+                  }
+
+                  final filtersWidth = constraints.maxWidth < 1100
+                      ? 200.0
+                      : 232.0;
+                  final resultsWidth = constraints.maxWidth < 1100
+                      ? 260.0
+                      : 320.0;
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(
+                        width: filtersWidth,
+                        child: _FiltersPanel(
+                          hasActiveFilters: hasActiveFilters,
+                          resultsCount: visibleResultsCount,
+                        ),
+                      ),
+                      Container(width: 1, color: AppColors.border),
+                      SizedBox(
+                        width: resultsWidth,
+                        child: _ResultsList(
+                          resultsAsync: resultsAsync,
+                          selectedId: selectedId,
+                          onSelect: (id) =>
+                              ref
+                                      .read(
+                                        selectedDatasheetIdProvider.notifier,
+                                      )
+                                      .state =
+                                  id,
+                        ),
+                      ),
+                      Container(width: 1, color: AppColors.border),
+                      Expanded(
+                        child: detailAsync.hasError
+                            ? RetryErrorState(
+                                onRetry: () =>
+                                    ref.invalidate(selectedDatasheetProvider),
+                              )
+                            : CatalogPreviewPanel(
+                                datasheet: detailAsync.value,
+                                loading: detailAsync.isLoading,
+                              ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

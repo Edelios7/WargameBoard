@@ -159,6 +159,28 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get customizationModeToggleLabel => 'Mode personnalisation';
+
+  @override
+  String get customizationModeToggleTooltip =>
+      'Activer/désactiver le mode personnalisation : personnalise chaque bloc et chaque page en te baladant dans l\'application.';
+
+  @override
+  String get blockEditTooltip => 'Personnaliser ce bloc';
+
+  @override
+  String get pageBackgroundEditTooltip => 'Personnaliser le fond de cette page';
+
+  @override
+  String get blockEditChooseColor => 'Choisir une couleur';
+
+  @override
+  String get blockEditReset => 'Réinitialiser';
+
+  @override
+  String get blockEditApply => 'Appliquer';
+
+  @override
   String get settingsProfileTitle => 'Profil';
 
   @override
