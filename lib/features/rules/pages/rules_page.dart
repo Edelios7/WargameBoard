@@ -590,34 +590,53 @@ class _CategoriesGrid extends StatelessWidget {
         ? kRuleDocuments.length
         : kRuleDocuments.where((d) => d.category == category).length;
 
-    final entries = <(RuleCategory?, IconData, String)>[
-      (null, Icons.bookmark_rounded, l10n.rulesCategoryAll),
-      (RuleCategory.mainRules, Icons.menu_book_rounded, l10n.rulesCategoryMain),
+    // Une couleur distincte par catégorie — avant, chaque tuile n'avait
+    // qu'une petite icône grise sur fond plat, aucune ne se distinguait
+    // visuellement des autres (même défaut que les cartes d'armée avant
+    // AppCard.accentColor).
+    final entries = <(RuleCategory?, IconData, String, Color)>[
+      (null, Icons.bookmark_rounded, l10n.rulesCategoryAll, AppColors.primary),
+      (
+        RuleCategory.mainRules,
+        Icons.menu_book_rounded,
+        l10n.rulesCategoryMain,
+        AppColors.info,
+      ),
       (
         RuleCategory.missions,
         Icons.track_changes_rounded,
         l10n.rulesCategoryMissions,
+        AppColors.warning,
       ),
-      (RuleCategory.faqs, Icons.help_outline_rounded, l10n.rulesCategoryFaqs),
+      (
+        RuleCategory.faqs,
+        Icons.help_outline_rounded,
+        l10n.rulesCategoryFaqs,
+        AppColors.success,
+      ),
       (
         RuleCategory.errata,
         Icons.description_rounded,
         l10n.rulesCategoryErrata,
+        AppColors.error,
       ),
       (
         RuleCategory.pointsAndProfiles,
         Icons.shield_rounded,
         l10n.rulesCategoryProfiles,
+        AppColors.primaryLight,
       ),
       (
         RuleCategory.tacticalGuides,
         Icons.hub_rounded,
         l10n.rulesCategoryTactics,
+        const Color(0xFF3EBFAE),
       ),
       (
         RuleCategory.armyLists,
         Icons.list_alt_rounded,
         l10n.rulesCategoryArmyLists,
+        const Color(0xFFE0729C),
       ),
     ];
 
@@ -642,6 +661,7 @@ class _CategoriesGrid extends StatelessWidget {
             for (final entry in entries)
               AppCard(
                 selected: selected == entry.$1,
+                accentColor: entry.$4,
                 onTap: () => onSelect(selected == entry.$1 ? null : entry.$1),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -652,14 +672,17 @@ class _CategoriesGrid extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      entry.$2,
-                      size: 18,
-                      color: selected == entry.$1
-                          ? AppColors.primary
-                          : AppColors.textSecondary,
+                    Container(
+                      width: 26,
+                      height: 26,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: entry.$4.withValues(alpha: .22),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(entry.$2, size: 14, color: entry.$4),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Text(
                       entry.$3,
                       style: AppTextStyles.body.copyWith(
