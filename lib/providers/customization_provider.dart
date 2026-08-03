@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_wallpapers.dart';
+import '../core/theme/block_overrides.dart';
 import '../domain/customization/theme_preset.dart';
 import '../services/customization_service.dart';
 import 'shared_preferences_provider.dart';
@@ -37,6 +38,22 @@ final wallpaperProvider = Provider.family<File?, WallpaperSlot>((ref, slot) {
 final wallpaperDimmingProvider = Provider<double>((ref) {
   ref.watch(themeVersionProvider);
   return AppWallpapers.dimming;
+});
+
+/// État on/off du mode personnalisation (bascule dans la sidebar) — état de
+/// session uniquement, pas persisté : à chaque lancement de l'appli, on
+/// repart en navigation normale sans badges d'édition.
+final customizationModeProvider = StateProvider<bool>((ref) => false);
+
+/// Surcharge de fond (image ou couleur) pour un bloc ou une page donnée,
+/// identifié par [CustomizationIds]. Même patron que [wallpaperProvider] :
+/// dépend de [themeVersionProvider] pour se rafraîchir après une mutation.
+final blockOverrideProvider = Provider.family<BlockOverride?, String>((
+  ref,
+  id,
+) {
+  ref.watch(themeVersionProvider);
+  return BlockOverrides.forId(id);
 });
 
 /// Liste des thèmes enregistrés par l'utilisateur — dépend de

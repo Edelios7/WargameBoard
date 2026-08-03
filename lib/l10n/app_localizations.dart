@@ -380,6 +380,48 @@ abstract class AppLocalizations {
   /// **'« {name} » sera définitivement supprimé.'**
   String customizationDeletePresetConfirmMessage(String name);
 
+  /// No description provided for @customizationModeToggleLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode personnalisation'**
+  String get customizationModeToggleLabel;
+
+  /// No description provided for @customizationModeToggleTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activer/désactiver le mode personnalisation : personnalise chaque bloc et chaque page en te baladant dans l\'application.'**
+  String get customizationModeToggleTooltip;
+
+  /// No description provided for @blockEditTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Personnaliser ce bloc'**
+  String get blockEditTooltip;
+
+  /// No description provided for @pageBackgroundEditTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Personnaliser le fond de cette page'**
+  String get pageBackgroundEditTooltip;
+
+  /// No description provided for @blockEditChooseColor.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir une couleur'**
+  String get blockEditChooseColor;
+
+  /// No description provided for @blockEditReset.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réinitialiser'**
+  String get blockEditReset;
+
+  /// No description provided for @blockEditApply.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appliquer'**
+  String get blockEditApply;
+
   /// No description provided for @settingsProfileTitle.
   ///
   /// In fr, this message translates to:

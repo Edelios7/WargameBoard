@@ -8,6 +8,7 @@ import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/donut_chart.dart';
+import '../../../core/widgets/page_background.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/battle_details.dart';
 import '../../../database/models/xp_summary.dart';
@@ -36,257 +37,271 @@ class StatisticsPage extends ConsumerWidget {
       backgroundColor: AppWallpapers.app == null
           ? AppColors.background
           : Colors.transparent,
-      body: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.navStatistics, style: AppTextStyles.heading),
-            const SizedBox(height: 24),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Contrairement au Dashboard (voir _WelcomeBanner), cette
-                    // page ne montrait qu'un mur de "—" à un nouveau joueur
-                    // sans armée/collection/partie — aucune indication que
-                    // les chiffres se rempliront une fois l'appli utilisée.
-                    if (armiesAsync.hasValue &&
-                        summaryAsync.hasValue &&
-                        battleStatsAsync.hasValue &&
-                        (armiesAsync.value?.isEmpty ?? true) &&
-                        (summaryAsync.value?.totalEntries ?? 0) == 0 &&
-                        (battleStats?.totalGames ?? 0) == 0) ...[
-                      Text(l10n.statsEmptyHint, style: AppTextStyles.caption),
-                      const SizedBox(height: 16),
-                    ],
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        // Même seuil que les autres grilles de l'appli
-                        // (Dashboard, Règles) — sans lui, ces tuiles se
-                        // retrouvaient écrasées sur 4 colonnes même en
-                        // fenêtre étroite ou tiroir mobile, avec un risque
-                        // de débordement des valeurs.
-                        final columns = constraints.maxWidth > 700 ? 4 : 2;
-                        return GridView.count(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisCount: columns,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 1.4,
-                          children: [
-                            _StatTile(
-                              label: l10n.statsArmiesCount,
-                              value:
-                                  armiesAsync.value?.length.toString() ?? '—',
-                            ),
-                            _StatTile(
-                              label: l10n.statsCollectionEntries,
-                              value:
-                                  summaryAsync.value?.totalEntries.toString() ??
-                                  '—',
-                            ),
-                            _StatTile(
-                              label: l10n.statsCollectionModels,
-                              value:
-                                  summaryAsync.value?.totalModels.toString() ??
-                                  '—',
-                            ),
-                            _StatTile(
-                              label: l10n.statsCollectionPainted,
-                              value:
-                                  summaryAsync.value?.totalPainted.toString() ??
-                                  '—',
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final columns = constraints.maxWidth > 700 ? 4 : 2;
-                        return GridView.count(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisCount: columns,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 1.4,
-                          children: [
-                            _StatTile(
-                              label: l10n.statsGamesPlayed,
-                              value: battleStats?.totalGames.toString() ?? '—',
-                            ),
-                            _StatTile(
-                              label: l10n.statsVictories,
-                              value: battleStats?.victories.toString() ?? '—',
-                            ),
-                            _StatTile(
-                              label: l10n.statsDefeats,
-                              value: battleStats?.defeats.toString() ?? '—',
-                            ),
-                            _StatTile(
-                              label: l10n.statsWinRate,
-                              value:
-                                  battleStats == null ||
-                                      battleStats.totalGames == 0
-                                  ? '—'
-                                  : '${(battleStats.winRate * 100).round()} %',
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                    if (battleStats != null && battleStats.totalGames > 0) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        l10n.statsBattleRecord(
-                          battleStats.victories,
-                          battleStats.defeats,
-                          battleStats.draws,
-                        ),
-                        style: AppTextStyles.body.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 28),
-                    summaryAsync.when(
-                      loading: () => const SizedBox.shrink(),
-                      error: (_, __) => const SizedBox.shrink(),
-                      data: (summary) => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: PageBackground(
+        pageId: 'statistics',
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.navStatistics, style: AppTextStyles.heading),
+              const SizedBox(height: 24),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Contrairement au Dashboard (voir _WelcomeBanner), cette
+                      // page ne montrait qu'un mur de "—" à un nouveau joueur
+                      // sans armée/collection/partie — aucune indication que
+                      // les chiffres se rempliront une fois l'appli utilisée.
+                      if (armiesAsync.hasValue &&
+                          summaryAsync.hasValue &&
+                          battleStatsAsync.hasValue &&
+                          (armiesAsync.value?.isEmpty ?? true) &&
+                          (summaryAsync.value?.totalEntries ?? 0) == 0 &&
+                          (battleStats?.totalGames ?? 0) == 0) ...[
+                        Text(l10n.statsEmptyHint, style: AppTextStyles.caption),
+                        const SizedBox(height: 16),
+                      ],
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          // Même seuil que les autres grilles de l'appli
+                          // (Dashboard, Règles) — sans lui, ces tuiles se
+                          // retrouvaient écrasées sur 4 colonnes même en
+                          // fenêtre étroite ou tiroir mobile, avec un risque
+                          // de débordement des valeurs.
+                          final columns = constraints.maxWidth > 700 ? 4 : 2;
+                          return GridView.count(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            crossAxisCount: columns,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 1.4,
                             children: [
-                              Text(
-                                l10n.statsPaintingProgress.toUpperCase(),
-                                style: AppTextStyles.eyebrow,
+                              _StatTile(
+                                label: l10n.statsArmiesCount,
+                                value:
+                                    armiesAsync.value?.length.toString() ?? '—',
                               ),
-                              Text(
-                                '${(summary.paintedRatio * 100).round()}%',
-                                style: AppTextStyles.body.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.primary,
-                                ),
+                              _StatTile(
+                                label: l10n.statsCollectionEntries,
+                                value:
+                                    summaryAsync.value?.totalEntries
+                                        .toString() ??
+                                    '—',
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: LinearProgressIndicator(
-                              value: summary.paintedRatio,
-                              minHeight: 10,
-                              backgroundColor: AppColors.surface,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const DecorSeparator(
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    Text(
-                      l10n.statsProgressionTitle,
-                      style: AppTextStyles.title,
-                    ),
-                    const SizedBox(height: 16),
-                    xpAsync.when(
-                      loading: () => const SizedBox.shrink(),
-                      error: (_, __) => const SizedBox.shrink(),
-                      data: (xp) => _ProgressionSection(l10n: l10n, xp: xp),
-                    ),
-                    const DecorSeparator(
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    Text(l10n.statsRecentFormTitle, style: AppTextStyles.title),
-                    const SizedBox(height: 16),
-                    // Une bataille "pas encore jouée" (result == null)
-                    // n'a pas sa place dans la forme récente : elle n'a
-                    // pas encore d'issue à afficher.
-                    battles.every((b) => b.result == null)
-                        ? Text(
-                            l10n.battleEmptyList,
-                            style: AppTextStyles.caption,
-                          )
-                        : _RecentFormRow(l10n: l10n, battles: battles),
-                    const DecorSeparator(
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final outcomes = _BattleOutcomesCard(
-                          l10n: l10n,
-                          battles: battles,
-                        );
-                        final byFaction = _BattlesByFactionCard(
-                          l10n: l10n,
-                          battles: battles,
-                        );
-                        if (constraints.maxWidth < 720) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              outcomes,
-                              const SizedBox(height: 16),
-                              byFaction,
+                              _StatTile(
+                                label: l10n.statsCollectionModels,
+                                value:
+                                    summaryAsync.value?.totalModels
+                                        .toString() ??
+                                    '—',
+                              ),
+                              _StatTile(
+                                label: l10n.statsCollectionPainted,
+                                value:
+                                    summaryAsync.value?.totalPainted
+                                        .toString() ??
+                                    '—',
+                              ),
                             ],
                           );
-                        }
-                        return Row(
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final columns = constraints.maxWidth > 700 ? 4 : 2;
+                          return GridView.count(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            crossAxisCount: columns,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 1.4,
+                            children: [
+                              _StatTile(
+                                label: l10n.statsGamesPlayed,
+                                value:
+                                    battleStats?.totalGames.toString() ?? '—',
+                              ),
+                              _StatTile(
+                                label: l10n.statsVictories,
+                                value: battleStats?.victories.toString() ?? '—',
+                              ),
+                              _StatTile(
+                                label: l10n.statsDefeats,
+                                value: battleStats?.defeats.toString() ?? '—',
+                              ),
+                              _StatTile(
+                                label: l10n.statsWinRate,
+                                value:
+                                    battleStats == null ||
+                                        battleStats.totalGames == 0
+                                    ? '—'
+                                    : '${(battleStats.winRate * 100).round()} %',
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                      if (battleStats != null &&
+                          battleStats.totalGames > 0) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n.statsBattleRecord(
+                            battleStats.victories,
+                            battleStats.defeats,
+                            battleStats.draws,
+                          ),
+                          style: AppTextStyles.body.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 28),
+                      summaryAsync.when(
+                        loading: () => const SizedBox.shrink(),
+                        error: (_, __) => const SizedBox.shrink(),
+                        data: (summary) => Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(child: outcomes),
-                            const SizedBox(width: 16),
-                            Expanded(child: byFaction),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  l10n.statsPaintingProgress.toUpperCase(),
+                                  style: AppTextStyles.eyebrow,
+                                ),
+                                Text(
+                                  '${(summary.paintedRatio * 100).round()}%',
+                                  style: AppTextStyles.body.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: LinearProgressIndicator(
+                                value: summary.paintedRatio,
+                                minHeight: 10,
+                                backgroundColor: AppColors.surface,
+                                color: AppColors.primary,
+                              ),
+                            ),
                           ],
-                        );
-                      },
-                    ),
-                    const DecorSeparator(
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    Text(l10n.statsPointsByArmy, style: AppTextStyles.title),
-                    const SizedBox(height: 16),
-                    armiesAsync.when(
-                      loading: () => Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.primary,
                         ),
                       ),
-                      error: (error, _) => Center(
-                        child: Text('$error', style: AppTextStyles.caption),
+                      const DecorSeparator(
+                        padding: EdgeInsets.symmetric(vertical: 14),
                       ),
-                      data: (armies) {
-                        if (armies.isEmpty) {
-                          return Text(
-                            l10n.statsNoArmies,
-                            style: AppTextStyles.caption,
+                      Text(
+                        l10n.statsProgressionTitle,
+                        style: AppTextStyles.title,
+                      ),
+                      const SizedBox(height: 16),
+                      xpAsync.when(
+                        loading: () => const SizedBox.shrink(),
+                        error: (_, __) => const SizedBox.shrink(),
+                        data: (xp) => _ProgressionSection(l10n: l10n, xp: xp),
+                      ),
+                      const DecorSeparator(
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      Text(
+                        l10n.statsRecentFormTitle,
+                        style: AppTextStyles.title,
+                      ),
+                      const SizedBox(height: 16),
+                      // Une bataille "pas encore jouée" (result == null)
+                      // n'a pas sa place dans la forme récente : elle n'a
+                      // pas encore d'issue à afficher.
+                      battles.every((b) => b.result == null)
+                          ? Text(
+                              l10n.battleEmptyList,
+                              style: AppTextStyles.caption,
+                            )
+                          : _RecentFormRow(l10n: l10n, battles: battles),
+                      const DecorSeparator(
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final outcomes = _BattleOutcomesCard(
+                            l10n: l10n,
+                            battles: battles,
                           );
-                        }
-                        final maxPoints = armies
-                            .map((a) => a.totalPoints)
-                            .fold<int>(1, (max, p) => p > max ? p : max);
+                          final byFaction = _BattlesByFactionCard(
+                            l10n: l10n,
+                            battles: battles,
+                          );
+                          if (constraints.maxWidth < 720) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                outcomes,
+                                const SizedBox(height: 16),
+                                byFaction,
+                              ],
+                            );
+                          }
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(child: outcomes),
+                              const SizedBox(width: 16),
+                              Expanded(child: byFaction),
+                            ],
+                          );
+                        },
+                      ),
+                      const DecorSeparator(
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      Text(l10n.statsPointsByArmy, style: AppTextStyles.title),
+                      const SizedBox(height: 16),
+                      armiesAsync.when(
+                        loading: () => Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        error: (error, _) => Center(
+                          child: Text('$error', style: AppTextStyles.caption),
+                        ),
+                        data: (armies) {
+                          if (armies.isEmpty) {
+                            return Text(
+                              l10n.statsNoArmies,
+                              style: AppTextStyles.caption,
+                            );
+                          }
+                          final maxPoints = armies
+                              .map((a) => a.totalPoints)
+                              .fold<int>(1, (max, p) => p > max ? p : max);
 
-                        return Column(
-                          children: [
-                            for (final army in armies)
-                              _ArmyPointsBar(army: army, maxPoints: maxPoints),
-                          ],
-                        );
-                      },
-                    ),
-                  ],
+                          return Column(
+                            children: [
+                              for (final army in armies)
+                                _ArmyPointsBar(
+                                  army: army,
+                                  maxPoints: maxPoints,
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

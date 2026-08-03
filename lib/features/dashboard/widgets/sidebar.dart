@@ -6,6 +6,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/widgets/hoverable.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../providers/customization_provider.dart';
 import '../../../shell/navigation.dart';
 import '../../profile/widgets/commandant_footer.dart';
 import 'sidebar_item.dart';
@@ -119,7 +120,9 @@ class Sidebar extends ConsumerWidget {
                   ),
                 ),
 
-                const SizedBox(height: 28),
+                const SizedBox(height: 16),
+                const _CustomizationModeToggle(),
+                const SizedBox(height: 16),
 
                 Expanded(
                   child: SingleChildScrollView(
@@ -181,6 +184,68 @@ class Sidebar extends ConsumerWidget {
             icon: icon,
             title: title,
             selected: selectedIndex == index,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Bascule le mode personnalisation (voir [customizationModeProvider]) —
+/// toujours visible en haut de la sidebar pour rester accessible en
+/// naviguant d'une page à l'autre, contrairement à un simple bouton dans
+/// la page Personnalisation qui obligerait à y retourner à chaque fois.
+class _CustomizationModeToggle extends ConsumerWidget {
+  const _CustomizationModeToggle();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final active = ref.watch(customizationModeProvider);
+
+    return Tooltip(
+      message: l10n.customizationModeToggleTooltip,
+      child: Hoverable(
+        borderRadius: BorderRadius.circular(12),
+        scaleAlignment: Alignment.centerLeft,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () =>
+              ref.read(customizationModeProvider.notifier).state = !active,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: active
+                  ? AppColors.primary.withValues(alpha: .18)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: active ? AppColors.primary : AppColors.border,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  active ? Icons.edit_rounded : Icons.edit_outlined,
+                  size: 18,
+                  color: active ? AppColors.primary : AppColors.textSecondary,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    l10n.customizationModeToggleLabel,
+                    style: AppTextStyles.body.copyWith(
+                      color: active
+                          ? AppColors.primary
+                          : AppColors.textSecondary,
+                      fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

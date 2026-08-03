@@ -15,6 +15,7 @@ import '../../../core/widgets/unit_photo_thumbnail.dart';
 import '../../../core/widgets/app_loading_indicator.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
+import '../../../core/widgets/page_background.dart';
 import '../../../core/widgets/retry_error_state.dart';
 import '../../catalog/pages/datasheet_full_page.dart';
 import '../../../database/models/army_details.dart';
@@ -93,136 +94,140 @@ class _CollectionPageState extends ConsumerState<CollectionPage>
       backgroundColor: AppWallpapers.app == null
           ? AppColors.background
           : Colors.transparent,
-      body: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final wide = constraints.maxWidth > 760;
-                final title = Text(
-                  l10n.navCollection,
-                  style: AppTextStyles.heading,
-                );
-                final controls = Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (wide)
-                      SizedBox(
-                        width: 260,
-                        child: TextField(
-                          controller: _searchController,
-                          style: AppTextStyles.body,
-                          onChanged: (value) =>
-                              setState(() => _searchQuery = value),
-                          decoration: InputDecoration(
-                            hintText: l10n.collectionSearchHint,
-                            hintStyle: AppTextStyles.caption,
-                            filled: true,
-                            fillColor: AppColors.surface,
-                            prefixIcon: const Icon(
-                              Icons.search_rounded,
-                              size: 18,
-                              color: AppColors.textSecondary,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 0,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(color: AppColors.border),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(color: AppColors.border),
+      body: PageBackground(
+        pageId: 'collection',
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final wide = constraints.maxWidth > 760;
+                  final title = Text(
+                    l10n.navCollection,
+                    style: AppTextStyles.heading,
+                  );
+                  final controls = Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (wide)
+                        SizedBox(
+                          width: 260,
+                          child: TextField(
+                            controller: _searchController,
+                            style: AppTextStyles.body,
+                            onChanged: (value) =>
+                                setState(() => _searchQuery = value),
+                            decoration: InputDecoration(
+                              hintText: l10n.collectionSearchHint,
+                              hintStyle: AppTextStyles.caption,
+                              filled: true,
+                              fillColor: AppColors.surface,
+                              prefixIcon: const Icon(
+                                Icons.search_rounded,
+                                size: 18,
+                                color: AppColors.textSecondary,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 0,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: AppColors.border),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: AppColors.border),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    if (wide) const SizedBox(width: 10),
-                    IconButton(
-                      tooltip: l10n.catalogFilterTitle,
-                      style: IconButton.styleFrom(
-                        backgroundColor: _filtersVisible
-                            ? AppColors.primary.withValues(alpha: .16)
-                            : AppColors.surface,
-                        side: BorderSide(color: AppColors.border),
-                      ),
-                      onPressed: () =>
-                          setState(() => _filtersVisible = !_filtersVisible),
-                      icon: Icon(
-                        Icons.tune_rounded,
-                        color: _filtersVisible
-                            ? AppColors.primary
-                            : AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: FilledButton.icon(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                      if (wide) const SizedBox(width: 10),
+                      IconButton(
+                        tooltip: l10n.catalogFilterTitle,
+                        style: IconButton.styleFrom(
+                          backgroundColor: _filtersVisible
+                              ? AppColors.primary.withValues(alpha: .16)
+                              : AppColors.surface,
+                          side: BorderSide(color: AppColors.border),
                         ),
-                        onPressed: () => showDialog(
-                          context: context,
-                          builder: (_) =>
-                              AddCollectionEntryDialog(wishlist: isWishlistTab),
-                        ),
-                        icon: const Icon(Icons.add_rounded),
-                        label: Text(
-                          isWishlistTab
-                              ? l10n.wishlistAddItem
-                              : l10n.collectionAddEntry,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        onPressed: () =>
+                            setState(() => _filtersVisible = !_filtersVisible),
+                        icon: Icon(
+                          Icons.tune_rounded,
+                          color: _filtersVisible
+                              ? AppColors.primary
+                              : AppColors.textSecondary,
                         ),
                       ),
-                    ),
-                  ],
-                );
-
-                if (!wide) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [title, const SizedBox(height: 12), controls],
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                          ),
+                          onPressed: () => showDialog(
+                            context: context,
+                            builder: (_) => AddCollectionEntryDialog(
+                              wishlist: isWishlistTab,
+                            ),
+                          ),
+                          icon: const Icon(Icons.add_rounded),
+                          label: Text(
+                            isWishlistTab
+                                ? l10n.wishlistAddItem
+                                : l10n.collectionAddEntry,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ],
                   );
-                }
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [title, controls],
-                );
-              },
-            ),
-            const DecorSeparator(
-              style: DecorSeparatorStyle.horizontal,
-              maxWidth: 320,
-              padding: EdgeInsets.symmetric(vertical: 12),
-            ),
-            TabBar(
-              controller: _tabController,
-              isScrollable: true,
-              labelColor: AppColors.primary,
-              unselectedLabelColor: AppColors.textSecondary,
-              indicatorColor: AppColors.primary,
-              tabs: [
-                Tab(text: l10n.collectionTabOwned),
-                Tab(text: l10n.collectionTabWishlist),
-              ],
-            ),
-            Expanded(
-              child: TabBarView(
+
+                  if (!wide) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [title, const SizedBox(height: 12), controls],
+                    );
+                  }
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [title, controls],
+                  );
+                },
+              ),
+              const DecorSeparator(
+                style: DecorSeparatorStyle.horizontal,
+                maxWidth: 320,
+                padding: EdgeInsets.symmetric(vertical: 12),
+              ),
+              TabBar(
                 controller: _tabController,
-                children: [
-                  _CollectionTab(
-                    searchQuery: _searchQuery,
-                    filtersVisible: _filtersVisible,
-                  ),
-                  const _WishlistTab(),
+                isScrollable: true,
+                labelColor: AppColors.primary,
+                unselectedLabelColor: AppColors.textSecondary,
+                indicatorColor: AppColors.primary,
+                tabs: [
+                  Tab(text: l10n.collectionTabOwned),
+                  Tab(text: l10n.collectionTabWishlist),
                 ],
               ),
-            ),
-          ],
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _CollectionTab(
+                      searchQuery: _searchQuery,
+                      filtersVisible: _filtersVisible,
+                    ),
+                    const _WishlistTab(),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

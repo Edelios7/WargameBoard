@@ -8,6 +8,7 @@ import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/app_loading_indicator.dart';
+import '../../../core/widgets/page_background.dart';
 import '../../../core/widgets/retry_error_state.dart';
 import '../../../database/models/battle_details.dart';
 import '../../../database/tables/battles_table.dart';
@@ -30,14 +31,17 @@ class BattlePage extends ConsumerWidget {
       backgroundColor: AppWallpapers.app == null
           ? AppColors.background
           : Colors.transparent,
-      body: activeBattleAsync.when(
-        loading: () => const AppLoadingIndicator(),
-        error: (error, _) => RetryErrorState(
-          onRetry: () => ref.invalidate(activeBattleProvider),
+      body: PageBackground(
+        pageId: 'battle',
+        child: activeBattleAsync.when(
+          loading: () => const AppLoadingIndicator(),
+          error: (error, _) => RetryErrorState(
+            onRetry: () => ref.invalidate(activeBattleProvider),
+          ),
+          data: (activeBattle) => activeBattle != null
+              ? BattleDashboard(battle: activeBattle)
+              : const _BattleHistoryView(),
         ),
-        data: (activeBattle) => activeBattle != null
-            ? BattleDashboard(battle: activeBattle)
-            : const _BattleHistoryView(),
       ),
     );
   }

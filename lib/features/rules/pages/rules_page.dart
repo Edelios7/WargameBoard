@@ -4,9 +4,11 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_wallpapers.dart';
+import '../../../core/theme/customization_ids.dart';
 import '../../../core/utils/rule_pdf_source.dart';
 import '../../../core/utils/search_normalize.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/page_background.dart';
 import '../../../domain/rules/rule_document.dart';
 import '../../../domain/rules/rules_data.dart';
 import '../../../l10n/app_localizations.dart';
@@ -121,84 +123,87 @@ class _RulesPageState extends State<RulesPage> {
       backgroundColor: AppWallpapers.app == null
           ? AppColors.background
           : Colors.transparent,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _RulesHeader(
-              onSearch: (value) => setState(() => _query = value),
-              onAdd: () => ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(l10n.rulesAddComingSoon))),
-              filtersActive: _showFilters,
-              onToggleFilters: () =>
-                  setState(() => _showFilters = !_showFilters),
-            ),
-            const SizedBox(height: 20),
-            _HeroCard(
-              document: hero,
-              l10n: l10n,
-              onOpenBook: () => _openBook(context, l10n, hero),
-              onViewErrata: () => _openDocument(context, hero),
-            ),
-            if (_showFilters) ...[
-              const SizedBox(height: 24),
-              Text(
-                l10n.rulesCategoryAll.toUpperCase(),
-                style: AppTextStyles.eyebrow,
+      body: PageBackground(
+        pageId: 'rules',
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _RulesHeader(
+                onSearch: (value) => setState(() => _query = value),
+                onAdd: () => ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.rulesAddComingSoon)),
+                ),
+                filtersActive: _showFilters,
+                onToggleFilters: () =>
+                    setState(() => _showFilters = !_showFilters),
               ),
-              const SizedBox(height: 12),
-              _CategoriesGrid(
-                selected: _category,
-                onSelect: (category) => setState(() => _category = category),
+              const SizedBox(height: 20),
+              _HeroCard(
+                document: hero,
+                l10n: l10n,
+                onOpenBook: () => _openBook(context, l10n, hero),
+                onViewErrata: () => _openDocument(context, hero),
+              ),
+              if (_showFilters) ...[
+                const SizedBox(height: 24),
+                Text(
+                  l10n.rulesCategoryAll.toUpperCase(),
+                  style: AppTextStyles.eyebrow,
+                ),
+                const SizedBox(height: 12),
+                _CategoriesGrid(
+                  selected: _category,
+                  onSelect: (category) => setState(() => _category = category),
+                ),
+              ],
+              const SizedBox(height: 24),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final wide = constraints.maxWidth > 900;
+                  final recentCard = _RecentDocumentsCard(
+                    documents: recent,
+                    l10n: l10n,
+                    onOpen: (doc) => _openDocument(context, doc),
+                  );
+                  final popularCard = _PopularRulesCard(
+                    documents: popular,
+                    l10n: l10n,
+                    onOpen: (doc) => _openDocument(context, doc),
+                  );
+                  if (!wide) {
+                    return Column(
+                      children: [
+                        recentCard,
+                        const SizedBox(height: 16),
+                        popularCard,
+                      ],
+                    );
+                  }
+                  return IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(flex: 3, child: recentCard),
+                        const SizedBox(width: 16),
+                        Expanded(flex: 2, child: popularCard),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 24),
+              _HelpRow(
+                l10n: l10n,
+                onOpenHowToPlay: () => _openDocument(context, hero),
+                onComingSoon: (label) =>
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.rulesComingSoon(label))),
+                    ),
               ),
             ],
-            const SizedBox(height: 24),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final wide = constraints.maxWidth > 900;
-                final recentCard = _RecentDocumentsCard(
-                  documents: recent,
-                  l10n: l10n,
-                  onOpen: (doc) => _openDocument(context, doc),
-                );
-                final popularCard = _PopularRulesCard(
-                  documents: popular,
-                  l10n: l10n,
-                  onOpen: (doc) => _openDocument(context, doc),
-                );
-                if (!wide) {
-                  return Column(
-                    children: [
-                      recentCard,
-                      const SizedBox(height: 16),
-                      popularCard,
-                    ],
-                  );
-                }
-                return IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(flex: 3, child: recentCard),
-                      const SizedBox(width: 16),
-                      Expanded(flex: 2, child: popularCard),
-                    ],
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 24),
-            _HelpRow(
-              l10n: l10n,
-              onOpenHowToPlay: () => _openDocument(context, hero),
-              onComingSoon: (label) =>
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.rulesComingSoon(label))),
-                  ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -357,6 +362,7 @@ class _HeroCard extends StatelessWidget {
     final dateFormat = DateFormat('dd/MM/yyyy');
 
     return AppCard(
+      customizationId: CustomizationIds.rulesIndexCard,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final wide = constraints.maxWidth > 720;
@@ -590,34 +596,53 @@ class _CategoriesGrid extends StatelessWidget {
         ? kRuleDocuments.length
         : kRuleDocuments.where((d) => d.category == category).length;
 
-    final entries = <(RuleCategory?, IconData, String)>[
-      (null, Icons.bookmark_rounded, l10n.rulesCategoryAll),
-      (RuleCategory.mainRules, Icons.menu_book_rounded, l10n.rulesCategoryMain),
+    // Une couleur distincte par catégorie — avant, chaque tuile n'avait
+    // qu'une petite icône grise sur fond plat, aucune ne se distinguait
+    // visuellement des autres (même défaut que les cartes d'armée avant
+    // AppCard.accentColor).
+    final entries = <(RuleCategory?, IconData, String, Color)>[
+      (null, Icons.bookmark_rounded, l10n.rulesCategoryAll, AppColors.primary),
+      (
+        RuleCategory.mainRules,
+        Icons.menu_book_rounded,
+        l10n.rulesCategoryMain,
+        AppColors.info,
+      ),
       (
         RuleCategory.missions,
         Icons.track_changes_rounded,
         l10n.rulesCategoryMissions,
+        AppColors.warning,
       ),
-      (RuleCategory.faqs, Icons.help_outline_rounded, l10n.rulesCategoryFaqs),
+      (
+        RuleCategory.faqs,
+        Icons.help_outline_rounded,
+        l10n.rulesCategoryFaqs,
+        AppColors.success,
+      ),
       (
         RuleCategory.errata,
         Icons.description_rounded,
         l10n.rulesCategoryErrata,
+        AppColors.error,
       ),
       (
         RuleCategory.pointsAndProfiles,
         Icons.shield_rounded,
         l10n.rulesCategoryProfiles,
+        AppColors.primaryLight,
       ),
       (
         RuleCategory.tacticalGuides,
         Icons.hub_rounded,
         l10n.rulesCategoryTactics,
+        const Color(0xFF3EBFAE),
       ),
       (
         RuleCategory.armyLists,
         Icons.list_alt_rounded,
         l10n.rulesCategoryArmyLists,
+        const Color(0xFFE0729C),
       ),
     ];
 
@@ -642,6 +667,7 @@ class _CategoriesGrid extends StatelessWidget {
             for (final entry in entries)
               AppCard(
                 selected: selected == entry.$1,
+                accentColor: entry.$4,
                 onTap: () => onSelect(selected == entry.$1 ? null : entry.$1),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -652,14 +678,17 @@ class _CategoriesGrid extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      entry.$2,
-                      size: 18,
-                      color: selected == entry.$1
-                          ? AppColors.primary
-                          : AppColors.textSecondary,
+                    Container(
+                      width: 26,
+                      height: 26,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: entry.$4.withValues(alpha: .22),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(entry.$2, size: 14, color: entry.$4),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Text(
                       entry.$3,
                       style: AppTextStyles.body.copyWith(
