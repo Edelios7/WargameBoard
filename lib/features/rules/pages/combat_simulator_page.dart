@@ -36,6 +36,10 @@ List<_WeaponChoice> _flattenWeapons(DatasheetDetails sheet) {
 /// (pas juste un nombre de dés) pour estimer les chances de l'attaquant.
 /// Cœur du combat uniquement (Toucher/Blesser/Sauvegarde/Dégâts) — voir
 /// [simulateCombat] pour le détail de ce qui n'est pas modélisé.
+///
+/// Le nombre de vagues et les résultats restent en haut de la page (avant
+/// le formulaire de sélection) pour rester visibles pendant qu'on ajuste
+/// les unités plus bas.
 class CombatSimulatorPage extends StatefulWidget {
   final RuleDocument document;
 
@@ -119,6 +123,46 @@ class _CombatSimulatorPageState extends State<CombatSimulatorPage> {
               ),
             ],
             const SizedBox(height: 28),
+            // Vagues de simulation + lancement + résultats : en haut, pour
+            // rester visibles pendant qu'on ajuste les unités plus bas.
+            Text(l10n.combatSimTrials, style: AppTextStyles.eyebrow),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                for (final count in const [10, 100, 1000])
+                  _TrialsChip(
+                    count: count,
+                    selected: _trials == count,
+                    onTap: () => setState(() {
+                      _trials = count;
+                      _result = null;
+                    }),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: _canRun ? _run : null,
+                icon: const Icon(Icons.casino_rounded),
+                label: Text(l10n.combatSimRun),
+              ),
+            ),
+            if (_result != null) ...[
+              const SizedBox(height: 24),
+              _CombatResultCard(
+                result: _result!,
+                defenderModelCount: _defenderModelCount,
+                l10n: l10n,
+              ),
+            ] else ...[
+              const SizedBox(height: 20),
+              Text(l10n.combatSimEmptyState, style: AppTextStyles.caption),
+            ],
+            const SizedBox(height: 28),
             LayoutBuilder(
               builder: (context, constraints) {
                 final wide = constraints.maxWidth > 760;
@@ -191,47 +235,96 @@ class _CombatSimulatorPageState extends State<CombatSimulatorPage> {
                 );
               },
             ),
-            const SizedBox(height: 24),
-            Text(l10n.combatSimTrials, style: AppTextStyles.eyebrow),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                for (final count in const [10, 100, 1000])
-                  _TrialsChip(
-                    count: count,
-                    selected: _trials == count,
-                    onTap: () => setState(() {
-                      _trials = count;
-                      _result = null;
-                    }),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: _canRun ? _run : null,
-                icon: const Icon(Icons.casino_rounded),
-                label: Text(l10n.combatSimRun),
-              ),
-            ),
-            if (_result != null) ...[
-              const SizedBox(height: 24),
-              _CombatResultCard(
-                result: _result!,
-                defenderModelCount: _defenderModelCount,
-                l10n: l10n,
-              ),
-            ] else ...[
-              const SizedBox(height: 20),
-              Text(l10n.combatSimEmptyState, style: AppTextStyles.caption),
-            ],
           ],
         ),
       ),
+    );
+  }
+}
+
+/// En-tête repliable/dépliable pour une étape du formulaire (Faction,
+/// Unité, Nombre de modèles, Arme). Se replie automatiquement dès qu'une
+/// valeur est choisie (affiche alors un résumé à la place du contenu),
+/// et reste cliquable pour la rouvrir et changer la sélection.
+class _CollapsibleSection extends StatefulWidget {
+  final String title;
+  final String? summary;
+  final Widget child;
+
+  const _CollapsibleSection({
+    super.key,
+    required this.title,
+    required this.summary,
+    required this.child,
+  });
+
+  @override
+  State<_CollapsibleSection> createState() => _CollapsibleSectionState();
+}
+
+class _CollapsibleSectionState extends State<_CollapsibleSection> {
+  bool _expanded = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _expanded = widget.summary == null;
+  }
+
+  @override
+  void didUpdateWidget(covariant _CollapsibleSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Se replie dès qu'une nouvelle valeur vient d'être choisie — que ce
+    // soit le tout premier choix ou un changement fait en rouvrant la
+    // section manuellement.
+    if (widget.summary != oldWidget.summary && widget.summary != null) {
+      _expanded = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () => setState(() => _expanded = !_expanded),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(widget.title, style: AppTextStyles.eyebrow),
+                ),
+                if (!_expanded && widget.summary != null) ...[
+                  Flexible(
+                    child: Text(
+                      widget.summary!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                ],
+                Icon(
+                  _expanded
+                      ? Icons.expand_less_rounded
+                      : Icons.expand_more_rounded,
+                  size: 18,
+                  color: AppColors.textSecondary,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_expanded) ...[const SizedBox(height: 8), widget.child],
+      ],
     );
   }
 }
@@ -240,7 +333,9 @@ class _CombatSimulatorPageState extends State<CombatSimulatorPage> {
 /// optionnellement, une arme qu'elle porte) via des puces cliquables —
 /// même style que le picker de faction d'`ArmyListsGuidePage`, plutôt
 /// qu'un menu déroulant natif moins lisible sur de longues listes.
-class _UnitPicker extends ConsumerWidget {
+/// Chaque étape se replie une fois choisie ; l'étape "Unité" a sa propre
+/// barre de recherche pour filtrer les listes de fiches longues.
+class _UnitPicker extends ConsumerStatefulWidget {
   final String label;
   final String? factionId;
   final DatasheetDetails? unit;
@@ -264,7 +359,30 @@ class _UnitPicker extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_UnitPicker> createState() => _UnitPickerState();
+}
+
+class _UnitPickerState extends ConsumerState<_UnitPicker> {
+  String _unitQuery = '';
+  final _searchController = TextEditingController();
+
+  @override
+  void didUpdateWidget(covariant _UnitPicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.factionId != widget.factionId) {
+      _unitQuery = '';
+      _searchController.clear();
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final factionsAsync = ref.watch(factionsListProvider);
 
@@ -273,94 +391,178 @@ class _UnitPicker extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: AppTextStyles.title),
+          Text(widget.label, style: AppTextStyles.title),
           const SizedBox(height: 14),
-          Text(l10n.combatSimSelectFaction, style: AppTextStyles.eyebrow),
-          const SizedBox(height: 8),
           factionsAsync.when(
-            data: (factions) => Wrap(
-              key: ValueKey('$label-faction-choices'),
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final faction in factions)
-                  _ChoiceChip(
-                    label: faction.name,
-                    selected: factionId == faction.id,
-                    onTap: () => onFactionChanged(faction.id),
-                  ),
-              ],
-            ),
-            loading: () => const LinearProgressIndicator(minHeight: 2),
-            error: (_, _) => const SizedBox.shrink(),
-          ),
-          if (factionId != null) ...[
-            const SizedBox(height: 16),
-            Text(l10n.combatSimSelectUnit, style: AppTextStyles.eyebrow),
-            const SizedBox(height: 8),
-            Builder(
-              builder: (context) {
-                final catalogAsync = ref.watch(
-                  factionCatalogDetailsProvider(factionId!),
-                );
-                return catalogAsync.when(
-                  data: (sheets) {
-                    final sorted = [...sheets]
-                      ..sort((a, b) => a.name.compareTo(b.name));
-                    return Wrap(
-                      key: ValueKey('$label-unit-choices'),
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        for (final sheet in sorted)
-                          _ChoiceChip(
-                            label: sheet.name,
-                            selected: unit?.id == sheet.id,
-                            onTap: () => onUnitChanged(sheet),
-                          ),
-                      ],
-                    );
-                  },
-                  loading: () => const LinearProgressIndicator(minHeight: 2),
-                  error: (_, _) => const SizedBox.shrink(),
-                );
-              },
-            ),
-          ],
-          if (unit != null) ...[
-            const SizedBox(height: 16),
-            Text(l10n.combatSimModelCount, style: AppTextStyles.eyebrow),
-            const SizedBox(height: 4),
-            _ModelCountStepper(
-              count: modelCount,
-              min: unit!.unit.minimumSize > 0 ? unit!.unit.minimumSize : 1,
-              max: unit!.unit.maximumSize > 0 ? unit!.unit.maximumSize : 20,
-              onChanged: onModelCountChanged,
-            ),
-          ],
-          if (unit != null && onWeaponChanged != null) ...[
-            const SizedBox(height: 16),
-            Text(l10n.combatSimSelectWeapon, style: AppTextStyles.eyebrow),
-            const SizedBox(height: 8),
-            Builder(
-              builder: (context) {
-                final choices = _flattenWeapons(unit!);
-                return Wrap(
-                  key: ValueKey('$label-weapon-choices'),
+            data: (factions) {
+              final match = factions.where((f) => f.id == widget.factionId);
+              final selectedName = match.isEmpty ? null : match.first.name;
+              return _CollapsibleSection(
+                key: ValueKey('${widget.label}-faction-section'),
+                title: l10n.combatSimSelectFaction,
+                summary: selectedName,
+                child: Wrap(
+                  key: ValueKey('${widget.label}-faction-choices'),
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    for (final choice in choices)
+                    for (final faction in factions)
                       _ChoiceChip(
-                        label: choice.label,
-                        selected:
-                            weaponChoice?.weapon.id == choice.weapon.id &&
-                            weaponChoice?.profile.name == choice.profile.name,
-                        onTap: () => onWeaponChanged!(choice),
+                        label: faction.name,
+                        selected: widget.factionId == faction.id,
+                        onTap: () => widget.onFactionChanged(faction.id),
                       ),
                   ],
-                );
-              },
+                ),
+              );
+            },
+            loading: () => const LinearProgressIndicator(minHeight: 2),
+            error: (_, _) => const SizedBox.shrink(),
+          ),
+          if (widget.factionId != null) ...[
+            const SizedBox(height: 16),
+            _CollapsibleSection(
+              key: ValueKey('${widget.label}-unit-section'),
+              title: l10n.combatSimSelectUnit,
+              summary: widget.unit?.name,
+              child: Builder(
+                builder: (context) {
+                  final catalogAsync = ref.watch(
+                    factionCatalogDetailsProvider(widget.factionId!),
+                  );
+                  return catalogAsync.when(
+                    data: (sheets) {
+                      final sorted = [...sheets]
+                        ..sort((a, b) => a.name.compareTo(b.name));
+                      final query = _unitQuery.trim().toLowerCase();
+                      final filtered = query.isEmpty
+                          ? sorted
+                          : sorted
+                                .where(
+                                  (s) => s.name.toLowerCase().contains(query),
+                                )
+                                .toList();
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextField(
+                            controller: _searchController,
+                            onChanged: (value) =>
+                                setState(() => _unitQuery = value),
+                            style: AppTextStyles.body,
+                            decoration: InputDecoration(
+                              isDense: true,
+                              hintText: l10n.catalogSearchHint,
+                              hintStyle: AppTextStyles.caption,
+                              filled: true,
+                              fillColor: AppColors.surface,
+                              prefixIcon: const Icon(
+                                Icons.search_rounded,
+                                size: 18,
+                                color: AppColors.textSecondary,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 10,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: AppColors.border,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: AppColors.border,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          if (filtered.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 4,
+                              ),
+                              child: Text(
+                                l10n.catalogEmptyResults,
+                                style: AppTextStyles.caption,
+                              ),
+                            )
+                          else
+                            Wrap(
+                              key: ValueKey('${widget.label}-unit-choices'),
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                for (final sheet in filtered)
+                                  _ChoiceChip(
+                                    label: sheet.name,
+                                    selected: widget.unit?.id == sheet.id,
+                                    onTap: () =>
+                                        widget.onUnitChanged(sheet),
+                                  ),
+                              ],
+                            ),
+                        ],
+                      );
+                    },
+                    loading: () =>
+                        const LinearProgressIndicator(minHeight: 2),
+                    error: (_, _) => const SizedBox.shrink(),
+                  );
+                },
+              ),
+            ),
+          ],
+          if (widget.unit != null) ...[
+            const SizedBox(height: 16),
+            _CollapsibleSection(
+              key: ValueKey('${widget.label}-count-section'),
+              title: l10n.combatSimModelCount,
+              summary: '${widget.modelCount}',
+              child: _ModelCountStepper(
+                count: widget.modelCount,
+                min: widget.unit!.unit.minimumSize > 0
+                    ? widget.unit!.unit.minimumSize
+                    : 1,
+                max: widget.unit!.unit.maximumSize > 0
+                    ? widget.unit!.unit.maximumSize
+                    : 20,
+                onChanged: widget.onModelCountChanged,
+              ),
+            ),
+          ],
+          if (widget.unit != null && widget.onWeaponChanged != null) ...[
+            const SizedBox(height: 16),
+            _CollapsibleSection(
+              key: ValueKey('${widget.label}-weapon-section'),
+              title: l10n.combatSimSelectWeapon,
+              summary: widget.weaponChoice?.label,
+              child: Builder(
+                builder: (context) {
+                  final choices = _flattenWeapons(widget.unit!);
+                  return Wrap(
+                    key: ValueKey('${widget.label}-weapon-choices'),
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final choice in choices)
+                        _ChoiceChip(
+                          label: choice.label,
+                          selected:
+                              widget.weaponChoice?.weapon.id ==
+                                  choice.weapon.id &&
+                              widget.weaponChoice?.profile.name ==
+                                  choice.profile.name,
+                          onTap: () => widget.onWeaponChanged!(choice),
+                        ),
+                    ],
+                  );
+                },
+              ),
             ),
           ],
         ],
