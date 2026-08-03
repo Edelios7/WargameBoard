@@ -26,6 +26,7 @@ class PageBackground extends ConsumerWidget {
     final customizationMode = ref.watch(customizationModeProvider);
 
     return Stack(
+      fit: StackFit.passthrough,
       children: [
         if (override?.image != null)
           Positioned.fill(

@@ -606,9 +606,12 @@ class _DashboardHeaderState extends ConsumerState<_DashboardHeader> {
 
         final effectiveImage = overrideImage ?? heroFile;
         // Stack externe non clippé, comme AppCard : le ClipRRect ci-dessous
-        // coupait net le badge d'édition positionné en négatif.
+        // coupait net le badge d'édition positionné en négatif. passthrough
+        // pour la même raison que dans AppCard (voir ce fichier) : ne pas
+        // réduire le bandeau à la taille de son contenu.
         return Stack(
           clipBehavior: Clip.none,
+          fit: StackFit.passthrough,
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(16),

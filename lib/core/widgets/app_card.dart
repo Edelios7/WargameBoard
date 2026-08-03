@@ -99,8 +99,20 @@ class _AppCardState extends ConsumerState<AppCard> {
     // clipBehavior: Clip.antiAlias pour ses coins arrondis, qui coupait
     // net un badge positionné en négatif (-6,-6) — il ne se voyait
     // quasiment jamais.
+    //
+    // fit: StackFit.passthrough est indispensable ici : un Stack normal
+    // (StackFit.loose) donne des contraintes "loose" à son enfant non
+    // positionné (MouseRegion...Material), qui se réduit alors à la
+    // taille de son contenu (le texte) au lieu de remplir la case de
+    // grille/le Expanded qui contient la carte — exactement le bug
+    // "petite case colorée dans un grand rectangle vide" déjà rencontré
+    // et corrigé une fois côté Stack interne (ligne plus bas), mais
+    // réintroduit ici par ce nouveau Stack externe si on ne le précise
+    // pas. passthrough transmet les contraintes reçues telles quelles à
+    // l'enfant non positionné, sans toucher au badge positionné.
     return Stack(
       clipBehavior: Clip.none,
+      fit: StackFit.passthrough,
       children: [
         MouseRegion(
           onEnter: interactive ? (_) => setState(() => _hovered = true) : null,

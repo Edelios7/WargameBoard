@@ -66,4 +66,37 @@ void main() {
 
     expect(find.text('Contenu'), findsOneWidget);
   });
+
+  testWidgets(
+    'fills a fixed-height parent instead of shrinking to its content — a '
+    'regression test for the outer Stack added for the edit badge, which '
+    'must use StackFit.passthrough or every card collapses to text size '
+    'inside a grid cell / Expanded+Row',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [customizationModeProvider.overrideWith((ref) => true)],
+          child: MaterialApp(
+            locale: const Locale('fr'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: SizedBox(
+                width: 300,
+                height: 240,
+                child: AppCard(
+                  customizationId: 'dashboard.test',
+                  child: const Text('Contenu'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final size = tester.getSize(find.byType(AppCard));
+      expect(size.width, 300);
+      expect(size.height, 240);
+    },
+  );
 }
