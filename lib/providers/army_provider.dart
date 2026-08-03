@@ -109,3 +109,14 @@ final unitEquipmentSelectionsProvider = FutureProvider.autoDispose
       final repository = ref.watch(armyRepositoryProvider);
       return repository.getUnitEquipmentSelections(armyUnitId);
     });
+
+/// Nombre d'exemplaires d'une datasheet déjà présents dans une armée —
+/// sert à prévisualiser le bon palier de prix dans le dialogue "Ajouter
+/// une unité" avant que l'ajout ne soit confirmé (voir
+/// CostBracket.minCopyIndex : certaines unités coûtent plus cher à
+/// partir de leur 3e exemplaire dans la même liste).
+final existingUnitCountProvider = FutureProvider.autoDispose
+    .family<int, (String armyId, String datasheetId)>((ref, key) {
+      final repository = ref.watch(armyRepositoryProvider);
+      return repository.countUnitsOfDatasheet(key.$1, key.$2);
+    });

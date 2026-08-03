@@ -205,6 +205,7 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
                             final owned = ownedIds.contains(result.id);
                             return _ResultTile(
                               key: ValueKey(result.id),
+                              armyId: widget.armyId,
                               result: result,
                               owned: owned,
                               onAdd: (modelCount, quantity) => _addUnit(
@@ -231,12 +232,14 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
 /// ajoutant 2 escouades de 5 pour simuler 1 escouade de 10 à un coût
 /// différent.
 class _ResultTile extends ConsumerStatefulWidget {
+  final String armyId;
   final SearchResult result;
   final bool owned;
   final void Function(int modelCount, int quantity) onAdd;
 
   const _ResultTile({
     super.key,
+    required this.armyId,
     required this.result,
     required this.owned,
     required this.onAdd,
@@ -280,13 +283,47 @@ class _ResultTileState extends ConsumerState<_ResultTile> {
             ..sort());
     final useSizeChips =
         canResize && knownSizes.length >= 2 && knownSizes.length <= 4;
+    // Certaines unités coûtent plus cher à partir de leur 3e exemplaire
+    // dans la même liste (voir CostBracket.minCopyIndex) — il faut donc
+    // savoir combien d'exemplaires de cette datasheet sont déjà dans
+    // l'armée pour prévisualiser le bon prix avant même de confirmer
+    // l'ajout.
+    final existingCount =
+        ref
+            .watch(existingUnitCountProvider((widget.armyId, result.id)))
+            .value ??
+        0;
+    final nextCopyIndex = existingCount + 1;
     final unitPoints = sheet == null
         ? result.points
         : (resolveCostForModelCount(
                 sheet.costBrackets,
                 _modelCount ?? sheet.unit.defaultSize,
+                copyIndex: nextCopyIndex,
               ) ??
               sheet.points);
+    // Total réel du lot en cours d'ajout : chaque escouade supplémentaire
+    // avance d'une copie (nextCopyIndex, +1, +2...), donc la somme n'est
+    // pas forcément `unitPoints * _quantity` si un seuil de surcoût est
+    // franchi en cours de lot.
+    int? batchTotal;
+    if (sheet != null && _quantity > 1) {
+      var runningTotal = 0;
+      var hasUnknown = false;
+      for (var i = 0; i < _quantity; i++) {
+        final points = resolveCostForModelCount(
+          sheet.costBrackets,
+          _modelCount ?? sheet.unit.defaultSize,
+          copyIndex: nextCopyIndex + i,
+        );
+        if (points == null) {
+          hasUnknown = true;
+          break;
+        }
+        runningTotal += points;
+      }
+      batchTotal = hasUnknown ? null : runningTotal;
+    }
 
     return Opacity(
       opacity: widget.owned ? 1 : 0.5,
@@ -363,6 +400,7 @@ class _ResultTileState extends ConsumerState<_ResultTile> {
                         points: resolveCostForModelCount(
                           sheet.costBrackets,
                           size,
+                          copyIndex: nextCopyIndex,
                         ),
                         selected: _modelCount == size,
                         onTap: () => setState(() => _modelCount = size),
@@ -402,6 +440,21 @@ class _ResultTileState extends ConsumerState<_ResultTile> {
                 ),
               ],
             ),
+            // N'affiche le total du lot que quand il diffère du simple
+            // `unitPoints * quantité` — c'est-à-dire quand ajouter ce lot
+            // franchit un seuil de surcoût (voir CostBracket.minCopyIndex),
+            // pour ne pas surcharger l'écran dans le cas courant.
+            if (batchTotal != null &&
+                (unitPoints == null || batchTotal != unitPoints * _quantity))
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  l10n.armyBuilderBatchTotalPoints(batchTotal),
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
           ],
         ),
       ),

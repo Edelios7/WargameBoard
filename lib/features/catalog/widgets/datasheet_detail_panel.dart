@@ -226,8 +226,13 @@ class DatasheetDetailPanel extends StatelessWidget {
   /// palier de coût, ou un badge par palier (voir DatasheetCosts.modelCount)
   /// quand le coût dépend du nombre de figurines choisi.
   Widget _costDisplay(AppLocalizations l10n, DatasheetDetails sheet) {
-    final sized = sheet.costBrackets.where((b) => b.modelCount != null).toList()
-      ..sort((a, b) => a.modelCount!.compareTo(b.modelCount!));
+    // Voir CatalogPreviewPanel._costDisplay : cette vue n'est pas
+    // rattachée à une armée, donc uniquement le palier de base.
+    final sized =
+        sheet.costBrackets
+            .where((b) => b.modelCount != null && (b.minCopyIndex ?? 1) <= 1)
+            .toList()
+          ..sort((a, b) => a.modelCount!.compareTo(b.modelCount!));
     if (sized.length <= 1) {
       return _pointsBadge(l10n, sheet.points);
     }

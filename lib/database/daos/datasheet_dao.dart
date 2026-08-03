@@ -432,9 +432,17 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
   /// Coût en points pour un nombre de figurines donné, en tenant compte
   /// des paliers de coût par taille d'unité (voir [resolveCostForModelCount]).
   /// `null` si cette datasheet n'a aucune donnée de coût.
-  Future<int?> getCostForModelCount(String datasheetId, int modelCount) async {
+  Future<int?> getCostForModelCount(
+    String datasheetId,
+    int modelCount, {
+    int copyIndex = 1,
+  }) async {
     final costs = await _getCostBrackets(datasheetId);
-    return resolveCostForModelCount(costs.brackets, modelCount);
+    return resolveCostForModelCount(
+      costs.brackets,
+      modelCount,
+      copyIndex: copyIndex,
+    );
   }
 
   Future<({List<CostBracket> brackets, String editionId})> _getCostBrackets(
@@ -452,7 +460,11 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     if (currentRows.isNotEmpty) {
       final brackets = currentRows.map((row) {
         final cost = row.readTable(datasheetCosts);
-        return CostBracket(modelCount: cost.modelCount, points: cost.points);
+        return CostBracket(
+          modelCount: cost.modelCount,
+          points: cost.points,
+          minCopyIndex: cost.minCopyIndex,
+        );
       }).toList();
       return (
         brackets: brackets,
@@ -477,7 +489,11 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
     final brackets = fallbackRows
         .where((row) => row.editionId == editionId)
         .map(
-          (row) => CostBracket(modelCount: row.modelCount, points: row.points),
+          (row) => CostBracket(
+            modelCount: row.modelCount,
+            points: row.points,
+            minCopyIndex: row.minCopyIndex,
+          ),
         )
         .toList();
     return (brackets: brackets, editionId: editionId);

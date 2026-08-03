@@ -293,8 +293,16 @@ class _CatalogPreviewPanelState extends State<CatalogPreviewPanel> {
   /// quand le coût dépend du nombre de figurines choisi — beaucoup d'unités
   /// Warhammer 40k ne montent pas en coût de façon linéaire avec l'effectif.
   Widget _costDisplay(AppLocalizations l10n, DatasheetDetails sheet) {
-    final sized = sheet.costBrackets.where((b) => b.modelCount != null).toList()
-      ..sort((a, b) => a.modelCount!.compareTo(b.modelCount!));
+    // Cette vue catalogue n'est pas rattachée à une armée précise, donc
+    // sans notion de "combien j'en ai déjà" : elle ne montre que le
+    // palier de base (1re/2e copie), pas les paliers de surcoût à partir
+    // de la Ne copie (voir CostBracket.minCopyIndex) qui, ici, ne
+    // feraient qu'afficher deux badges pour la même taille de figurines.
+    final sized =
+        sheet.costBrackets
+            .where((b) => b.modelCount != null && (b.minCopyIndex ?? 1) <= 1)
+            .toList()
+          ..sort((a, b) => a.modelCount!.compareTo(b.modelCount!));
     if (sized.length <= 1) {
       return _pointsBadge(l10n, sheet.points);
     }

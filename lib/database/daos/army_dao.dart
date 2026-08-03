@@ -138,6 +138,20 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
     return id;
   }
 
+  /// Nombre d'exemplaires de `datasheetId` déjà présents dans `armyId` —
+  /// utilisé pour prévisualiser le bon palier de prix avant d'ajouter une
+  /// nouvelle copie (voir CostBracket.minCopyIndex : la 3e copie d'une
+  /// unité coûte parfois plus cher que la 1re ou la 2e).
+  Future<int> countUnitsOfDatasheet(String armyId, String datasheetId) async {
+    final rows =
+        await (select(armyUnits)..where(
+              (t) =>
+                  t.armyId.equals(armyId) & t.datasheetId.equals(datasheetId),
+            ))
+            .get();
+    return rows.length;
+  }
+
   /// Réordonne les unités d'une armée (glisser-déposer d'une carte sur une
   /// autre dans l'army builder) — réécrit `displayOrder` en séquence
   /// 0..n-1 pour toute l'armée en une fois. Le regroupement par rôle à
@@ -444,7 +458,10 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
             ),
           ])
           ..where(armyUnits.armyId.equals(armyId))
-          ..orderBy([OrderingTerm.asc(armyUnits.displayOrder)]);
+          ..orderBy([
+            OrderingTerm.asc(armyUnits.displayOrder),
+            OrderingTerm.asc(armyUnits.createdAt),
+          ]);
 
     final unitRows = await unitsQuery.get();
     final datasheetIds = unitRows
@@ -468,15 +485,24 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
 
     final units = <ArmyUnitDetails>[];
     var totalPoints = 0;
+    // Compte, dans l'ordre d'affichage de la liste, combien de fois chaque
+    // datasheet a déjà été vue — détermine si l'unité en cours est la 1re,
+    // 2e, 3e... copie de cette fiche, pour appliquer le bon palier de prix
+    // (voir CostBracket.minCopyIndex / resolveCostForModelCount).
+    final copyIndexByDatasheet = <String, int>{};
     for (final row in unitRows) {
       final unit = row.readTable(armyUnits);
       final datasheet = row.readTable(datasheets);
       final size = row.readTableOrNull(unitSizes);
       final enhancement = row.readTableOrNull(enhancements);
       final brackets = costsByDatasheet[unit.datasheetId] ?? const [];
+      final copyIndex =
+          (copyIndexByDatasheet[unit.datasheetId] ?? 0) + 1;
+      copyIndexByDatasheet[unit.datasheetId] = copyIndex;
       final datasheetPoints = resolveCostForModelCount(
         brackets,
         unit.modelCount,
+        copyIndex: copyIndex,
       );
       final enhancementPoints = enhancement?.points ?? 0;
       totalPoints += (datasheetPoints ?? 0) + enhancementPoints;
@@ -529,12 +555,18 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
   Future<({int total, bool hasUnknownCost})> _totalPointsInfo(
     String armyId,
   ) async {
-    final query = select(armyUnits).join([
-      leftOuterJoin(
-        enhancements,
-        enhancements.id.equalsExp(armyUnits.enhancementId),
-      ),
-    ])..where(armyUnits.armyId.equals(armyId));
+    final query =
+        select(armyUnits).join([
+          leftOuterJoin(
+            enhancements,
+            enhancements.id.equalsExp(armyUnits.enhancementId),
+          ),
+        ])
+          ..where(armyUnits.armyId.equals(armyId))
+          ..orderBy([
+            OrderingTerm.asc(armyUnits.displayOrder),
+            OrderingTerm.asc(armyUnits.createdAt),
+          ]);
 
     final rows = await query.get();
     final datasheetIds = rows
@@ -546,12 +578,20 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
 
     var total = 0;
     var hasUnknownCost = false;
+    // Même logique de comptage de copie que dans la vue détaillée (voir
+    // plus haut) — l'ordre d'itération doit être le même (displayOrder)
+    // pour que ce total corresponde à la somme des coûts affichés.
+    final copyIndexByDatasheet = <String, int>{};
     for (final row in rows) {
       final unit = row.readTable(armyUnits);
       final brackets = costsByDatasheet[unit.datasheetId] ?? const [];
+      final copyIndex =
+          (copyIndexByDatasheet[unit.datasheetId] ?? 0) + 1;
+      copyIndexByDatasheet[unit.datasheetId] = copyIndex;
       final datasheetPoints = resolveCostForModelCount(
         brackets,
         unit.modelCount,
+        copyIndex: copyIndex,
       );
       if (datasheetPoints == null) hasUnknownCost = true;
       total += datasheetPoints ?? 0;
@@ -585,7 +625,13 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
       final cost = row.readTable(datasheetCosts);
       result
           .putIfAbsent(cost.datasheetId, () => [])
-          .add(CostBracket(modelCount: cost.modelCount, points: cost.points));
+          .add(
+            CostBracket(
+              modelCount: cost.modelCount,
+              points: cost.points,
+              minCopyIndex: cost.minCopyIndex,
+            ),
+          );
     }
 
     // Repli tolérant (mêmes règles que DatasheetDao) pour les datasheets
@@ -604,8 +650,11 @@ class ArmyDao extends DatabaseAccessor<AppDatabase> with _$ArmyDaoMixin {
       result[id] = fallbackRows
           .where((row) => row.editionId == editionId)
           .map(
-            (row) =>
-                CostBracket(modelCount: row.modelCount, points: row.points),
+            (row) => CostBracket(
+              modelCount: row.modelCount,
+              points: row.points,
+              minCopyIndex: row.minCopyIndex,
+            ),
           )
           .toList();
     }

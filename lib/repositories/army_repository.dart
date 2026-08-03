@@ -165,6 +165,10 @@ class ArmyRepository {
     return database.armyDao.removeUnit(armyUnitId);
   }
 
+  Future<int> countUnitsOfDatasheet(String armyId, String datasheetId) {
+    return database.armyDao.countUnitsOfDatasheet(armyId, datasheetId);
+  }
+
   Future<Map<String, List<String>>> getUnitEquipmentSelections(
     String armyUnitId,
   ) {
