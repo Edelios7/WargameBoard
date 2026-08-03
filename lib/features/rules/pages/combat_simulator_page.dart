@@ -123,51 +123,11 @@ class _CombatSimulatorPageState extends State<CombatSimulatorPage> {
               ),
             ],
             const SizedBox(height: 28),
-            // Vagues de simulation + lancement + résultats : en haut, pour
-            // rester visibles pendant qu'on ajuste les unités plus bas.
-            Text(l10n.combatSimTrials, style: AppTextStyles.eyebrow),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                for (final count in const [10, 100, 1000])
-                  _TrialsChip(
-                    count: count,
-                    selected: _trials == count,
-                    onTap: () => setState(() {
-                      _trials = count;
-                      _result = null;
-                    }),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: _canRun ? _run : null,
-                icon: const Icon(Icons.casino_rounded),
-                label: Text(l10n.combatSimRun),
-              ),
-            ),
-            if (_result != null) ...[
-              const SizedBox(height: 24),
-              _CombatResultCard(
-                result: _result!,
-                defenderModelCount: _defenderModelCount,
-                l10n: l10n,
-              ),
-            ] else ...[
-              const SizedBox(height: 20),
-              Text(l10n.combatSimEmptyState, style: AppTextStyles.caption),
-            ],
-            const SizedBox(height: 28),
             LayoutBuilder(
               builder: (context, constraints) {
-                final wide = constraints.maxWidth > 760;
                 final attacker = _UnitPicker(
                   label: l10n.combatSimAttacker,
+                  accentColor: AppColors.info,
                   factionId: _attackerFactionId,
                   unit: _attackerUnit,
                   modelCount: _attackerModelCount,
@@ -195,6 +155,7 @@ class _CombatSimulatorPageState extends State<CombatSimulatorPage> {
                 );
                 final defender = _UnitPicker(
                   label: l10n.combatSimDefender,
+                  accentColor: AppColors.error,
                   factionId: _defenderFactionId,
                   unit: _defenderUnit,
                   modelCount: _defenderModelCount,
@@ -215,21 +176,58 @@ class _CombatSimulatorPageState extends State<CombatSimulatorPage> {
                     _result = null;
                   }),
                 );
+                final center = _CombatCenterPanel(
+                  l10n: l10n,
+                  trials: _trials,
+                  canRun: _canRun,
+                  result: _result,
+                  defenderModelCount: _defenderModelCount,
+                  onTrialsChanged: (count) => setState(() {
+                    _trials = count;
+                    _result = null;
+                  }),
+                  onRun: _run,
+                );
 
-                if (wide) {
+                // À gauche l'attaquant, à droite le défenseur, et les
+                // lancés au centre entre les deux — la disposition
+                // spatiale du combat lui-même, plutôt que trois blocs
+                // empilés sans lien visuel évident entre eux.
+                if (constraints.maxWidth > 980) {
                   return Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(child: attacker),
-                      const SizedBox(width: 20),
-                      Expanded(child: defender),
+                      Expanded(flex: 4, child: attacker),
+                      const SizedBox(width: 16),
+                      Expanded(flex: 5, child: center),
+                      const SizedBox(width: 16),
+                      Expanded(flex: 4, child: defender),
+                    ],
+                  );
+                }
+                if (constraints.maxWidth > 640) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: attacker),
+                          const SizedBox(width: 16),
+                          Expanded(child: defender),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      center,
                     ],
                   );
                 }
                 return Column(
                   children: [
                     attacker,
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
+                    center,
+                    const SizedBox(height: 16),
                     defender,
                   ],
                 );
@@ -237,6 +235,81 @@ class _CombatSimulatorPageState extends State<CombatSimulatorPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Colonne centrale : nombre de vagues, lancement, résultats — entre
+/// l'attaquant et le défenseur sur écran large (voir le `LayoutBuilder`
+/// ci-dessus), au-dessus du défenseur sur écran étroit.
+class _CombatCenterPanel extends StatelessWidget {
+  final AppLocalizations l10n;
+  final int trials;
+  final bool canRun;
+  final CombatSimulationResult? result;
+  final int defenderModelCount;
+  final ValueChanged<int> onTrialsChanged;
+  final VoidCallback onRun;
+
+  const _CombatCenterPanel({
+    required this.l10n,
+    required this.trials,
+    required this.canRun,
+    required this.result,
+    required this.defenderModelCount,
+    required this.onTrialsChanged,
+    required this.onRun,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(l10n.combatSimTrials, style: AppTextStyles.eyebrow),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              for (final count in const [10, 100, 1000]) ...[
+                Expanded(
+                  child: _TrialsChip(
+                    count: count,
+                    selected: trials == count,
+                    onTap: () => onTrialsChanged(count),
+                  ),
+                ),
+                if (count != 1000) const SizedBox(width: 10),
+              ],
+            ],
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: canRun ? onRun : null,
+              icon: const Icon(Icons.casino_rounded),
+              label: Text(l10n.combatSimRun),
+            ),
+          ),
+          const SizedBox(height: 20),
+          if (result != null)
+            _CombatResultCard(
+              result: result!,
+              defenderModelCount: defenderModelCount,
+              l10n: l10n,
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                l10n.combatSimEmptyState,
+                style: AppTextStyles.caption,
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -337,6 +410,7 @@ class _CollapsibleSectionState extends State<_CollapsibleSection> {
 /// barre de recherche pour filtrer les listes de fiches longues.
 class _UnitPicker extends ConsumerStatefulWidget {
   final String label;
+  final Color accentColor;
   final String? factionId;
   final DatasheetDetails? unit;
   final int modelCount;
@@ -348,6 +422,7 @@ class _UnitPicker extends ConsumerStatefulWidget {
 
   const _UnitPicker({
     required this.label,
+    required this.accentColor,
     required this.factionId,
     required this.unit,
     required this.modelCount,
@@ -387,11 +462,15 @@ class _UnitPickerState extends ConsumerState<_UnitPicker> {
     final factionsAsync = ref.watch(factionsListProvider);
 
     return AppCard(
+      accentColor: widget.accentColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(widget.label, style: AppTextStyles.title),
+          Text(
+            widget.label,
+            style: AppTextStyles.title.copyWith(color: widget.accentColor),
+          ),
           const SizedBox(height: 14),
           factionsAsync.when(
             data: (factions) {
@@ -678,7 +757,16 @@ class _CombatResultCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final percent = (result.destructionProbability * 100).toStringAsFixed(1);
 
-    return AppCard(
+    // Pas un AppCard imbriqué : ce widget vit déjà à l'intérieur de la
+    // carte centrale (_CombatCenterPanel) — une deuxième bordure/fond
+    // par-dessus l'aurait juste rendu confus (carte dans une carte).
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -686,15 +774,18 @@ class _CombatResultCard extends StatelessWidget {
           Text(l10n.combatSimResultsTitle, style: AppTextStyles.title),
           const SizedBox(height: 14),
           Text(
+            l10n.combatSimDestroyProbability('$percent%'),
+            style: AppTextStyles.body.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
             l10n.combatSimAvgKills(
               result.averageModelsKilled.toStringAsFixed(1),
               '$defenderModelCount',
             ),
-            style: AppTextStyles.body,
-          ),
-          const SizedBox(height: 6),
-          Text(
-            l10n.combatSimDestroyProbability('$percent%'),
             style: AppTextStyles.body,
           ),
           const SizedBox(height: 6),

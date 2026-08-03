@@ -31,6 +31,58 @@ const _interactiveToolIds = {
   'simulateur-de-combat',
 };
 
+/// Icône/couleur/libellé par catégorie — partagé entre la grille de
+/// catégories et la liste qui apparaît une fois une catégorie choisie,
+/// pour qu'elles se réfèrent visuellement l'une à l'autre (même icône,
+/// même couleur).
+typedef _CategoryMeta = (RuleCategory?, IconData, String, Color);
+
+List<_CategoryMeta> _categoryEntries(AppLocalizations l10n) => [
+  (null, Icons.bookmark_rounded, l10n.rulesCategoryAll, AppColors.primary),
+  (
+    RuleCategory.mainRules,
+    Icons.menu_book_rounded,
+    l10n.rulesCategoryMain,
+    AppColors.info,
+  ),
+  (
+    RuleCategory.missions,
+    Icons.track_changes_rounded,
+    l10n.rulesCategoryMissions,
+    AppColors.warning,
+  ),
+  (
+    RuleCategory.faqs,
+    Icons.help_outline_rounded,
+    l10n.rulesCategoryFaqs,
+    AppColors.success,
+  ),
+  (
+    RuleCategory.errata,
+    Icons.description_rounded,
+    l10n.rulesCategoryErrata,
+    AppColors.error,
+  ),
+  (
+    RuleCategory.pointsAndProfiles,
+    Icons.shield_rounded,
+    l10n.rulesCategoryProfiles,
+    AppColors.primaryLight,
+  ),
+  (
+    RuleCategory.tacticalGuides,
+    Icons.hub_rounded,
+    l10n.rulesCategoryTactics,
+    const Color(0xFF3EBFAE),
+  ),
+  (
+    RuleCategory.armyLists,
+    Icons.list_alt_rounded,
+    l10n.rulesCategoryArmyLists,
+    const Color(0xFFE0729C),
+  ),
+];
+
 class RulesPage extends StatefulWidget {
   const RulesPage({super.key});
 
@@ -159,40 +211,66 @@ class _RulesPageState extends State<RulesPage> {
                 ),
               ],
               const SizedBox(height: 24),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final wide = constraints.maxWidth > 900;
-                  final recentCard = _RecentDocumentsCard(
-                    documents: recent,
-                    l10n: l10n,
-                    onOpen: (doc) => _openDocument(context, doc),
-                  );
-                  final popularCard = _PopularRulesCard(
-                    documents: popular,
-                    l10n: l10n,
-                    onOpen: (doc) => _openDocument(context, doc),
-                  );
-                  if (!wide) {
-                    return Column(
-                      children: [
-                        recentCard,
-                        const SizedBox(height: 16),
-                        popularCard,
-                      ],
+              // Une catégorie choisie remplace le duo Récents/Populaires
+              // (qui n'a de sens que sur l'ensemble des documents) par une
+              // seule liste, clairement intitulée par la catégorie : sur
+              // "Guides tactiques" par exemple, les Récents/Populaires
+              // montraient les deux mêmes documents dans un ordre
+              // différent, ce qui ne disait pas clairement "voici les
+              // guides tactiques, choisissez-en un".
+              if (_category != null)
+                Builder(
+                  builder: (context) {
+                    final meta = _categoryEntries(
+                      l10n,
+                    ).firstWhere((e) => e.$1 == _category);
+                    final sorted = [...documents]
+                      ..sort((a, b) => a.title.compareTo(b.title));
+                    return _CategoryDocumentsCard(
+                      title: meta.$3,
+                      icon: meta.$2,
+                      color: meta.$4,
+                      documents: sorted,
+                      l10n: l10n,
+                      onOpen: (doc) => _openDocument(context, doc),
                     );
-                  }
-                  return IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(flex: 3, child: recentCard),
-                        const SizedBox(width: 16),
-                        Expanded(flex: 2, child: popularCard),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                  },
+                )
+              else
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final wide = constraints.maxWidth > 900;
+                    final recentCard = _RecentDocumentsCard(
+                      documents: recent,
+                      l10n: l10n,
+                      onOpen: (doc) => _openDocument(context, doc),
+                    );
+                    final popularCard = _PopularRulesCard(
+                      documents: popular,
+                      l10n: l10n,
+                      onOpen: (doc) => _openDocument(context, doc),
+                    );
+                    if (!wide) {
+                      return Column(
+                        children: [
+                          recentCard,
+                          const SizedBox(height: 16),
+                          popularCard,
+                        ],
+                      );
+                    }
+                    return IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(flex: 3, child: recentCard),
+                          const SizedBox(width: 16),
+                          Expanded(flex: 2, child: popularCard),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               const SizedBox(height: 24),
               _HelpRow(
                 l10n: l10n,
@@ -596,55 +674,7 @@ class _CategoriesGrid extends StatelessWidget {
         ? kRuleDocuments.length
         : kRuleDocuments.where((d) => d.category == category).length;
 
-    // Une couleur distincte par catégorie — avant, chaque tuile n'avait
-    // qu'une petite icône grise sur fond plat, aucune ne se distinguait
-    // visuellement des autres (même défaut que les cartes d'armée avant
-    // AppCard.accentColor).
-    final entries = <(RuleCategory?, IconData, String, Color)>[
-      (null, Icons.bookmark_rounded, l10n.rulesCategoryAll, AppColors.primary),
-      (
-        RuleCategory.mainRules,
-        Icons.menu_book_rounded,
-        l10n.rulesCategoryMain,
-        AppColors.info,
-      ),
-      (
-        RuleCategory.missions,
-        Icons.track_changes_rounded,
-        l10n.rulesCategoryMissions,
-        AppColors.warning,
-      ),
-      (
-        RuleCategory.faqs,
-        Icons.help_outline_rounded,
-        l10n.rulesCategoryFaqs,
-        AppColors.success,
-      ),
-      (
-        RuleCategory.errata,
-        Icons.description_rounded,
-        l10n.rulesCategoryErrata,
-        AppColors.error,
-      ),
-      (
-        RuleCategory.pointsAndProfiles,
-        Icons.shield_rounded,
-        l10n.rulesCategoryProfiles,
-        AppColors.primaryLight,
-      ),
-      (
-        RuleCategory.tacticalGuides,
-        Icons.hub_rounded,
-        l10n.rulesCategoryTactics,
-        const Color(0xFF3EBFAE),
-      ),
-      (
-        RuleCategory.armyLists,
-        Icons.list_alt_rounded,
-        l10n.rulesCategoryArmyLists,
-        const Color(0xFFE0729C),
-      ),
-    ];
+    final entries = _categoryEntries(l10n);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -708,6 +738,155 @@ class _CategoriesGrid extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// Liste des documents d'une catégorie choisie dans [_CategoriesGrid] —
+/// remplace le duo Récents/Populaires (voir [_RulesPageState.build]) par
+/// une seule liste sans ambiguïté sur ce qu'elle représente : son icône et
+/// sa couleur reprennent celles de la tuile de catégorie cliquée.
+class _CategoryDocumentsCard extends StatefulWidget {
+  final String title;
+  final IconData icon;
+  final Color color;
+  final List<RuleDocument> documents;
+  final AppLocalizations l10n;
+  final ValueChanged<RuleDocument> onOpen;
+
+  const _CategoryDocumentsCard({
+    required this.title,
+    required this.icon,
+    required this.color,
+    required this.documents,
+    required this.l10n,
+    required this.onOpen,
+  });
+
+  @override
+  State<_CategoryDocumentsCard> createState() =>
+      _CategoryDocumentsCardState();
+}
+
+class _CategoryDocumentsCardState extends State<_CategoryDocumentsCard> {
+  static const _collapsedCount = 8;
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = widget.l10n;
+    final dateFormat = DateFormat('dd/MM/yyyy');
+    final documents = _expanded
+        ? widget.documents
+        : widget.documents.take(_collapsedCount).toList();
+    final canExpand = widget.documents.length > _collapsedCount;
+
+    return AppCard(
+      accentColor: widget.color,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(widget.icon, size: 16, color: widget.color),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        '${widget.title.toUpperCase()} (${widget.documents.length})',
+                        style: AppTextStyles.eyebrow,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (canExpand)
+                TextButton(
+                  onPressed: () => setState(() => _expanded = !_expanded),
+                  child: Text(
+                    _expanded ? l10n.catalogSeeLess : l10n.rulesSeeAll,
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          if (documents.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Text(l10n.rulesEmpty, style: AppTextStyles.caption),
+            )
+          else
+            ...documents.map((doc) {
+              final isTool = _interactiveToolIds.contains(doc.id);
+              return InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () => widget.onOpen(doc),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: widget.color.withValues(alpha: .16),
+                        ),
+                        child: Icon(
+                          isTool ? Icons.bolt_rounded : widget.icon,
+                          size: 18,
+                          color: widget.color,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              doc.title,
+                              style: AppTextStyles.body,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              isTool
+                                  ? l10n.rulesInteractiveTool
+                                  : 'v${doc.version} • ${dateFormat.format(doc.lastUpdate)} • ${doc.language}',
+                              style: AppTextStyles.caption.copyWith(
+                                color: isTool
+                                    ? widget.color
+                                    : AppColors.textSecondary,
+                                fontWeight: isTool
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        Icons.chevron_right_rounded,
+                        size: 20,
+                        color: AppColors.textSecondary,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+        ],
+      ),
     );
   }
 }
