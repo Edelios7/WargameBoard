@@ -6,6 +6,7 @@ import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
 import '../../../core/widgets/app_loading_indicator.dart';
 import '../../../core/widgets/archetype_badge.dart';
+import '../../../core/widgets/unit_photo_thumbnail.dart';
 import '../../../database/models/ability_details.dart';
 import '../../../database/models/cost_bracket.dart';
 import '../../../database/models/datasheet_details.dart';
@@ -122,59 +123,88 @@ class DatasheetDetailPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (imageFile != null)
-            Stack(
-              children: [
-                Image.file(
-                  imageFile,
-                  height: 240,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-                Positioned.fill(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          AppColors.surfaceElevated.withValues(alpha: .95),
-                        ],
-                        stops: const [0.4, 1.0],
+          Stack(
+            children: [
+              if (imageFile != null)
+                Stack(
+                  children: [
+                    Image.file(
+                      imageFile,
+                      height: 240,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              AppColors.surfaceElevated.withValues(alpha: .95),
+                            ],
+                            stops: const [0.4, 1.0],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ],
-            )
-          else if (factionBanner != null)
-            // Pas de visuel propre à la fiche : la bannière de faction
-            // habille l'en-tête à la place d'un bloc vide.
-            Stack(
-              children: [
-                Image.file(
-                  factionBanner,
-                  height: 90,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-                Positioned.fill(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: [
-                          AppColors.surfaceElevated.withValues(alpha: .35),
-                          AppColors.surfaceElevated.withValues(alpha: .9),
-                        ],
+                  ],
+                )
+              else if (factionBanner != null)
+                // Pas de visuel propre à la fiche : la bannière de faction
+                // habille l'en-tête à la place d'un bloc vide.
+                Stack(
+                  children: [
+                    Image.file(
+                      factionBanner,
+                      height: 90,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              AppColors.surfaceElevated.withValues(alpha: .35),
+                              AppColors.surfaceElevated.withValues(alpha: .9),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
+                  ],
+                )
+              else
+                // Ni photo perso ni bannière de faction : sans ce bloc
+                // neutre, la zone d'image disparaissait entièrement (la
+                // fiche passait directement au titre), ce qui rendait
+                // le bouton d'ajout d'image ci-dessous encore plus dur
+                // à situer.
+                Container(
+                  height: 140,
+                  width: double.infinity,
+                  color: AppColors.background,
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.shield_outlined,
+                    size: 48,
+                    color: AppColors.textSecondary.withValues(alpha: .4),
                   ),
                 ),
-              ],
-            ),
+              Positioned(
+                top: 12,
+                right: 12,
+                child: UnitPhotoEditButton(
+                  datasheetId: sheet.id,
+                  hasPhoto: imageFile != null,
+                ),
+              ),
+            ],
+          ),
           Padding(
             padding: const EdgeInsets.all(24),
             child: Column(

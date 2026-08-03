@@ -996,6 +996,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get collectionPhotoSaveError => 'Impossible d\'enregistrer la photo';
 
   @override
+  String get unitPhotoAddButton => 'Ajouter une image';
+
+  @override
+  String get unitPhotoChangeButton => 'Modifier l\'image';
+
+  @override
   String get collectionDeleteConfirmTitle => 'Retirer cette entrée ?';
 
   @override

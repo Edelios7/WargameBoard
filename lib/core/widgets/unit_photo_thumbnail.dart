@@ -192,3 +192,127 @@ class _UnitPhotoThumbnailState extends ConsumerState<UnitPhotoThumbnail> {
     );
   }
 }
+
+/// Bouton étiqueté ("Ajouter une image" / "Modifier l'image") pour choisir
+/// une photo — même service et même invalidation que [UnitPhotoThumbnail],
+/// mais visible et texté plutôt qu'une icône de 20px en coin d'image :
+/// pour les zones où cette dernière passe trop inaperçue (ex. la fiche
+/// complète du Catalogue), placer ce bouton à côté de l'image plutôt que
+/// de compter sur le badge en overlay.
+class UnitPhotoEditButton extends ConsumerStatefulWidget {
+  final String datasheetId;
+  final String? entryId;
+  final bool hasPhoto;
+
+  const UnitPhotoEditButton({
+    super.key,
+    required this.datasheetId,
+    this.entryId,
+    required this.hasPhoto,
+  });
+
+  @override
+  ConsumerState<UnitPhotoEditButton> createState() =>
+      _UnitPhotoEditButtonState();
+}
+
+class _UnitPhotoEditButtonState extends ConsumerState<UnitPhotoEditButton> {
+  bool _busy = false;
+
+  void _invalidatePhotoCaches() {
+    PaintingBinding.instance.imageCache.clear();
+    PaintingBinding.instance.imageCache.clearLiveImages();
+    if (mounted) ref.read(photoVersionProvider.notifier).state++;
+  }
+
+  Future<void> _choosePhoto() async {
+    setState(() => _busy = true);
+    try {
+      await ref
+          .read(userPhotoServiceProvider)
+          .pickAndSave(widget.datasheetId, entryId: widget.entryId);
+      _invalidatePhotoCaches();
+    } catch (_) {
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.collectionPhotoSaveError)));
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _removePhoto() async {
+    final service = ref.read(userPhotoServiceProvider);
+    final entryId = widget.entryId;
+    if (entryId != null) {
+      await service.removeEntry(entryId);
+    } else {
+      await service.remove(widget.datasheetId);
+    }
+    _invalidatePhotoCaches();
+    if (mounted) setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return PopupMenuButton<String>(
+      tooltip: l10n.collectionPhotoTooltip,
+      onSelected: (value) {
+        if (value == 'choose') _choosePhoto();
+        if (value == 'remove') _removePhoto();
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem(value: 'choose', child: Text(l10n.collectionChoosePhoto)),
+        if (widget.hasPhoto)
+          PopupMenuItem(
+            value: 'remove',
+            child: Text(l10n.collectionRemovePhoto),
+          ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: .55),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.white.withValues(alpha: .25)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_busy)
+              const SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            else
+              const Icon(
+                Icons.camera_alt_rounded,
+                size: 15,
+                color: Colors.white,
+              ),
+            const SizedBox(width: 8),
+            Text(
+              widget.hasPhoto
+                  ? l10n.unitPhotoChangeButton
+                  : l10n.unitPhotoAddButton,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

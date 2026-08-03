@@ -1850,6 +1850,18 @@ abstract class AppLocalizations {
   /// **'Impossible d\'enregistrer la photo'**
   String get collectionPhotoSaveError;
 
+  /// No description provided for @unitPhotoAddButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une image'**
+  String get unitPhotoAddButton;
+
+  /// No description provided for @unitPhotoChangeButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier l\'image'**
+  String get unitPhotoChangeButton;
+
   /// No description provided for @collectionDeleteConfirmTitle.
   ///
   /// In fr, this message translates to:
