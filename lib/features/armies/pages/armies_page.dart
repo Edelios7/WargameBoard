@@ -17,6 +17,7 @@ import '../../../core/widgets/app_loading_indicator.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/discard_guard.dart';
 import '../../../core/widgets/faction_badge_icon.dart';
+import '../../../core/widgets/page_background.dart';
 import '../../../core/widgets/radar_chart.dart';
 import '../../../core/widgets/retry_error_state.dart';
 import '../../../core/widgets/unit_fallback_visual.dart';
@@ -295,15 +296,18 @@ class ArmiesPage extends ConsumerWidget {
       backgroundColor: AppWallpapers.app == null
           ? AppColors.background
           : Colors.transparent,
-      body: detailAsync.when(
-        loading: () => const AppLoadingIndicator(),
-        error: (error, _) => RetryErrorState(
-          onRetry: () => ref.invalidate(selectedArmyProvider),
+      body: PageBackground(
+        pageId: 'armies',
+        child: detailAsync.when(
+          loading: () => const AppLoadingIndicator(),
+          error: (error, _) => RetryErrorState(
+            onRetry: () => ref.invalidate(selectedArmyProvider),
+          ),
+          data: (army) {
+            if (army == null) return const _ArmyListPage();
+            return _ArmyBuilderPage(army: army);
+          },
         ),
-        data: (army) {
-          if (army == null) return const _ArmyListPage();
-          return _ArmyBuilderPage(army: army);
-        },
       ),
     );
   }
@@ -323,177 +327,181 @@ class _ArmyListPage extends ConsumerWidget {
       backgroundColor: AppWallpapers.app == null
           ? AppColors.background
           : Colors.transparent,
-      body: Stack(
-        children: [
-          if (ambianceFile != null)
-            Positioned.fill(
-              child: Image.file(
-                ambianceFile,
-                fit: BoxFit.cover,
-                alignment: Alignment.topCenter,
+      body: PageBackground(
+        pageId: 'armies',
+        child: Stack(
+          children: [
+            if (ambianceFile != null)
+              Positioned.fill(
+                child: Image.file(
+                  ambianceFile,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
+                ),
               ),
-            ),
-          if (ambianceFile != null)
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      AppColors.background.withValues(alpha: .55),
-                      AppColors.background.withValues(alpha: .93),
-                      AppColors.background,
-                    ],
-                    stops: const [0, 0.45, 0.75],
+            if (ambianceFile != null)
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        AppColors.background.withValues(alpha: .55),
+                        AppColors.background.withValues(alpha: .93),
+                        AppColors.background,
+                      ],
+                      stops: const [0, 0.45, 0.75],
+                    ),
                   ),
                 ),
               ),
-            ),
-          Padding(
-            padding: const EdgeInsets.all(28),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(l10n.navArmies, style: AppTextStyles.heading),
-                    IconButton(
-                      tooltip: l10n.dashboardCreateArmyShort,
-                      style: IconButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
+            Padding(
+              padding: const EdgeInsets.all(28),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(l10n.navArmies, style: AppTextStyles.heading),
+                      IconButton(
+                        tooltip: l10n.dashboardCreateArmyShort,
+                        style: IconButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                        ),
+                        icon: const Icon(Icons.add_rounded),
+                        onPressed: () => showDialog(
+                          context: context,
+                          builder: (_) => const CreateArmyDialog(),
+                        ),
                       ),
-                      icon: const Icon(Icons.add_rounded),
-                      onPressed: () => showDialog(
-                        context: context,
-                        builder: (_) => const CreateArmyDialog(),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Expanded(
+                    child: armiesAsync.when(
+                      loading: () => Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Expanded(
-                  child: armiesAsync.when(
-                    loading: () => Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primary,
+                      error: (error, _) => Center(
+                        child: Text('$error', style: AppTextStyles.caption),
                       ),
-                    ),
-                    error: (error, _) => Center(
-                      child: Text('$error', style: AppTextStyles.caption),
-                    ),
-                    data: (armies) {
-                      if (armies.isEmpty) {
-                        return Center(
-                          child: Text(
-                            l10n.armyBuilderEmptyList,
-                            style: AppTextStyles.caption,
-                          ),
-                        );
-                      }
-                      return LayoutBuilder(
-                        builder: (context, constraints) {
-                          final columns = (constraints.maxWidth / 260)
-                              .floor()
-                              .clamp(1, 5);
-                          return GridView.builder(
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: columns,
-                                  crossAxisSpacing: 16,
-                                  mainAxisSpacing: 16,
-                                  childAspectRatio: 1.9,
-                                ),
-                            itemCount: armies.length,
-                            itemBuilder: (context, index) {
-                              final army = armies[index];
-                              return AppCard(
-                                accentColor: FactionColors.of(army.factionId),
-                                onTap: () =>
-                                    ref
-                                        .read(selectedArmyIdProvider.notifier)
-                                        .state = army
-                                        .id,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      army.name,
-                                      style: AppTextStyles.title,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        FactionBadgeIcon(
-                                          factionName: army.factionName,
-                                          factionId: army.factionId,
-                                          size: 18,
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Flexible(
-                                          child: Text(
-                                            army.factionName,
-                                            style: AppTextStyles.caption,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
+                      data: (armies) {
+                        if (armies.isEmpty) {
+                          return Center(
+                            child: Text(
+                              l10n.armyBuilderEmptyList,
+                              style: AppTextStyles.caption,
+                            ),
+                          );
+                        }
+                        return LayoutBuilder(
+                          builder: (context, constraints) {
+                            final columns = (constraints.maxWidth / 260)
+                                .floor()
+                                .clamp(1, 5);
+                            return GridView.builder(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: columns,
+                                    crossAxisSpacing: 16,
+                                    mainAxisSpacing: 16,
+                                    childAspectRatio: 1.9,
+                                  ),
+                              itemCount: armies.length,
+                              itemBuilder: (context, index) {
+                                final army = armies[index];
+                                return AppCard(
+                                  accentColor: FactionColors.of(army.factionId),
+                                  onTap: () =>
+                                      ref
+                                          .read(selectedArmyIdProvider.notifier)
+                                          .state = army
+                                          .id,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        army.name,
+                                        style: AppTextStyles.title,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          FactionBadgeIcon(
+                                            factionName: army.factionName,
+                                            factionId: army.factionId,
+                                            size: 18,
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          army.pointsLimit != null
-                                              ? l10n.armyBuilderPointsWithLimit(
-                                                  army.totalPoints,
-                                                  army.pointsLimit!,
-                                                )
-                                              : l10n.pointsSuffix(
-                                                  army.totalPoints,
-                                                ),
-                                          style: AppTextStyles.body.copyWith(
-                                            color: army.hasValidationErrors
-                                                ? AppColors.error
-                                                : AppColors.primary,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        if (army.hasUnknownCost) ...[
                                           const SizedBox(width: 6),
-                                          Tooltip(
-                                            message: l10n.unknownCostTooltip,
-                                            child: Icon(
-                                              Icons.warning_amber_rounded,
-                                              size: 16,
-                                              color: AppColors.warning,
+                                          Flexible(
+                                            child: Text(
+                                              army.factionName,
+                                              style: AppTextStyles.caption,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                         ],
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      );
-                    },
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            army.pointsLimit != null
+                                                ? l10n.armyBuilderPointsWithLimit(
+                                                    army.totalPoints,
+                                                    army.pointsLimit!,
+                                                  )
+                                                : l10n.pointsSuffix(
+                                                    army.totalPoints,
+                                                  ),
+                                            style: AppTextStyles.body.copyWith(
+                                              color: army.hasValidationErrors
+                                                  ? AppColors.error
+                                                  : AppColors.primary,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          if (army.hasUnknownCost) ...[
+                                            const SizedBox(width: 6),
+                                            Tooltip(
+                                              message: l10n.unknownCostTooltip,
+                                              child: Icon(
+                                                Icons.warning_amber_rounded,
+                                                size: 16,
+                                                color: AppColors.warning,
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -4,9 +4,11 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_wallpapers.dart';
+import '../../../core/theme/customization_ids.dart';
 import '../../../core/utils/rule_pdf_source.dart';
 import '../../../core/utils/search_normalize.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/page_background.dart';
 import '../../../domain/rules/rule_document.dart';
 import '../../../domain/rules/rules_data.dart';
 import '../../../l10n/app_localizations.dart';
@@ -121,84 +123,87 @@ class _RulesPageState extends State<RulesPage> {
       backgroundColor: AppWallpapers.app == null
           ? AppColors.background
           : Colors.transparent,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _RulesHeader(
-              onSearch: (value) => setState(() => _query = value),
-              onAdd: () => ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(l10n.rulesAddComingSoon))),
-              filtersActive: _showFilters,
-              onToggleFilters: () =>
-                  setState(() => _showFilters = !_showFilters),
-            ),
-            const SizedBox(height: 20),
-            _HeroCard(
-              document: hero,
-              l10n: l10n,
-              onOpenBook: () => _openBook(context, l10n, hero),
-              onViewErrata: () => _openDocument(context, hero),
-            ),
-            if (_showFilters) ...[
-              const SizedBox(height: 24),
-              Text(
-                l10n.rulesCategoryAll.toUpperCase(),
-                style: AppTextStyles.eyebrow,
+      body: PageBackground(
+        pageId: 'rules',
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _RulesHeader(
+                onSearch: (value) => setState(() => _query = value),
+                onAdd: () => ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.rulesAddComingSoon)),
+                ),
+                filtersActive: _showFilters,
+                onToggleFilters: () =>
+                    setState(() => _showFilters = !_showFilters),
               ),
-              const SizedBox(height: 12),
-              _CategoriesGrid(
-                selected: _category,
-                onSelect: (category) => setState(() => _category = category),
+              const SizedBox(height: 20),
+              _HeroCard(
+                document: hero,
+                l10n: l10n,
+                onOpenBook: () => _openBook(context, l10n, hero),
+                onViewErrata: () => _openDocument(context, hero),
+              ),
+              if (_showFilters) ...[
+                const SizedBox(height: 24),
+                Text(
+                  l10n.rulesCategoryAll.toUpperCase(),
+                  style: AppTextStyles.eyebrow,
+                ),
+                const SizedBox(height: 12),
+                _CategoriesGrid(
+                  selected: _category,
+                  onSelect: (category) => setState(() => _category = category),
+                ),
+              ],
+              const SizedBox(height: 24),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final wide = constraints.maxWidth > 900;
+                  final recentCard = _RecentDocumentsCard(
+                    documents: recent,
+                    l10n: l10n,
+                    onOpen: (doc) => _openDocument(context, doc),
+                  );
+                  final popularCard = _PopularRulesCard(
+                    documents: popular,
+                    l10n: l10n,
+                    onOpen: (doc) => _openDocument(context, doc),
+                  );
+                  if (!wide) {
+                    return Column(
+                      children: [
+                        recentCard,
+                        const SizedBox(height: 16),
+                        popularCard,
+                      ],
+                    );
+                  }
+                  return IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(flex: 3, child: recentCard),
+                        const SizedBox(width: 16),
+                        Expanded(flex: 2, child: popularCard),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 24),
+              _HelpRow(
+                l10n: l10n,
+                onOpenHowToPlay: () => _openDocument(context, hero),
+                onComingSoon: (label) =>
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.rulesComingSoon(label))),
+                    ),
               ),
             ],
-            const SizedBox(height: 24),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final wide = constraints.maxWidth > 900;
-                final recentCard = _RecentDocumentsCard(
-                  documents: recent,
-                  l10n: l10n,
-                  onOpen: (doc) => _openDocument(context, doc),
-                );
-                final popularCard = _PopularRulesCard(
-                  documents: popular,
-                  l10n: l10n,
-                  onOpen: (doc) => _openDocument(context, doc),
-                );
-                if (!wide) {
-                  return Column(
-                    children: [
-                      recentCard,
-                      const SizedBox(height: 16),
-                      popularCard,
-                    ],
-                  );
-                }
-                return IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(flex: 3, child: recentCard),
-                      const SizedBox(width: 16),
-                      Expanded(flex: 2, child: popularCard),
-                    ],
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 24),
-            _HelpRow(
-              l10n: l10n,
-              onOpenHowToPlay: () => _openDocument(context, hero),
-              onComingSoon: (label) =>
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.rulesComingSoon(label))),
-                  ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -357,6 +362,7 @@ class _HeroCard extends StatelessWidget {
     final dateFormat = DateFormat('dd/MM/yyyy');
 
     return AppCard(
+      customizationId: CustomizationIds.rulesIndexCard,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final wide = constraints.maxWidth > 720;

@@ -4,10 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_wallpapers.dart';
+import '../../../core/theme/customization_ids.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_loading_indicator.dart';
 import '../../../core/widgets/decor_separator.dart';
+import '../../../core/widgets/page_background.dart';
 import '../../../core/widgets/retry_error_state.dart';
 import '../../../database/models/xp_summary.dart';
 import '../../../domain/xp/xp_category.dart';
@@ -26,26 +28,29 @@ class ProfilePage extends ConsumerWidget {
       backgroundColor: AppWallpapers.app == null
           ? AppColors.background
           : Colors.transparent,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.profilePageTitle, style: AppTextStyles.heading),
-            const SizedBox(height: 4),
-            Text(l10n.profilePageSubtitle, style: AppTextStyles.caption),
-            const SizedBox(height: 24),
-            summaryAsync.when(
-              loading: () => const Padding(
-                padding: EdgeInsets.all(40),
-                child: AppLoadingIndicator(),
+      body: PageBackground(
+        pageId: 'profile',
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.profilePageTitle, style: AppTextStyles.heading),
+              const SizedBox(height: 4),
+              Text(l10n.profilePageSubtitle, style: AppTextStyles.caption),
+              const SizedBox(height: 24),
+              summaryAsync.when(
+                loading: () => const Padding(
+                  padding: EdgeInsets.all(40),
+                  child: AppLoadingIndicator(),
+                ),
+                error: (_, __) => RetryErrorState(
+                  onRetry: () => ref.invalidate(xpSummaryProvider),
+                ),
+                data: (summary) => _ProfileContent(summary: summary),
               ),
-              error: (_, __) => RetryErrorState(
-                onRetry: () => ref.invalidate(xpSummaryProvider),
-              ),
-              data: (summary) => _ProfileContent(summary: summary),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -135,6 +140,7 @@ class _CommandantHeader extends StatelessWidget {
     final level = summary.commandantLevel;
 
     return AppCard(
+      customizationId: CustomizationIds.profileCommanderCard,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
