@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_wallpapers.dart';
+import '../../../core/theme/customization_ids.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
 import '../../../core/widgets/decor_separator.dart';
@@ -194,6 +195,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   SizedBox(
                     width: cardWidth,
                     child: AppCard(
+                      customizationId: CustomizationIds.settingsProfileCard,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -228,6 +230,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   SizedBox(
                     width: cardWidth,
                     child: AppCard(
+                      customizationId: CustomizationIds.settingsLanguageCard,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -259,6 +262,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   SizedBox(
                     width: cardWidth,
                     child: AppCard(
+                      customizationId: CustomizationIds.settingsImportCard,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -288,6 +292,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   SizedBox(
                     width: cardWidth,
                     child: AppCard(
+                      customizationId: CustomizationIds.settingsBackupCard,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/customization_ids.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/battle_details.dart';
@@ -87,6 +88,9 @@ class StratagemAssistantBlock extends ConsumerWidget {
             if (matching.isEmpty) return const SizedBox.shrink();
 
             return AppCard(
+              customizationId: mine
+                  ? '${CustomizationIds.battleStratagemAssistant}.mine'
+                  : '${CustomizationIds.battleStratagemAssistant}.opponent',
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

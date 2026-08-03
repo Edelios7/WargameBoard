@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_wallpapers.dart';
+import '../../../core/theme/customization_ids.dart';
 import '../../../core/utils/collection_export_formatter.dart';
 import '../../../core/utils/faction_iconography.dart';
 import '../../../core/utils/local_catalog_images.dart';
@@ -812,6 +813,7 @@ class _OverviewStatsRow extends StatelessWidget {
               label: l10n.dashboardStatArmies,
               value: armies.length.toString(),
               sublabel: l10n.collectionStatArmiesSub(completeArmies),
+              customizationId: CustomizationIds.collectionStatArmies,
             ),
             _StatTile(
               icon: Icons.inventory_2_rounded,
@@ -821,12 +823,14 @@ class _OverviewStatsRow extends StatelessWidget {
                 summary?.totalPainted ?? 0,
                 paintedPct,
               ),
+              customizationId: CustomizationIds.collectionStatModels,
             ),
             _StatTile(
               icon: Icons.diamond_outlined,
               label: l10n.collectionStatFactionsTitle,
               value: quantityByFaction.length.toString(),
               sublabel: l10n.collectionStatFactionsSub(entries.length),
+              customizationId: CustomizationIds.collectionStatFactions,
             ),
             _StatTile(
               icon: Icons.sports_martial_arts_rounded,
@@ -837,6 +841,7 @@ class _OverviewStatsRow extends StatelessWidget {
                         lastBattle!.opponentFactionName ??
                         '—'),
               sublabel: resultLabel ?? l10n.dashboardLastBattleEmpty,
+              customizationId: CustomizationIds.collectionStatLastBattle,
             ),
           ],
         );
@@ -850,17 +855,20 @@ class _StatTile extends StatelessWidget {
   final String label;
   final String value;
   final String sublabel;
+  final String customizationId;
 
   const _StatTile({
     required this.icon,
     required this.label,
     required this.value,
     required this.sublabel,
+    required this.customizationId,
   });
 
   @override
   Widget build(BuildContext context) {
     return AppCard(
+      customizationId: customizationId,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1106,6 +1114,7 @@ class _FiltersSidebar extends StatelessWidget {
     final hasActiveFilters = factionFilter != null || stateFilter.isNotEmpty;
 
     return AppCard(
+      customizationId: CustomizationIds.collectionFiltersPanel,
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

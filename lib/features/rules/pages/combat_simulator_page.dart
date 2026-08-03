@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/customization_ids.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../database/models/datasheet_details.dart';
 import '../../../database/models/weapon_details.dart';
@@ -128,6 +129,7 @@ class _CombatSimulatorPageState extends State<CombatSimulatorPage> {
                 final attacker = _UnitPicker(
                   label: l10n.combatSimAttacker,
                   accentColor: AppColors.info,
+                  customizationId: CustomizationIds.rulesCombatSimAttacker,
                   factionId: _attackerFactionId,
                   unit: _attackerUnit,
                   modelCount: _attackerModelCount,
@@ -156,6 +158,7 @@ class _CombatSimulatorPageState extends State<CombatSimulatorPage> {
                 final defender = _UnitPicker(
                   label: l10n.combatSimDefender,
                   accentColor: AppColors.error,
+                  customizationId: CustomizationIds.rulesCombatSimDefender,
                   factionId: _defenderFactionId,
                   unit: _defenderUnit,
                   modelCount: _defenderModelCount,
@@ -265,6 +268,7 @@ class _CombatCenterPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppCard(
+      customizationId: CustomizationIds.rulesCombatSimControls,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -411,6 +415,7 @@ class _CollapsibleSectionState extends State<_CollapsibleSection> {
 class _UnitPicker extends ConsumerStatefulWidget {
   final String label;
   final Color accentColor;
+  final String customizationId;
   final String? factionId;
   final DatasheetDetails? unit;
   final int modelCount;
@@ -423,6 +428,7 @@ class _UnitPicker extends ConsumerStatefulWidget {
   const _UnitPicker({
     required this.label,
     required this.accentColor,
+    required this.customizationId,
     required this.factionId,
     required this.unit,
     required this.modelCount,
@@ -463,6 +469,7 @@ class _UnitPickerState extends ConsumerState<_UnitPicker> {
 
     return AppCard(
       accentColor: widget.accentColor,
+      customizationId: widget.customizationId,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -547,24 +554,18 @@ class _UnitPickerState extends ConsumerState<_UnitPicker> {
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
-                                  color: AppColors.border,
-                                ),
+                                borderSide: BorderSide(color: AppColors.border),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
-                                  color: AppColors.border,
-                                ),
+                                borderSide: BorderSide(color: AppColors.border),
                               ),
                             ),
                           ),
                           const SizedBox(height: 10),
                           if (filtered.isEmpty)
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 4,
-                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 4),
                               child: Text(
                                 l10n.catalogEmptyResults,
                                 style: AppTextStyles.caption,
@@ -580,16 +581,14 @@ class _UnitPickerState extends ConsumerState<_UnitPicker> {
                                   _ChoiceChip(
                                     label: sheet.name,
                                     selected: widget.unit?.id == sheet.id,
-                                    onTap: () =>
-                                        widget.onUnitChanged(sheet),
+                                    onTap: () => widget.onUnitChanged(sheet),
                                   ),
                               ],
                             ),
                         ],
                       );
                     },
-                    loading: () =>
-                        const LinearProgressIndicator(minHeight: 2),
+                    loading: () => const LinearProgressIndicator(minHeight: 2),
                     error: (_, _) => const SizedBox.shrink(),
                   );
                 },

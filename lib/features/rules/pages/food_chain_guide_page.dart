@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/customization_ids.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/catalog/common/unit_archetype.dart';
 import '../../../domain/rules/rule_document.dart';
@@ -222,6 +223,7 @@ class _MatchupResultCard extends StatelessWidget {
           );
 
     return AppCard(
+      customizationId: CustomizationIds.rulesFoodChainResult,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -229,10 +231,7 @@ class _MatchupResultCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _ArchetypeBadge(
-                archetype: a,
-                highlighted: result.advantage == a,
-              ),
+              _ArchetypeBadge(archetype: a, highlighted: result.advantage == a),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
@@ -242,19 +241,13 @@ class _MatchupResultCard extends StatelessWidget {
                   ),
                 ),
               ),
-              _ArchetypeBadge(
-                archetype: b,
-                highlighted: result.advantage == b,
-              ),
+              _ArchetypeBadge(archetype: b, highlighted: result.advantage == b),
             ],
           ),
           const SizedBox(height: 20),
           Center(
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
                 color: balanced
                     ? AppColors.surface
@@ -329,10 +322,7 @@ class _CollapsibleSection extends StatelessWidget {
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 4,
-          ),
+          tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
           childrenPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
           title: Text(
             section.heading,

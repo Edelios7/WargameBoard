@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_wallpapers.dart';
+import '../../../core/theme/customization_ids.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/decor_separator.dart';
 import '../../../core/widgets/donut_chart.dart';
@@ -84,6 +85,8 @@ class StatisticsPage extends ConsumerWidget {
                                 label: l10n.statsArmiesCount,
                                 value:
                                     armiesAsync.value?.length.toString() ?? '—',
+                                customizationId:
+                                    CustomizationIds.statisticsStatArmies,
                               ),
                               _StatTile(
                                 label: l10n.statsCollectionEntries,
@@ -91,6 +94,8 @@ class StatisticsPage extends ConsumerWidget {
                                     summaryAsync.value?.totalEntries
                                         .toString() ??
                                     '—',
+                                customizationId:
+                                    CustomizationIds.statisticsStatEntries,
                               ),
                               _StatTile(
                                 label: l10n.statsCollectionModels,
@@ -98,6 +103,8 @@ class StatisticsPage extends ConsumerWidget {
                                     summaryAsync.value?.totalModels
                                         .toString() ??
                                     '—',
+                                customizationId:
+                                    CustomizationIds.statisticsStatModels,
                               ),
                               _StatTile(
                                 label: l10n.statsCollectionPainted,
@@ -105,6 +112,8 @@ class StatisticsPage extends ConsumerWidget {
                                     summaryAsync.value?.totalPainted
                                         .toString() ??
                                     '—',
+                                customizationId:
+                                    CustomizationIds.statisticsStatPainted,
                               ),
                             ],
                           );
@@ -126,14 +135,20 @@ class StatisticsPage extends ConsumerWidget {
                                 label: l10n.statsGamesPlayed,
                                 value:
                                     battleStats?.totalGames.toString() ?? '—',
+                                customizationId:
+                                    CustomizationIds.statisticsStatGames,
                               ),
                               _StatTile(
                                 label: l10n.statsVictories,
                                 value: battleStats?.victories.toString() ?? '—',
+                                customizationId:
+                                    CustomizationIds.statisticsStatVictories,
                               ),
                               _StatTile(
                                 label: l10n.statsDefeats,
                                 value: battleStats?.defeats.toString() ?? '—',
+                                customizationId:
+                                    CustomizationIds.statisticsStatDefeats,
                               ),
                               _StatTile(
                                 label: l10n.statsWinRate,
@@ -142,6 +157,8 @@ class StatisticsPage extends ConsumerWidget {
                                         battleStats.totalGames == 0
                                     ? '—'
                                     : '${(battleStats.winRate * 100).round()} %',
+                                customizationId:
+                                    CustomizationIds.statisticsStatWinRate,
                               ),
                             ],
                           );
@@ -311,12 +328,18 @@ class StatisticsPage extends ConsumerWidget {
 class _StatTile extends StatelessWidget {
   final String label;
   final String value;
+  final String customizationId;
 
-  const _StatTile({required this.label, required this.value});
+  const _StatTile({
+    required this.label,
+    required this.value,
+    required this.customizationId,
+  });
 
   @override
   Widget build(BuildContext context) {
     return AppCard(
+      customizationId: customizationId,
       child: SingleChildScrollView(
         physics: const NeverScrollableScrollPhysics(),
         child: Column(
@@ -413,6 +436,7 @@ class _ProgressionSection extends StatelessWidget {
     final topFactions = [...xp.factions]..sort((a, b) => b.xp.compareTo(a.xp));
 
     return AppCard(
+      customizationId: CustomizationIds.statisticsXpProgress,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -585,6 +609,7 @@ class _BattleOutcomesCard extends StatelessWidget {
     final decided = victories + defeats + draws;
 
     return AppCard(
+      customizationId: CustomizationIds.statisticsBattleOutcomes,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -650,6 +675,7 @@ class _BattlesByFactionCard extends StatelessWidget {
       ..sort((a, b) => b.value.compareTo(a.value));
 
     return AppCard(
+      customizationId: CustomizationIds.statisticsFactionBreakdown,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

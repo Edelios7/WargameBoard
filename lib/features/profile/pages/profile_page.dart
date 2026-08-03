@@ -98,10 +98,12 @@ class _ProfileContent extends StatelessWidget {
         const SizedBox(height: 12),
         if (summary.factions.isEmpty)
           AppCard(
+            customizationId: CustomizationIds.profileFactionsCard,
             child: Text(l10n.profileNoFactionXp, style: AppTextStyles.caption),
           )
         else
           AppCard(
+            customizationId: CustomizationIds.profileFactionsCard,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

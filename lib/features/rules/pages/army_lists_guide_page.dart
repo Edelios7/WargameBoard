@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/customization_ids.dart';
 import '../../../core/utils/search_normalize.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/rules/army_list_style_parser.dart';
@@ -218,6 +219,7 @@ class _EmptySelectionHint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppCard(
+      customizationId: CustomizationIds.rulesArmyListsEmptyHint,
       child: Row(
         children: [
           Icon(Icons.touch_app_rounded, color: AppColors.textSecondary),

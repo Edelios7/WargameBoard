@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wargameboard/domain/rules/rules_data.dart';
 import 'package:wargameboard/features/rules/pages/food_chain_guide_page.dart';
@@ -10,11 +11,13 @@ void main() {
   );
 
   Widget wrap() {
-    return MaterialApp(
-      locale: const Locale('fr'),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: FoodChainGuidePage(document: document),
+    return ProviderScope(
+      child: MaterialApp(
+        locale: const Locale('fr'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: FoodChainGuidePage(document: document),
+      ),
     );
   }
 

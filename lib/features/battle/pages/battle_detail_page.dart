@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/customization_ids.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../database/models/battle_details.dart';
 import '../../../database/tables/battles_table.dart';
@@ -55,6 +56,7 @@ class BattleDetailPage extends StatelessWidget {
           title: l10n.battleDashboardRoster,
           accentColor: AppColors.primary,
           readOnly: true,
+          customizationId: CustomizationIds.battleRosterMine,
         ),
       if (battle.opponentArmyId != null)
         RosterBlock(
@@ -63,6 +65,7 @@ class BattleDetailPage extends StatelessWidget {
           title: l10n.battleDashboardOpponentRoster,
           accentColor: AppColors.info,
           readOnly: true,
+          customizationId: CustomizationIds.battleRosterOpponent,
         ),
     ];
 
@@ -84,6 +87,7 @@ class BattleDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AppCard(
+              customizationId: CustomizationIds.battleSummaryCard,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

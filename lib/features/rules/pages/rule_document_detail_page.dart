@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/customization_ids.dart';
 import '../../../core/utils/rule_pdf_source.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/rules/rule_document.dart';
@@ -100,6 +101,7 @@ class RuleDocumentDetailPage extends StatelessWidget {
             const SizedBox(height: 24),
             if (document.sections.isEmpty)
               AppCard(
+                customizationId: CustomizationIds.rulesDocumentEmptyState,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 24),
                   child: Center(
@@ -118,10 +120,7 @@ class RuleDocumentDetailPage extends StatelessWidget {
                               backgroundColor: AppColors.primary,
                             ),
                             onPressed: () => _openBook(context, l10n),
-                            icon: const Icon(
-                              Icons.menu_book_rounded,
-                              size: 18,
-                            ),
+                            icon: const Icon(Icons.menu_book_rounded, size: 18),
                             label: Text(l10n.rulesOpenBook),
                           ),
                         ],

@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/customization_ids.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
@@ -69,6 +70,7 @@ class BattleDashboard extends ConsumerWidget {
           armyId: battle.armyId!,
           title: AppLocalizations.of(context)!.battleDashboardRoster,
           accentColor: AppColors.primary,
+          customizationId: CustomizationIds.battleRosterMine,
         ),
       if (battle.opponentArmyId != null)
         RosterBlock(
@@ -76,6 +78,7 @@ class BattleDashboard extends ConsumerWidget {
           armyId: battle.opponentArmyId!,
           title: AppLocalizations.of(context)!.battleDashboardOpponentRoster,
           accentColor: AppColors.info,
+          customizationId: CustomizationIds.battleRosterOpponent,
         ),
     ];
 
@@ -388,6 +391,7 @@ class _ScoreBlock extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     return AppCard(
+      customizationId: CustomizationIds.battleScoreBlock,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -510,6 +514,7 @@ class _PhaseBlockState extends ConsumerState<_PhaseBlock> {
     final currentIndex = _phaseOrder.indexOf(currentPhase);
 
     return AppCard(
+      customizationId: CustomizationIds.battlePhaseBlock,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -768,6 +773,7 @@ class _CommandPointsBlock extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     return AppCard(
+      customizationId: CustomizationIds.battleCommandPoints,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -829,6 +835,7 @@ class RosterBlock extends ConsumerWidget {
   final String title;
   final Color accentColor;
   final bool readOnly;
+  final String? customizationId;
 
   const RosterBlock({
     super.key,
@@ -837,6 +844,7 @@ class RosterBlock extends ConsumerWidget {
     required this.title,
     required this.accentColor,
     this.readOnly = false,
+    this.customizationId,
   });
 
   @override
@@ -847,6 +855,7 @@ class RosterBlock extends ConsumerWidget {
     final modifiersAsync = ref.watch(battleUnitModifiersProvider(battleId));
 
     return AppCard(
+      customizationId: customizationId,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1621,6 +1630,7 @@ class _DiceRollerBlockState extends ConsumerState<DiceRollerBlock> {
     final total = results?.fold<int>(0, (sum, value) => sum + value);
 
     return AppCard(
+      customizationId: CustomizationIds.battleDiceRoller,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1773,6 +1783,7 @@ class EventsBlockState extends ConsumerState<EventsBlock> {
     final eventsAsync = ref.watch(battleEventsProvider(widget.battleId));
 
     return AppCard(
+      customizationId: CustomizationIds.battleEventsBlock,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1951,6 +1962,7 @@ class _NotesBlockState extends ConsumerState<NotesBlock> {
     final l10n = AppLocalizations.of(context)!;
 
     return AppCard(
+      customizationId: CustomizationIds.battleNotesBlock,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -27,7 +27,8 @@ class CustomizationIds {
   static const String dashboardLastBattle = 'dashboard.last_battle';
   static const String dashboardYourArmies = 'dashboard.your_armies';
   static const String dashboardPaintingDonut = 'dashboard.painting_donut';
-  static const String dashboardFactionBreakdown = 'dashboard.faction_breakdown';
+  static const String dashboardFactionBreakdown =
+      'dashboard.faction_breakdown';
   static const String dashboardRecentlyViewed = 'dashboard.recently_viewed';
   static const String dashboardNextBattle = 'dashboard.next_battle';
   static const String dashboardProjects = 'dashboard.projects';
@@ -36,17 +37,57 @@ class CustomizationIds {
 
   static const String battleSummaryCard = 'battle.summary_card';
   static const String battleStratagemAssistant = 'battle.stratagem_assistant';
+  static const String battleScoreBlock = 'battle.score_block';
+  static const String battlePhaseBlock = 'battle.phase_block';
+  static const String battleCommandPoints = 'battle.command_points';
+  static const String battleRosterMine = 'battle.roster_mine';
+  static const String battleRosterOpponent = 'battle.roster_opponent';
+  static const String battleDiceRoller = 'battle.dice_roller';
+  static const String battleEventsBlock = 'battle.events_block';
+  static const String battleNotesBlock = 'battle.notes_block';
 
   static const String catalogFiltersHeader = 'catalog.filters_header';
 
   static const String collectionSummaryCard = 'collection.summary_card';
+  static const String collectionStatArmies = 'collection.stat_armies';
+  static const String collectionStatModels = 'collection.stat_models';
+  static const String collectionStatFactions = 'collection.stat_factions';
+  static const String collectionStatLastBattle =
+      'collection.stat_last_battle';
+  static const String collectionFiltersPanel = 'collection.filters_panel';
 
   static const String statisticsFactionBreakdown =
       'statistics.faction_breakdown';
   static const String statisticsXpProgress = 'statistics.xp_progress';
   static const String statisticsRecentForm = 'statistics.recent_form';
+  static const String statisticsStatArmies = 'statistics.stat_armies';
+  static const String statisticsStatEntries = 'statistics.stat_entries';
+  static const String statisticsStatModels = 'statistics.stat_models';
+  static const String statisticsStatPainted = 'statistics.stat_painted';
+  static const String statisticsStatGames = 'statistics.stat_games';
+  static const String statisticsStatVictories = 'statistics.stat_victories';
+  static const String statisticsStatDefeats = 'statistics.stat_defeats';
+  static const String statisticsStatWinRate = 'statistics.stat_win_rate';
+  static const String statisticsBattleOutcomes =
+      'statistics.battle_outcomes';
+
+  static const String settingsProfileCard = 'settings.profile_card';
+  static const String settingsLanguageCard = 'settings.language_card';
+  static const String settingsImportCard = 'settings.import_card';
+  static const String settingsBackupCard = 'settings.backup_card';
 
   static const String profileCommanderCard = 'profile.commander_card';
+  static const String profileFactionsCard = 'profile.factions_card';
 
   static const String rulesIndexCard = 'rules.index_card';
+  static const String rulesCategoryDocuments = 'rules.category_documents';
+  static const String rulesRecentDocuments = 'rules.recent_documents';
+  static const String rulesPopularDocuments = 'rules.popular_documents';
+  static const String rulesHelpRow = 'rules.help_row';
+  static const String rulesArmyListsEmptyHint = 'rules.army_lists_empty_hint';
+  static const String rulesFoodChainResult = 'rules.food_chain_result';
+  static const String rulesDocumentEmptyState = 'rules.document_empty_state';
+  static const String rulesCombatSimControls = 'rules.combat_sim_controls';
+  static const String rulesCombatSimAttacker = 'rules.combat_sim_attacker';
+  static const String rulesCombatSimDefender = 'rules.combat_sim_defender';
 }

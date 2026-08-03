@@ -764,8 +764,7 @@ class _CategoryDocumentsCard extends StatefulWidget {
   });
 
   @override
-  State<_CategoryDocumentsCard> createState() =>
-      _CategoryDocumentsCardState();
+  State<_CategoryDocumentsCard> createState() => _CategoryDocumentsCardState();
 }
 
 class _CategoryDocumentsCardState extends State<_CategoryDocumentsCard> {
@@ -783,6 +782,7 @@ class _CategoryDocumentsCardState extends State<_CategoryDocumentsCard> {
 
     return AppCard(
       accentColor: widget.color,
+      customizationId: CustomizationIds.rulesCategoryDocuments,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -920,6 +920,7 @@ class _RecentDocumentsCardState extends State<_RecentDocumentsCard> {
     final canExpand = widget.documents.length > _collapsedCount;
 
     return AppCard(
+      customizationId: CustomizationIds.rulesRecentDocuments,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -1053,6 +1054,7 @@ class _PopularRulesCardState extends State<_PopularRulesCard> {
     final canExpand = widget.documents.length > _collapsedCount;
 
     return AppCard(
+      customizationId: CustomizationIds.rulesPopularDocuments,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -1195,6 +1197,7 @@ class _HelpRow extends StatelessWidget {
     ];
 
     return AppCard(
+      customizationId: CustomizationIds.rulesHelpRow,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
