@@ -10,6 +10,7 @@ import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
 import '../../../core/widgets/app_loading_indicator.dart';
 import '../../../core/widgets/archetype_badge.dart';
+import '../../../core/widgets/unit_fallback_visual.dart';
 import '../../../database/app_database.dart' show Faction, Keyword;
 import '../../../database/models/catalog_sort.dart';
 import '../../../database/models/search_result.dart';
@@ -1455,6 +1456,16 @@ class _DatasheetListItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final imageFile = LocalCatalogImages.unitPhoto(result.id);
+    // Une fiche sans photo affichait un bouclier générique identique pour
+    // absolument toutes les unités du Catalogue (personnage nommé, escouade
+    // de ligne, monstre...) — on réutilise ici la même icône de rôle que
+    // l'Army Builder (voir UnitFallbackVisual/unitRoleIcon), dérivée de
+    // signaux réels (archétype déjà calculé, rôle de bataille) plutôt
+    // qu'un aplat neutre répété sur chaque carte.
+    final subtitleLower = result.subtitle?.toLowerCase() ?? '';
+    final isCharacterRole =
+        subtitleLower.contains('personnage') ||
+        subtitleLower.contains('character');
     final favoriteIds = ref.watch(catalogFavoritesProvider).value ?? const {};
     final isFavorite = favoriteIds.contains(result.id);
     final factionColor = result.factionId != null
@@ -1509,10 +1520,16 @@ class _DatasheetListItem extends ConsumerWidget {
                                         color: factionColor.withValues(
                                           alpha: .16,
                                         ),
-                                        child: Icon(
-                                          Icons.shield_outlined,
-                                          color: factionColor,
-                                          size: 20,
+                                        child: UnitFallbackVisual(
+                                          factionName: result.factionName ?? '',
+                                          roleIcon: unitRoleIcon(
+                                            isWarlord: false,
+                                            isCharacter: isCharacterRole,
+                                            archetype: result.archetype,
+                                            battlefieldRole:
+                                                result.subtitle ?? '',
+                                          ),
+                                          size: 52,
                                         ),
                                       ),
                               ),

@@ -12,6 +12,7 @@ import '../../../core/widgets/faction_badge_icon.dart';
 import '../../../core/widgets/donut_chart.dart';
 import '../../../core/widgets/hoverable.dart';
 import '../../../core/widgets/textured_button.dart';
+import '../../../core/widgets/unit_fallback_visual.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/battle_details.dart';
 import '../../../database/models/collection_item_details.dart';
@@ -1189,7 +1190,11 @@ class _RecentAdditionsCard extends StatelessWidget {
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
-                                child: _thumbnail(entry.datasheetId, 40),
+                                child: _thumbnail(
+                                  entry.datasheetId,
+                                  40,
+                                  factionName: entry.factionName,
+                                ),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
@@ -1278,7 +1283,25 @@ class _RecentlyViewedCard extends StatelessWidget {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: _thumbnail(result.id, 64),
+                              child: _thumbnail(
+                                result.id,
+                                64,
+                                factionName: result.factionName,
+                                roleIcon: unitRoleIcon(
+                                  isWarlord: false,
+                                  isCharacter:
+                                      (result.subtitle?.toLowerCase().contains(
+                                            'personnage',
+                                          ) ??
+                                          false) ||
+                                      (result.subtitle?.toLowerCase().contains(
+                                            'character',
+                                          ) ??
+                                          false),
+                                  archetype: result.archetype,
+                                  battlefieldRole: result.subtitle ?? '',
+                                ),
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -1767,7 +1790,12 @@ class _ProjectRow extends ConsumerWidget {
   }
 }
 
-Widget _thumbnail(String datasheetId, double size) {
+Widget _thumbnail(
+  String datasheetId,
+  double size, {
+  String? factionName,
+  IconData? roleIcon,
+}) {
   final imageFile = LocalCatalogImages.unitPhoto(datasheetId);
   if (imageFile != null) {
     return Image.file(imageFile, width: size, height: size, fit: BoxFit.cover);
@@ -1776,10 +1804,23 @@ Widget _thumbnail(String datasheetId, double size) {
     width: size,
     height: size,
     color: AppColors.surface,
-    child: const Icon(
-      Icons.shield_outlined,
-      color: AppColors.textSecondary,
-      size: 20,
-    ),
+    alignment: Alignment.center,
+    // Un bouclier générique identique pour toute unité sans photo, quel
+    // que soit son rôle ou sa faction — dès qu'on a de quoi faire mieux
+    // (voir UnitFallbackVisual/FactionBadgeIcon, déjà utilisés ailleurs
+    // dans l'app), on l'utilise ici aussi.
+    child: roleIcon != null
+        ? UnitFallbackVisual(
+            factionName: factionName ?? '',
+            roleIcon: roleIcon,
+            size: size,
+          )
+        : factionName != null
+        ? FactionBadgeIcon(factionName: factionName, size: size * 0.7)
+        : const Icon(
+            Icons.shield_outlined,
+            color: AppColors.textSecondary,
+            size: 20,
+          ),
   );
 }

@@ -1275,7 +1275,6 @@ class _MyArmiesRow extends StatelessWidget {
           final qty = quantityByFaction[army.factionName] ?? 0;
           final painted = paintedByFaction[army.factionName] ?? 0;
           final ratio = qty == 0 ? 0.0 : (painted / qty).clamp(0, 1);
-          final imageFile = LocalCatalogImages.faction(army.factionId);
 
           return Container(
             width: 220,
@@ -1291,25 +1290,10 @@ class _MyArmiesRow extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: imageFile != null
-                          ? Image.file(
-                              imageFile,
-                              width: 28,
-                              height: 28,
-                              fit: BoxFit.cover,
-                            )
-                          : Container(
-                              width: 28,
-                              height: 28,
-                              color: AppColors.surface,
-                              child: const Icon(
-                                Icons.shield_outlined,
-                                size: 16,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
+                    FactionBadgeIcon(
+                      factionName: army.factionName,
+                      factionId: army.factionId,
+                      size: 28,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -1393,9 +1377,10 @@ class _RecentAdditionsRow extends StatelessWidget {
                           width: 110,
                           height: 72,
                           color: AppColors.surface,
-                          child: const Icon(
-                            Icons.shield_outlined,
-                            color: AppColors.textSecondary,
+                          alignment: Alignment.center,
+                          child: FactionBadgeIcon(
+                            factionName: entry.factionName,
+                            size: 40,
                           ),
                         ),
                 ),

@@ -10,6 +10,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_dialog_shortcuts.dart';
+import '../../../core/widgets/unit_fallback_visual.dart';
 import '../../../database/models/army_details.dart';
 import '../../../database/models/battle_details.dart';
 import '../../../database/models/battle_event_details.dart';
@@ -1171,10 +1172,17 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
                                 width: 52,
                                 height: 52,
                                 color: AppColors.surfaceElevated,
-                                child: Icon(
-                                  Icons.shield_outlined,
-                                  color: AppColors.textSecondary,
-                                  size: 24,
+                                child: UnitFallbackVisual(
+                                  factionName:
+                                      datasheetAsync.value?.factionName ?? '',
+                                  roleIcon: unitRoleIcon(
+                                    isWarlord: widget.unit.isWarlord,
+                                    isCharacter: widget.unit.isCharacter,
+                                    archetype: null,
+                                    battlefieldRole:
+                                        widget.unit.battlefieldRole,
+                                  ),
+                                  size: 52,
                                 ),
                               ),
                       ),
