@@ -1739,6 +1739,12 @@ class _ProjectRow extends ConsumerWidget {
                   if (confirmed != true) return;
                   await ref.read(projectRepositoryProvider).deleteProject(id);
                   ref.invalidate(projectsListProvider);
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.dashboardProjectDeleted(title)),
+                    ),
+                  );
                 },
               ),
             ],

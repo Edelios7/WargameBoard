@@ -48,6 +48,13 @@
   "customizationPresetApply": "Appliquer",
   "customizationPresetDelete": "Supprimer ce thème",
   "customizationNoPresets": "Aucun thème enregistré pour l'instant.",
+  "customizationDeletePresetConfirmTitle": "Supprimer ce thème ?",
+  "customizationDeletePresetConfirmMessage": "« {name} » sera définitivement supprimé.",
+  "@customizationDeletePresetConfirmMessage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
 
   "settingsProfileTitle": "Profil",
   "settingsDisplayNameLabel": "Ton nom",
@@ -97,6 +104,7 @@
   "catalogRemoveFavoriteTooltip": "Retirer des favoris",
   "catalogFavoritesOnlyOn": "Afficher uniquement les favoris",
   "catalogFavoritesOnlyOff": "Afficher toutes les fiches",
+  "catalogFavoritesOnlyChip": "Favoris",
   "catalogSelectPrompt": "Sélectionnez une unité pour voir sa fiche",
   "catalogLoadError": "Erreur de chargement du catalogue : {error}",
   "@catalogLoadError": {
@@ -160,6 +168,7 @@
   "catalogBackToCatalog": "Catalogue",
   "commonBack": "Retour",
   "commonLoadError": "Un problème est survenu pendant le chargement.",
+  "commonSaveError": "Un problème est survenu pendant l'enregistrement.",
   "commonRetry": "Réessayer",
   "catalogWeaponsButton": "Armes",
   "catalogWeaponsTitle": "Inventaire des armes",
@@ -348,6 +357,12 @@
   "armyBuilderPickOne": "Choisis une option",
   "armyBuilderPickUpTo": "Choisis jusqu'à {count} options",
   "@armyBuilderPickUpTo": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "armyBuilderSelectAtLeastMore": "Choisis-en encore {count} pour valider",
+  "@armyBuilderSelectAtLeastMore": {
     "placeholders": {
       "count": { "type": "int" }
     }
@@ -673,6 +688,12 @@
   "dashboardDeleteProjectConfirmTitle": "Supprimer ce projet ?",
   "dashboardDeleteProjectConfirmMessage": "« {title} » sera définitivement supprimé.",
   "@dashboardDeleteProjectConfirmMessage": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "dashboardProjectDeleted": "« {title} » supprimé.",
+  "@dashboardProjectDeleted": {
     "placeholders": {
       "title": { "type": "String" }
     }

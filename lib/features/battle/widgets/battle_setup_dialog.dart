@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -93,30 +94,43 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
   Future<void> _start() async {
     if (_submitting) return;
     setState(() => _submitting = true);
-    final id = await ref
-        .read(battleRepositoryProvider)
-        .startBattle(
-          armyId: _armyId,
-          opponentArmyId: _opponentArmyId,
-          opponentName: _opponentController.text.trim().isEmpty
-              ? null
-              : _opponentController.text.trim(),
-          opponentFactionId: _opponentFactionId,
-          pointsLimit: int.tryParse(_pointsLimitController.text.trim()),
-          missionName: _missionController.text.trim().isEmpty
-              ? null
-              : _missionController.text.trim(),
-          missionPack: _missionPackController.text.trim().isEmpty
-              ? null
-              : _missionPackController.text.trim(),
-          terrain: _terrainController.text.trim().isEmpty
-              ? null
-              : _terrainController.text.trim(),
-          type: _type,
-        );
+    try {
+      final id = await ref
+          .read(battleRepositoryProvider)
+          .startBattle(
+            armyId: _armyId,
+            opponentArmyId: _opponentArmyId,
+            opponentName: _opponentController.text.trim().isEmpty
+                ? null
+                : _opponentController.text.trim(),
+            opponentFactionId: _opponentFactionId,
+            pointsLimit: int.tryParse(_pointsLimitController.text.trim()),
+            missionName: _missionController.text.trim().isEmpty
+                ? null
+                : _missionController.text.trim(),
+            missionPack: _missionPackController.text.trim().isEmpty
+                ? null
+                : _missionPackController.text.trim(),
+            terrain: _terrainController.text.trim().isEmpty
+                ? null
+                : _terrainController.text.trim(),
+            type: _type,
+          );
 
-    ref.invalidate(activeBattleProvider);
-    if (mounted) Navigator.of(context).pop(id);
+      ref.invalidate(activeBattleProvider);
+      if (mounted) Navigator.of(context).pop(id);
+    } catch (_) {
+      // Sans ce filet, une erreur ici laissait `_submitting` bloqué à
+      // `true` pour toujours : le bouton restait désactivé en spinner,
+      // sans le moindre message, et démarrer une partie devenait
+      // impossible sans fermer/rouvrir le dialogue.
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.commonSaveError)));
+    }
   }
 
   InputDecoration _decoration(String label) {
@@ -280,6 +294,9 @@ class _BattleSetupDialogState extends ConsumerState<BattleSetupDialog> {
                           child: TextField(
                             controller: _pointsLimitController,
                             keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
                             style: AppTextStyles.body,
                             decoration: _decoration(
                               l10n.battlePointsLimitLabel,

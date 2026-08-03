@@ -48,6 +48,13 @@
   "customizationPresetApply": "Apply",
   "customizationPresetDelete": "Delete this theme",
   "customizationNoPresets": "No saved themes yet.",
+  "customizationDeletePresetConfirmTitle": "Delete this theme?",
+  "customizationDeletePresetConfirmMessage": "\"{name}\" will be permanently deleted.",
+  "@customizationDeletePresetConfirmMessage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
 
   "settingsProfileTitle": "Profile",
   "settingsDisplayNameLabel": "Your name",
@@ -97,6 +104,7 @@
   "catalogRemoveFavoriteTooltip": "Remove from favorites",
   "catalogFavoritesOnlyOn": "Show favorites only",
   "catalogFavoritesOnlyOff": "Show all datasheets",
+  "catalogFavoritesOnlyChip": "Favorites",
   "catalogSelectPrompt": "Select a unit to see its datasheet",
   "catalogLoadError": "Error loading catalog: {error}",
   "@catalogLoadError": {
@@ -160,6 +168,7 @@
   "catalogBackToCatalog": "Catalog",
   "commonBack": "Back",
   "commonLoadError": "Something went wrong while loading.",
+  "commonSaveError": "Something went wrong while saving.",
   "commonRetry": "Retry",
   "catalogWeaponsButton": "Weapons",
   "catalogWeaponsTitle": "Weapons inventory",
@@ -348,6 +357,12 @@
   "armyBuilderPickOne": "Pick an option",
   "armyBuilderPickUpTo": "Pick up to {count} options",
   "@armyBuilderPickUpTo": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "armyBuilderSelectAtLeastMore": "Pick {count} more to continue",
+  "@armyBuilderSelectAtLeastMore": {
     "placeholders": {
       "count": { "type": "int" }
     }
@@ -673,6 +688,12 @@
   "dashboardDeleteProjectConfirmTitle": "Delete this project?",
   "dashboardDeleteProjectConfirmMessage": "\"{title}\" will be permanently deleted.",
   "@dashboardDeleteProjectConfirmMessage": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "dashboardProjectDeleted": "\"{title}\" deleted.",
+  "@dashboardProjectDeleted": {
     "placeholders": {
       "title": { "type": "String" }
     }

@@ -73,36 +73,49 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
 
   Future<void> _save() async {
     if (_submitting) return;
-    _submitting = true;
-    await ref
-        .read(battleRepositoryProvider)
-        .addBattle(
-          armyId: _armyId,
-          opponentName: _opponentController.text.trim().isEmpty
-              ? null
-              : _opponentController.text.trim(),
-          opponentFactionId: _opponentFactionId,
-          location: _locationController.text.trim().isEmpty
-              ? null
-              : _locationController.text.trim(),
-          missionName: _missionController.text.trim().isEmpty
-              ? null
-              : _missionController.text.trim(),
-          result: _result,
-          type: _type,
-          myScore: int.tryParse(_myScoreController.text.trim()),
-          opponentScore: int.tryParse(_opponentScoreController.text.trim()),
-          notes: _notesController.text.trim().isEmpty
-              ? null
-              : _notesController.text.trim(),
-          playedAt: _playedAt,
-        );
+    setState(() => _submitting = true);
+    try {
+      await ref
+          .read(battleRepositoryProvider)
+          .addBattle(
+            armyId: _armyId,
+            opponentName: _opponentController.text.trim().isEmpty
+                ? null
+                : _opponentController.text.trim(),
+            opponentFactionId: _opponentFactionId,
+            location: _locationController.text.trim().isEmpty
+                ? null
+                : _locationController.text.trim(),
+            missionName: _missionController.text.trim().isEmpty
+                ? null
+                : _missionController.text.trim(),
+            result: _result,
+            type: _type,
+            myScore: int.tryParse(_myScoreController.text.trim()),
+            opponentScore: int.tryParse(_opponentScoreController.text.trim()),
+            notes: _notesController.text.trim().isEmpty
+                ? null
+                : _notesController.text.trim(),
+            playedAt: _playedAt,
+          );
 
-    ref.invalidate(battlesListProvider);
-    ref.invalidate(nextBattleProvider);
-    ref.invalidate(lastBattleProvider);
-    ref.invalidate(xpSummaryProvider);
-    if (mounted) Navigator.of(context).pop();
+      ref.invalidate(battlesListProvider);
+      ref.invalidate(nextBattleProvider);
+      ref.invalidate(lastBattleProvider);
+      ref.invalidate(xpSummaryProvider);
+      if (mounted) Navigator.of(context).pop();
+    } catch (_) {
+      // Sans ce filet, une erreur ici laissait `_submitting` bloqué à
+      // `true` pour toujours (jamais remis à `false`, jamais affiché nulle
+      // part) : le bouton Enregistrer ne répondait alors plus jamais, sans
+      // le moindre message pour comprendre pourquoi.
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.commonSaveError)));
+    }
   }
 
   bool get _hasUnsavedInput =>
@@ -376,8 +389,16 @@ class _LogBattleDialogState extends ConsumerState<LogBattleDialog> {
                           style: FilledButton.styleFrom(
                             backgroundColor: AppColors.primary,
                           ),
-                          onPressed: _save,
-                          child: Text(l10n.armyBuilderCreate),
+                          onPressed: _submitting ? null : _save,
+                          child: _submitting
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(l10n.armyBuilderCreate),
                         ),
                       ],
                     ),

@@ -103,7 +103,44 @@ class CustomizationPage extends ConsumerWidget {
     ref.read(themeVersionProvider.notifier).state++;
   }
 
-  Future<void> _deletePreset(WidgetRef ref, String name) async {
+  Future<void> _deletePreset(
+    BuildContext context,
+    WidgetRef ref,
+    String name,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    // Contrairement à "Tout réinitialiser" (qui demande déjà confirmation),
+    // supprimer un thème enregistré individuellement s'exécutait
+    // directement sans recours — une combinaison composée à la main
+    // (couleur, fonds d'écran, voile) perdue sur un clic mal calibré.
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AppDialogShortcuts(
+        child: AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text(
+            l10n.customizationDeletePresetConfirmTitle,
+            style: AppTextStyles.title,
+          ),
+          content: Text(
+            l10n.customizationDeletePresetConfirmMessage(name),
+            style: AppTextStyles.body,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.armyBuilderCancel),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(l10n.customizationPresetDelete),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmed != true) return;
     await ref.read(customizationServiceProvider).deletePreset(name);
     ref.read(themeVersionProvider.notifier).state++;
   }
@@ -407,8 +444,11 @@ class CustomizationPage extends ConsumerWidget {
                                   child: _PresetRow(
                                     preset: preset,
                                     onApply: () => _applyPreset(ref, preset),
-                                    onDelete: () =>
-                                        _deletePreset(ref, preset.name),
+                                    onDelete: () => _deletePreset(
+                                      context,
+                                      ref,
+                                      preset.name,
+                                    ),
                                   ),
                                 ),
                             ],
@@ -474,11 +514,7 @@ class _LivePreviewStrip extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.check_circle_rounded,
-                        color: accent,
-                        size: 16,
-                      ),
+                      Icon(Icons.check_circle_rounded, color: accent, size: 16),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -542,7 +578,10 @@ class _PresetRow extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        TextButton(onPressed: onApply, child: Text(l10n.customizationPresetApply)),
+        TextButton(
+          onPressed: onApply,
+          child: Text(l10n.customizationPresetApply),
+        ),
         IconButton(
           tooltip: l10n.customizationPresetDelete,
           icon: const Icon(Icons.close_rounded, size: 18),

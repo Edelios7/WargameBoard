@@ -1499,7 +1499,11 @@ class _WishlistTab extends ConsumerWidget {
                       ),
                       IconButton(
                         tooltip: l10n.wishlistRemove,
-                        icon: const Icon(Icons.close_rounded),
+                        // Même icône que la suppression d'une entrée de
+                        // collection (delete_outline_rounded) — une croix
+                        // laissait penser à tort à une action moins
+                        // définitive pour la même action de suppression.
+                        icon: const Icon(Icons.delete_outline_rounded),
                         color: AppColors.textSecondary,
                         onPressed: () async {
                           // Même garde-fou que la suppression d'une entrée

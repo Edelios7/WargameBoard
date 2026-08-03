@@ -368,6 +368,18 @@ abstract class AppLocalizations {
   /// **'Aucun thème enregistré pour l\'instant.'**
   String get customizationNoPresets;
 
+  /// No description provided for @customizationDeletePresetConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer ce thème ?'**
+  String get customizationDeletePresetConfirmTitle;
+
+  /// No description provided for @customizationDeletePresetConfirmMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'« {name} » sera définitivement supprimé.'**
+  String customizationDeletePresetConfirmMessage(String name);
+
   /// No description provided for @settingsProfileTitle.
   ///
   /// In fr, this message translates to:
@@ -583,6 +595,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Afficher toutes les fiches'**
   String get catalogFavoritesOnlyOff;
+
+  /// No description provided for @catalogFavoritesOnlyChip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Favoris'**
+  String get catalogFavoritesOnlyChip;
 
   /// No description provided for @catalogSelectPrompt.
   ///
@@ -805,6 +823,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Un problème est survenu pendant le chargement.'**
   String get commonLoadError;
+
+  /// No description provided for @commonSaveError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un problème est survenu pendant l\'enregistrement.'**
+  String get commonSaveError;
 
   /// No description provided for @commonRetry.
   ///
@@ -1477,6 +1501,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Choisis jusqu\'à {count} options'**
   String armyBuilderPickUpTo(int count);
+
+  /// No description provided for @armyBuilderSelectAtLeastMore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisis-en encore {count} pour valider'**
+  String armyBuilderSelectAtLeastMore(int count);
 
   /// No description provided for @armyBuilderSave.
   ///
@@ -2653,6 +2683,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'« {title} » sera définitivement supprimé.'**
   String dashboardDeleteProjectConfirmMessage(String title);
+
+  /// No description provided for @dashboardProjectDeleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'« {title} » supprimé.'**
+  String dashboardProjectDeleted(String title);
 
   /// No description provided for @dashboardSearchHint.
   ///

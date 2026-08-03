@@ -3274,6 +3274,17 @@ class _EquipmentGroupDialogState extends ConsumerState<_EquipmentGroupDialog> {
                       : l10n.armyBuilderPickUpTo(widget.group.maximumChoices),
                   style: AppTextStyles.caption,
                 ),
+                if (!canSave) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.armyBuilderSelectAtLeastMore(
+                      widget.group.minimumChoices - _selected.length,
+                    ),
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.warning,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxHeight: 320),
@@ -3544,10 +3555,15 @@ class _NotesDialog extends ConsumerWidget {
                 const SizedBox(height: 16),
                 Align(
                   alignment: Alignment.centerRight,
+                  // "Fermer", pas "Annuler" : le champ ci-dessus s'enregistre
+                  // déjà tout seul (perte de focus / démontage), il n'y a
+                  // donc rien à annuler — ce bouton ne fait que fermer le
+                  // dialogue, contrairement à ce que "Annuler" laisserait
+                  // penser (le texte tapé serait perdu).
                   child: TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: Text(
-                      l10n.armyBuilderCancel,
+                      l10n.armyBuilderClose,
                       style: AppTextStyles.body,
                     ),
                   ),

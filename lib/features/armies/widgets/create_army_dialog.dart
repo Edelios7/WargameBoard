@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -200,6 +201,13 @@ class _CreateArmyDialogState extends ConsumerState<CreateArmyDialog> {
                   TextField(
                     controller: _pointsLimitController,
                     keyboardType: TextInputType.number,
+                    // Sans ce filtre, taper "2k" ou "abc" ici ne levait
+                    // aucune erreur : int.tryParse renvoyait juste null en
+                    // silence à la création, et l'armée se retrouvait sans
+                    // limite de points sans que l'utilisateur comprenne
+                    // pourquoi — ne laisser saisir que des chiffres empêche
+                    // ce piège plutôt que de le signaler après coup.
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     style: AppTextStyles.body,
                     onSubmitted: (_) => _create(),
                     decoration: InputDecoration(

@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_wallpapers.dart';
 import '../../../core/utils/rule_pdf_source.dart';
+import '../../../core/utils/search_normalize.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/rules/rule_document.dart';
 import '../../../domain/rules/rules_data.dart';
@@ -42,9 +43,9 @@ class _RulesPageState extends State<RulesPage> {
 
   List<RuleDocument> get _filtered {
     return kRuleDocuments.where((doc) {
-      final matchesQuery = doc.title.toLowerCase().contains(
-        _query.toLowerCase(),
-      );
+      final matchesQuery = normalizeForSearch(
+        doc.title,
+      ).contains(normalizeForSearch(_query));
       final matchesCategory = _category == null || doc.category == _category;
       return matchesQuery && matchesCategory;
     }).toList();
@@ -301,9 +302,13 @@ class _RulesHeaderState extends State<_RulesHeader> {
             Flexible(
               child: Tooltip(
                 message: l10n.rulesAddComingSoon,
-                child: FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                // Bouton secondaire (pas FilledButton) : cette action
+                // n'affiche pour l'instant qu'un "bientôt disponible", la
+                // traiter visuellement comme l'action principale de
+                // l'écran (couleur pleine) inviterait à cliquer pour rien.
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.border),
                   ),
                   onPressed: widget.onAdd,
                   icon: const Icon(Icons.add_rounded),

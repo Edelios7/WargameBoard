@@ -856,6 +856,38 @@ class _ResultsList extends ConsumerWidget {
                         l10n.catalogEmptyResults,
                         style: AppTextStyles.caption,
                       ),
+                      const SizedBox(height: 10),
+                      TextButton(
+                        onPressed: () {
+                          ref
+                                  .read(catalogFactionFilterProvider.notifier)
+                                  .state =
+                              null;
+                          ref
+                                  .read(catalogKeywordFilterProvider.notifier)
+                                  .state =
+                              {};
+                          ref.read(catalogRoleFilterProvider.notifier).state =
+                              null;
+                          ref
+                                  .read(catalogUnitTypeFilterProvider.notifier)
+                                  .state =
+                              null;
+                          ref
+                                  .read(catalogEditionFilterProvider.notifier)
+                                  .state =
+                              null;
+                          ref.read(catalogPointsRangeProvider.notifier).state =
+                              null;
+                          ref.read(catalogSearchQueryProvider.notifier).state =
+                              '';
+                          ref
+                                  .read(catalogFavoritesOnlyProvider.notifier)
+                                  .state =
+                              false;
+                        },
+                        child: Text(l10n.catalogResetFilters),
+                      ),
                     ],
                   ),
                 ),
@@ -963,6 +995,16 @@ class _ActiveFiltersRow extends ConsumerWidget {
         _activeFilterChip(
           '${pointsRange.start.round()}-${pointsRange.end.round()} pts',
           () => ref.read(catalogPointsRangeProvider.notifier).state = null,
+        ),
+      );
+    }
+    final favoritesOnly = ref.watch(catalogFavoritesOnlyProvider);
+    if (favoritesOnly) {
+      final l10n = AppLocalizations.of(context)!;
+      chips.add(
+        _activeFilterChip(
+          l10n.catalogFavoritesOnlyChip,
+          () => ref.read(catalogFavoritesOnlyProvider.notifier).state = false,
         ),
       );
     }
@@ -1245,6 +1287,11 @@ class _CatalogSearchFieldState extends ConsumerState<_CatalogSearchField> {
     _controller = TextEditingController(
       text: ref.read(catalogSearchQueryProvider),
     );
+    // Le champ n'écoute pas catalogSearchQueryProvider via ref.watch (juste
+    // ref.listen plus bas, pour la synchro externe) : sans ce listener, le
+    // bouton "effacer" ci-dessous ne réagirait qu'aux changements externes,
+    // jamais à la frappe de l'utilisateur elle-même.
+    _controller.addListener(() => setState(() {}));
   }
 
   @override
@@ -1282,6 +1329,19 @@ class _CatalogSearchFieldState extends ConsumerState<_CatalogSearchField> {
             Icons.search_rounded,
             color: AppColors.textSecondary,
           ),
+          suffixIcon: _controller.text.isEmpty
+              ? null
+              : IconButton(
+                  tooltip: AppLocalizations.of(
+                    context,
+                  )!.catalogWeaponsSearchClear,
+                  icon: const Icon(Icons.close_rounded, size: 18),
+                  color: AppColors.textSecondary,
+                  onPressed: () {
+                    _controller.clear();
+                    ref.read(catalogSearchQueryProvider.notifier).state = '';
+                  },
+                ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 14),
         ),

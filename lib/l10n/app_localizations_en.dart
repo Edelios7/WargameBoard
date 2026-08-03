@@ -150,6 +150,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customizationNoPresets => 'No saved themes yet.';
 
   @override
+  String get customizationDeletePresetConfirmTitle => 'Delete this theme?';
+
+  @override
+  String customizationDeletePresetConfirmMessage(String name) {
+    return '\"$name\" will be permanently deleted.';
+  }
+
+  @override
   String get settingsProfileTitle => 'Profile';
 
   @override
@@ -269,6 +277,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get catalogFavoritesOnlyOff => 'Show all datasheets';
+
+  @override
+  String get catalogFavoritesOnlyChip => 'Favorites';
 
   @override
   String get catalogSelectPrompt => 'Select a unit to see its datasheet';
@@ -391,6 +402,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commonLoadError => 'Something went wrong while loading.';
+
+  @override
+  String get commonSaveError => 'Something went wrong while saving.';
 
   @override
   String get commonRetry => 'Retry';
@@ -759,6 +773,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String armyBuilderPickUpTo(int count) {
     return 'Pick up to $count options';
+  }
+
+  @override
+  String armyBuilderSelectAtLeastMore(int count) {
+    return 'Pick $count more to continue';
   }
 
   @override
@@ -1413,6 +1432,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String dashboardDeleteProjectConfirmMessage(String title) {
     return '\"$title\" will be permanently deleted.';
+  }
+
+  @override
+  String dashboardProjectDeleted(String title) {
+    return '\"$title\" deleted.';
   }
 
   @override

@@ -151,6 +151,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aucun thème enregistré pour l\'instant.';
 
   @override
+  String get customizationDeletePresetConfirmTitle => 'Supprimer ce thème ?';
+
+  @override
+  String customizationDeletePresetConfirmMessage(String name) {
+    return '« $name » sera définitivement supprimé.';
+  }
+
+  @override
   String get settingsProfileTitle => 'Profil';
 
   @override
@@ -276,6 +284,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get catalogFavoritesOnlyOff => 'Afficher toutes les fiches';
 
   @override
+  String get catalogFavoritesOnlyChip => 'Favoris';
+
+  @override
   String get catalogSelectPrompt => 'Sélectionnez une unité pour voir sa fiche';
 
   @override
@@ -397,6 +408,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get commonLoadError =>
       'Un problème est survenu pendant le chargement.';
+
+  @override
+  String get commonSaveError =>
+      'Un problème est survenu pendant l\'enregistrement.';
 
   @override
   String get commonRetry => 'Réessayer';
@@ -769,6 +784,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String armyBuilderPickUpTo(int count) {
     return 'Choisis jusqu\'à $count options';
+  }
+
+  @override
+  String armyBuilderSelectAtLeastMore(int count) {
+    return 'Choisis-en encore $count pour valider';
   }
 
   @override
@@ -1428,6 +1448,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String dashboardDeleteProjectConfirmMessage(String title) {
     return '« $title » sera définitivement supprimé.';
+  }
+
+  @override
+  String dashboardProjectDeleted(String title) {
+    return '« $title » supprimé.';
   }
 
   @override

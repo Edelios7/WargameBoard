@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/search_normalize.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/rules/army_list_style_parser.dart';
 import '../../../domain/rules/rule_document.dart';
@@ -60,8 +61,10 @@ class _ArmyListsGuidePageState extends State<ArmyListsGuidePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final normalizedQuery = normalizeForSearch(_query);
     final factions = _byFaction.keys.where((f) {
-      return _query.isEmpty || f.toLowerCase().contains(_query.toLowerCase());
+      return normalizedQuery.isEmpty ||
+          normalizeForSearch(f).contains(normalizedQuery);
     }).toList();
     final selectedStyles = _selectedFaction == null
         ? null
