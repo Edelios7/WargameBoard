@@ -6,6 +6,7 @@ import '../../l10n/app_localizations.dart';
 import '../../providers/customization_provider.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
+import '../theme/block_overrides.dart';
 import 'app_dialog_shortcuts.dart';
 
 /// Petit bouton d'édition affiché en overlay sur un bloc ou une page, visible
@@ -50,9 +51,25 @@ class _CustomizationEditBadgeState
 
   Future<void> _chooseColor() async {
     final l10n = AppLocalizations.of(context)!;
-    final current = ref.read(blockOverrideProvider(widget.id));
-    final initial = current?.color ?? AppColors.primary;
+    // Capturée avant d'ouvrir le dialogue pour pouvoir restaurer exactement
+    // ce qu'il y avait avant (image, couleur ou rien) si l'utilisateur
+    // annule après avoir prévisualisé plusieurs teintes.
+    final previous = ref.read(blockOverrideProvider(widget.id));
+    final initial = previous?.color ?? AppColors.primary;
     var picked = initial;
+
+    void restorePrevious() {
+      final image = previous?.image;
+      final color = previous?.color;
+      if (image != null) {
+        BlockOverrides.setImage(widget.id, image);
+      } else if (color != null) {
+        BlockOverrides.setColor(widget.id, color);
+      } else {
+        BlockOverrides.clear(widget.id);
+      }
+      ref.read(themeVersionProvider.notifier).state++;
+    }
 
     final chosen = await showDialog<Color>(
       context: context,
@@ -64,7 +81,16 @@ class _CustomizationEditBadgeState
             width: 280,
             child: HsvColorPicker(
               initialColor: initial,
-              onChanged: (color) => picked = color,
+              // Prévisualisation en direct : applique la couleur tout de
+              // suite (juste le static en mémoire, pas encore persisté) pour
+              // voir le rendu réel derrière le dialogue pendant qu'on
+              // glisse sur la pipette — seul "Appliquer" l'enregistre pour
+              // de bon ; "Annuler" (ou fermer autrement) revient en arrière.
+              onChanged: (color) {
+                picked = color;
+                BlockOverrides.setColor(widget.id, color);
+                ref.read(themeVersionProvider.notifier).state++;
+              },
             ),
           ),
           actions: [
@@ -81,7 +107,10 @@ class _CustomizationEditBadgeState
         ),
       ),
     );
-    if (chosen == null) return;
+    if (chosen == null) {
+      restorePrevious();
+      return;
+    }
 
     await ref
         .read(customizationServiceProvider)
