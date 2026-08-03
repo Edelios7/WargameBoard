@@ -22,6 +22,13 @@ class AppCard extends StatefulWidget {
   /// [AppWallpapers.banner]) plutôt que le réglage générique "Cartes".
   final File? wallpaperOverride;
 
+  /// Teinte de fond optionnelle (ex. la couleur de faction d'une armée) —
+  /// mélangée à la couleur de fond habituelle plutôt que de la remplacer,
+  /// pour que le texte reste toujours lisible quelle que soit la couleur.
+  /// Ignorée si un fond d'écran (image) est actif : les deux se
+  /// superposeraient mal.
+  final Color? accentColor;
+
   const AppCard({
     super.key,
     required this.child,
@@ -29,6 +36,7 @@ class AppCard extends StatefulWidget {
     this.padding = const EdgeInsets.all(20),
     this.selected = false,
     this.wallpaperOverride,
+    this.accentColor,
   });
 
   @override
@@ -43,6 +51,15 @@ class _AppCardState extends State<AppCard> {
     final interactive = widget.onTap != null;
     final hovered = interactive && _hovered;
     final wallpaper = widget.wallpaperOverride ?? AppWallpapers.cards;
+    final accentColor = widget.accentColor;
+    final baseColor = wallpaper != null
+        ? null
+        : accentColor == null
+        ? AppColors.surfaceElevated
+        : Color.alphaBlend(
+            accentColor.withValues(alpha: hovered ? .28 : .20),
+            AppColors.surfaceElevated,
+          );
 
     return MouseRegion(
       onEnter: interactive ? (_) => setState(() => _hovered = true) : null,
@@ -52,7 +69,7 @@ class _AppCardState extends State<AppCard> {
         duration: const Duration(milliseconds: 140),
         curve: Curves.easeOut,
         child: Material(
-          color: wallpaper == null ? AppColors.surfaceElevated : null,
+          color: baseColor,
           borderRadius: BorderRadius.circular(14),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
@@ -87,7 +104,8 @@ class _AppCardState extends State<AppCard> {
                           ? AppColors.primary
                           : hovered
                           ? AppColors.primary.withValues(alpha: .5)
-                          : AppColors.border,
+                          : accentColor?.withValues(alpha: .45) ??
+                                AppColors.border,
                       width: widget.selected ? 1.4 : 1,
                     ),
                     boxShadow: hovered

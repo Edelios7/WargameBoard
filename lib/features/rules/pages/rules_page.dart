@@ -361,6 +361,10 @@ class _HeroCard extends StatelessWidget {
         builder: (context, constraints) {
           final wide = constraints.maxWidth > 720;
 
+          // Un dégradé à peine teinté (alpha .28) sur fond quasi noir se
+          // lisait comme une case vide avec une petite icône perdue au
+          // milieu plutôt qu'une vraie couverture de livre — un dégradé
+          // plus saturé, bord à bord, se rapproche du rendu visé.
           final cover = Container(
             width: wide ? 220 : double.infinity,
             height: 150,
@@ -369,17 +373,14 @@ class _HeroCard extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primary.withValues(alpha: .28),
-                  AppColors.surfaceElevated,
-                ],
+                colors: [AppColors.primary, AppColors.primaryDark],
               ),
             ),
             child: Center(
               child: Icon(
                 Icons.shield_moon_rounded,
                 size: 56,
-                color: AppColors.primaryLight,
+                color: Colors.white.withValues(alpha: .92),
               ),
             ),
           );

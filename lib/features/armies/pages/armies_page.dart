@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_wallpapers.dart';
+import '../../../core/theme/faction_colors.dart';
 import '../../../core/utils/army_list_formatter.dart';
 import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/utils/search_normalize.dart';
@@ -161,10 +163,20 @@ Future<void> _removeUnitWithUndo(
 
   if (!context.mounted) return;
   final l10n = AppLocalizations.of(context)!;
+  const undoWindow = Duration(seconds: 5);
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      content: Text(l10n.armyBuilderUnitRemoved(unit.datasheetName)),
-      duration: const Duration(seconds: 5),
+      // La barre de progression qui se vide rend visible le compte à
+      // rebours vers la fermeture automatique — sur desktop, un SnackBar
+      // survolé par la souris met sa fermeture en pause tant que le
+      // curseur reste dessus (comportement Material voulu, pour laisser
+      // le temps de lire/cliquer "Annuler"), ce qui pouvait donner
+      // l'impression à tort qu'il ne partait "jamais".
+      content: _UndoSnackBarContent(
+        message: l10n.armyBuilderUnitRemoved(unit.datasheetName),
+        duration: undoWindow,
+      ),
+      duration: undoWindow,
       action: SnackBarAction(
         label: l10n.armyBuilderUndoRemove,
         onPressed: () async {
@@ -180,6 +192,45 @@ Future<void> _removeUnitWithUndo(
       ),
     ),
   );
+}
+
+/// Contenu d'un SnackBar "annulable" avec une barre de progression qui se
+/// vide sur [duration] — rend visible le compte à rebours vers la
+/// fermeture automatique, plutôt qu'un simple texte qui donne l'impression
+/// (à tort) de rester affiché indéfiniment.
+class _UndoSnackBarContent extends StatelessWidget {
+  final String message;
+  final Duration duration;
+
+  const _UndoSnackBarContent({required this.message, required this.duration});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(message),
+        const SizedBox(height: 8),
+        TweenAnimationBuilder<double>(
+          tween: Tween(begin: 1, end: 0),
+          duration: duration,
+          curve: Curves.linear,
+          builder: (context, value, _) => ClipRRect(
+            borderRadius: BorderRadius.circular(2),
+            child: LinearProgressIndicator(
+              value: value,
+              minHeight: 3,
+              backgroundColor: Colors.white.withValues(alpha: .16),
+              valueColor: AlwaysStoppedAnimation(
+                Colors.white.withValues(alpha: .7),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 /// Ajoute une copie d'une unité déjà présente dans l'armée (même
@@ -355,6 +406,7 @@ class _ArmyListPage extends ConsumerWidget {
                             itemBuilder: (context, index) {
                               final army = armies[index];
                               return AppCard(
+                                accentColor: FactionColors.of(army.factionId),
                                 onTap: () =>
                                     ref
                                         .read(selectedArmyIdProvider.notifier)
@@ -1327,6 +1379,26 @@ class _BuilderSidebarState extends ConsumerState<_BuilderSidebar> {
             ),
           ),
           const SizedBox(height: 16),
+          // Placé ici (au-dessus de la liste/recherche d'unités), pas en
+          // bas de la colonne comme avant : le SnackBar "annuler" affiché
+          // après un retrait d'unité se pose tout en bas de l'écran et
+          // cachait complètement ce bouton juste après l'action où
+          // l'utilisateur en a justement le plus besoin (rajouter une
+          // unité de remplacement).
+          FilledButton.icon(
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              minimumSize: const Size.fromHeight(40),
+            ),
+            onPressed: () => showDialog(
+              context: context,
+              builder: (_) =>
+                  AddUnitDialog(armyId: army.id, factionId: army.factionId),
+            ),
+            icon: const Icon(Icons.add_rounded),
+            label: Text(l10n.armyBuilderAddUnit),
+          ),
+          const SizedBox(height: 16),
           Text(
             l10n.armyBuilderUnitsSection.toUpperCase(),
             style: AppTextStyles.eyebrow,
@@ -1410,20 +1482,6 @@ class _BuilderSidebarState extends ConsumerState<_BuilderSidebar> {
                       );
                     },
                   ),
-          ),
-          const SizedBox(height: 10),
-          FilledButton.icon(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              minimumSize: const Size.fromHeight(40),
-            ),
-            onPressed: () => showDialog(
-              context: context,
-              builder: (_) =>
-                  AddUnitDialog(armyId: army.id, factionId: army.factionId),
-            ),
-            icon: const Icon(Icons.add_rounded),
-            label: Text(l10n.armyBuilderAddUnit),
           ),
         ],
       ),
@@ -1558,15 +1616,23 @@ class _UnitRosterRow extends ConsumerWidget {
                           const SizedBox(width: 4),
                         ],
                         Flexible(
-                          child: Text(
-                            unit.datasheetName,
-                            style: AppTextStyles.body.copyWith(
-                              fontWeight: selected
-                                  ? FontWeight.w600
-                                  : FontWeight.w400,
+                          // Sur une seule ligne de sidebar, réduire la
+                          // police jusqu'à faire tenir un nom très long
+                          // le rendrait illisible — l'infobulle au survol
+                          // donne accès au nom complet sans sacrifier la
+                          // lisibilité de la ligne.
+                          child: Tooltip(
+                            message: unit.datasheetName,
+                            child: Text(
+                              unit.datasheetName,
+                              style: AppTextStyles.body.copyWith(
+                                fontWeight: selected
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -2100,14 +2166,23 @@ class _UnitCardVisual extends StatelessWidget {
                     ],
                   ),
                 ),
-                child: Text(
-                  unit.datasheetName,
-                  style: AppTextStyles.body.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
+                // AutoSizeText plutôt que Text+ellipsis : un nom de fiche
+                // long (fréquent en 40k, ex. "Escouade de Vétérans
+                // Vanguards à Réacteurs Dorsaux") ne doit jamais être
+                // coupé — la police se réduit au besoin pour que le nom
+                // entier tienne toujours dans la zone réservée.
+                child: SizedBox(
+                  height: 54,
+                  child: AutoSizeText(
+                    unit.datasheetName,
+                    style: AppTextStyles.body.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 3,
+                    minFontSize: 8,
+                    overflow: TextOverflow.visible,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
