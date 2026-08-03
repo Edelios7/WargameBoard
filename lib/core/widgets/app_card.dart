@@ -22,9 +22,11 @@ class AppCard extends StatefulWidget {
   /// [AppWallpapers.banner]) plutôt que le réglage générique "Cartes".
   final File? wallpaperOverride;
 
-  /// Teinte de fond optionnelle (ex. la couleur de faction d'une armée) —
-  /// mélangée à la couleur de fond habituelle plutôt que de la remplacer,
-  /// pour que le texte reste toujours lisible quelle que soit la couleur.
+  /// Teinte d'accent optionnelle (ex. la couleur de faction d'une armée) —
+  /// se limite à la bordure de la carte, le fond reste neutre. Un fond
+  /// entièrement teinté écrasait le titre (petit texte) sous un gros
+  /// aplat de couleur et donnait une impression de décalage/déséquilibre ;
+  /// la bordure suffit à identifier la carte sans dominer visuellement.
   /// Ignorée si un fond d'écran (image) est actif : les deux se
   /// superposeraient mal.
   final Color? accentColor;
@@ -52,14 +54,7 @@ class _AppCardState extends State<AppCard> {
     final hovered = interactive && _hovered;
     final wallpaper = widget.wallpaperOverride ?? AppWallpapers.cards;
     final accentColor = widget.accentColor;
-    final baseColor = wallpaper != null
-        ? null
-        : accentColor == null
-        ? AppColors.surfaceElevated
-        : Color.alphaBlend(
-            accentColor.withValues(alpha: hovered ? .28 : .20),
-            AppColors.surfaceElevated,
-          );
+    final baseColor = wallpaper != null ? null : AppColors.surfaceElevated;
 
     return MouseRegion(
       onEnter: interactive ? (_) => setState(() => _hovered = true) : null,
@@ -104,9 +99,13 @@ class _AppCardState extends State<AppCard> {
                           ? AppColors.primary
                           : hovered
                           ? AppColors.primary.withValues(alpha: .5)
-                          : accentColor?.withValues(alpha: .45) ??
+                          : accentColor?.withValues(alpha: .6) ??
                                 AppColors.border,
-                      width: widget.selected ? 1.4 : 1,
+                      width: widget.selected
+                          ? 1.4
+                          : accentColor != null
+                          ? 1.4
+                          : 1,
                     ),
                     boxShadow: hovered
                         ? [

@@ -164,19 +164,23 @@ Future<void> _removeUnitWithUndo(
   if (!context.mounted) return;
   final l10n = AppLocalizations.of(context)!;
   const undoWindow = Duration(seconds: 5);
-  ScaffoldMessenger.of(context).showSnackBar(
+  final messenger = ScaffoldMessenger.of(context);
+  // Efface tout SnackBar déjà affiché/en file : sans ça, retirer plusieurs
+  // unités à la suite empile des SnackBars qui s'enchaînent l'un après
+  // l'autre — ça donnait l'impression que "le bandeau ne part jamais"
+  // alors qu'il s'agissait en fait de plusieurs bandeaux mis bout à bout.
+  messenger.clearSnackBars();
+  messenger.showSnackBar(
     SnackBar(
       // La barre de progression qui se vide rend visible le compte à
-      // rebours vers la fermeture automatique — sur desktop, un SnackBar
-      // survolé par la souris met sa fermeture en pause tant que le
-      // curseur reste dessus (comportement Material voulu, pour laisser
-      // le temps de lire/cliquer "Annuler"), ce qui pouvait donner
-      // l'impression à tort qu'il ne partait "jamais".
+      // rebours vers la fermeture automatique, et la croix permet de le
+      // faire disparaître immédiatement sans attendre.
       content: _UndoSnackBarContent(
         message: l10n.armyBuilderUnitRemoved(unit.datasheetName),
         duration: undoWindow,
       ),
       duration: undoWindow,
+      showCloseIcon: true,
       action: SnackBarAction(
         label: l10n.armyBuilderUndoRemove,
         onPressed: () async {
