@@ -890,6 +890,7 @@ class RosterBlock extends ConsumerWidget {
                     RosterChip(
                       label: unit.datasheetName,
                       modelCount: unit.modelCount,
+                      enhancementName: unit.enhancementName,
                       destroyed: destroyedIds.contains(unit.id),
                       modifierCount: modifierCounts[unit.id] ?? 0,
                       accentColor: accentColor,
@@ -930,6 +931,7 @@ class RosterBlock extends ConsumerWidget {
 class RosterChip extends StatelessWidget {
   final String label;
   final int modelCount;
+  final String? enhancementName;
   final bool destroyed;
   final int modifierCount;
   final Color accentColor;
@@ -940,6 +942,7 @@ class RosterChip extends StatelessWidget {
     super.key,
     required this.label,
     required this.modelCount,
+    this.enhancementName,
     required this.destroyed,
     required this.modifierCount,
     required this.accentColor,
@@ -975,13 +978,29 @@ class RosterChip extends StatelessWidget {
                     color: AppColors.error,
                   ),
                 ),
-              Text(
-                '$label ×$modelCount',
-                style: AppTextStyles.body.copyWith(
-                  decoration: destroyed
-                      ? TextDecoration.lineThrough
-                      : TextDecoration.none,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '$label ×$modelCount',
+                    style: AppTextStyles.body.copyWith(
+                      decoration: destroyed
+                          ? TextDecoration.lineThrough
+                          : TextDecoration.none,
+                    ),
+                  ),
+                  if (enhancementName != null && enhancementName!.isNotEmpty)
+                    Text(
+                      '★ $enhancementName',
+                      style: AppTextStyles.caption.copyWith(
+                        color: accentColor,
+                        decoration: destroyed
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
+                      ),
+                    ),
+                ],
               ),
               if (modifierCount > 0) ...[
                 const SizedBox(width: 6),
@@ -1188,9 +1207,23 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Text(
-                          widget.unit.datasheetName,
-                          style: AppTextStyles.title,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              widget.unit.datasheetName,
+                              style: AppTextStyles.title,
+                            ),
+                            if (widget.unit.enhancementName != null &&
+                                widget.unit.enhancementName!.isNotEmpty)
+                              Text(
+                                '★ ${widget.unit.enhancementName}',
+                                style: AppTextStyles.caption.copyWith(
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     ],
