@@ -4,16 +4,21 @@ import 'package:uuid/uuid.dart';
 import '../app_database.dart';
 import '../models/battle_details.dart';
 import '../models/battle_event_details.dart';
+import '../models/battle_secondary_mission_details.dart';
 import '../models/battle_unit_modifier_details.dart';
 import '../models/battle_unit_state_details.dart';
 import '../models/battle_unit_wound_details.dart';
 import '../tables/armies_table.dart';
 import '../tables/battle_events_table.dart';
+import '../tables/battle_secondary_missions_table.dart';
 import '../tables/battle_unit_modifiers_table.dart';
 import '../tables/battle_unit_states_table.dart';
 import '../tables/battle_unit_wounds_table.dart';
 import '../tables/battles_table.dart';
 import '../tables/factions_table.dart';
+import '../tables/mission_dispositions_table.dart';
+import '../tables/primary_missions_table.dart';
+import '../tables/secondary_missions_table.dart';
 
 part 'battle_dao.g.dart';
 
@@ -35,8 +40,12 @@ const _battlePhaseOrder = [
     BattleUnitStates,
     BattleUnitModifiers,
     BattleUnitWounds,
+    BattleSecondaryMissionSelections,
     Armies,
     Factions,
+    MissionDispositions,
+    PrimaryMissions,
+    SecondaryMissions,
   ],
 )
 class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
@@ -48,6 +57,17 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   /// un alias est nécessaire pour la seconde occurrence.
   late final $ArmiesTable _opponentArmies = alias(armies, 'opponentArmies');
 
+  /// `mission_dispositions` est jointe deux fois (ma posture, celle de
+  /// l'adversaire) — même raison.
+  late final $MissionDispositionsTable _myDispositions = alias(
+    missionDispositions,
+    'myDispositions',
+  );
+  late final $MissionDispositionsTable _opponentDispositions = alias(
+    missionDispositions,
+    'opponentDispositions',
+  );
+
   List<Join> _baseJoins() => [
     leftOuterJoin(armies, armies.id.equalsExp(battles.armyId)),
     leftOuterJoin(
@@ -55,6 +75,18 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
       _opponentArmies.id.equalsExp(battles.opponentArmyId),
     ),
     leftOuterJoin(factions, factions.id.equalsExp(battles.opponentFactionId)),
+    leftOuterJoin(
+      _myDispositions,
+      _myDispositions.id.equalsExp(battles.myDispositionId),
+    ),
+    leftOuterJoin(
+      _opponentDispositions,
+      _opponentDispositions.id.equalsExp(battles.opponentDispositionId),
+    ),
+    leftOuterJoin(
+      primaryMissions,
+      primaryMissions.id.equalsExp(battles.primaryMissionId),
+    ),
   ];
 
   Future<String> addBattle({
@@ -108,6 +140,9 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
       battleUnitModifiers,
     )..where((t) => t.battleId.equals(id))).go();
     await (delete(battleUnitWounds)..where((t) => t.battleId.equals(id))).go();
+    await (delete(
+      battleSecondaryMissionSelections,
+    )..where((t) => t.battleId.equals(id))).go();
     await (delete(battles)..where((t) => t.id.equals(id))).go();
   }
 
@@ -116,6 +151,9 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
     final army = row.readTableOrNull(armies);
     final opponentArmy = row.readTableOrNull(_opponentArmies);
     final opponentFaction = row.readTableOrNull(factions);
+    final myDisposition = row.readTableOrNull(_myDispositions);
+    final opponentDisposition = row.readTableOrNull(_opponentDispositions);
+    final primaryMission = row.readTableOrNull(primaryMissions);
     return BattleDetails(
       id: battle.id,
       armyId: army?.id,
@@ -142,6 +180,14 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
       terrain: battle.terrain,
       pointsLimit: battle.pointsLimit,
       myTurnActive: battle.myTurnActive,
+      myDispositionId: myDisposition?.id,
+      myDispositionName: myDisposition?.name,
+      opponentDispositionId: opponentDisposition?.id,
+      opponentDispositionName: opponentDisposition?.name,
+      primaryMissionId: primaryMission?.id,
+      primaryMissionName: primaryMission?.name,
+      primaryMissionScoring: primaryMission?.scoring,
+      primaryMissionAction: primaryMission?.action,
     );
   }
 
@@ -255,6 +301,9 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
     Value<int?> opponentScore = const Value.absent(),
     Value<bool?> myTurnActive = const Value.absent(),
     Value<String?> notes = const Value.absent(),
+    Value<String?> myDispositionId = const Value.absent(),
+    Value<String?> opponentDispositionId = const Value.absent(),
+    Value<String?> primaryMissionId = const Value.absent(),
   }) {
     return (update(battles)..where((t) => t.id.equals(battleId))).write(
       BattlesCompanion(
@@ -267,8 +316,62 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
         opponentScore: opponentScore,
         myTurnActive: myTurnActive,
         notes: notes,
+        myDispositionId: myDispositionId,
+        opponentDispositionId: opponentDispositionId,
+        primaryMissionId: primaryMissionId,
       ),
     );
+  }
+
+  /// Missions secondaires choisies pour cette bataille, par camp.
+  Future<List<BattleSecondaryMissionDetails>> listBattleSecondaryMissions(
+    String battleId,
+  ) async {
+    final query =
+        select(battleSecondaryMissionSelections).join([
+          innerJoin(
+            secondaryMissions,
+            secondaryMissions.id.equalsExp(
+              battleSecondaryMissionSelections.secondaryMissionId,
+            ),
+          ),
+        ])..where(battleSecondaryMissionSelections.battleId.equals(battleId));
+    final rows = await query.get();
+    return rows.map((row) {
+      final selection = row.readTable(battleSecondaryMissionSelections);
+      final mission = row.readTable(secondaryMissions);
+      return BattleSecondaryMissionDetails(
+        id: selection.id,
+        secondaryMissionId: mission.id,
+        name: mission.name,
+        isFixed: mission.isFixed,
+        effect: mission.effect,
+        side: selection.side,
+      );
+    }).toList();
+  }
+
+  /// Remplace les missions secondaires choisies pour [side] par
+  /// [secondaryMissionIds] (typiquement 2 en Tactique, jusqu'à 2 en Fixe).
+  Future<void> setBattleSecondaryMissions(
+    String battleId,
+    BattleSecondarySide side,
+    List<String> secondaryMissionIds,
+  ) async {
+    await (delete(battleSecondaryMissionSelections)..where(
+          (t) => t.battleId.equals(battleId) & t.side.equalsValue(side),
+        ))
+        .go();
+    for (final missionId in secondaryMissionIds) {
+      await into(battleSecondaryMissionSelections).insert(
+        BattleSecondaryMissionSelectionsCompanion.insert(
+          id: _uuid.v4(),
+          battleId: battleId,
+          secondaryMissionId: missionId,
+          side: side,
+        ),
+      );
+    }
   }
 
   /// Passe à la phase suivante du round courant ; après Moral, repart en

@@ -2131,6 +2131,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get battleDetailBack => 'Back to history';
 
   @override
+  String get battleMissionCardTitle => 'Mission card';
+
+  @override
+  String get battleMissionCardMyDisposition => 'My disposition';
+
+  @override
+  String get battleMissionCardOpponentDisposition => 'Opponent\'s disposition';
+
+  @override
+  String get battleMissionCardChoose => 'Choose…';
+
+  @override
+  String get battleMissionCardPrimaryMission => 'Primary mission';
+
+  @override
+  String get battleMissionCardAction => 'Action';
+
+  @override
+  String get battleMissionCardMySecondaries => 'My secondaries';
+
+  @override
+  String get battleMissionCardOpponentSecondaries => 'Opponent\'s secondaries';
+
+  @override
+  String get battleMissionCardEditSecondaries => 'Edit';
+
+  @override
+  String get battleMissionCardPickSecondariesTitle =>
+      'Choose secondary missions';
+
+  @override
+  String get battleMissionCardFixedBadge => 'Fixed';
+
+  @override
+  String get battleMissionCardNoneChosen => 'None chosen';
+
+  @override
   String get battleStratagemAssistantTitle => 'Stratagems for this phase';
 
   @override

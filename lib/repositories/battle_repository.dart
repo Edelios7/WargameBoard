@@ -3,9 +3,12 @@ import 'package:drift/drift.dart' show Value;
 import '../database/app_database.dart';
 import '../database/models/battle_details.dart';
 import '../database/models/battle_event_details.dart';
+import '../database/models/battle_secondary_mission_details.dart';
 import '../database/models/battle_unit_modifier_details.dart';
 import '../database/models/battle_unit_state_details.dart';
 import '../database/models/battle_unit_wound_details.dart';
+import '../database/models/mission_options.dart';
+import '../database/tables/battle_secondary_missions_table.dart';
 import '../database/tables/battle_unit_modifiers_table.dart';
 import '../database/tables/battles_table.dart';
 import '../services/xp_service.dart';
@@ -127,6 +130,9 @@ class BattleRepository {
     Value<int?> opponentScore = const Value.absent(),
     Value<bool?> myTurnActive = const Value.absent(),
     Value<String?> notes = const Value.absent(),
+    Value<String?> myDispositionId = const Value.absent(),
+    Value<String?> opponentDispositionId = const Value.absent(),
+    Value<String?> primaryMissionId = const Value.absent(),
   }) {
     return database.battleDao.updateLiveState(
       battleId,
@@ -139,6 +145,49 @@ class BattleRepository {
       opponentScore: opponentScore,
       myTurnActive: myTurnActive,
       notes: notes,
+      myDispositionId: myDispositionId,
+      opponentDispositionId: opponentDispositionId,
+      primaryMissionId: primaryMissionId,
+    );
+  }
+
+  // =========================
+  // Fiche de mission (GDM 2026)
+  // =========================
+
+  Future<List<DispositionOption>> listDispositions() {
+    return database.missionDao.listDispositions();
+  }
+
+  Future<PrimaryMissionDetails?> getPrimaryMission({
+    required String yourDispositionId,
+    required String opponentDispositionId,
+  }) {
+    return database.missionDao.getPrimaryMission(
+      yourDispositionId: yourDispositionId,
+      opponentDispositionId: opponentDispositionId,
+    );
+  }
+
+  Future<List<SecondaryMissionOption>> listSecondaryMissions() {
+    return database.missionDao.listSecondaryMissions();
+  }
+
+  Future<List<BattleSecondaryMissionDetails>> listBattleSecondaryMissions(
+    String battleId,
+  ) {
+    return database.battleDao.listBattleSecondaryMissions(battleId);
+  }
+
+  Future<void> setBattleSecondaryMissions(
+    String battleId,
+    BattleSecondarySide side,
+    List<String> secondaryMissionIds,
+  ) {
+    return database.battleDao.setBattleSecondaryMissions(
+      battleId,
+      side,
+      secondaryMissionIds,
     );
   }
 

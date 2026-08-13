@@ -3938,6 +3938,78 @@ abstract class AppLocalizations {
   /// **'Retour à l\'historique'**
   String get battleDetailBack;
 
+  /// No description provided for @battleMissionCardTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fiche de mission'**
+  String get battleMissionCardTitle;
+
+  /// No description provided for @battleMissionCardMyDisposition.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ma posture'**
+  String get battleMissionCardMyDisposition;
+
+  /// No description provided for @battleMissionCardOpponentDisposition.
+  ///
+  /// In fr, this message translates to:
+  /// **'Posture adverse'**
+  String get battleMissionCardOpponentDisposition;
+
+  /// No description provided for @battleMissionCardChoose.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir…'**
+  String get battleMissionCardChoose;
+
+  /// No description provided for @battleMissionCardPrimaryMission.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mission primaire'**
+  String get battleMissionCardPrimaryMission;
+
+  /// No description provided for @battleMissionCardAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Action'**
+  String get battleMissionCardAction;
+
+  /// No description provided for @battleMissionCardMySecondaries.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes secondaires'**
+  String get battleMissionCardMySecondaries;
+
+  /// No description provided for @battleMissionCardOpponentSecondaries.
+  ///
+  /// In fr, this message translates to:
+  /// **'Secondaires adverses'**
+  String get battleMissionCardOpponentSecondaries;
+
+  /// No description provided for @battleMissionCardEditSecondaries.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier'**
+  String get battleMissionCardEditSecondaries;
+
+  /// No description provided for @battleMissionCardPickSecondariesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir les missions secondaires'**
+  String get battleMissionCardPickSecondariesTitle;
+
+  /// No description provided for @battleMissionCardFixedBadge.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fixe'**
+  String get battleMissionCardFixedBadge;
+
+  /// No description provided for @battleMissionCardNoneChosen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune sélectionnée'**
+  String get battleMissionCardNoneChosen;
+
   /// No description provided for @battleStratagemAssistantTitle.
   ///
   /// In fr, this message translates to:

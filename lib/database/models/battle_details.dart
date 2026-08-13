@@ -30,6 +30,16 @@ class BattleDetails {
   final int? pointsLimit;
   final bool? myTurnActive;
 
+  // Fiche de mission structurée (GDM 2026) — voir [MissionDao].
+  final String? myDispositionId;
+  final String? myDispositionName;
+  final String? opponentDispositionId;
+  final String? opponentDispositionName;
+  final String? primaryMissionId;
+  final String? primaryMissionName;
+  final String? primaryMissionScoring;
+  final String? primaryMissionAction;
+
   const BattleDetails({
     required this.id,
     this.armyId,
@@ -56,6 +66,14 @@ class BattleDetails {
     this.terrain,
     this.pointsLimit,
     this.myTurnActive,
+    this.myDispositionId,
+    this.myDispositionName,
+    this.opponentDispositionId,
+    this.opponentDispositionName,
+    this.primaryMissionId,
+    this.primaryMissionName,
+    this.primaryMissionScoring,
+    this.primaryMissionAction,
   });
 
   bool get isUpcoming => result == null && playedAt.isAfter(DateTime.now());

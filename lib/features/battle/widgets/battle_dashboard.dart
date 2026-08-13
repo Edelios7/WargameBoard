@@ -22,6 +22,7 @@ import '../../../providers/battle_provider.dart';
 import '../../../providers/catalog_provider.dart';
 import '../../../providers/xp_provider.dart';
 import '../../catalog/pages/datasheet_full_page.dart';
+import 'mission_card_block.dart';
 import 'stratagem_assistant_block.dart';
 
 const _phaseOrder = [
@@ -133,6 +134,8 @@ class BattleDashboard extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      MissionCardBlock(battle: battle),
+                      const SizedBox(height: 16),
                       DiceRollerBlock(battleId: battle.id),
                       const SizedBox(height: 16),
                       EventsBlock(battleId: battle.id),
@@ -155,6 +158,8 @@ class BattleDashboard extends ConsumerWidget {
                           roster,
                           const SizedBox(height: 16),
                         ],
+                        MissionCardBlock(battle: battle),
+                        const SizedBox(height: 16),
                         DiceRollerBlock(battleId: battle.id),
                         const SizedBox(height: 16),
                         EventsBlock(battleId: battle.id),

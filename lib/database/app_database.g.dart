@@ -16811,6 +16811,39 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
       'CHECK ("my_turn_active" IN (0, 1))',
     ),
   );
+  static const VerificationMeta _myDispositionIdMeta = const VerificationMeta(
+    'myDispositionId',
+  );
+  @override
+  late final GeneratedColumn<String> myDispositionId = GeneratedColumn<String>(
+    'my_disposition_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _opponentDispositionIdMeta =
+      const VerificationMeta('opponentDispositionId');
+  @override
+  late final GeneratedColumn<String> opponentDispositionId =
+      GeneratedColumn<String>(
+        'opponent_disposition_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _primaryMissionIdMeta = const VerificationMeta(
+    'primaryMissionId',
+  );
+  @override
+  late final GeneratedColumn<String> primaryMissionId = GeneratedColumn<String>(
+    'primary_mission_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -16836,6 +16869,9 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
     terrain,
     pointsLimit,
     myTurnActive,
+    myDispositionId,
+    opponentDispositionId,
+    primaryMissionId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -16995,6 +17031,33 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
         ),
       );
     }
+    if (data.containsKey('my_disposition_id')) {
+      context.handle(
+        _myDispositionIdMeta,
+        myDispositionId.isAcceptableOrUnknown(
+          data['my_disposition_id']!,
+          _myDispositionIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('opponent_disposition_id')) {
+      context.handle(
+        _opponentDispositionIdMeta,
+        opponentDispositionId.isAcceptableOrUnknown(
+          data['opponent_disposition_id']!,
+          _opponentDispositionIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('primary_mission_id')) {
+      context.handle(
+        _primaryMissionIdMeta,
+        primaryMissionId.isAcceptableOrUnknown(
+          data['primary_mission_id']!,
+          _primaryMissionIdMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -17104,6 +17167,18 @@ class $BattlesTable extends Battles with TableInfo<$BattlesTable, Battle> {
         DriftSqlType.bool,
         data['${effectivePrefix}my_turn_active'],
       ),
+      myDispositionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}my_disposition_id'],
+      ),
+      opponentDispositionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}opponent_disposition_id'],
+      ),
+      primaryMissionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}primary_mission_id'],
+      ),
     );
   }
 
@@ -17164,6 +17239,9 @@ class Battle extends DataClass implements Insertable<Battle> {
 
   /// `true` = c'est mon tour actif, `false` = celui de l'adversaire.
   final bool? myTurnActive;
+  final String? myDispositionId;
+  final String? opponentDispositionId;
+  final String? primaryMissionId;
   const Battle({
     required this.id,
     this.armyId,
@@ -17188,6 +17266,9 @@ class Battle extends DataClass implements Insertable<Battle> {
     this.terrain,
     this.pointsLimit,
     this.myTurnActive,
+    this.myDispositionId,
+    this.opponentDispositionId,
+    this.primaryMissionId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -17261,6 +17342,15 @@ class Battle extends DataClass implements Insertable<Battle> {
     if (!nullToAbsent || myTurnActive != null) {
       map['my_turn_active'] = Variable<bool>(myTurnActive);
     }
+    if (!nullToAbsent || myDispositionId != null) {
+      map['my_disposition_id'] = Variable<String>(myDispositionId);
+    }
+    if (!nullToAbsent || opponentDispositionId != null) {
+      map['opponent_disposition_id'] = Variable<String>(opponentDispositionId);
+    }
+    if (!nullToAbsent || primaryMissionId != null) {
+      map['primary_mission_id'] = Variable<String>(primaryMissionId);
+    }
     return map;
   }
 
@@ -17327,6 +17417,15 @@ class Battle extends DataClass implements Insertable<Battle> {
       myTurnActive: myTurnActive == null && nullToAbsent
           ? const Value.absent()
           : Value(myTurnActive),
+      myDispositionId: myDispositionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(myDispositionId),
+      opponentDispositionId: opponentDispositionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(opponentDispositionId),
+      primaryMissionId: primaryMissionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(primaryMissionId),
     );
   }
 
@@ -17371,6 +17470,11 @@ class Battle extends DataClass implements Insertable<Battle> {
       terrain: serializer.fromJson<String?>(json['terrain']),
       pointsLimit: serializer.fromJson<int?>(json['pointsLimit']),
       myTurnActive: serializer.fromJson<bool?>(json['myTurnActive']),
+      myDispositionId: serializer.fromJson<String?>(json['myDispositionId']),
+      opponentDispositionId: serializer.fromJson<String?>(
+        json['opponentDispositionId'],
+      ),
+      primaryMissionId: serializer.fromJson<String?>(json['primaryMissionId']),
     );
   }
   @override
@@ -17408,6 +17512,11 @@ class Battle extends DataClass implements Insertable<Battle> {
       'terrain': serializer.toJson<String?>(terrain),
       'pointsLimit': serializer.toJson<int?>(pointsLimit),
       'myTurnActive': serializer.toJson<bool?>(myTurnActive),
+      'myDispositionId': serializer.toJson<String?>(myDispositionId),
+      'opponentDispositionId': serializer.toJson<String?>(
+        opponentDispositionId,
+      ),
+      'primaryMissionId': serializer.toJson<String?>(primaryMissionId),
     };
   }
 
@@ -17435,6 +17544,9 @@ class Battle extends DataClass implements Insertable<Battle> {
     Value<String?> terrain = const Value.absent(),
     Value<int?> pointsLimit = const Value.absent(),
     Value<bool?> myTurnActive = const Value.absent(),
+    Value<String?> myDispositionId = const Value.absent(),
+    Value<String?> opponentDispositionId = const Value.absent(),
+    Value<String?> primaryMissionId = const Value.absent(),
   }) => Battle(
     id: id ?? this.id,
     armyId: armyId.present ? armyId.value : this.armyId,
@@ -17469,6 +17581,15 @@ class Battle extends DataClass implements Insertable<Battle> {
     terrain: terrain.present ? terrain.value : this.terrain,
     pointsLimit: pointsLimit.present ? pointsLimit.value : this.pointsLimit,
     myTurnActive: myTurnActive.present ? myTurnActive.value : this.myTurnActive,
+    myDispositionId: myDispositionId.present
+        ? myDispositionId.value
+        : this.myDispositionId,
+    opponentDispositionId: opponentDispositionId.present
+        ? opponentDispositionId.value
+        : this.opponentDispositionId,
+    primaryMissionId: primaryMissionId.present
+        ? primaryMissionId.value
+        : this.primaryMissionId,
   );
   Battle copyWithCompanion(BattlesCompanion data) {
     return Battle(
@@ -17519,6 +17640,15 @@ class Battle extends DataClass implements Insertable<Battle> {
       myTurnActive: data.myTurnActive.present
           ? data.myTurnActive.value
           : this.myTurnActive,
+      myDispositionId: data.myDispositionId.present
+          ? data.myDispositionId.value
+          : this.myDispositionId,
+      opponentDispositionId: data.opponentDispositionId.present
+          ? data.opponentDispositionId.value
+          : this.opponentDispositionId,
+      primaryMissionId: data.primaryMissionId.present
+          ? data.primaryMissionId.value
+          : this.primaryMissionId,
     );
   }
 
@@ -17547,7 +17677,10 @@ class Battle extends DataClass implements Insertable<Battle> {
           ..write('missionPack: $missionPack, ')
           ..write('terrain: $terrain, ')
           ..write('pointsLimit: $pointsLimit, ')
-          ..write('myTurnActive: $myTurnActive')
+          ..write('myTurnActive: $myTurnActive, ')
+          ..write('myDispositionId: $myDispositionId, ')
+          ..write('opponentDispositionId: $opponentDispositionId, ')
+          ..write('primaryMissionId: $primaryMissionId')
           ..write(')'))
         .toString();
   }
@@ -17577,6 +17710,9 @@ class Battle extends DataClass implements Insertable<Battle> {
     terrain,
     pointsLimit,
     myTurnActive,
+    myDispositionId,
+    opponentDispositionId,
+    primaryMissionId,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -17604,7 +17740,10 @@ class Battle extends DataClass implements Insertable<Battle> {
           other.missionPack == this.missionPack &&
           other.terrain == this.terrain &&
           other.pointsLimit == this.pointsLimit &&
-          other.myTurnActive == this.myTurnActive);
+          other.myTurnActive == this.myTurnActive &&
+          other.myDispositionId == this.myDispositionId &&
+          other.opponentDispositionId == this.opponentDispositionId &&
+          other.primaryMissionId == this.primaryMissionId);
 }
 
 class BattlesCompanion extends UpdateCompanion<Battle> {
@@ -17631,6 +17770,9 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
   final Value<String?> terrain;
   final Value<int?> pointsLimit;
   final Value<bool?> myTurnActive;
+  final Value<String?> myDispositionId;
+  final Value<String?> opponentDispositionId;
+  final Value<String?> primaryMissionId;
   final Value<int> rowid;
   const BattlesCompanion({
     this.id = const Value.absent(),
@@ -17656,6 +17798,9 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     this.terrain = const Value.absent(),
     this.pointsLimit = const Value.absent(),
     this.myTurnActive = const Value.absent(),
+    this.myDispositionId = const Value.absent(),
+    this.opponentDispositionId = const Value.absent(),
+    this.primaryMissionId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   BattlesCompanion.insert({
@@ -17682,6 +17827,9 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     this.terrain = const Value.absent(),
     this.pointsLimit = const Value.absent(),
     this.myTurnActive = const Value.absent(),
+    this.myDispositionId = const Value.absent(),
+    this.opponentDispositionId = const Value.absent(),
+    this.primaryMissionId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id);
   static Insertable<Battle> custom({
@@ -17708,6 +17856,9 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     Expression<String>? terrain,
     Expression<int>? pointsLimit,
     Expression<bool>? myTurnActive,
+    Expression<String>? myDispositionId,
+    Expression<String>? opponentDispositionId,
+    Expression<String>? primaryMissionId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -17735,6 +17886,10 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
       if (terrain != null) 'terrain': terrain,
       if (pointsLimit != null) 'points_limit': pointsLimit,
       if (myTurnActive != null) 'my_turn_active': myTurnActive,
+      if (myDispositionId != null) 'my_disposition_id': myDispositionId,
+      if (opponentDispositionId != null)
+        'opponent_disposition_id': opponentDispositionId,
+      if (primaryMissionId != null) 'primary_mission_id': primaryMissionId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -17763,6 +17918,9 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     Value<String?>? terrain,
     Value<int?>? pointsLimit,
     Value<bool?>? myTurnActive,
+    Value<String?>? myDispositionId,
+    Value<String?>? opponentDispositionId,
+    Value<String?>? primaryMissionId,
     Value<int>? rowid,
   }) {
     return BattlesCompanion(
@@ -17790,6 +17948,10 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
       terrain: terrain ?? this.terrain,
       pointsLimit: pointsLimit ?? this.pointsLimit,
       myTurnActive: myTurnActive ?? this.myTurnActive,
+      myDispositionId: myDispositionId ?? this.myDispositionId,
+      opponentDispositionId:
+          opponentDispositionId ?? this.opponentDispositionId,
+      primaryMissionId: primaryMissionId ?? this.primaryMissionId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -17876,6 +18038,17 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
     if (myTurnActive.present) {
       map['my_turn_active'] = Variable<bool>(myTurnActive.value);
     }
+    if (myDispositionId.present) {
+      map['my_disposition_id'] = Variable<String>(myDispositionId.value);
+    }
+    if (opponentDispositionId.present) {
+      map['opponent_disposition_id'] = Variable<String>(
+        opponentDispositionId.value,
+      );
+    }
+    if (primaryMissionId.present) {
+      map['primary_mission_id'] = Variable<String>(primaryMissionId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -17908,6 +18081,9 @@ class BattlesCompanion extends UpdateCompanion<Battle> {
           ..write('terrain: $terrain, ')
           ..write('pointsLimit: $pointsLimit, ')
           ..write('myTurnActive: $myTurnActive, ')
+          ..write('myDispositionId: $myDispositionId, ')
+          ..write('opponentDispositionId: $opponentDispositionId, ')
+          ..write('primaryMissionId: $primaryMissionId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -19652,6 +19828,1437 @@ class BattleUnitWoundsCompanion extends UpdateCompanion<BattleUnitWound> {
   }
 }
 
+class $MissionDispositionsTable extends MissionDispositions
+    with TableInfo<$MissionDispositionsTable, MissionDisposition> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MissionDispositionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _slugMeta = const VerificationMeta('slug');
+  @override
+  late final GeneratedColumn<String> slug = GeneratedColumn<String>(
+    'slug',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, slug, name];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'mission_dispositions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MissionDisposition> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('slug')) {
+      context.handle(
+        _slugMeta,
+        slug.isAcceptableOrUnknown(data['slug']!, _slugMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_slugMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MissionDisposition map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MissionDisposition(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      slug: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}slug'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+    );
+  }
+
+  @override
+  $MissionDispositionsTable createAlias(String alias) {
+    return $MissionDispositionsTable(attachedDatabase, alias);
+  }
+}
+
+class MissionDisposition extends DataClass
+    implements Insertable<MissionDisposition> {
+  final String id;
+  final String slug;
+  final String name;
+  const MissionDisposition({
+    required this.id,
+    required this.slug,
+    required this.name,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['slug'] = Variable<String>(slug);
+    map['name'] = Variable<String>(name);
+    return map;
+  }
+
+  MissionDispositionsCompanion toCompanion(bool nullToAbsent) {
+    return MissionDispositionsCompanion(
+      id: Value(id),
+      slug: Value(slug),
+      name: Value(name),
+    );
+  }
+
+  factory MissionDisposition.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MissionDisposition(
+      id: serializer.fromJson<String>(json['id']),
+      slug: serializer.fromJson<String>(json['slug']),
+      name: serializer.fromJson<String>(json['name']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'slug': serializer.toJson<String>(slug),
+      'name': serializer.toJson<String>(name),
+    };
+  }
+
+  MissionDisposition copyWith({String? id, String? slug, String? name}) =>
+      MissionDisposition(
+        id: id ?? this.id,
+        slug: slug ?? this.slug,
+        name: name ?? this.name,
+      );
+  MissionDisposition copyWithCompanion(MissionDispositionsCompanion data) {
+    return MissionDisposition(
+      id: data.id.present ? data.id.value : this.id,
+      slug: data.slug.present ? data.slug.value : this.slug,
+      name: data.name.present ? data.name.value : this.name,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MissionDisposition(')
+          ..write('id: $id, ')
+          ..write('slug: $slug, ')
+          ..write('name: $name')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, slug, name);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MissionDisposition &&
+          other.id == this.id &&
+          other.slug == this.slug &&
+          other.name == this.name);
+}
+
+class MissionDispositionsCompanion extends UpdateCompanion<MissionDisposition> {
+  final Value<String> id;
+  final Value<String> slug;
+  final Value<String> name;
+  final Value<int> rowid;
+  const MissionDispositionsCompanion({
+    this.id = const Value.absent(),
+    this.slug = const Value.absent(),
+    this.name = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MissionDispositionsCompanion.insert({
+    required String id,
+    required String slug,
+    required String name,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       slug = Value(slug),
+       name = Value(name);
+  static Insertable<MissionDisposition> custom({
+    Expression<String>? id,
+    Expression<String>? slug,
+    Expression<String>? name,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (slug != null) 'slug': slug,
+      if (name != null) 'name': name,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MissionDispositionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? slug,
+    Value<String>? name,
+    Value<int>? rowid,
+  }) {
+    return MissionDispositionsCompanion(
+      id: id ?? this.id,
+      slug: slug ?? this.slug,
+      name: name ?? this.name,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (slug.present) {
+      map['slug'] = Variable<String>(slug.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MissionDispositionsCompanion(')
+          ..write('id: $id, ')
+          ..write('slug: $slug, ')
+          ..write('name: $name, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PrimaryMissionsTable extends PrimaryMissions
+    with TableInfo<$PrimaryMissionsTable, PrimaryMission> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PrimaryMissionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _yourDispositionIdMeta = const VerificationMeta(
+    'yourDispositionId',
+  );
+  @override
+  late final GeneratedColumn<String> yourDispositionId =
+      GeneratedColumn<String>(
+        'your_disposition_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _opponentDispositionIdMeta =
+      const VerificationMeta('opponentDispositionId');
+  @override
+  late final GeneratedColumn<String> opponentDispositionId =
+      GeneratedColumn<String>(
+        'opponent_disposition_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _scoringMeta = const VerificationMeta(
+    'scoring',
+  );
+  @override
+  late final GeneratedColumn<String> scoring = GeneratedColumn<String>(
+    'scoring',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _actionMeta = const VerificationMeta('action');
+  @override
+  late final GeneratedColumn<String> action = GeneratedColumn<String>(
+    'action',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    yourDispositionId,
+    opponentDispositionId,
+    name,
+    scoring,
+    action,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'primary_missions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PrimaryMission> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('your_disposition_id')) {
+      context.handle(
+        _yourDispositionIdMeta,
+        yourDispositionId.isAcceptableOrUnknown(
+          data['your_disposition_id']!,
+          _yourDispositionIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_yourDispositionIdMeta);
+    }
+    if (data.containsKey('opponent_disposition_id')) {
+      context.handle(
+        _opponentDispositionIdMeta,
+        opponentDispositionId.isAcceptableOrUnknown(
+          data['opponent_disposition_id']!,
+          _opponentDispositionIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_opponentDispositionIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('scoring')) {
+      context.handle(
+        _scoringMeta,
+        scoring.isAcceptableOrUnknown(data['scoring']!, _scoringMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_scoringMeta);
+    }
+    if (data.containsKey('action')) {
+      context.handle(
+        _actionMeta,
+        action.isAcceptableOrUnknown(data['action']!, _actionMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PrimaryMission map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PrimaryMission(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      yourDispositionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}your_disposition_id'],
+      )!,
+      opponentDispositionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}opponent_disposition_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      scoring: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}scoring'],
+      )!,
+      action: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}action'],
+      ),
+    );
+  }
+
+  @override
+  $PrimaryMissionsTable createAlias(String alias) {
+    return $PrimaryMissionsTable(attachedDatabase, alias);
+  }
+}
+
+class PrimaryMission extends DataClass implements Insertable<PrimaryMission> {
+  final String id;
+  final String yourDispositionId;
+  final String opponentDispositionId;
+  final String name;
+  final String scoring;
+  final String? action;
+  const PrimaryMission({
+    required this.id,
+    required this.yourDispositionId,
+    required this.opponentDispositionId,
+    required this.name,
+    required this.scoring,
+    this.action,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['your_disposition_id'] = Variable<String>(yourDispositionId);
+    map['opponent_disposition_id'] = Variable<String>(opponentDispositionId);
+    map['name'] = Variable<String>(name);
+    map['scoring'] = Variable<String>(scoring);
+    if (!nullToAbsent || action != null) {
+      map['action'] = Variable<String>(action);
+    }
+    return map;
+  }
+
+  PrimaryMissionsCompanion toCompanion(bool nullToAbsent) {
+    return PrimaryMissionsCompanion(
+      id: Value(id),
+      yourDispositionId: Value(yourDispositionId),
+      opponentDispositionId: Value(opponentDispositionId),
+      name: Value(name),
+      scoring: Value(scoring),
+      action: action == null && nullToAbsent
+          ? const Value.absent()
+          : Value(action),
+    );
+  }
+
+  factory PrimaryMission.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PrimaryMission(
+      id: serializer.fromJson<String>(json['id']),
+      yourDispositionId: serializer.fromJson<String>(json['yourDispositionId']),
+      opponentDispositionId: serializer.fromJson<String>(
+        json['opponentDispositionId'],
+      ),
+      name: serializer.fromJson<String>(json['name']),
+      scoring: serializer.fromJson<String>(json['scoring']),
+      action: serializer.fromJson<String?>(json['action']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'yourDispositionId': serializer.toJson<String>(yourDispositionId),
+      'opponentDispositionId': serializer.toJson<String>(opponentDispositionId),
+      'name': serializer.toJson<String>(name),
+      'scoring': serializer.toJson<String>(scoring),
+      'action': serializer.toJson<String?>(action),
+    };
+  }
+
+  PrimaryMission copyWith({
+    String? id,
+    String? yourDispositionId,
+    String? opponentDispositionId,
+    String? name,
+    String? scoring,
+    Value<String?> action = const Value.absent(),
+  }) => PrimaryMission(
+    id: id ?? this.id,
+    yourDispositionId: yourDispositionId ?? this.yourDispositionId,
+    opponentDispositionId: opponentDispositionId ?? this.opponentDispositionId,
+    name: name ?? this.name,
+    scoring: scoring ?? this.scoring,
+    action: action.present ? action.value : this.action,
+  );
+  PrimaryMission copyWithCompanion(PrimaryMissionsCompanion data) {
+    return PrimaryMission(
+      id: data.id.present ? data.id.value : this.id,
+      yourDispositionId: data.yourDispositionId.present
+          ? data.yourDispositionId.value
+          : this.yourDispositionId,
+      opponentDispositionId: data.opponentDispositionId.present
+          ? data.opponentDispositionId.value
+          : this.opponentDispositionId,
+      name: data.name.present ? data.name.value : this.name,
+      scoring: data.scoring.present ? data.scoring.value : this.scoring,
+      action: data.action.present ? data.action.value : this.action,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PrimaryMission(')
+          ..write('id: $id, ')
+          ..write('yourDispositionId: $yourDispositionId, ')
+          ..write('opponentDispositionId: $opponentDispositionId, ')
+          ..write('name: $name, ')
+          ..write('scoring: $scoring, ')
+          ..write('action: $action')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    yourDispositionId,
+    opponentDispositionId,
+    name,
+    scoring,
+    action,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PrimaryMission &&
+          other.id == this.id &&
+          other.yourDispositionId == this.yourDispositionId &&
+          other.opponentDispositionId == this.opponentDispositionId &&
+          other.name == this.name &&
+          other.scoring == this.scoring &&
+          other.action == this.action);
+}
+
+class PrimaryMissionsCompanion extends UpdateCompanion<PrimaryMission> {
+  final Value<String> id;
+  final Value<String> yourDispositionId;
+  final Value<String> opponentDispositionId;
+  final Value<String> name;
+  final Value<String> scoring;
+  final Value<String?> action;
+  final Value<int> rowid;
+  const PrimaryMissionsCompanion({
+    this.id = const Value.absent(),
+    this.yourDispositionId = const Value.absent(),
+    this.opponentDispositionId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.scoring = const Value.absent(),
+    this.action = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PrimaryMissionsCompanion.insert({
+    required String id,
+    required String yourDispositionId,
+    required String opponentDispositionId,
+    required String name,
+    required String scoring,
+    this.action = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       yourDispositionId = Value(yourDispositionId),
+       opponentDispositionId = Value(opponentDispositionId),
+       name = Value(name),
+       scoring = Value(scoring);
+  static Insertable<PrimaryMission> custom({
+    Expression<String>? id,
+    Expression<String>? yourDispositionId,
+    Expression<String>? opponentDispositionId,
+    Expression<String>? name,
+    Expression<String>? scoring,
+    Expression<String>? action,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (yourDispositionId != null) 'your_disposition_id': yourDispositionId,
+      if (opponentDispositionId != null)
+        'opponent_disposition_id': opponentDispositionId,
+      if (name != null) 'name': name,
+      if (scoring != null) 'scoring': scoring,
+      if (action != null) 'action': action,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PrimaryMissionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? yourDispositionId,
+    Value<String>? opponentDispositionId,
+    Value<String>? name,
+    Value<String>? scoring,
+    Value<String?>? action,
+    Value<int>? rowid,
+  }) {
+    return PrimaryMissionsCompanion(
+      id: id ?? this.id,
+      yourDispositionId: yourDispositionId ?? this.yourDispositionId,
+      opponentDispositionId:
+          opponentDispositionId ?? this.opponentDispositionId,
+      name: name ?? this.name,
+      scoring: scoring ?? this.scoring,
+      action: action ?? this.action,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (yourDispositionId.present) {
+      map['your_disposition_id'] = Variable<String>(yourDispositionId.value);
+    }
+    if (opponentDispositionId.present) {
+      map['opponent_disposition_id'] = Variable<String>(
+        opponentDispositionId.value,
+      );
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (scoring.present) {
+      map['scoring'] = Variable<String>(scoring.value);
+    }
+    if (action.present) {
+      map['action'] = Variable<String>(action.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PrimaryMissionsCompanion(')
+          ..write('id: $id, ')
+          ..write('yourDispositionId: $yourDispositionId, ')
+          ..write('opponentDispositionId: $opponentDispositionId, ')
+          ..write('name: $name, ')
+          ..write('scoring: $scoring, ')
+          ..write('action: $action, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $SecondaryMissionsTable extends SecondaryMissions
+    with TableInfo<$SecondaryMissionsTable, SecondaryMission> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SecondaryMissionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _slugMeta = const VerificationMeta('slug');
+  @override
+  late final GeneratedColumn<String> slug = GeneratedColumn<String>(
+    'slug',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isFixedMeta = const VerificationMeta(
+    'isFixed',
+  );
+  @override
+  late final GeneratedColumn<bool> isFixed = GeneratedColumn<bool>(
+    'is_fixed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_fixed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _effectMeta = const VerificationMeta('effect');
+  @override
+  late final GeneratedColumn<String> effect = GeneratedColumn<String>(
+    'effect',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, slug, name, isFixed, effect];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'secondary_missions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SecondaryMission> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('slug')) {
+      context.handle(
+        _slugMeta,
+        slug.isAcceptableOrUnknown(data['slug']!, _slugMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_slugMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('is_fixed')) {
+      context.handle(
+        _isFixedMeta,
+        isFixed.isAcceptableOrUnknown(data['is_fixed']!, _isFixedMeta),
+      );
+    }
+    if (data.containsKey('effect')) {
+      context.handle(
+        _effectMeta,
+        effect.isAcceptableOrUnknown(data['effect']!, _effectMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_effectMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SecondaryMission map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SecondaryMission(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      slug: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}slug'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      isFixed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_fixed'],
+      )!,
+      effect: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}effect'],
+      )!,
+    );
+  }
+
+  @override
+  $SecondaryMissionsTable createAlias(String alias) {
+    return $SecondaryMissionsTable(attachedDatabase, alias);
+  }
+}
+
+class SecondaryMission extends DataClass
+    implements Insertable<SecondaryMission> {
+  final String id;
+  final String slug;
+  final String name;
+  final bool isFixed;
+  final String effect;
+  const SecondaryMission({
+    required this.id,
+    required this.slug,
+    required this.name,
+    required this.isFixed,
+    required this.effect,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['slug'] = Variable<String>(slug);
+    map['name'] = Variable<String>(name);
+    map['is_fixed'] = Variable<bool>(isFixed);
+    map['effect'] = Variable<String>(effect);
+    return map;
+  }
+
+  SecondaryMissionsCompanion toCompanion(bool nullToAbsent) {
+    return SecondaryMissionsCompanion(
+      id: Value(id),
+      slug: Value(slug),
+      name: Value(name),
+      isFixed: Value(isFixed),
+      effect: Value(effect),
+    );
+  }
+
+  factory SecondaryMission.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SecondaryMission(
+      id: serializer.fromJson<String>(json['id']),
+      slug: serializer.fromJson<String>(json['slug']),
+      name: serializer.fromJson<String>(json['name']),
+      isFixed: serializer.fromJson<bool>(json['isFixed']),
+      effect: serializer.fromJson<String>(json['effect']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'slug': serializer.toJson<String>(slug),
+      'name': serializer.toJson<String>(name),
+      'isFixed': serializer.toJson<bool>(isFixed),
+      'effect': serializer.toJson<String>(effect),
+    };
+  }
+
+  SecondaryMission copyWith({
+    String? id,
+    String? slug,
+    String? name,
+    bool? isFixed,
+    String? effect,
+  }) => SecondaryMission(
+    id: id ?? this.id,
+    slug: slug ?? this.slug,
+    name: name ?? this.name,
+    isFixed: isFixed ?? this.isFixed,
+    effect: effect ?? this.effect,
+  );
+  SecondaryMission copyWithCompanion(SecondaryMissionsCompanion data) {
+    return SecondaryMission(
+      id: data.id.present ? data.id.value : this.id,
+      slug: data.slug.present ? data.slug.value : this.slug,
+      name: data.name.present ? data.name.value : this.name,
+      isFixed: data.isFixed.present ? data.isFixed.value : this.isFixed,
+      effect: data.effect.present ? data.effect.value : this.effect,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SecondaryMission(')
+          ..write('id: $id, ')
+          ..write('slug: $slug, ')
+          ..write('name: $name, ')
+          ..write('isFixed: $isFixed, ')
+          ..write('effect: $effect')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, slug, name, isFixed, effect);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SecondaryMission &&
+          other.id == this.id &&
+          other.slug == this.slug &&
+          other.name == this.name &&
+          other.isFixed == this.isFixed &&
+          other.effect == this.effect);
+}
+
+class SecondaryMissionsCompanion extends UpdateCompanion<SecondaryMission> {
+  final Value<String> id;
+  final Value<String> slug;
+  final Value<String> name;
+  final Value<bool> isFixed;
+  final Value<String> effect;
+  final Value<int> rowid;
+  const SecondaryMissionsCompanion({
+    this.id = const Value.absent(),
+    this.slug = const Value.absent(),
+    this.name = const Value.absent(),
+    this.isFixed = const Value.absent(),
+    this.effect = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SecondaryMissionsCompanion.insert({
+    required String id,
+    required String slug,
+    required String name,
+    this.isFixed = const Value.absent(),
+    required String effect,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       slug = Value(slug),
+       name = Value(name),
+       effect = Value(effect);
+  static Insertable<SecondaryMission> custom({
+    Expression<String>? id,
+    Expression<String>? slug,
+    Expression<String>? name,
+    Expression<bool>? isFixed,
+    Expression<String>? effect,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (slug != null) 'slug': slug,
+      if (name != null) 'name': name,
+      if (isFixed != null) 'is_fixed': isFixed,
+      if (effect != null) 'effect': effect,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SecondaryMissionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? slug,
+    Value<String>? name,
+    Value<bool>? isFixed,
+    Value<String>? effect,
+    Value<int>? rowid,
+  }) {
+    return SecondaryMissionsCompanion(
+      id: id ?? this.id,
+      slug: slug ?? this.slug,
+      name: name ?? this.name,
+      isFixed: isFixed ?? this.isFixed,
+      effect: effect ?? this.effect,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (slug.present) {
+      map['slug'] = Variable<String>(slug.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (isFixed.present) {
+      map['is_fixed'] = Variable<bool>(isFixed.value);
+    }
+    if (effect.present) {
+      map['effect'] = Variable<String>(effect.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SecondaryMissionsCompanion(')
+          ..write('id: $id, ')
+          ..write('slug: $slug, ')
+          ..write('name: $name, ')
+          ..write('isFixed: $isFixed, ')
+          ..write('effect: $effect, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $BattleSecondaryMissionSelectionsTable
+    extends BattleSecondaryMissionSelections
+    with
+        TableInfo<
+          $BattleSecondaryMissionSelectionsTable,
+          BattleSecondaryMissionSelection
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BattleSecondaryMissionSelectionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _battleIdMeta = const VerificationMeta(
+    'battleId',
+  );
+  @override
+  late final GeneratedColumn<String> battleId = GeneratedColumn<String>(
+    'battle_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _secondaryMissionIdMeta =
+      const VerificationMeta('secondaryMissionId');
+  @override
+  late final GeneratedColumn<String> secondaryMissionId =
+      GeneratedColumn<String>(
+        'secondary_mission_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  @override
+  late final GeneratedColumnWithTypeConverter<BattleSecondarySide, String>
+  side =
+      GeneratedColumn<String>(
+        'side',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<BattleSecondarySide>(
+        $BattleSecondaryMissionSelectionsTable.$converterside,
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    battleId,
+    secondaryMissionId,
+    side,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'battle_secondary_mission_selections';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BattleSecondaryMissionSelection> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('battle_id')) {
+      context.handle(
+        _battleIdMeta,
+        battleId.isAcceptableOrUnknown(data['battle_id']!, _battleIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_battleIdMeta);
+    }
+    if (data.containsKey('secondary_mission_id')) {
+      context.handle(
+        _secondaryMissionIdMeta,
+        secondaryMissionId.isAcceptableOrUnknown(
+          data['secondary_mission_id']!,
+          _secondaryMissionIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_secondaryMissionIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BattleSecondaryMissionSelection map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BattleSecondaryMissionSelection(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      battleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}battle_id'],
+      )!,
+      secondaryMissionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}secondary_mission_id'],
+      )!,
+      side: $BattleSecondaryMissionSelectionsTable.$converterside.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}side'],
+        )!,
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BattleSecondaryMissionSelectionsTable createAlias(String alias) {
+    return $BattleSecondaryMissionSelectionsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<BattleSecondarySide, String, String>
+  $converterside = const EnumNameConverter<BattleSecondarySide>(
+    BattleSecondarySide.values,
+  );
+}
+
+class BattleSecondaryMissionSelection extends DataClass
+    implements Insertable<BattleSecondaryMissionSelection> {
+  final String id;
+  final String battleId;
+  final String secondaryMissionId;
+  final BattleSecondarySide side;
+  final DateTime createdAt;
+  const BattleSecondaryMissionSelection({
+    required this.id,
+    required this.battleId,
+    required this.secondaryMissionId,
+    required this.side,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['battle_id'] = Variable<String>(battleId);
+    map['secondary_mission_id'] = Variable<String>(secondaryMissionId);
+    {
+      map['side'] = Variable<String>(
+        $BattleSecondaryMissionSelectionsTable.$converterside.toSql(side),
+      );
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  BattleSecondaryMissionSelectionsCompanion toCompanion(bool nullToAbsent) {
+    return BattleSecondaryMissionSelectionsCompanion(
+      id: Value(id),
+      battleId: Value(battleId),
+      secondaryMissionId: Value(secondaryMissionId),
+      side: Value(side),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory BattleSecondaryMissionSelection.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BattleSecondaryMissionSelection(
+      id: serializer.fromJson<String>(json['id']),
+      battleId: serializer.fromJson<String>(json['battleId']),
+      secondaryMissionId: serializer.fromJson<String>(
+        json['secondaryMissionId'],
+      ),
+      side: $BattleSecondaryMissionSelectionsTable.$converterside.fromJson(
+        serializer.fromJson<String>(json['side']),
+      ),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'battleId': serializer.toJson<String>(battleId),
+      'secondaryMissionId': serializer.toJson<String>(secondaryMissionId),
+      'side': serializer.toJson<String>(
+        $BattleSecondaryMissionSelectionsTable.$converterside.toJson(side),
+      ),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  BattleSecondaryMissionSelection copyWith({
+    String? id,
+    String? battleId,
+    String? secondaryMissionId,
+    BattleSecondarySide? side,
+    DateTime? createdAt,
+  }) => BattleSecondaryMissionSelection(
+    id: id ?? this.id,
+    battleId: battleId ?? this.battleId,
+    secondaryMissionId: secondaryMissionId ?? this.secondaryMissionId,
+    side: side ?? this.side,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  BattleSecondaryMissionSelection copyWithCompanion(
+    BattleSecondaryMissionSelectionsCompanion data,
+  ) {
+    return BattleSecondaryMissionSelection(
+      id: data.id.present ? data.id.value : this.id,
+      battleId: data.battleId.present ? data.battleId.value : this.battleId,
+      secondaryMissionId: data.secondaryMissionId.present
+          ? data.secondaryMissionId.value
+          : this.secondaryMissionId,
+      side: data.side.present ? data.side.value : this.side,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BattleSecondaryMissionSelection(')
+          ..write('id: $id, ')
+          ..write('battleId: $battleId, ')
+          ..write('secondaryMissionId: $secondaryMissionId, ')
+          ..write('side: $side, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, battleId, secondaryMissionId, side, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BattleSecondaryMissionSelection &&
+          other.id == this.id &&
+          other.battleId == this.battleId &&
+          other.secondaryMissionId == this.secondaryMissionId &&
+          other.side == this.side &&
+          other.createdAt == this.createdAt);
+}
+
+class BattleSecondaryMissionSelectionsCompanion
+    extends UpdateCompanion<BattleSecondaryMissionSelection> {
+  final Value<String> id;
+  final Value<String> battleId;
+  final Value<String> secondaryMissionId;
+  final Value<BattleSecondarySide> side;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const BattleSecondaryMissionSelectionsCompanion({
+    this.id = const Value.absent(),
+    this.battleId = const Value.absent(),
+    this.secondaryMissionId = const Value.absent(),
+    this.side = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BattleSecondaryMissionSelectionsCompanion.insert({
+    required String id,
+    required String battleId,
+    required String secondaryMissionId,
+    required BattleSecondarySide side,
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       battleId = Value(battleId),
+       secondaryMissionId = Value(secondaryMissionId),
+       side = Value(side);
+  static Insertable<BattleSecondaryMissionSelection> custom({
+    Expression<String>? id,
+    Expression<String>? battleId,
+    Expression<String>? secondaryMissionId,
+    Expression<String>? side,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (battleId != null) 'battle_id': battleId,
+      if (secondaryMissionId != null)
+        'secondary_mission_id': secondaryMissionId,
+      if (side != null) 'side': side,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BattleSecondaryMissionSelectionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? battleId,
+    Value<String>? secondaryMissionId,
+    Value<BattleSecondarySide>? side,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return BattleSecondaryMissionSelectionsCompanion(
+      id: id ?? this.id,
+      battleId: battleId ?? this.battleId,
+      secondaryMissionId: secondaryMissionId ?? this.secondaryMissionId,
+      side: side ?? this.side,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (battleId.present) {
+      map['battle_id'] = Variable<String>(battleId.value);
+    }
+    if (secondaryMissionId.present) {
+      map['secondary_mission_id'] = Variable<String>(secondaryMissionId.value);
+    }
+    if (side.present) {
+      map['side'] = Variable<String>(
+        $BattleSecondaryMissionSelectionsTable.$converterside.toSql(side.value),
+      );
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BattleSecondaryMissionSelectionsCompanion(')
+          ..write('id: $id, ')
+          ..write('battleId: $battleId, ')
+          ..write('secondaryMissionId: $secondaryMissionId, ')
+          ..write('side: $side, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $ProjectsTable extends Projects with TableInfo<$ProjectsTable, Project> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -20767,6 +22374,17 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $BattleUnitWoundsTable battleUnitWounds = $BattleUnitWoundsTable(
     this,
   );
+  late final $MissionDispositionsTable missionDispositions =
+      $MissionDispositionsTable(this);
+  late final $PrimaryMissionsTable primaryMissions = $PrimaryMissionsTable(
+    this,
+  );
+  late final $SecondaryMissionsTable secondaryMissions =
+      $SecondaryMissionsTable(this);
+  late final $BattleSecondaryMissionSelectionsTable
+  battleSecondaryMissionSelections = $BattleSecondaryMissionSelectionsTable(
+    this,
+  );
   late final $ProjectsTable projects = $ProjectsTable(this);
   late final $XpCategoryTotalsTable xpCategoryTotals = $XpCategoryTotalsTable(
     this,
@@ -20784,6 +22402,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final ArmyDao armyDao = ArmyDao(this as AppDatabase);
   late final CollectionDao collectionDao = CollectionDao(this as AppDatabase);
   late final BattleDao battleDao = BattleDao(this as AppDatabase);
+  late final MissionDao missionDao = MissionDao(this as AppDatabase);
   late final ProjectDao projectDao = ProjectDao(this as AppDatabase);
   late final XpDao xpDao = XpDao(this as AppDatabase);
   @override
@@ -20832,6 +22451,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     battleUnitStates,
     battleUnitModifiers,
     battleUnitWounds,
+    missionDispositions,
+    primaryMissions,
+    secondaryMissions,
+    battleSecondaryMissionSelections,
     projects,
     xpCategoryTotals,
     xpFactionTotals,
@@ -29592,6 +31215,9 @@ typedef $$BattlesTableCreateCompanionBuilder =
       Value<String?> terrain,
       Value<int?> pointsLimit,
       Value<bool?> myTurnActive,
+      Value<String?> myDispositionId,
+      Value<String?> opponentDispositionId,
+      Value<String?> primaryMissionId,
       Value<int> rowid,
     });
 typedef $$BattlesTableUpdateCompanionBuilder =
@@ -29619,6 +31245,9 @@ typedef $$BattlesTableUpdateCompanionBuilder =
       Value<String?> terrain,
       Value<int?> pointsLimit,
       Value<bool?> myTurnActive,
+      Value<String?> myDispositionId,
+      Value<String?> opponentDispositionId,
+      Value<String?> primaryMissionId,
       Value<int> rowid,
     });
 
@@ -29749,6 +31378,21 @@ class $$BattlesTableFilterComposer
     column: $table.myTurnActive,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnFilters<String> get myDispositionId => $composableBuilder(
+    column: $table.myDispositionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get opponentDispositionId => $composableBuilder(
+    column: $table.opponentDispositionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get primaryMissionId => $composableBuilder(
+    column: $table.primaryMissionId,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$BattlesTableOrderingComposer
@@ -29874,6 +31518,21 @@ class $$BattlesTableOrderingComposer
     column: $table.myTurnActive,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get myDispositionId => $composableBuilder(
+    column: $table.myDispositionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get opponentDispositionId => $composableBuilder(
+    column: $table.opponentDispositionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get primaryMissionId => $composableBuilder(
+    column: $table.primaryMissionId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$BattlesTableAnnotationComposer
@@ -29978,6 +31637,21 @@ class $$BattlesTableAnnotationComposer
     column: $table.myTurnActive,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get myDispositionId => $composableBuilder(
+    column: $table.myDispositionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get opponentDispositionId => $composableBuilder(
+    column: $table.opponentDispositionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get primaryMissionId => $composableBuilder(
+    column: $table.primaryMissionId,
+    builder: (column) => column,
+  );
 }
 
 class $$BattlesTableTableManager
@@ -30031,6 +31705,9 @@ class $$BattlesTableTableManager
                 Value<String?> terrain = const Value.absent(),
                 Value<int?> pointsLimit = const Value.absent(),
                 Value<bool?> myTurnActive = const Value.absent(),
+                Value<String?> myDispositionId = const Value.absent(),
+                Value<String?> opponentDispositionId = const Value.absent(),
+                Value<String?> primaryMissionId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => BattlesCompanion(
                 id: id,
@@ -30056,6 +31733,9 @@ class $$BattlesTableTableManager
                 terrain: terrain,
                 pointsLimit: pointsLimit,
                 myTurnActive: myTurnActive,
+                myDispositionId: myDispositionId,
+                opponentDispositionId: opponentDispositionId,
+                primaryMissionId: primaryMissionId,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -30083,6 +31763,9 @@ class $$BattlesTableTableManager
                 Value<String?> terrain = const Value.absent(),
                 Value<int?> pointsLimit = const Value.absent(),
                 Value<bool?> myTurnActive = const Value.absent(),
+                Value<String?> myDispositionId = const Value.absent(),
+                Value<String?> opponentDispositionId = const Value.absent(),
+                Value<String?> primaryMissionId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => BattlesCompanion.insert(
                 id: id,
@@ -30108,6 +31791,9 @@ class $$BattlesTableTableManager
                 terrain: terrain,
                 pointsLimit: pointsLimit,
                 myTurnActive: myTurnActive,
+                myDispositionId: myDispositionId,
+                opponentDispositionId: opponentDispositionId,
+                primaryMissionId: primaryMissionId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -31069,6 +32755,852 @@ typedef $$BattleUnitWoundsTableProcessedTableManager =
       BattleUnitWound,
       PrefetchHooks Function()
     >;
+typedef $$MissionDispositionsTableCreateCompanionBuilder =
+    MissionDispositionsCompanion Function({
+      required String id,
+      required String slug,
+      required String name,
+      Value<int> rowid,
+    });
+typedef $$MissionDispositionsTableUpdateCompanionBuilder =
+    MissionDispositionsCompanion Function({
+      Value<String> id,
+      Value<String> slug,
+      Value<String> name,
+      Value<int> rowid,
+    });
+
+class $$MissionDispositionsTableFilterComposer
+    extends Composer<_$AppDatabase, $MissionDispositionsTable> {
+  $$MissionDispositionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MissionDispositionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MissionDispositionsTable> {
+  $$MissionDispositionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MissionDispositionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MissionDispositionsTable> {
+  $$MissionDispositionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get slug =>
+      $composableBuilder(column: $table.slug, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+}
+
+class $$MissionDispositionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MissionDispositionsTable,
+          MissionDisposition,
+          $$MissionDispositionsTableFilterComposer,
+          $$MissionDispositionsTableOrderingComposer,
+          $$MissionDispositionsTableAnnotationComposer,
+          $$MissionDispositionsTableCreateCompanionBuilder,
+          $$MissionDispositionsTableUpdateCompanionBuilder,
+          (
+            MissionDisposition,
+            BaseReferences<
+              _$AppDatabase,
+              $MissionDispositionsTable,
+              MissionDisposition
+            >,
+          ),
+          MissionDisposition,
+          PrefetchHooks Function()
+        > {
+  $$MissionDispositionsTableTableManager(
+    _$AppDatabase db,
+    $MissionDispositionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MissionDispositionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MissionDispositionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$MissionDispositionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> slug = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MissionDispositionsCompanion(
+                id: id,
+                slug: slug,
+                name: name,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String slug,
+                required String name,
+                Value<int> rowid = const Value.absent(),
+              }) => MissionDispositionsCompanion.insert(
+                id: id,
+                slug: slug,
+                name: name,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MissionDispositionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MissionDispositionsTable,
+      MissionDisposition,
+      $$MissionDispositionsTableFilterComposer,
+      $$MissionDispositionsTableOrderingComposer,
+      $$MissionDispositionsTableAnnotationComposer,
+      $$MissionDispositionsTableCreateCompanionBuilder,
+      $$MissionDispositionsTableUpdateCompanionBuilder,
+      (
+        MissionDisposition,
+        BaseReferences<
+          _$AppDatabase,
+          $MissionDispositionsTable,
+          MissionDisposition
+        >,
+      ),
+      MissionDisposition,
+      PrefetchHooks Function()
+    >;
+typedef $$PrimaryMissionsTableCreateCompanionBuilder =
+    PrimaryMissionsCompanion Function({
+      required String id,
+      required String yourDispositionId,
+      required String opponentDispositionId,
+      required String name,
+      required String scoring,
+      Value<String?> action,
+      Value<int> rowid,
+    });
+typedef $$PrimaryMissionsTableUpdateCompanionBuilder =
+    PrimaryMissionsCompanion Function({
+      Value<String> id,
+      Value<String> yourDispositionId,
+      Value<String> opponentDispositionId,
+      Value<String> name,
+      Value<String> scoring,
+      Value<String?> action,
+      Value<int> rowid,
+    });
+
+class $$PrimaryMissionsTableFilterComposer
+    extends Composer<_$AppDatabase, $PrimaryMissionsTable> {
+  $$PrimaryMissionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get yourDispositionId => $composableBuilder(
+    column: $table.yourDispositionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get opponentDispositionId => $composableBuilder(
+    column: $table.opponentDispositionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get scoring => $composableBuilder(
+    column: $table.scoring,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get action => $composableBuilder(
+    column: $table.action,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PrimaryMissionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PrimaryMissionsTable> {
+  $$PrimaryMissionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get yourDispositionId => $composableBuilder(
+    column: $table.yourDispositionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get opponentDispositionId => $composableBuilder(
+    column: $table.opponentDispositionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get scoring => $composableBuilder(
+    column: $table.scoring,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get action => $composableBuilder(
+    column: $table.action,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PrimaryMissionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PrimaryMissionsTable> {
+  $$PrimaryMissionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get yourDispositionId => $composableBuilder(
+    column: $table.yourDispositionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get opponentDispositionId => $composableBuilder(
+    column: $table.opponentDispositionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get scoring =>
+      $composableBuilder(column: $table.scoring, builder: (column) => column);
+
+  GeneratedColumn<String> get action =>
+      $composableBuilder(column: $table.action, builder: (column) => column);
+}
+
+class $$PrimaryMissionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PrimaryMissionsTable,
+          PrimaryMission,
+          $$PrimaryMissionsTableFilterComposer,
+          $$PrimaryMissionsTableOrderingComposer,
+          $$PrimaryMissionsTableAnnotationComposer,
+          $$PrimaryMissionsTableCreateCompanionBuilder,
+          $$PrimaryMissionsTableUpdateCompanionBuilder,
+          (
+            PrimaryMission,
+            BaseReferences<
+              _$AppDatabase,
+              $PrimaryMissionsTable,
+              PrimaryMission
+            >,
+          ),
+          PrimaryMission,
+          PrefetchHooks Function()
+        > {
+  $$PrimaryMissionsTableTableManager(
+    _$AppDatabase db,
+    $PrimaryMissionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PrimaryMissionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PrimaryMissionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PrimaryMissionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> yourDispositionId = const Value.absent(),
+                Value<String> opponentDispositionId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> scoring = const Value.absent(),
+                Value<String?> action = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PrimaryMissionsCompanion(
+                id: id,
+                yourDispositionId: yourDispositionId,
+                opponentDispositionId: opponentDispositionId,
+                name: name,
+                scoring: scoring,
+                action: action,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String yourDispositionId,
+                required String opponentDispositionId,
+                required String name,
+                required String scoring,
+                Value<String?> action = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PrimaryMissionsCompanion.insert(
+                id: id,
+                yourDispositionId: yourDispositionId,
+                opponentDispositionId: opponentDispositionId,
+                name: name,
+                scoring: scoring,
+                action: action,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PrimaryMissionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PrimaryMissionsTable,
+      PrimaryMission,
+      $$PrimaryMissionsTableFilterComposer,
+      $$PrimaryMissionsTableOrderingComposer,
+      $$PrimaryMissionsTableAnnotationComposer,
+      $$PrimaryMissionsTableCreateCompanionBuilder,
+      $$PrimaryMissionsTableUpdateCompanionBuilder,
+      (
+        PrimaryMission,
+        BaseReferences<_$AppDatabase, $PrimaryMissionsTable, PrimaryMission>,
+      ),
+      PrimaryMission,
+      PrefetchHooks Function()
+    >;
+typedef $$SecondaryMissionsTableCreateCompanionBuilder =
+    SecondaryMissionsCompanion Function({
+      required String id,
+      required String slug,
+      required String name,
+      Value<bool> isFixed,
+      required String effect,
+      Value<int> rowid,
+    });
+typedef $$SecondaryMissionsTableUpdateCompanionBuilder =
+    SecondaryMissionsCompanion Function({
+      Value<String> id,
+      Value<String> slug,
+      Value<String> name,
+      Value<bool> isFixed,
+      Value<String> effect,
+      Value<int> rowid,
+    });
+
+class $$SecondaryMissionsTableFilterComposer
+    extends Composer<_$AppDatabase, $SecondaryMissionsTable> {
+  $$SecondaryMissionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isFixed => $composableBuilder(
+    column: $table.isFixed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get effect => $composableBuilder(
+    column: $table.effect,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$SecondaryMissionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $SecondaryMissionsTable> {
+  $$SecondaryMissionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isFixed => $composableBuilder(
+    column: $table.isFixed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get effect => $composableBuilder(
+    column: $table.effect,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$SecondaryMissionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SecondaryMissionsTable> {
+  $$SecondaryMissionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get slug =>
+      $composableBuilder(column: $table.slug, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<bool> get isFixed =>
+      $composableBuilder(column: $table.isFixed, builder: (column) => column);
+
+  GeneratedColumn<String> get effect =>
+      $composableBuilder(column: $table.effect, builder: (column) => column);
+}
+
+class $$SecondaryMissionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SecondaryMissionsTable,
+          SecondaryMission,
+          $$SecondaryMissionsTableFilterComposer,
+          $$SecondaryMissionsTableOrderingComposer,
+          $$SecondaryMissionsTableAnnotationComposer,
+          $$SecondaryMissionsTableCreateCompanionBuilder,
+          $$SecondaryMissionsTableUpdateCompanionBuilder,
+          (
+            SecondaryMission,
+            BaseReferences<
+              _$AppDatabase,
+              $SecondaryMissionsTable,
+              SecondaryMission
+            >,
+          ),
+          SecondaryMission,
+          PrefetchHooks Function()
+        > {
+  $$SecondaryMissionsTableTableManager(
+    _$AppDatabase db,
+    $SecondaryMissionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SecondaryMissionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SecondaryMissionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SecondaryMissionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> slug = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<bool> isFixed = const Value.absent(),
+                Value<String> effect = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SecondaryMissionsCompanion(
+                id: id,
+                slug: slug,
+                name: name,
+                isFixed: isFixed,
+                effect: effect,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String slug,
+                required String name,
+                Value<bool> isFixed = const Value.absent(),
+                required String effect,
+                Value<int> rowid = const Value.absent(),
+              }) => SecondaryMissionsCompanion.insert(
+                id: id,
+                slug: slug,
+                name: name,
+                isFixed: isFixed,
+                effect: effect,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$SecondaryMissionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SecondaryMissionsTable,
+      SecondaryMission,
+      $$SecondaryMissionsTableFilterComposer,
+      $$SecondaryMissionsTableOrderingComposer,
+      $$SecondaryMissionsTableAnnotationComposer,
+      $$SecondaryMissionsTableCreateCompanionBuilder,
+      $$SecondaryMissionsTableUpdateCompanionBuilder,
+      (
+        SecondaryMission,
+        BaseReferences<
+          _$AppDatabase,
+          $SecondaryMissionsTable,
+          SecondaryMission
+        >,
+      ),
+      SecondaryMission,
+      PrefetchHooks Function()
+    >;
+typedef $$BattleSecondaryMissionSelectionsTableCreateCompanionBuilder =
+    BattleSecondaryMissionSelectionsCompanion Function({
+      required String id,
+      required String battleId,
+      required String secondaryMissionId,
+      required BattleSecondarySide side,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+typedef $$BattleSecondaryMissionSelectionsTableUpdateCompanionBuilder =
+    BattleSecondaryMissionSelectionsCompanion Function({
+      Value<String> id,
+      Value<String> battleId,
+      Value<String> secondaryMissionId,
+      Value<BattleSecondarySide> side,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$BattleSecondaryMissionSelectionsTableFilterComposer
+    extends Composer<_$AppDatabase, $BattleSecondaryMissionSelectionsTable> {
+  $$BattleSecondaryMissionSelectionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get battleId => $composableBuilder(
+    column: $table.battleId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get secondaryMissionId => $composableBuilder(
+    column: $table.secondaryMissionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    BattleSecondarySide,
+    BattleSecondarySide,
+    String
+  >
+  get side => $composableBuilder(
+    column: $table.side,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BattleSecondaryMissionSelectionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $BattleSecondaryMissionSelectionsTable> {
+  $$BattleSecondaryMissionSelectionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get battleId => $composableBuilder(
+    column: $table.battleId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get secondaryMissionId => $composableBuilder(
+    column: $table.secondaryMissionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get side => $composableBuilder(
+    column: $table.side,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BattleSecondaryMissionSelectionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BattleSecondaryMissionSelectionsTable> {
+  $$BattleSecondaryMissionSelectionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get battleId =>
+      $composableBuilder(column: $table.battleId, builder: (column) => column);
+
+  GeneratedColumn<String> get secondaryMissionId => $composableBuilder(
+    column: $table.secondaryMissionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<BattleSecondarySide, String> get side =>
+      $composableBuilder(column: $table.side, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$BattleSecondaryMissionSelectionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BattleSecondaryMissionSelectionsTable,
+          BattleSecondaryMissionSelection,
+          $$BattleSecondaryMissionSelectionsTableFilterComposer,
+          $$BattleSecondaryMissionSelectionsTableOrderingComposer,
+          $$BattleSecondaryMissionSelectionsTableAnnotationComposer,
+          $$BattleSecondaryMissionSelectionsTableCreateCompanionBuilder,
+          $$BattleSecondaryMissionSelectionsTableUpdateCompanionBuilder,
+          (
+            BattleSecondaryMissionSelection,
+            BaseReferences<
+              _$AppDatabase,
+              $BattleSecondaryMissionSelectionsTable,
+              BattleSecondaryMissionSelection
+            >,
+          ),
+          BattleSecondaryMissionSelection,
+          PrefetchHooks Function()
+        > {
+  $$BattleSecondaryMissionSelectionsTableTableManager(
+    _$AppDatabase db,
+    $BattleSecondaryMissionSelectionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BattleSecondaryMissionSelectionsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$BattleSecondaryMissionSelectionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$BattleSecondaryMissionSelectionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> battleId = const Value.absent(),
+                Value<String> secondaryMissionId = const Value.absent(),
+                Value<BattleSecondarySide> side = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BattleSecondaryMissionSelectionsCompanion(
+                id: id,
+                battleId: battleId,
+                secondaryMissionId: secondaryMissionId,
+                side: side,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String battleId,
+                required String secondaryMissionId,
+                required BattleSecondarySide side,
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BattleSecondaryMissionSelectionsCompanion.insert(
+                id: id,
+                battleId: battleId,
+                secondaryMissionId: secondaryMissionId,
+                side: side,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BattleSecondaryMissionSelectionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BattleSecondaryMissionSelectionsTable,
+      BattleSecondaryMissionSelection,
+      $$BattleSecondaryMissionSelectionsTableFilterComposer,
+      $$BattleSecondaryMissionSelectionsTableOrderingComposer,
+      $$BattleSecondaryMissionSelectionsTableAnnotationComposer,
+      $$BattleSecondaryMissionSelectionsTableCreateCompanionBuilder,
+      $$BattleSecondaryMissionSelectionsTableUpdateCompanionBuilder,
+      (
+        BattleSecondaryMissionSelection,
+        BaseReferences<
+          _$AppDatabase,
+          $BattleSecondaryMissionSelectionsTable,
+          BattleSecondaryMissionSelection
+        >,
+      ),
+      BattleSecondaryMissionSelection,
+      PrefetchHooks Function()
+    >;
 typedef $$ProjectsTableCreateCompanionBuilder =
     ProjectsCompanion Function({
       required String id,
@@ -31819,6 +34351,18 @@ class $AppDatabaseManager {
       $$BattleUnitModifiersTableTableManager(_db, _db.battleUnitModifiers);
   $$BattleUnitWoundsTableTableManager get battleUnitWounds =>
       $$BattleUnitWoundsTableTableManager(_db, _db.battleUnitWounds);
+  $$MissionDispositionsTableTableManager get missionDispositions =>
+      $$MissionDispositionsTableTableManager(_db, _db.missionDispositions);
+  $$PrimaryMissionsTableTableManager get primaryMissions =>
+      $$PrimaryMissionsTableTableManager(_db, _db.primaryMissions);
+  $$SecondaryMissionsTableTableManager get secondaryMissions =>
+      $$SecondaryMissionsTableTableManager(_db, _db.secondaryMissions);
+  $$BattleSecondaryMissionSelectionsTableTableManager
+  get battleSecondaryMissionSelections =>
+      $$BattleSecondaryMissionSelectionsTableTableManager(
+        _db,
+        _db.battleSecondaryMissionSelections,
+      );
   $$ProjectsTableTableManager get projects =>
       $$ProjectsTableTableManager(_db, _db.projects);
   $$XpCategoryTotalsTableTableManager get xpCategoryTotals =>

@@ -2,10 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../database/models/battle_details.dart';
 import '../database/models/battle_event_details.dart';
+import '../database/models/battle_secondary_mission_details.dart';
 import '../database/models/battle_stats.dart';
 import '../database/models/battle_unit_modifier_details.dart';
 import '../database/models/battle_unit_state_details.dart';
 import '../database/models/battle_unit_wound_details.dart';
+import '../database/models/mission_options.dart';
 import '../repositories/battle_repository.dart';
 import 'database_provider.dart';
 import 'xp_provider.dart';
@@ -78,4 +80,44 @@ final battleUnitWoundsProvider = FutureProvider.autoDispose
     .family<List<BattleUnitWoundDetails>, String>((ref, battleId) {
       final repository = ref.watch(battleRepositoryProvider);
       return repository.getUnitWounds(battleId);
+    });
+
+// =========================
+// Fiche de mission (GDM 2026)
+// =========================
+
+/// Les 5 postures de bataille disponibles — liste fixe, seedée une fois
+/// pour toutes, ne dépend d'aucune partie.
+final dispositionsProvider = FutureProvider<List<DispositionOption>>((ref) {
+  final repository = ref.watch(battleRepositoryProvider);
+  return repository.listDispositions();
+});
+
+/// Les 18 missions secondaires disponibles — même remarque.
+final secondaryMissionsProvider = FutureProvider<List<SecondaryMissionOption>>(
+  (ref) {
+    final repository = ref.watch(battleRepositoryProvider);
+    return repository.listSecondaryMissions();
+  },
+);
+
+/// Mission primaire résultant du croisement (ma posture, posture
+/// adverse) — `null` tant que les deux n'ont pas été choisies.
+final primaryMissionProvider = FutureProvider.autoDispose
+    .family<PrimaryMissionDetails?, (String yourDispositionId, String opponentDispositionId)>((
+      ref,
+      key,
+    ) {
+      final repository = ref.watch(battleRepositoryProvider);
+      return repository.getPrimaryMission(
+        yourDispositionId: key.$1,
+        opponentDispositionId: key.$2,
+      );
+    });
+
+/// Missions secondaires choisies pour cette bataille, par camp.
+final battleSecondaryMissionsProvider = FutureProvider.autoDispose
+    .family<List<BattleSecondaryMissionDetails>, String>((ref, battleId) {
+      final repository = ref.watch(battleRepositoryProvider);
+      return repository.listBattleSecondaryMissions(battleId);
     });

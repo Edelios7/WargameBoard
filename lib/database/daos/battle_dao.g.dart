@@ -12,8 +12,15 @@ mixin _$BattleDaoMixin on DatabaseAccessor<AppDatabase> {
       attachedDatabase.battleUnitModifiers;
   $BattleUnitWoundsTable get battleUnitWounds =>
       attachedDatabase.battleUnitWounds;
+  $BattleSecondaryMissionSelectionsTable get battleSecondaryMissionSelections =>
+      attachedDatabase.battleSecondaryMissionSelections;
   $ArmiesTable get armies => attachedDatabase.armies;
   $FactionsTable get factions => attachedDatabase.factions;
+  $MissionDispositionsTable get missionDispositions =>
+      attachedDatabase.missionDispositions;
+  $PrimaryMissionsTable get primaryMissions => attachedDatabase.primaryMissions;
+  $SecondaryMissionsTable get secondaryMissions =>
+      attachedDatabase.secondaryMissions;
   BattleDaoManager get managers => BattleDaoManager(this);
 }
 
@@ -39,8 +46,29 @@ class BattleDaoManager {
         _db.attachedDatabase,
         _db.battleUnitWounds,
       );
+  $$BattleSecondaryMissionSelectionsTableTableManager
+  get battleSecondaryMissionSelections =>
+      $$BattleSecondaryMissionSelectionsTableTableManager(
+        _db.attachedDatabase,
+        _db.battleSecondaryMissionSelections,
+      );
   $$ArmiesTableTableManager get armies =>
       $$ArmiesTableTableManager(_db.attachedDatabase, _db.armies);
   $$FactionsTableTableManager get factions =>
       $$FactionsTableTableManager(_db.attachedDatabase, _db.factions);
+  $$MissionDispositionsTableTableManager get missionDispositions =>
+      $$MissionDispositionsTableTableManager(
+        _db.attachedDatabase,
+        _db.missionDispositions,
+      );
+  $$PrimaryMissionsTableTableManager get primaryMissions =>
+      $$PrimaryMissionsTableTableManager(
+        _db.attachedDatabase,
+        _db.primaryMissions,
+      );
+  $$SecondaryMissionsTableTableManager get secondaryMissions =>
+      $$SecondaryMissionsTableTableManager(
+        _db.attachedDatabase,
+        _db.secondaryMissions,
+      );
 }

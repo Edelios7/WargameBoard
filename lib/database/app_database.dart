@@ -59,6 +59,10 @@ import 'tables/battle_events_table.dart';
 import 'tables/battle_unit_states_table.dart';
 import 'tables/battle_unit_modifiers_table.dart';
 import 'tables/battle_unit_wounds_table.dart';
+import 'tables/mission_dispositions_table.dart';
+import 'tables/primary_missions_table.dart';
+import 'tables/secondary_missions_table.dart';
+import 'tables/battle_secondary_missions_table.dart';
 
 import 'tables/projects_table.dart';
 
@@ -79,11 +83,13 @@ import 'daos/datasheet_dao.dart';
 import 'daos/army_dao.dart';
 import 'daos/collection_dao.dart';
 import 'daos/battle_dao.dart';
+import 'daos/mission_dao.dart';
 import 'daos/project_dao.dart';
 import 'daos/xp_dao.dart';
 
 import 'seed/catalog_seed.dart';
 import 'seed/weapon_profile_seed.dart';
+import 'seed/mission_seed.dart';
 
 part 'app_database.g.dart';
 
@@ -154,6 +160,12 @@ part 'app_database.g.dart';
     BattleUnitModifiers,
     BattleUnitWounds,
 
+    // ===== MISSIONS =====
+    MissionDispositions,
+    PrimaryMissions,
+    SecondaryMissions,
+    BattleSecondaryMissionSelections,
+
     // ===== PROJECTS =====
     Projects,
 
@@ -172,6 +184,7 @@ part 'app_database.g.dart';
     ArmyDao,
     CollectionDao,
     BattleDao,
+    MissionDao,
     ProjectDao,
     XpDao,
   ],
@@ -203,6 +216,8 @@ class AppDatabase extends _$AppDatabase {
 
   late final BattleDao battleDao = BattleDao(this);
 
+  late final MissionDao missionDao = MissionDao(this);
+
   late final ProjectDao projectDao = ProjectDao(this);
 
   late final XpDao xpDao = XpDao(this);
@@ -212,7 +227,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 24;
+  int get schemaVersion => 25;
 
   // =========================
   // Migrations
@@ -244,6 +259,7 @@ class AppDatabase extends _$AppDatabase {
       await m.createAll();
       await seedCatalog(this);
       await xpDao.seedCategories();
+      await seedMissions(this);
     },
 
     onUpgrade: (Migrator m, int from, int to) async {
@@ -423,6 +439,30 @@ class AppDatabase extends _$AppDatabase {
         if (!await _hasColumn('datasheet_costs', 'min_copy_index')) {
           await m.addColumn(datasheetCosts, datasheetCosts.minCopyIndex);
         }
+      }
+      if (from < 25) {
+        if (!await _hasTable('mission_dispositions')) {
+          await m.createTable(missionDispositions);
+        }
+        if (!await _hasTable('primary_missions')) {
+          await m.createTable(primaryMissions);
+        }
+        if (!await _hasTable('secondary_missions')) {
+          await m.createTable(secondaryMissions);
+        }
+        if (!await _hasTable('battle_secondary_mission_selections')) {
+          await m.createTable(battleSecondaryMissionSelections);
+        }
+        if (!await _hasColumn('battles', 'my_disposition_id')) {
+          await m.addColumn(battles, battles.myDispositionId);
+        }
+        if (!await _hasColumn('battles', 'opponent_disposition_id')) {
+          await m.addColumn(battles, battles.opponentDispositionId);
+        }
+        if (!await _hasColumn('battles', 'primary_mission_id')) {
+          await m.addColumn(battles, battles.primaryMissionId);
+        }
+        await seedMissions(this);
       }
     },
 

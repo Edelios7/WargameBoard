@@ -2,6 +2,8 @@ import 'package:drift/drift.dart';
 
 import 'armies_table.dart';
 import 'factions_table.dart';
+import 'mission_dispositions_table.dart';
+import 'primary_missions_table.dart';
 
 enum BattleResult { victory, defeat, draw }
 
@@ -73,6 +75,18 @@ class Battles extends Table {
 
   /// `true` = c'est mon tour actif, `false` = celui de l'adversaire.
   BoolColumn get myTurnActive => boolean().nullable()();
+
+  // Fiche de mission structurée (GDM 2026) — toutes nullable : une bataille
+  // peut toujours rester en mode "texte libre" via [missionName]/
+  // [missionPack] ci-dessus si le joueur ne veut pas s'en servir.
+  TextColumn get myDispositionId =>
+      text().nullable().references(MissionDispositions, #id)();
+
+  TextColumn get opponentDispositionId =>
+      text().nullable().references(MissionDispositions, #id)();
+
+  TextColumn get primaryMissionId =>
+      text().nullable().references(PrimaryMissions, #id)();
 
   @override
   Set<Column> get primaryKey => {id};

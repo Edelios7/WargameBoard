@@ -2152,6 +2152,43 @@ class AppLocalizationsFr extends AppLocalizations {
   String get battleDetailBack => 'Retour à l\'historique';
 
   @override
+  String get battleMissionCardTitle => 'Fiche de mission';
+
+  @override
+  String get battleMissionCardMyDisposition => 'Ma posture';
+
+  @override
+  String get battleMissionCardOpponentDisposition => 'Posture adverse';
+
+  @override
+  String get battleMissionCardChoose => 'Choisir…';
+
+  @override
+  String get battleMissionCardPrimaryMission => 'Mission primaire';
+
+  @override
+  String get battleMissionCardAction => 'Action';
+
+  @override
+  String get battleMissionCardMySecondaries => 'Mes secondaires';
+
+  @override
+  String get battleMissionCardOpponentSecondaries => 'Secondaires adverses';
+
+  @override
+  String get battleMissionCardEditSecondaries => 'Modifier';
+
+  @override
+  String get battleMissionCardPickSecondariesTitle =>
+      'Choisir les missions secondaires';
+
+  @override
+  String get battleMissionCardFixedBadge => 'Fixe';
+
+  @override
+  String get battleMissionCardNoneChosen => 'Aucune sélectionnée';
+
+  @override
   String get battleStratagemAssistantTitle => 'Stratagèmes pour cette phase';
 
   @override
