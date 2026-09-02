@@ -1457,46 +1457,82 @@ class _BuilderSidebarState extends ConsumerState<_BuilderSidebar> {
                       style: AppTextStyles.caption,
                     ),
                   )
-                : ListView.builder(
-                    padding: EdgeInsets.zero,
-                    itemCount: filteredUnits.length,
-                    itemBuilder: (context, index) {
-                      final unit = filteredUnits[index];
-                      final attachedLeaderNames = army
-                          .leadersAttachedTo(unit.id)
-                          .map((leader) => leader.datasheetName)
-                          .toList();
-                      return _UnitRosterRow(
-                        army: army,
-                        unit: unit,
-                        selected: unit.id == selectedUnitId,
-                        attachedLeaderNames: attachedLeaderNames,
-                        onTap: () =>
-                            ref.read(selectedUnitIdProvider.notifier).state =
-                                unit.id,
-                        onDelete: () async {
-                          final confirmed = await _confirmDelete(
-                            context,
-                            title: l10n.armyBuilderRemoveUnitConfirmTitle,
-                            message: l10n.armyBuilderRemoveUnitConfirmMessage(
-                              unit.datasheetName,
-                            ),
-                            confirmLabel: l10n.armyBuilderRemoveUnit,
-                          );
-                          if (!confirmed || !context.mounted) return;
-                          await _removeUnitWithUndo(
-                            context,
-                            ref,
-                            army: army,
-                            unit: unit,
-                          );
-                        },
-                      );
-                    },
+                : _RosterList(
+                    army: army,
+                    units: filteredUnits,
+                    selectedUnitId: selectedUnitId,
+                    l10n: l10n,
                   ),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Liste de la roster groupée par rôle de bataille (QG/Troupes/Élites/...),
+/// comme la grille centrale (_GroupedUnitGrid) — la sidebar listait les
+/// unités à plat, seule la grille centrale reflétait ce groupement.
+class _RosterList extends ConsumerWidget {
+  final ArmyDetails army;
+  final List<ArmyUnitDetails> units;
+  final String? selectedUnitId;
+  final AppLocalizations l10n;
+
+  const _RosterList({
+    required this.army,
+    required this.units,
+    required this.selectedUnitId,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final groups = <String, List<ArmyUnitDetails>>{};
+    for (final unit in units) {
+      final role = unit.battlefieldRole.isEmpty
+          ? l10n.armyBuilderRoleOther
+          : unit.battlefieldRole;
+      groups.putIfAbsent(role, () => []).add(unit);
+    }
+
+    return ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        for (final entry in groups.entries) ...[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 10, 4, 6),
+            child: Text(
+              entry.key.toUpperCase(),
+              style: AppTextStyles.eyebrow.copyWith(color: AppColors.primary),
+            ),
+          ),
+          for (final unit in entry.value)
+            _UnitRosterRow(
+              army: army,
+              unit: unit,
+              selected: unit.id == selectedUnitId,
+              attachedLeaderNames: army
+                  .leadersAttachedTo(unit.id)
+                  .map((leader) => leader.datasheetName)
+                  .toList(),
+              onTap: () =>
+                  ref.read(selectedUnitIdProvider.notifier).state = unit.id,
+              onDelete: () async {
+                final confirmed = await _confirmDelete(
+                  context,
+                  title: l10n.armyBuilderRemoveUnitConfirmTitle,
+                  message: l10n.armyBuilderRemoveUnitConfirmMessage(
+                    unit.datasheetName,
+                  ),
+                  confirmLabel: l10n.armyBuilderRemoveUnit,
+                );
+                if (!confirmed || !context.mounted) return;
+                await _removeUnitWithUndo(context, ref, army: army, unit: unit);
+              },
+            ),
+        ],
+      ],
     );
   }
 }

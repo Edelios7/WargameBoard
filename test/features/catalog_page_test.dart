@@ -211,6 +211,10 @@ void main() {
     // panneau latéral.
     expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
     expect(find.text('Blood Angels'), findsWidgets);
+    // Fil d'Ariane Catalogue › Faction › Unité, pour situer la fiche sans
+    // avoir à deviner d'où on vient.
+    expect(find.text('Catalogue'), findsOneWidget);
+    expect(find.text('Sanguinary Guard'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
 }
