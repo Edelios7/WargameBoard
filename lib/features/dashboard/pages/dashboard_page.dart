@@ -477,7 +477,9 @@ class _DashboardHeader extends ConsumerStatefulWidget {
 }
 
 class _DashboardHeaderState extends ConsumerState<_DashboardHeader> {
-  final _searchController = TextEditingController();
+  late final _searchController = TextEditingController(
+    text: ref.read(catalogSearchQueryProvider),
+  );
 
   @override
   void dispose() {
@@ -488,6 +490,18 @@ class _DashboardHeaderState extends ConsumerState<_DashboardHeader> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    // Sans ça, le champ restait figé sur ce qui avait été tapé ici même
+    // après qu'une recherche lancée depuis le Catalogue (ou son bouton
+    // "Réinitialiser") ait changé la requête active — il fallait revenir
+    // sur le Dashboard pour voir un texte qui ne correspondait plus à rien.
+    ref.listen<String>(catalogSearchQueryProvider, (previous, next) {
+      if (next != _searchController.text) {
+        _searchController.value = TextEditingValue(
+          text: next,
+          selection: TextSelection.collapsed(offset: next.length),
+        );
+      }
+    });
     final greeting = widget.displayName == null || widget.displayName!.isEmpty
         ? l10n.dashboardGreetingAnon
         : l10n.dashboardGreetingNamed(widget.displayName!);
@@ -519,88 +533,99 @@ class _DashboardHeaderState extends ConsumerState<_DashboardHeader> {
             ),
             const SizedBox(height: 4),
             Text(
-              l10n.dashboardEditionLine('Warhammer 40,000', 'Édition 11'),
+              // "Warhammer 40,000" est un nom de marque, identique dans
+              // toutes les langues (pas de clé l10n) — seule l'édition
+              // (elle, traduite) était codée en dur, et avec le mauvais
+              // numéro : l'appli tourne sur la 10e édition (voir
+              // ed-w40k-10e en base), pas une "11e" qui n'existe pas.
+              l10n.dashboardEditionLine(
+                'Warhammer 40,000',
+                l10n.dashboardEditionName,
+              ),
               style: AppTextStyles.caption,
             ),
           ],
         );
 
-        final actionsRow = Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (wide)
-              SizedBox(
-                width: 260,
-                child: TextField(
-                  controller: _searchController,
-                  style: AppTextStyles.body,
-                  onSubmitted: widget.onSearch,
-                  decoration: InputDecoration(
-                    hintText: l10n.dashboardSearchHint,
-                    hintStyle: AppTextStyles.caption,
-                    filled: true,
-                    fillColor: AppColors.surface,
-                    prefixIcon: const Icon(
-                      Icons.search_rounded,
-                      size: 18,
-                      color: AppColors.textSecondary,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: AppColors.border),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: AppColors.border),
-                    ),
-                  ),
-                ),
+        final searchField = TextField(
+          controller: _searchController,
+          style: AppTextStyles.body,
+          onSubmitted: widget.onSearch,
+          decoration: InputDecoration(
+            hintText: l10n.dashboardSearchHint,
+            hintStyle: AppTextStyles.caption,
+            filled: true,
+            fillColor: AppColors.surface,
+            prefixIcon: const Icon(
+              Icons.search_rounded,
+              size: 18,
+              color: AppColors.textSecondary,
+            ),
+            contentPadding: const EdgeInsets.symmetric(vertical: 0),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: AppColors.border),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: AppColors.border),
+            ),
+          ),
+        );
+
+        final settingsButton = Tooltip(
+          message: l10n.navSettings,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: widget.onOpenSettings,
+            child: Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
               ),
-            if (wide) const SizedBox(width: 12),
-            Tooltip(
-              message: l10n.navSettings,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(20),
-                onTap: widget.onOpenSettings,
-                child: Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      (widget.displayName?.isNotEmpty ?? false)
-                          ? widget.displayName![0].toUpperCase()
-                          : '?',
-                      style: AppTextStyles.body.copyWith(
-                        color: AppColors.onPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+              child: Center(
+                child: Text(
+                  (widget.displayName?.isNotEmpty ?? false)
+                      ? widget.displayName![0].toUpperCase()
+                      : '?',
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.onPrimary,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
             ),
-          ],
+          ),
         );
 
+        // En dessous de 760px, la barre de recherche passe sur sa propre
+        // ligne pleine largeur plutôt que de disparaître purement et
+        // simplement (elle était auparavant masquée avec `if (wide)`, la
+        // rendant totalement inaccessible sur petit écran).
         final content = !wide
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   greetingBlock,
                   const SizedBox(height: 16),
-                  actionsRow,
+                  Row(
+                    children: [
+                      Expanded(child: searchField),
+                      const SizedBox(width: 12),
+                      settingsButton,
+                    ],
+                  ),
                 ],
               )
             : Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(child: greetingBlock),
-                  actionsRow,
+                  SizedBox(width: 260, child: searchField),
+                  const SizedBox(width: 12),
+                  settingsButton,
                 ],
               );
 

@@ -960,6 +960,7 @@ class _ActiveFiltersRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final factionFilter = ref.watch(catalogFactionFilterProvider);
     final keywordFilter = ref.watch(catalogKeywordFilterProvider);
     final roleFilter = ref.watch(catalogRoleFilterProvider);
@@ -1030,14 +1031,16 @@ class _ActiveFiltersRow extends ConsumerWidget {
     if (pointsRange != null) {
       chips.add(
         _activeFilterChip(
-          '${pointsRange.start.round()}-${pointsRange.end.round()} pts',
+          l10n.pointsRangeSuffix(
+            pointsRange.start.round(),
+            pointsRange.end.round(),
+          ),
           () => ref.read(catalogPointsRangeProvider.notifier).state = null,
         ),
       );
     }
     final favoritesOnly = ref.watch(catalogFavoritesOnlyProvider);
     if (favoritesOnly) {
-      final l10n = AppLocalizations.of(context)!;
       chips.add(
         _activeFilterChip(
           l10n.catalogFavoritesOnlyChip,

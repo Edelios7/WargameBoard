@@ -10,9 +10,10 @@ class ArmyBuilderService {
 
   /// Duplique une armée existante (même faction/détachement/limite de
   /// points) sous un nouveau nom, avec toutes ses unités, leurs
-  /// enhancements, leur équipement choisi, le porte-étendard et les
-  /// notes — sinon dupliquer une liste déjà personnalisée la ferait
-  /// repartir de zéro sur tout sauf le squelette d'unités/points.
+  /// enhancements, leur équipement choisi, les attachements Leader, le
+  /// porte-étendard et les notes — sinon dupliquer une liste déjà
+  /// personnalisée la ferait repartir de zéro sur tout sauf le squelette
+  /// d'unités/points.
   /// Retourne l'id de la nouvelle armée, ou `null` si l'armée source
   /// n'existe pas.
   Future<String?> duplicateArmy(String armyId, String newName) async {
@@ -26,18 +27,23 @@ class ArmyBuilderService {
       detachmentId: source.detachmentId,
     );
 
+    // Correspondance ancien id -> nouvel id d'unité, nécessaire pour
+    // rebrancher les liens Leader (attachedToUnitId) une fois toutes les
+    // unités créées : sans elle, une escouade dupliquée perdait
+    // silencieusement le personnage qui lui était attaché.
+    final idMap = <String, String>{};
+
     for (final unit in source.units) {
       final newUnitId = await repository.addUnit(
         armyId: newArmyId,
         datasheetId: unit.datasheetId,
         modelCount: unit.modelCount,
       );
+      idMap[unit.id] = newUnitId;
       if (unit.enhancementId != null) {
         await repository.setUnitEnhancement(newUnitId, unit.enhancementId);
       }
-      final selections = await repository.getUnitEquipmentSelections(
-        unit.id,
-      );
+      final selections = await repository.getUnitEquipmentSelections(unit.id);
       for (final entry in selections.entries) {
         if (entry.value.isEmpty) continue;
         await repository.setUnitEquipmentSelection(
@@ -49,6 +55,14 @@ class ArmyBuilderService {
       if (unit.isWarlord) {
         await repository.setWarlord(newArmyId, newUnitId);
       }
+    }
+
+    for (final unit in source.units) {
+      if (unit.attachedToUnitId == null) continue;
+      final newCharacterId = idMap[unit.id];
+      final newTargetId = idMap[unit.attachedToUnitId];
+      if (newCharacterId == null || newTargetId == null) continue;
+      await repository.attachCharacter(newCharacterId, newTargetId);
     }
 
     if (source.notes != null) {

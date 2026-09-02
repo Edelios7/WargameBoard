@@ -563,6 +563,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String pointsRangeSuffix(int start, int end) {
+    return '$start-$end pts';
+  }
+
+  @override
   String get armyBuilderNewArmy => 'Nouvelle armée';
 
   @override
@@ -1318,6 +1323,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String dashboardEditionLine(String system, String edition) {
     return '$system • $edition';
   }
+
+  @override
+  String get dashboardEditionName => '10e édition';
 
   @override
   String get dashboardStatModels => 'Figurines';

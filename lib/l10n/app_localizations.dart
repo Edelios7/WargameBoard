@@ -1106,6 +1106,12 @@ abstract class AppLocalizations {
   /// **'{points} pts'**
   String pointsSuffix(int points);
 
+  /// No description provided for @pointsRangeSuffix.
+  ///
+  /// In fr, this message translates to:
+  /// **'{start}-{end} pts'**
+  String pointsRangeSuffix(int start, int end);
+
   /// No description provided for @armyBuilderNewArmy.
   ///
   /// In fr, this message translates to:
@@ -2437,6 +2443,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'{system} • {edition}'**
   String dashboardEditionLine(String system, String edition);
+
+  /// No description provided for @dashboardEditionName.
+  ///
+  /// In fr, this message translates to:
+  /// **'10e édition'**
+  String get dashboardEditionName;
 
   /// No description provided for @dashboardStatModels.
   ///

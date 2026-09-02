@@ -184,9 +184,6 @@ class _RulesPageState extends State<RulesPage> {
             children: [
               _RulesHeader(
                 onSearch: (value) => setState(() => _query = value),
-                onAdd: () => ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.rulesAddComingSoon)),
-                ),
                 filtersActive: _showFilters,
                 onToggleFilters: () =>
                     setState(() => _showFilters = !_showFilters),
@@ -290,13 +287,11 @@ class _RulesPageState extends State<RulesPage> {
 
 class _RulesHeader extends StatefulWidget {
   final ValueChanged<String> onSearch;
-  final VoidCallback onAdd;
   final bool filtersActive;
   final VoidCallback onToggleFilters;
 
   const _RulesHeader({
     required this.onSearch,
-    required this.onAdd,
     required this.filtersActive,
     required this.onToggleFilters,
   });
@@ -385,15 +380,17 @@ class _RulesHeaderState extends State<_RulesHeader> {
             Flexible(
               child: Tooltip(
                 message: l10n.rulesAddComingSoon,
-                // Bouton secondaire (pas FilledButton) : cette action
-                // n'affiche pour l'instant qu'un "bientôt disponible", la
-                // traiter visuellement comme l'action principale de
-                // l'écran (couleur pleine) inviterait à cliquer pour rien.
+                // Désactivé (onPressed: null) plutôt que cliquable pour
+                // n'afficher qu'un SnackBar "bientôt disponible" : un
+                // bouton actif qui ne fait rien d'utile trompe surtout sur
+                // tactile, où il n'y a pas de survol pour voir le tooltip
+                // avant de taper dessus. Le grisé du style désactivé rend
+                // l'indisponibilité visible sans avoir à cliquer.
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: AppColors.border),
                   ),
-                  onPressed: widget.onAdd,
+                  onPressed: null,
                   icon: const Icon(Icons.add_rounded),
                   label: Text(
                     l10n.rulesAddButton,

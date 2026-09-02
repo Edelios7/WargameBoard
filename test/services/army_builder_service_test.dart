@@ -60,6 +60,47 @@ void main() {
     expect(original.units.single.isWarlord, isTrue);
   });
 
+  test(
+      'duplicating an army with a character attached to a squad (Leader) '
+      'keeps that attachment pointing at the corresponding duplicated units',
+      () async {
+    final sourceId = await repository.createArmy(
+      name: 'Originale',
+      factionId: seedFactionId,
+      pointsLimit: 2000,
+      detachmentId: detAngelicHost,
+    );
+    final captainResults = await database.datasheetDao.search('Captain');
+    final squadResults = await database.datasheetDao.search(
+      'Intercessor Squad',
+    );
+    final characterUnitId = await repository.addUnit(
+      armyId: sourceId,
+      datasheetId: captainResults.single.id,
+      modelCount: 1,
+    );
+    final squadUnitId = await repository.addUnit(
+      armyId: sourceId,
+      datasheetId: squadResults.single.id,
+      modelCount: 5,
+    );
+    await repository.attachCharacter(characterUnitId, squadUnitId);
+
+    final newId = await service.duplicateArmy(sourceId, 'Copie');
+    final copy = await repository.getArmy(newId!);
+
+    final copiedCharacter = copy!.units.firstWhere(
+      (u) => u.datasheetName == 'Captain',
+    );
+    final copiedSquad = copy.units.firstWhere(
+      (u) => u.datasheetName == 'Intercessor Squad',
+    );
+    expect(copiedCharacter.attachedToUnitId, copiedSquad.id);
+    // Pas l'id de l'unité source : la correspondance doit pointer vers la
+    // NOUVELLE unité dupliquée, pas avoir simplement recopié l'ancien lien.
+    expect(copiedCharacter.attachedToUnitId, isNot(squadUnitId));
+  });
+
   test('duplicating an unknown army returns null', () async {
     final result = await service.duplicateArmy('does-not-exist', 'Copie');
     expect(result, isNull);

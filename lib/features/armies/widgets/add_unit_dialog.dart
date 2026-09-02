@@ -78,6 +78,11 @@ class _AddUnitDialogState extends ConsumerState<AddUnitDialog> {
       ref.invalidate(selectedArmyProvider);
       ref.invalidate(armiesListProvider);
       ref.invalidate(armyByIdProvider(widget.armyId));
+      // Sans ça, l'aperçu de prix affiché pour cette fiche restait figé sur
+      // le nombre d'exemplaires déjà possédés AVANT cet ajout — ajouter
+      // plusieurs fois la même unité dans une seule session de ce dialogue
+      // montrait donc un prix par palier faux pour les copies suivantes.
+      ref.invalidate(existingUnitCountProvider((widget.armyId, result.id)));
     }
 
     if (!mounted) return;

@@ -505,6 +505,10 @@ class _PhaseBlock extends ConsumerStatefulWidget {
 
 class _PhaseBlockState extends ConsumerState<_PhaseBlock> {
   bool _beginnerMode = false;
+  // Sans cette garde, un double-clic sur "Suivant" pendant l'aller-retour
+  // base de données pouvait déclencher deux advancePhase() d'affilée et,
+  // en fin de round, afficher deux fois la boîte de rappel.
+  bool _phasePending = false;
 
   @override
   Widget build(BuildContext context) {
@@ -600,13 +604,22 @@ class _PhaseBlockState extends ConsumerState<_PhaseBlock> {
                     ),
                   ),
                   onPressed:
-                      currentIndex == 0 && (battle.currentRound ?? 1) <= 1
+                      _phasePending ||
+                          (currentIndex == 0 &&
+                              (battle.currentRound ?? 1) <= 1)
                       ? null
                       : () async {
-                          await ref
-                              .read(battleRepositoryProvider)
-                              .previousPhase(battle.id);
-                          ref.invalidate(activeBattleProvider);
+                          setState(() => _phasePending = true);
+                          try {
+                            await ref
+                                .read(battleRepositoryProvider)
+                                .previousPhase(battle.id);
+                            ref.invalidate(activeBattleProvider);
+                          } finally {
+                            if (mounted) {
+                              setState(() => _phasePending = false);
+                            }
+                          }
                         },
                   child: const Icon(Icons.arrow_back_rounded),
                 ),
@@ -617,19 +630,30 @@ class _PhaseBlockState extends ConsumerState<_PhaseBlock> {
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primary,
                   ),
-                  onPressed: () async {
-                    final isEndOfRound = currentIndex == _phaseOrder.length - 1;
-                    await ref
-                        .read(battleRepositoryProvider)
-                        .advancePhase(battle.id);
-                    ref.invalidate(activeBattleProvider);
-                    if (isEndOfRound && context.mounted) {
-                      await showDialog(
-                        context: context,
-                        builder: (_) => _EndOfRoundReminderDialog(l10n: l10n),
-                      );
-                    }
-                  },
+                  onPressed: _phasePending
+                      ? null
+                      : () async {
+                          setState(() => _phasePending = true);
+                          final isEndOfRound =
+                              currentIndex == _phaseOrder.length - 1;
+                          try {
+                            await ref
+                                .read(battleRepositoryProvider)
+                                .advancePhase(battle.id);
+                            ref.invalidate(activeBattleProvider);
+                            if (isEndOfRound && context.mounted) {
+                              await showDialog(
+                                context: context,
+                                builder: (_) =>
+                                    _EndOfRoundReminderDialog(l10n: l10n),
+                              );
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() => _phasePending = false);
+                            }
+                          }
+                        },
                   icon: const Icon(Icons.arrow_forward_rounded),
                   label: Text(l10n.battleDashboardNextPhase),
                 ),
@@ -1044,6 +1068,7 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
   final _valueController = TextEditingController(text: '1');
   final _labelController = TextEditingController();
   BattleStatKey _statKey = BattleStatKey.toughness;
+  bool _togglingDestroyed = false;
 
   @override
   void dispose() {
@@ -1053,22 +1078,32 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
   }
 
   Future<void> _toggleDestroyed(bool destroyed) async {
+    // Sans cette garde, un double-clic pendant l'aller-retour base de
+    // données déclenchait deux fois le repo.setUnitDestroyed/logEvent avant
+    // que la boîte de dialogue ait le temps de se fermer, dupliquant
+    // l'entrée de journal.
+    if (_togglingDestroyed) return;
+    setState(() => _togglingDestroyed = true);
     final l10n = AppLocalizations.of(context)!;
     final repo = ref.read(battleRepositoryProvider);
-    await repo.setUnitDestroyed(
-      widget.battleId,
-      widget.unit.id,
-      destroyed: destroyed,
-    );
-    await repo.logEvent(
-      widget.battleId,
-      label: destroyed
-          ? '${widget.unit.datasheetName} — ${l10n.battleUnitDestroyed}'
-          : '${widget.unit.datasheetName} — ${l10n.battleUnitRestore}',
-    );
-    ref.invalidate(battleUnitStatesProvider(widget.battleId));
-    ref.invalidate(battleEventsProvider(widget.battleId));
-    if (mounted) Navigator.of(context).pop();
+    try {
+      await repo.setUnitDestroyed(
+        widget.battleId,
+        widget.unit.id,
+        destroyed: destroyed,
+      );
+      await repo.logEvent(
+        widget.battleId,
+        label: destroyed
+            ? '${widget.unit.datasheetName} — ${l10n.battleUnitDestroyed}'
+            : '${widget.unit.datasheetName} — ${l10n.battleUnitRestore}',
+      );
+      ref.invalidate(battleUnitStatesProvider(widget.battleId));
+      ref.invalidate(battleEventsProvider(widget.battleId));
+      if (mounted) Navigator.of(context).pop();
+    } finally {
+      if (mounted) setState(() => _togglingDestroyed = false);
+    }
   }
 
   Future<void> _addModifier() async {
@@ -1343,7 +1378,9 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
                           ? AppColors.success
                           : AppColors.error,
                     ),
-                    onPressed: () => _toggleDestroyed(!widget.destroyed),
+                    onPressed: _togglingDestroyed
+                        ? null
+                        : () => _toggleDestroyed(!widget.destroyed),
                     child: Text(
                       widget.destroyed
                           ? l10n.battleUnitRestore
@@ -1600,11 +1637,17 @@ class _DiceRollerBlockState extends ConsumerState<DiceRollerBlock> {
     final results = _results;
     if (results == null) return;
     final total = results.fold<int>(0, (sum, value) => sum + value);
+    // Sans round/phase, un lancer de dés apparaissait dans le journal sans
+    // le contexte de tour/phase où il a eu lieu, contrairement aux
+    // événements d'ajustement de CP qui, eux, le renseignent.
+    final battle = ref.read(activeBattleProvider).value;
     await ref
         .read(battleRepositoryProvider)
         .logEvent(
           widget.battleId,
           label: '${results.length}D6 : ${results.join(', ')} (total $total)',
+          round: battle?.currentRound,
+          phase: battle?.currentPhase,
         );
     ref.invalidate(battleEventsProvider(widget.battleId));
   }
@@ -1750,9 +1793,15 @@ class EventsBlockState extends ConsumerState<EventsBlock> {
   Future<void> _add() async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
+    final battle = ref.read(activeBattleProvider).value;
     await ref
         .read(battleRepositoryProvider)
-        .logEvent(widget.battleId, label: text);
+        .logEvent(
+          widget.battleId,
+          label: text,
+          round: battle?.currentRound,
+          phase: battle?.currentPhase,
+        );
     _controller.clear();
     ref.invalidate(battleEventsProvider(widget.battleId));
   }

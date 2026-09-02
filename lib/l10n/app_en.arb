@@ -241,6 +241,13 @@
       "points": { "type": "int" }
     }
   },
+  "pointsRangeSuffix": "{start}-{end} pts",
+  "@pointsRangeSuffix": {
+    "placeholders": {
+      "start": { "type": "int" },
+      "end": { "type": "int" }
+    }
+  },
 
   "armyBuilderNewArmy": "New army",
   "armyBuilderArmyName": "Army name",
@@ -640,6 +647,7 @@
       "edition": { "type": "String" }
     }
   },
+  "dashboardEditionName": "10th Edition",
   "dashboardStatModels": "Models",
   "dashboardStatModelsSub": "Total owned",
   "dashboardStatCollectionEntries": "Collection",
