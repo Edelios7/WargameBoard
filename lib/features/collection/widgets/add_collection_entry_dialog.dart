@@ -106,7 +106,7 @@ class _AddCollectionEntryDialogState
     final l10n = AppLocalizations.of(context)!;
 
     return AppDialogShortcuts(
-      onEnter: _selected == null ? null : _add,
+      onEnter: _selected == null || _quantity < 1 ? null : _add,
       child: DiscardGuardScope(
         hasUnsavedInput: () => _selected != null,
         child: Dialog(
@@ -205,7 +205,17 @@ class _AddCollectionEntryDialogState
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           style: AppTextStyles.body,
-                          onSubmitted: (_) => _selected == null ? null : _add(),
+                          // Sans ça, taper directement une valeur au
+                          // clavier (plutôt que d'utiliser +/-) ne
+                          // déclenchait aucun rebuild : le bouton "-" et
+                          // le bouton "Ajouter" restaient figés sur l'état
+                          // (activé/désactivé) du dernier build, jusqu'à
+                          // ce qu'une autre interaction force un rebuild.
+                          onChanged: (_) => setState(() {}),
+                          onSubmitted: (_) =>
+                              _selected == null || _quantity < 1
+                              ? null
+                              : _add(),
                           decoration: InputDecoration(
                             labelText: l10n.collectionQuantityDialogLabel,
                             labelStyle: AppTextStyles.caption,
@@ -238,7 +248,9 @@ class _AddCollectionEntryDialogState
                             controller: _notesController,
                             style: AppTextStyles.body,
                             onSubmitted: (_) =>
-                                _selected == null ? null : _add(),
+                                _selected == null || _quantity < 1
+                                ? null
+                                : _add(),
                             decoration: InputDecoration(
                               labelText: l10n.wishlistNotesDialogLabel,
                               labelStyle: AppTextStyles.caption,
@@ -269,7 +281,9 @@ class _AddCollectionEntryDialogState
                         style: FilledButton.styleFrom(
                           backgroundColor: AppColors.primary,
                         ),
-                        onPressed: _selected == null ? null : _add,
+                        onPressed: _selected == null || _quantity < 1
+                            ? null
+                            : _add,
                         child: Text(
                           widget.wishlist
                               ? l10n.wishlistAddItem

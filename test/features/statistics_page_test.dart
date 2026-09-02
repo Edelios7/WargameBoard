@@ -97,6 +97,32 @@ void main() {
   });
 
   testWidgets(
+      'a battle scheduled in the future without a result yet does not '
+      'count in the "parties par faction" donut, keeping it consistent '
+      'with the victoires/défaites/nuls donut which already excludes it',
+      (tester) async {
+    await database.battleDao.addBattle(
+      opponentName: 'Julie',
+      opponentFactionId: seedOrksFactionId,
+      result: BattleResult.victory,
+      playedAt: DateTime(2026, 1, 1),
+    );
+    // Partie planifiée, adversaire déjà choisi mais pas encore jouée.
+    await database.battleDao.addBattle(
+      opponentName: 'Marc',
+      opponentFactionId: seedFactionId, // Blood Angels, distinct des Orks
+      result: null,
+      playedAt: DateTime(2099, 1, 1),
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Orks'), findsWidgets);
+    expect(find.textContaining('Blood Angels'), findsNothing);
+  });
+
+  testWidgets(
       'the statistics page renders without overflow on a phone-sized screen',
       (tester) async {
     tester.view.physicalSize = const Size(390, 844);

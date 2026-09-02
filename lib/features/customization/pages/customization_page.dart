@@ -12,6 +12,7 @@ import '../../../core/widgets/decor_separator.dart';
 import '../../../domain/customization/theme_preset.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/customization_provider.dart';
+import '../../../services/customization_service.dart' show ImagePickOutcome;
 import '../widgets/hsv_color_picker.dart';
 
 class CustomizationPage extends ConsumerWidget {
@@ -33,15 +34,20 @@ class CustomizationPage extends ConsumerWidget {
     WallpaperSlot slot,
   ) async {
     final l10n = AppLocalizations.of(context)!;
-    final ok = await ref
+    final outcome = await ref
         .read(customizationServiceProvider)
-        .pickAndSetWallpaper(slot);
-    if (ok) {
-      ref.read(themeVersionProvider.notifier).state++;
-    } else if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.customizationUnsupportedFormat)),
-      );
+        .pickAndSetWallpaper(slot, dialogTitle: l10n.customizationChooseImage);
+    switch (outcome) {
+      case ImagePickOutcome.success:
+        ref.read(themeVersionProvider.notifier).state++;
+      case ImagePickOutcome.cancelled:
+        break;
+      case ImagePickOutcome.unsupportedFormat:
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.customizationUnsupportedFormat)),
+          );
+        }
     }
   }
 

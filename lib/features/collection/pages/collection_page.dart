@@ -256,18 +256,36 @@ class _CollectionTab extends ConsumerStatefulWidget {
 }
 
 class _CollectionTabState extends ConsumerState<_CollectionTab> {
-  String? _factionFilter;
-  String? _chapterFilter;
+  // Multi-selection : plusieurs factions (ex. Blood Angels + Adeptus
+  // Astartes) et plusieurs chapitres peuvent être actifs en même temps,
+  // combinés en OU (une entrée qui matche au moins un filtre actif
+  // s'affiche) — voir _matchesFaction.
+  final Set<String> _factionFilters = {};
+  final Set<String> _chapterFilters = {};
   final Set<_PaintState> _stateFilter = {};
   _CollectionSort _sort = _CollectionSort.nameAsc;
   bool _selectionMode = false;
   final Set<String> _selectedIds = {};
 
-  void _setFactionFilter(String? value) {
+  void _toggleFactionFilter(String value) {
     setState(() {
-      _factionFilter = value;
-      if (value != _spaceMarinesGroupKey) {
-        _chapterFilter = null;
+      if (_factionFilters.contains(value)) {
+        _factionFilters.remove(value);
+        if (value == _spaceMarinesGroupKey) {
+          _chapterFilters.clear();
+        }
+      } else {
+        _factionFilters.add(value);
+      }
+    });
+  }
+
+  void _toggleChapterFilter(String value) {
+    setState(() {
+      if (_chapterFilters.contains(value)) {
+        _chapterFilters.remove(value);
+      } else {
+        _chapterFilters.add(value);
       }
     });
   }
@@ -387,6 +405,28 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
     return sorted;
   }
 
+  /// Une entrée passe le filtre de faction si elle matche AU MOINS UN des
+  /// filtres actifs (OU, pas ET) — sélectionner "Blood Angels" et
+  /// "Adeptus Astartes" doit montrer les deux, pas leur intersection
+  /// (vide). Aucun filtre actif = tout passe. Le groupe "Space Marines"
+  /// (voir _spaceMarinesGroupKey) est raffiné par les chapitres cochés,
+  /// eux-mêmes combinés en OU entre eux.
+  bool _matchesFaction(CollectionItemDetails entry) {
+    if (_factionFilters.isEmpty) return true;
+    for (final filter in _factionFilters) {
+      if (filter == _spaceMarinesGroupKey) {
+        if (isSpaceMarineFactionName(entry.factionName) &&
+            (_chapterFilters.isEmpty ||
+                _chapterFilters.contains(entry.factionName))) {
+          return true;
+        }
+      } else if (entry.factionName == filter) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   bool _matches(CollectionItemDetails entry) {
     if (widget.searchQuery.isNotEmpty) {
       final normalizedQuery = normalizeForSearch(widget.searchQuery);
@@ -403,16 +443,7 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
         return false;
       }
     }
-    if (_factionFilter != null) {
-      if (_factionFilter == _spaceMarinesGroupKey) {
-        if (!isSpaceMarineFactionName(entry.factionName)) {
-          return false;
-        }
-      } else if (entry.factionName != _factionFilter) {
-        return false;
-      }
-    }
-    if (_chapterFilter != null && entry.factionName != _chapterFilter) {
+    if (!_matchesFaction(entry)) {
       return false;
     }
     if (_stateFilter.isNotEmpty &&
@@ -490,10 +521,10 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
           const SizedBox(height: 20),
           _FactionQuickAccessRow(
             entries: entries,
-            factionFilter: _factionFilter,
-            chapterFilter: _chapterFilter,
-            onFactionChanged: _setFactionFilter,
-            onChapterChanged: (value) => setState(() => _chapterFilter = value),
+            factionFilters: _factionFilters,
+            chapterFilters: _chapterFilters,
+            onFactionToggled: _toggleFactionFilter,
+            onChapterToggled: _toggleChapterFilter,
           ),
           LayoutBuilder(
             builder: (context, constraints) {
@@ -501,9 +532,9 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
               final filters = widget.filtersVisible
                   ? _FiltersSidebar(
                       entries: entries,
-                      factionFilter: _factionFilter,
+                      factionFilters: _factionFilters,
                       stateFilter: _stateFilter,
-                      onFactionChanged: _setFactionFilter,
+                      onFactionToggled: _toggleFactionFilter,
                       onStateToggled: (state, value) => setState(() {
                         if (value) {
                           _stateFilter.add(state);
@@ -512,8 +543,8 @@ class _CollectionTabState extends ConsumerState<_CollectionTab> {
                         }
                       }),
                       onReset: () => setState(() {
-                        _factionFilter = null;
-                        _chapterFilter = null;
+                        _factionFilters.clear();
+                        _chapterFilters.clear();
                         _stateFilter.clear();
                       }),
                     )
@@ -910,17 +941,17 @@ class _StatTile extends StatelessWidget {
 
 class _FactionQuickAccessRow extends StatelessWidget {
   final List<CollectionItemDetails> entries;
-  final String? factionFilter;
-  final String? chapterFilter;
-  final ValueChanged<String?> onFactionChanged;
-  final ValueChanged<String?> onChapterChanged;
+  final Set<String> factionFilters;
+  final Set<String> chapterFilters;
+  final ValueChanged<String> onFactionToggled;
+  final ValueChanged<String> onChapterToggled;
 
   const _FactionQuickAccessRow({
     required this.entries,
-    required this.factionFilter,
-    required this.chapterFilter,
-    required this.onFactionChanged,
-    required this.onChapterChanged,
+    required this.factionFilters,
+    required this.chapterFilters,
+    required this.onFactionToggled,
+    required this.onChapterToggled,
   });
 
   @override
@@ -936,7 +967,7 @@ class _FactionQuickAccessRow extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final chapters = factionFilter == _spaceMarinesGroupKey
+    final chapters = factionFilters.contains(_spaceMarinesGroupKey)
         ? (presentFactions.where(isSpaceMarineFactionName).toList()..sort())
         : const <String>[];
 
@@ -960,12 +991,8 @@ class _FactionQuickAccessRow extends StatelessWidget {
                     padding: const EdgeInsets.only(right: 8),
                     child: _FactionChip(
                       label: 'Space Marines',
-                      selected: factionFilter == _spaceMarinesGroupKey,
-                      onTap: () => onFactionChanged(
-                        factionFilter == _spaceMarinesGroupKey
-                            ? null
-                            : _spaceMarinesGroupKey,
-                      ),
+                      selected: factionFilters.contains(_spaceMarinesGroupKey),
+                      onTap: () => onFactionToggled(_spaceMarinesGroupKey),
                     ),
                   ),
                 for (final faction in otherFactions)
@@ -973,10 +1000,8 @@ class _FactionQuickAccessRow extends StatelessWidget {
                     padding: const EdgeInsets.only(right: 8),
                     child: _FactionChip(
                       label: faction,
-                      selected: factionFilter == faction,
-                      onTap: () => onFactionChanged(
-                        factionFilter == faction ? null : faction,
-                      ),
+                      selected: factionFilters.contains(faction),
+                      onTap: () => onFactionToggled(faction),
                     ),
                   ),
               ],
@@ -994,11 +1019,9 @@ class _FactionQuickAccessRow extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 8),
                       child: _FactionChip(
                         label: chapter,
-                        selected: chapterFilter == chapter,
+                        selected: chapterFilters.contains(chapter),
                         compact: true,
-                        onTap: () => onChapterChanged(
-                          chapterFilter == chapter ? null : chapter,
-                        ),
+                        onTap: () => onChapterToggled(chapter),
                       ),
                     ),
                 ],
@@ -1071,17 +1094,17 @@ class _FactionChip extends StatelessWidget {
 
 class _FiltersSidebar extends StatelessWidget {
   final List<CollectionItemDetails> entries;
-  final String? factionFilter;
+  final Set<String> factionFilters;
   final Set<_PaintState> stateFilter;
-  final ValueChanged<String?> onFactionChanged;
+  final ValueChanged<String> onFactionToggled;
   final void Function(_PaintState, bool) onStateToggled;
   final VoidCallback onReset;
 
   const _FiltersSidebar({
     required this.entries,
-    required this.factionFilter,
+    required this.factionFilters,
     required this.stateFilter,
-    required this.onFactionChanged,
+    required this.onFactionToggled,
     required this.onStateToggled,
     required this.onReset,
   });
@@ -1111,7 +1134,8 @@ class _FiltersSidebar extends StatelessWidget {
       _PaintState.painted: l10n.collectionPainted,
     };
 
-    final hasActiveFilters = factionFilter != null || stateFilter.isNotEmpty;
+    final hasActiveFilters =
+        factionFilters.isNotEmpty || stateFilter.isNotEmpty;
 
     return AppCard(
       customizationId: CustomizationIds.collectionFiltersPanel,
@@ -1136,12 +1160,12 @@ class _FiltersSidebar extends StatelessWidget {
           Text(l10n.collectionFilterFactionTitle, style: AppTextStyles.title),
           const SizedBox(height: 10),
           ...factions.map(
-            (faction) => _FilterRow(
+            (faction) => _FilterCheckboxRow(
+              key: Key('faction-filter-$faction'),
               label: faction,
               count: quantityByFaction[faction] ?? 0,
-              selected: factionFilter == faction,
-              onTap: () =>
-                  onFactionChanged(factionFilter == faction ? null : faction),
+              selected: factionFilters.contains(faction),
+              onChanged: (_) => onFactionToggled(faction),
             ),
           ),
           const SizedBox(height: 18),
@@ -1161,56 +1185,6 @@ class _FiltersSidebar extends StatelessWidget {
   }
 }
 
-class _FilterRow extends StatelessWidget {
-  final String label;
-  final int count;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _FilterRow({
-    required this.label,
-    required this.count,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(8),
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: selected ? AppColors.primary : AppColors.border,
-                shape: BoxShape.circle,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                label,
-                style: AppTextStyles.body.copyWith(
-                  color: selected ? AppColors.primary : AppColors.textPrimary,
-                  fontSize: 14,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Text('$count', style: AppTextStyles.caption),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _FilterCheckboxRow extends StatelessWidget {
   final String label;
   final int count;
@@ -1218,6 +1192,7 @@ class _FilterCheckboxRow extends StatelessWidget {
   final ValueChanged<bool> onChanged;
 
   const _FilterCheckboxRow({
+    super.key,
     required this.label,
     required this.count,
     required this.selected,

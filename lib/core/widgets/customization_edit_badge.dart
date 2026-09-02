@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/customization/widgets/hsv_color_picker.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/customization_provider.dart';
+import '../../services/customization_service.dart' show ImagePickOutcome;
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../theme/block_overrides.dart';
@@ -31,18 +32,26 @@ class _CustomizationEditBadgeState
   bool _busy = false;
 
   Future<void> _chooseImage() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _busy = true);
     try {
-      final ok = await ref
+      final outcome = await ref
           .read(customizationServiceProvider)
-          .pickAndSetBlockImage(widget.id);
-      if (ok) {
-        ref.read(themeVersionProvider.notifier).state++;
-      } else if (mounted) {
-        final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.customizationUnsupportedFormat)),
-        );
+          .pickAndSetBlockImage(
+            widget.id,
+            dialogTitle: l10n.customizationChooseImage,
+          );
+      switch (outcome) {
+        case ImagePickOutcome.success:
+          ref.read(themeVersionProvider.notifier).state++;
+        case ImagePickOutcome.cancelled:
+          break;
+        case ImagePickOutcome.unsupportedFormat:
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.customizationUnsupportedFormat)),
+            );
+          }
       }
     } finally {
       if (mounted) setState(() => _busy = false);

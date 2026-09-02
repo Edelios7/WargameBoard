@@ -303,14 +303,14 @@ class BattleRepository {
     String battleId,
     String armyUnitId,
     int modelIndex, {
-    required int currentWounds,
+    required int delta,
     required int maxWounds,
   }) {
     return database.battleDao.setModelWounds(
       battleId,
       armyUnitId,
       modelIndex,
-      currentWounds: currentWounds,
+      delta: delta,
       maxWounds: maxWounds,
     );
   }

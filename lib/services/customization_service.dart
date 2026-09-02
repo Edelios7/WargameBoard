@@ -20,6 +20,14 @@ const String blockOverridesPreferenceKey = 'customization_block_overrides';
 String _wallpaperPreferenceKey(WallpaperSlot slot) =>
     'customization_wallpaper_${slot.name}';
 
+/// Résultat d'une sélection d'image via [FilePicker] — distingue
+/// explicitement l'annulation (l'utilisateur ferme le sélecteur sans rien
+/// choisir) d'un format réellement non supporté, deux cas auparavant tous
+/// les deux réduits à `false` : l'appelant affichait alors un message
+/// "format non supporté" même quand l'utilisateur n'avait rien choisi du
+/// tout.
+enum ImagePickOutcome { success, cancelled, unsupportedFormat }
+
 /// Applique et persiste la couleur d'accent et les fonds d'écran choisis
 /// par l'utilisateur (page Personnalisation). Mute directement les
 /// statics [AppColors]/[AppWallpapers] — voir leurs commentaires pour
@@ -114,21 +122,27 @@ class CustomizationService {
 
   /// Ouvre le sélecteur de fichiers ; si l'utilisateur choisit une image,
   /// la copie dans le dossier applicatif (comme [UserPhotoService], même
-  /// convention) et l'applique à `slot`. Retourne `false` si l'utilisateur
-  /// annule ou si le format n'est pas pris en charge.
-  Future<bool> pickAndSetWallpaper(WallpaperSlot slot) async {
+  /// convention) et l'applique à `slot`. [dialogTitle] vient de l'appelant
+  /// (localisé via `l10n.customizationChooseImage`) : ce service n'a pas
+  /// accès au `BuildContext`/`AppLocalizations` pour le traduire lui-même.
+  Future<ImagePickOutcome> pickAndSetWallpaper(
+    WallpaperSlot slot, {
+    required String dialogTitle,
+  }) async {
     final result = await FilePicker.pickFiles(
       type: FileType.image,
-      dialogTitle: 'Choisir une image',
+      dialogTitle: dialogTitle,
     );
     final sourcePath = result?.files.single.path;
-    if (sourcePath == null) return false;
+    if (sourcePath == null) return ImagePickOutcome.cancelled;
 
     final extension = p
         .extension(sourcePath)
         .replaceFirst('.', '')
         .toLowerCase();
-    if (!_extensions.contains(extension)) return false;
+    if (!_extensions.contains(extension)) {
+      return ImagePickOutcome.unsupportedFormat;
+    }
 
     await _wallpapersFolder.create(recursive: true);
     final destination = File(
@@ -143,7 +157,7 @@ class CustomizationService {
 
     AppWallpapers.setSlot(slot, saved);
     await prefs.setString(_wallpaperPreferenceKey(slot), saved.path);
-    return true;
+    return ImagePickOutcome.success;
   }
 
   Future<void> clearWallpaper(WallpaperSlot slot) async {
@@ -190,20 +204,26 @@ class CustomizationService {
   /// Équivalent de [pickAndSetWallpaper] pour un bloc/page identifié par
   /// [id] (mode personnalisation) — même convention de fichier, dans le
   /// sous-dossier `blocks/` pour ne pas entrer en collision avec les 4
-  /// noms de fichier fixes des [WallpaperSlot].
-  Future<bool> pickAndSetBlockImage(String id) async {
+  /// noms de fichier fixes des [WallpaperSlot]. [dialogTitle] : voir
+  /// [pickAndSetWallpaper].
+  Future<ImagePickOutcome> pickAndSetBlockImage(
+    String id, {
+    required String dialogTitle,
+  }) async {
     final result = await FilePicker.pickFiles(
       type: FileType.image,
-      dialogTitle: 'Choisir une image',
+      dialogTitle: dialogTitle,
     );
     final sourcePath = result?.files.single.path;
-    if (sourcePath == null) return false;
+    if (sourcePath == null) return ImagePickOutcome.cancelled;
 
     final extension = p
         .extension(sourcePath)
         .replaceFirst('.', '')
         .toLowerCase();
-    if (!_extensions.contains(extension)) return false;
+    if (!_extensions.contains(extension)) {
+      return ImagePickOutcome.unsupportedFormat;
+    }
 
     await _blockWallpapersFolder.create(recursive: true);
     await _removeBlockOverrideFiles(id);
@@ -216,7 +236,7 @@ class CustomizationService {
     final raw = _readBlockOverridesRaw();
     raw[id] = {'type': 'image', 'path': saved.path};
     await _writeBlockOverridesRaw(raw);
-    return true;
+    return ImagePickOutcome.success;
   }
 
   Future<void> setBlockColor(String id, Color color) async {

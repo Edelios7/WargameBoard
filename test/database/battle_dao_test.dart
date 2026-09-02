@@ -376,18 +376,20 @@ void main() {
         );
         final armyUnitId = await seedArmyUnit(database);
 
+        // Un modèle sans ligne part de maxWounds (3) : -2 -> 1.
         await database.battleDao.setModelWounds(
           battleId,
           armyUnitId,
           1,
-          currentWounds: 1,
+          delta: -2,
           maxWounds: 3,
         );
+        // -8 depuis 3 -> -5, clampé à 0.
         await database.battleDao.setModelWounds(
           battleId,
           armyUnitId,
           2,
-          currentWounds: -5,
+          delta: -8,
           maxWounds: 3,
         );
 
@@ -397,17 +399,54 @@ void main() {
         // Clampée à 0, jamais négative.
         expect(wounds.firstWhere((w) => w.modelIndex == 2).currentWounds, 0);
 
-        // Revenir au maximum efface la ligne (absence = plein PV).
+        // Revenir au maximum efface la ligne (absence = plein PV) : le
+        // modèle 1 est à 1 PV, +2 -> 3 (max).
         await database.battleDao.setModelWounds(
           battleId,
           armyUnitId,
           1,
-          currentWounds: 3,
+          delta: 2,
           maxWounds: 3,
         );
         wounds = await database.battleDao.getUnitWounds(battleId);
         expect(wounds, hasLength(1));
         expect(wounds.single.modelIndex, 2);
+      },
+    );
+
+    test(
+      'two concurrent -1 PV adjustments chain instead of both applying to '
+      'the same stale starting value (double-clic rapproché)',
+      () async {
+        final battleId = await database.battleDao.startBattle(
+          opponentName: 'Marc',
+        );
+        final armyUnitId = await seedArmyUnit(database);
+
+        // Deux appels "en même temps" (aucun await entre les deux, comme
+        // un double-clic avant que l'UI n'ait pu se reconstruire) doivent
+        // s'enchaîner (3 -> 2 -> 1) grâce à la transaction+relecture,
+        // jamais partir deux fois de la même valeur de départ (3 -> 2 les
+        // deux fois).
+        await Future.wait([
+          database.battleDao.setModelWounds(
+            battleId,
+            armyUnitId,
+            1,
+            delta: -1,
+            maxWounds: 3,
+          ),
+          database.battleDao.setModelWounds(
+            battleId,
+            armyUnitId,
+            1,
+            delta: -1,
+            maxWounds: 3,
+          ),
+        ]);
+
+        final wounds = await database.battleDao.getUnitWounds(battleId);
+        expect(wounds.single.currentWounds, 1);
       },
     );
 
@@ -433,7 +472,7 @@ void main() {
         battleId,
         armyUnitId,
         1,
-        currentWounds: 1,
+        delta: -2,
         maxWounds: 3,
       );
 

@@ -92,9 +92,15 @@ CombatSimulationResult simulateCombat({
           : weaponProfile.ballisticSkill) ??
       4;
   final wound = woundThreshold(weaponProfile.strength, defenderModel.toughness);
+  // weaponProfile.armorPenetration est stocké négatif (convention GW,
+  // ex. "PA-2" -> -2, voir WeaponProfileDetails.toString) alors que
+  // modifiedSaveThreshold attend une pénétration positive (nombre de
+  // points à ajouter au seuil de sauvegarde) : sans ce signe inversé, une
+  // arme PA-2 *améliorait* la sauvegarde de la cible au lieu de la
+  // dégrader, faussant toute simulation avec une arme à PA non nul.
   final save = modifiedSaveThreshold(
     defenderModel.save,
-    weaponProfile.armorPenetration,
+    -weaponProfile.armorPenetration,
   );
 
   var totalKilled = 0;

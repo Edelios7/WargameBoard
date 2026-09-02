@@ -1095,19 +1095,14 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
     ref.invalidate(battleUnitModifiersProvider(widget.battleId));
   }
 
-  Future<void> _adjustWounds(
-    int modelIndex,
-    int maxWounds,
-    int current,
-    int delta,
-  ) async {
+  Future<void> _adjustWounds(int modelIndex, int maxWounds, int delta) async {
     await ref
         .read(battleRepositoryProvider)
         .setModelWounds(
           widget.battleId,
           widget.unit.id,
           modelIndex,
-          currentWounds: current + delta,
+          delta: delta,
           maxWounds: maxWounds,
         );
     ref.invalidate(battleUnitWoundsProvider(widget.battleId));
@@ -1381,12 +1376,8 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
                               size: 20,
                             ),
                             color: AppColors.error,
-                            onPressed: () => _adjustWounds(
-                              i,
-                              maxWounds,
-                              currentWoundsByModel[i] ?? maxWounds,
-                              -1,
-                            ),
+                            onPressed: () =>
+                                _adjustWounds(i, maxWounds, -1),
                           ),
                           SizedBox(
                             width: 52,
@@ -1405,12 +1396,7 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
                               size: 20,
                             ),
                             color: AppColors.success,
-                            onPressed: () => _adjustWounds(
-                              i,
-                              maxWounds,
-                              currentWoundsByModel[i] ?? maxWounds,
-                              1,
-                            ),
+                            onPressed: () => _adjustWounds(i, maxWounds, 1),
                           ),
                         ],
                       ),
@@ -2014,6 +2000,13 @@ class _FinishBattleDialog extends ConsumerStatefulWidget {
 class _FinishBattleDialogState extends ConsumerState<_FinishBattleDialog> {
   final _notesController = TextEditingController();
   BattleResult? _result = BattleResult.victory;
+  // Sans ce garde-fou, un double-clic (ou un Entrée suivi d'un clic) sur
+  // "Terminer" avant la fermeture du dialogue lançait deux appels à
+  // finishBattle/awardBattle : BattleDao.finishBattle accepte d'être
+  // rappelé sur une partie déjà terminée (simple UPDATE, pas de
+  // vérification d'état) et XpService.awardBattle n'a aucune protection
+  // d'idempotence — l'XP de fin de partie était alors créditée deux fois.
+  bool _submitting = false;
 
   @override
   void dispose() {
@@ -2022,26 +2015,37 @@ class _FinishBattleDialogState extends ConsumerState<_FinishBattleDialog> {
   }
 
   Future<void> _finish() async {
+    if (_submitting) return;
+    setState(() => _submitting = true);
     final battle = widget.battle;
-    await ref
-        .read(battleRepositoryProvider)
-        .finishBattle(
-          battle.id,
-          armyId: battle.armyId,
-          result: _result,
-          type: battle.type,
-          myScore: battle.myScore,
-          opponentScore: battle.opponentScore,
-          notes: _notesController.text.trim().isEmpty
-              ? null
-              : _notesController.text.trim(),
-        );
+    try {
+      await ref
+          .read(battleRepositoryProvider)
+          .finishBattle(
+            battle.id,
+            armyId: battle.armyId,
+            result: _result,
+            type: battle.type,
+            myScore: battle.myScore,
+            opponentScore: battle.opponentScore,
+            notes: _notesController.text.trim().isEmpty
+                ? null
+                : _notesController.text.trim(),
+          );
 
-    ref.invalidate(activeBattleProvider);
-    ref.invalidate(battlesListProvider);
-    ref.invalidate(battleStatsProvider);
-    ref.invalidate(xpSummaryProvider);
-    if (mounted) Navigator.of(context).pop();
+      ref.invalidate(activeBattleProvider);
+      ref.invalidate(battlesListProvider);
+      ref.invalidate(battleStatsProvider);
+      ref.invalidate(xpSummaryProvider);
+      if (mounted) Navigator.of(context).pop();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.commonSaveError)));
+    }
   }
 
   @override
@@ -2117,7 +2121,9 @@ class _FinishBattleDialogState extends ConsumerState<_FinishBattleDialog> {
                   runSpacing: 8,
                   children: [
                     TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: _submitting
+                          ? null
+                          : () => Navigator.of(context).pop(),
                       child: Text(
                         l10n.armyBuilderCancel,
                         style: AppTextStyles.body,
@@ -2127,8 +2133,14 @@ class _FinishBattleDialogState extends ConsumerState<_FinishBattleDialog> {
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.primary,
                       ),
-                      onPressed: _finish,
-                      child: Text(l10n.battleDashboardFinish),
+                      onPressed: _submitting ? null : _finish,
+                      child: _submitting
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text(l10n.battleDashboardFinish),
                     ),
                   ],
                 ),

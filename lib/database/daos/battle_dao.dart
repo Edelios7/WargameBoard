@@ -695,58 +695,66 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
   // PV des modèles en direct
   // =========================
 
-  /// Fixe les PV restants d'un modèle précis d'une unité (son numéro dans
-  /// l'escouade, 1 à modelCount). Une fois revenu à son [maxWounds] (ou
-  /// au-delà), la ligne est supprimée plutôt que gardée à sa valeur max —
-  /// cohérent avec le reste du suivi en direct (absence = valeur par
-  /// défaut).
+  /// Ajoute (ou retire) [delta] aux PV restants d'un modèle précis d'une
+  /// unité (son numéro dans l'escouade, 1 à modelCount). Relit la valeur
+  /// actuelle en base à l'intérieur d'une transaction avant d'appliquer le
+  /// delta — même raison que [adjustScore]/[adjustCommandPoints] : sans
+  /// ça, deux clics rapprochés sur "-1 PV" partaient tous les deux de la
+  /// même valeur (déjà périmée dans l'UI au moment du second clic) au lieu
+  /// de s'enchaîner, perdant silencieusement un coup de dé. Une fois
+  /// revenu à [maxWounds] (ou au-delà), la ligne est supprimée plutôt que
+  /// gardée à sa valeur max — cohérent avec le reste du suivi en direct
+  /// (absence = valeur par défaut).
   Future<void> setModelWounds(
     String battleId,
     String armyUnitId,
     int modelIndex, {
-    required int currentWounds,
+    required int delta,
     required int maxWounds,
-  }) async {
-    final clamped = currentWounds.clamp(0, maxWounds);
-    final existing =
-        await (select(battleUnitWounds)..where(
-              (t) =>
-                  t.battleId.equals(battleId) &
-                  t.armyUnitId.equals(armyUnitId) &
-                  t.modelIndex.equals(modelIndex),
-            ))
-            .getSingleOrNull();
+  }) {
+    return transaction(() async {
+      final existing =
+          await (select(battleUnitWounds)..where(
+                (t) =>
+                    t.battleId.equals(battleId) &
+                    t.armyUnitId.equals(armyUnitId) &
+                    t.modelIndex.equals(modelIndex),
+              ))
+              .getSingleOrNull();
+      final current = existing?.currentWounds ?? maxWounds;
+      final clamped = (current + delta).clamp(0, maxWounds);
 
-    if (clamped >= maxWounds) {
-      if (existing != null) {
-        await (delete(
-          battleUnitWounds,
-        )..where((t) => t.id.equals(existing.id))).go();
+      if (clamped >= maxWounds) {
+        if (existing != null) {
+          await (delete(
+            battleUnitWounds,
+          )..where((t) => t.id.equals(existing.id))).go();
+        }
+        return;
       }
-      return;
-    }
 
-    if (existing != null) {
-      await (update(
-        battleUnitWounds,
-      )..where((t) => t.id.equals(existing.id))).write(
-        BattleUnitWoundsCompanion(
-          currentWounds: Value(clamped),
-          updatedAt: Value(DateTime.now()),
+      if (existing != null) {
+        await (update(
+          battleUnitWounds,
+        )..where((t) => t.id.equals(existing.id))).write(
+          BattleUnitWoundsCompanion(
+            currentWounds: Value(clamped),
+            updatedAt: Value(DateTime.now()),
+          ),
+        );
+        return;
+      }
+
+      await into(battleUnitWounds).insert(
+        BattleUnitWoundsCompanion.insert(
+          id: _uuid.v4(),
+          battleId: battleId,
+          armyUnitId: armyUnitId,
+          modelIndex: modelIndex,
+          currentWounds: clamped,
         ),
       );
-      return;
-    }
-
-    await into(battleUnitWounds).insert(
-      BattleUnitWoundsCompanion.insert(
-        id: _uuid.v4(),
-        battleId: battleId,
-        armyUnitId: armyUnitId,
-        modelIndex: modelIndex,
-        currentWounds: clamped,
-      ),
-    );
+    });
   }
 
   /// Modèles blessés pour cette partie, toutes unités confondues — les

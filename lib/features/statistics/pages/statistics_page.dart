@@ -667,7 +667,11 @@ class _BattlesByFactionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final counts = <String, int>{};
-    for (final battle in battles) {
+    // Une bataille programmée dans le futur (adversaire renseigné, mais
+    // sans résultat) ne doit pas compter ici — sinon ce donut se
+    // contredit avec _BattleOutcomesCard juste à côté, qui lui ignore
+    // déjà correctement les parties sans résultat.
+    for (final battle in battles.where((b) => b.result != null)) {
       final name = battle.opponentFactionName ?? l10n.statsUnknownFaction;
       counts[name] = (counts[name] ?? 0) + 1;
     }

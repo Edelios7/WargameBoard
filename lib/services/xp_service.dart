@@ -52,7 +52,11 @@ class XpService {
       delta: delta,
       squadToggled: squadCompleted,
     );
-    await _award(category: XpCategory.painting, amount: amount, factionId: factionId);
+    await _award(
+      category: XpCategory.painting,
+      amount: amount,
+      factionId: factionId,
+    );
   }
 
   /// Symétrique de [awardPainting] — reprend l'XP quand un compteur de
@@ -69,7 +73,11 @@ class XpService {
       delta: delta,
       squadToggled: squadUncompleted,
     );
-    await _revoke(category: XpCategory.painting, amount: amount, factionId: factionId);
+    await _revoke(
+      category: XpCategory.painting,
+      amount: amount,
+      factionId: factionId,
+    );
   }
 
   Future<(int, String?)> _paintingAmount({
@@ -81,9 +89,11 @@ class XpService {
     final xpClass = await database.datasheetDao.getXpClassification(
       datasheetId,
     );
-    final perModel =
-        xpClass == null ? paintingXpStandard : paintingXpPerModel(xpClass);
-    final amount = (delta > 0 ? delta * perModel : 0) +
+    final perModel = xpClass == null
+        ? paintingXpStandard
+        : paintingXpPerModel(xpClass);
+    final amount =
+        (delta > 0 ? delta * perModel : 0) +
         (squadToggled ? paintingXpSquadComplete : 0);
     return (amount, xpClass?.factionId);
   }
@@ -99,7 +109,11 @@ class XpService {
       delta: delta,
       squadToggled: squadCompleted,
     );
-    await _award(category: XpCategory.assembly, amount: amount, factionId: factionId);
+    await _award(
+      category: XpCategory.assembly,
+      amount: amount,
+      factionId: factionId,
+    );
   }
 
   /// Symétrique de [awardAssembly] — voir [revokePainting].
@@ -113,7 +127,11 @@ class XpService {
       delta: delta,
       squadToggled: squadUncompleted,
     );
-    await _revoke(category: XpCategory.assembly, amount: amount, factionId: factionId);
+    await _revoke(
+      category: XpCategory.assembly,
+      amount: amount,
+      factionId: factionId,
+    );
   }
 
   Future<(int, String?)> _assemblyAmount({
@@ -125,9 +143,11 @@ class XpService {
     final xpClass = await database.datasheetDao.getXpClassification(
       datasheetId,
     );
-    final perModel =
-        xpClass == null ? assemblyXpStandard : assemblyXpPerModel(xpClass);
-    final amount = (delta > 0 ? delta * perModel : 0) +
+    final perModel = xpClass == null
+        ? assemblyXpStandard
+        : assemblyXpPerModel(xpClass);
+    final amount =
+        (delta > 0 ? delta * perModel : 0) +
         (squadToggled ? assemblyXpSquadComplete : 0);
     return (amount, xpClass?.factionId);
   }
@@ -148,8 +168,9 @@ class XpService {
     if (type == BattleType.narrative) amount += battleXpNarrativeBonus;
     if (type == BattleType.tournament) amount += battleXpTournamentBonus;
 
-    final factionId =
-        armyId == null ? null : await database.armyDao.getFactionId(armyId);
+    final factionId = armyId == null
+        ? null
+        : await database.armyDao.getFactionId(armyId);
 
     await _award(
       category: XpCategory.battle,
@@ -176,8 +197,9 @@ class XpService {
     if (type == BattleType.narrative) amount += battleXpNarrativeBonus;
     if (type == BattleType.tournament) amount += battleXpTournamentBonus;
 
-    final factionId =
-        armyId == null ? null : await database.armyDao.getFactionId(armyId);
+    final factionId = armyId == null
+        ? null
+        : await database.armyDao.getFactionId(armyId);
 
     await _revoke(
       category: XpCategory.battle,
@@ -207,8 +229,7 @@ class XpService {
 
     await _award(
       category: XpCategory.collection,
-      amount: collectionXpNewBox +
-          (isNewFaction ? collectionXpNewFaction : 0),
+      amount: collectionXpNewBox + (isNewFaction ? collectionXpNewFaction : 0),
       factionId: xpClass.factionId,
     );
   }
@@ -247,7 +268,16 @@ class XpService {
     );
   }
 
+  /// Une seule fois par fiche, tous historiques confondus (jalon
+  /// persistant par datasheetId, même mécanisme que
+  /// [awardFirstArmyIfNeeded]) : sans ça, rouvrir/refermer la même fiche
+  /// depuis le Catalogue créditait l'XP "Archiviste" à l'infini, à chaque
+  /// ouverture de page.
   Future<void> awardDatasheetViewed(String datasheetId) async {
+    final milestone = 'datasheet_viewed_$datasheetId';
+    if (await database.xpDao.hasMilestone(milestone)) return;
+    await database.xpDao.markMilestone(milestone);
+
     final xpClass = await database.datasheetDao.getXpClassification(
       datasheetId,
     );

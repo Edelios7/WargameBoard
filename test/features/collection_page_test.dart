@@ -58,6 +58,33 @@ void main() {
     expect(find.text('possédées'), findsOneWidget);
   });
 
+  testWidgets(
+      'typing an invalid quantity (0) disables the add button instead of '
+      'failing silently when tapped', (tester) async {
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Ajouter à la collection'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Death Company Marines'));
+    await tester.pumpAndSettle();
+    // TextField 0 = recherche, 1 = quantité, 2 = prix (optionnel).
+    await tester.enterText(find.byType(TextField).at(1), '0');
+    await tester.pumpAndSettle();
+
+    // Deux boutons portent ce texte : celui qui ouvre le dialogue (barre
+    // d'outils de la page) et celui du dialogue lui-même — on veut le
+    // second.
+    final addButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Ajouter à la collection').last,
+    );
+    expect(addButton.onPressed, isNull);
+
+    final entries = await database.collectionDao.listEntries();
+    expect(entries, isEmpty);
+  });
+
   testWidgets('tapping a collection card opens its datasheet page',
       (tester) async {
     await database.collectionDao.addEntry(
@@ -325,5 +352,68 @@ void main() {
 
     expect(find.text('Captain'), findsWidgets);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'selecting two faction filters at once shows entries from both '
+      '(OR, not AND)', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    // Captain -> Blood Angels, Intercessor Squad -> Space Marines (Adeptus
+    // Astartes) : deux factions distinctes, comme dans l'exemple de la
+    // demande ("blood angels et adeptus astartes en même temps").
+    await database.collectionDao.addEntry(
+      datasheetId: 'ds-captain',
+      quantity: 1,
+    );
+    await database.collectionDao.addEntry(
+      datasheetId: 'ds-intercessor-squad',
+      quantity: 1,
+    );
+
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+
+    // Les deux apparaissent avant tout filtre.
+    expect(find.text('Captain'), findsWidgets);
+    expect(find.text('Intercessor Squad'), findsWidgets);
+
+    // Chaque ligne de filtre de faction porte une clé dédiée
+    // ("faction-filter-<nom>") pour la cibler sans ambiguïté — le nom
+    // de faction apparaît aussi en sous-titre sur la carte de la grille,
+    // qui n'est pas le widget qu'on veut taper ici.
+    // "Ajouts récents" affiche toujours les entrées les plus récentes
+    // sans tenir compte du filtre actif (même logique que "Mes armées") :
+    // on compte donc précisément les occurrences plutôt que d'attendre
+    // zéro, pour ne pas confondre "sorti de la grille filtrée" avec
+    // "disparu de la page entière".
+    final bloodAngelsRow = find.byKey(const Key('faction-filter-Blood Angels'));
+    await tester.ensureVisible(bloodAngelsRow);
+    await tester.pumpAndSettle();
+    await tester.tap(bloodAngelsRow);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Captain'), findsNWidgets(2)); // ajouts récents + grille
+    expect(
+      find.text('Intercessor Squad'),
+      findsOneWidget,
+    ); // ajouts récents seulement, sorti de la grille filtrée
+
+    // Coche EN PLUS "Space Marines (Adeptus Astartes)", sans décocher
+    // "Blood Angels" : les deux doivent maintenant réapparaître dans la
+    // grille (union), pas seulement leur éventuelle intersection.
+    final spaceMarinesRow = find.byKey(
+      const Key('faction-filter-Space Marines (Adeptus Astartes)'),
+    );
+    await tester.ensureVisible(spaceMarinesRow);
+    await tester.pumpAndSettle();
+    await tester.tap(spaceMarinesRow);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Captain'), findsNWidgets(2));
+    expect(find.text('Intercessor Squad'), findsNWidgets(2));
   });
 }
