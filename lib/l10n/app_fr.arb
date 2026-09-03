@@ -225,6 +225,25 @@
   "abilityNoTextAvailable": "Règle propre à la faction — texte non disponible dans cette fiche, voir le livre de règles.",
   "sectionEquipment": "Équipement",
 
+  "datasheetTabSheet": "Fiche",
+  "datasheetTabEquipment": "Équipement",
+  "datasheetTabAbilities": "Capacités",
+  "datasheetTabHistory": "Historique",
+  "sectionInformation": "Informations",
+  "infoFaction": "Faction",
+  "infoRole": "Rôle",
+  "infoUnitType": "Type",
+  "infoUnitSize": "Taille d'unité",
+  "infoEdition": "Édition",
+  "datasheetHistoryEmpty": "Aucune partie enregistrée avec cette fiche pour l'instant.",
+  "datasheetHistoryBattleSubtitle": "{opponent} • {result}",
+  "@datasheetHistoryBattleSubtitle": {
+    "placeholders": {
+      "opponent": { "type": "String" },
+      "result": { "type": "String" }
+    }
+  },
+
   "unitSizeRange": "{min} - {max} figurines (par défaut : {defaultSize})",
   "@unitSizeRange": {
     "placeholders": {

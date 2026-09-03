@@ -17,6 +17,10 @@ class DatasheetDetails {
 
   final String factionName;
 
+  final String battlefieldRole;
+
+  final String unitType;
+
   final String gameSystemId;
 
   final String editionId;
@@ -61,6 +65,8 @@ class DatasheetDetails {
     this.description,
     required this.factionId,
     required this.factionName,
+    required this.battlefieldRole,
+    required this.unitType,
     required this.gameSystemId,
     required this.editionId,
     required this.keywords,

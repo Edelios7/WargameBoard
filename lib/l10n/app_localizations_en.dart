@@ -542,6 +542,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sectionEquipment => 'Equipment';
 
   @override
+  String get datasheetTabSheet => 'Sheet';
+
+  @override
+  String get datasheetTabEquipment => 'Equipment';
+
+  @override
+  String get datasheetTabAbilities => 'Abilities';
+
+  @override
+  String get datasheetTabHistory => 'History';
+
+  @override
+  String get sectionInformation => 'Information';
+
+  @override
+  String get infoFaction => 'Faction';
+
+  @override
+  String get infoRole => 'Role';
+
+  @override
+  String get infoUnitType => 'Type';
+
+  @override
+  String get infoUnitSize => 'Unit size';
+
+  @override
+  String get infoEdition => 'Edition';
+
+  @override
+  String get datasheetHistoryEmpty =>
+      'No recorded battle with this datasheet yet.';
+
+  @override
+  String datasheetHistoryBattleSubtitle(String opponent, String result) {
+    return '$opponent • $result';
+  }
+
+  @override
   String unitSizeRange(int min, int max, int defaultSize) {
     return '$min - $max models (default: $defaultSize)';
   }

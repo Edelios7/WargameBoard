@@ -1088,6 +1088,78 @@ abstract class AppLocalizations {
   /// **'Équipement'**
   String get sectionEquipment;
 
+  /// No description provided for @datasheetTabSheet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fiche'**
+  String get datasheetTabSheet;
+
+  /// No description provided for @datasheetTabEquipment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Équipement'**
+  String get datasheetTabEquipment;
+
+  /// No description provided for @datasheetTabAbilities.
+  ///
+  /// In fr, this message translates to:
+  /// **'Capacités'**
+  String get datasheetTabAbilities;
+
+  /// No description provided for @datasheetTabHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Historique'**
+  String get datasheetTabHistory;
+
+  /// No description provided for @sectionInformation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Informations'**
+  String get sectionInformation;
+
+  /// No description provided for @infoFaction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Faction'**
+  String get infoFaction;
+
+  /// No description provided for @infoRole.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rôle'**
+  String get infoRole;
+
+  /// No description provided for @infoUnitType.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type'**
+  String get infoUnitType;
+
+  /// No description provided for @infoUnitSize.
+  ///
+  /// In fr, this message translates to:
+  /// **'Taille d\'unité'**
+  String get infoUnitSize;
+
+  /// No description provided for @infoEdition.
+  ///
+  /// In fr, this message translates to:
+  /// **'Édition'**
+  String get infoEdition;
+
+  /// No description provided for @datasheetHistoryEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune partie enregistrée avec cette fiche pour l\'instant.'**
+  String get datasheetHistoryEmpty;
+
+  /// No description provided for @datasheetHistoryBattleSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'{opponent} • {result}'**
+  String datasheetHistoryBattleSubtitle(String opponent, String result);
+
   /// No description provided for @unitSizeRange.
   ///
   /// In fr, this message translates to:

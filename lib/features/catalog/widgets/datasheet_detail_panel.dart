@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -8,12 +10,16 @@ import '../../../core/widgets/app_loading_indicator.dart';
 import '../../../core/widgets/archetype_badge.dart';
 import '../../../core/widgets/unit_photo_thumbnail.dart';
 import '../../../database/models/ability_details.dart';
+import '../../../database/models/battle_details.dart';
 import '../../../database/models/cost_bracket.dart';
 import '../../../database/models/datasheet_details.dart';
+import '../../../database/tables/battles_table.dart';
 import '../../../domain/catalog/core_ability_glossary.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../providers/battle_provider.dart';
+import '../../../providers/catalog_provider.dart';
 
-class DatasheetDetailPanel extends StatelessWidget {
+class DatasheetDetailPanel extends ConsumerWidget {
   final DatasheetDetails? datasheet;
   final bool loading;
 
@@ -31,7 +37,7 @@ class DatasheetDetailPanel extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
 
     if (loading) {
@@ -51,34 +57,87 @@ class DatasheetDetailPanel extends StatelessWidget {
         ? LocalCatalogImages.factionBanner(sheet.factionId)
         : null;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(28),
+    // DefaultTabController plutôt qu'un TabController manuel : ce panneau
+    // est reconstruit avec une nouvelle clé à chaque changement de fiche
+    // sélectionnée côté appelants (Catalogue/DatasheetFullPage), donc pas
+    // besoin de préserver l'onglet actif entre deux fiches différentes.
+    return DefaultTabController(
+      length: 4,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _hero(sheet, imageFile, factionIcon, factionBanner, l10n),
-          if (onAddToCollection != null) ...[
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(28, 28, 28, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _hero(sheet, imageFile, factionIcon, factionBanner, l10n),
+                if (onAddToCollection != null) ...[
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: onAddToCollection,
+                      icon: const Icon(Icons.add_rounded),
+                      label: Text(
+                        l10n.collectionAddEntry,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
                   ),
+                ],
+                const SizedBox(height: 16),
+                TabBar(
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.start,
+                  labelColor: AppColors.primary,
+                  unselectedLabelColor: AppColors.textSecondary,
+                  indicatorColor: AppColors.primary,
+                  dividerColor: AppColors.border,
+                  tabs: [
+                    Tab(text: l10n.datasheetTabSheet),
+                    Tab(text: l10n.datasheetTabEquipment),
+                    Tab(text: l10n.datasheetTabAbilities),
+                    Tab(text: l10n.datasheetTabHistory),
+                  ],
                 ),
-                onPressed: onAddToCollection,
-                icon: const Icon(Icons.add_rounded),
-                label: Text(
-                  l10n.collectionAddEntry,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
+              ],
             ),
-          ],
-          const SizedBox(height: 28),
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                _sheetTab(context, ref, sheet, l10n),
+                _equipmentTab(sheet, l10n),
+                _abilitiesTab(sheet, l10n),
+                _historyTab(ref, sheet, l10n),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _sheetTab(
+    BuildContext context,
+    WidgetRef ref,
+    DatasheetDetails sheet,
+    AppLocalizations l10n,
+  ) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(28, 20, 28, 28),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _section(l10n.sectionInformation, _informationCard(ref, sheet, l10n)),
           _section(
             l10n.sectionUnitSize,
             Text(
@@ -91,16 +150,191 @@ class DatasheetDetailPanel extends StatelessWidget {
             ),
           ),
           _section(l10n.sectionProfiles, _modelsStatBlocks(sheet, l10n)),
-          _section(l10n.sectionWeapons, _weaponsList(l10n, sheet)),
           if (sheet.keywords.isNotEmpty)
             _section(l10n.sectionKeywords, _chips(sheet.keywords)),
-          if (sheet.abilities.isNotEmpty)
-            _section(
-              l10n.sectionAbilities,
-              _abilityCards(sheet.abilities, l10n),
-            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _equipmentTab(DatasheetDetails sheet, AppLocalizations l10n) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(28, 20, 28, 28),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _section(l10n.sectionWeapons, _weaponsList(l10n, sheet)),
           if (sheet.equipment.isNotEmpty)
             _section(l10n.sectionEquipment, _equipmentList(sheet)),
+        ],
+      ),
+    );
+  }
+
+  Widget _abilitiesTab(DatasheetDetails sheet, AppLocalizations l10n) {
+    if (sheet.abilities.isEmpty) {
+      return Center(
+        child: Text(
+          l10n.abilityNoTextAvailable,
+          style: AppTextStyles.caption,
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(28, 20, 28, 28),
+      child: _abilityCards(sheet.abilities, l10n),
+    );
+  }
+
+  /// Bloc "Informations" (faction/rôle/type/taille/édition) — tout ce que
+  /// la maquette de référence demandait sauf la référence codex+page, qui
+  /// n'existe dans aucune source de données disponible actuellement.
+  Widget _informationCard(
+    WidgetRef ref,
+    DatasheetDetails sheet,
+    AppLocalizations l10n,
+  ) {
+    final editionsAsync = ref.watch(editionsListProvider);
+    final editionName = editionsAsync.value
+        ?.where((e) => e.id == sheet.editionId)
+        .map((e) => e.name)
+        .firstOrNull;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _infoRow(l10n.infoFaction, sheet.factionName),
+          _infoRow(l10n.infoRole, sheet.battlefieldRole),
+          _infoRow(l10n.infoUnitType, sheet.unitType),
+          _infoRow(
+            l10n.infoUnitSize,
+            l10n.unitSizeRange(
+              sheet.unit.minimumSize,
+              sheet.unit.maximumSize,
+              sheet.unit.defaultSize,
+            ),
+          ),
+          if (editionName != null) _infoRow(l10n.infoEdition, editionName, last: true),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoRow(String label, String value, {bool last = false}) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: last ? 0 : 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 110,
+            child: Text(label, style: AppTextStyles.caption),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _historyTab(
+    WidgetRef ref,
+    DatasheetDetails sheet,
+    AppLocalizations l10n,
+  ) {
+    final historyAsync = ref.watch(datasheetBattleHistoryProvider(sheet.id));
+
+    return historyAsync.when(
+      loading: () => const AppLoadingIndicator(),
+      error: (_, _) => Center(
+        child: Text(l10n.datasheetHistoryEmpty, style: AppTextStyles.caption),
+      ),
+      data: (battles) {
+        if (battles.isEmpty) {
+          return Center(
+            child: Text(
+              l10n.datasheetHistoryEmpty,
+              style: AppTextStyles.caption,
+            ),
+          );
+        }
+        return ListView.separated(
+          padding: const EdgeInsets.fromLTRB(28, 20, 28, 28),
+          itemCount: battles.length,
+          separatorBuilder: (_, _) => const SizedBox(height: 8),
+          itemBuilder: (context, index) =>
+              _historyRow(context, battles[index], l10n),
+        );
+      },
+    );
+  }
+
+  Widget _historyRow(
+    BuildContext context,
+    BattleDetails battle,
+    AppLocalizations l10n,
+  ) {
+    final dateFormat = DateFormat.yMMMMd(
+      Localizations.localeOf(context).toString(),
+    );
+    final resultLabel = switch (battle.result) {
+      BattleResult.victory => l10n.battleResultVictory,
+      BattleResult.defeat => l10n.battleResultDefeat,
+      BattleResult.draw || null => l10n.battleResultDraw,
+    };
+    final resultColor = switch (battle.result) {
+      BattleResult.victory => AppColors.success,
+      BattleResult.defeat => AppColors.error,
+      BattleResult.draw || null => AppColors.textSecondary,
+    };
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  dateFormat.format(battle.playedAt),
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  l10n.datasheetHistoryBattleSubtitle(
+                    battle.opponentName ?? battle.missionName ?? '—',
+                    resultLabel,
+                  ),
+                  style: AppTextStyles.caption,
+                ),
+              ],
+            ),
+          ),
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(color: resultColor, shape: BoxShape.circle),
+          ),
         ],
       ),
     );

@@ -414,6 +414,8 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
       description: null,
       factionId: faction.id,
       factionName: faction.name,
+      battlefieldRole: datasheet.battlefieldRole,
+      unitType: datasheet.unitType,
       gameSystemId: faction.gameSystemId,
       editionId: costs.editionId,
       keywords: keywordNames,

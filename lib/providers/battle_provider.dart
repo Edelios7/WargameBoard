@@ -22,6 +22,15 @@ final battlesListProvider = FutureProvider<List<BattleDetails>>((ref) {
   return repository.listBattles();
 });
 
+/// Parties où cette fiche a été alignée — pour l'onglet "Historique" de la
+/// fiche catalogue. `.autoDispose` : ne vaut la peine d'être gardé en
+/// mémoire que pendant que cette fiche précise est affichée.
+final datasheetBattleHistoryProvider = FutureProvider.autoDispose
+    .family<List<BattleDetails>, String>((ref, datasheetId) {
+      final repository = ref.watch(battleRepositoryProvider);
+      return repository.listBattlesForDatasheet(datasheetId);
+    });
+
 final battleStatsProvider = FutureProvider<BattleStats>((ref) async {
   final battles = await ref.watch(battlesListProvider.future);
   return BattleStats.fromBattles(battles);

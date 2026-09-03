@@ -20,6 +20,10 @@ class BattleRepository {
     return database.battleDao.listBattles();
   }
 
+  Future<List<BattleDetails>> listBattlesForDatasheet(String datasheetId) {
+    return database.battleDao.listBattlesForDatasheet(datasheetId);
+  }
+
   Future<String> addBattle({
     String? armyId,
     String? opponentName,

@@ -13,6 +13,7 @@ mixin _$BattleDaoMixin on DatabaseAccessor<AppDatabase> {
   $BattleUnitWoundsTable get battleUnitWounds =>
       attachedDatabase.battleUnitWounds;
   $ArmiesTable get armies => attachedDatabase.armies;
+  $ArmyUnitsTable get armyUnits => attachedDatabase.armyUnits;
   $FactionsTable get factions => attachedDatabase.factions;
   BattleDaoManager get managers => BattleDaoManager(this);
 }
@@ -41,6 +42,8 @@ class BattleDaoManager {
       );
   $$ArmiesTableTableManager get armies =>
       $$ArmiesTableTableManager(_db.attachedDatabase, _db.armies);
+  $$ArmyUnitsTableTableManager get armyUnits =>
+      $$ArmyUnitsTableTableManager(_db.attachedDatabase, _db.armyUnits);
   $$FactionsTableTableManager get factions =>
       $$FactionsTableTableManager(_db.attachedDatabase, _db.factions);
 }

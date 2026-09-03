@@ -19,6 +19,8 @@ DatasheetDetails _sheet({
     name: name,
     factionId: 'fac-test',
     factionName: 'Test',
+    battlefieldRole: 'Troops',
+    unitType: 'Infantry',
     gameSystemId: 'gs',
     editionId: 'ed',
     keywords: const [],

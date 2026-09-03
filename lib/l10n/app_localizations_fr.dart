@@ -549,6 +549,45 @@ class AppLocalizationsFr extends AppLocalizations {
   String get sectionEquipment => 'Équipement';
 
   @override
+  String get datasheetTabSheet => 'Fiche';
+
+  @override
+  String get datasheetTabEquipment => 'Équipement';
+
+  @override
+  String get datasheetTabAbilities => 'Capacités';
+
+  @override
+  String get datasheetTabHistory => 'Historique';
+
+  @override
+  String get sectionInformation => 'Informations';
+
+  @override
+  String get infoFaction => 'Faction';
+
+  @override
+  String get infoRole => 'Rôle';
+
+  @override
+  String get infoUnitType => 'Type';
+
+  @override
+  String get infoUnitSize => 'Taille d\'unité';
+
+  @override
+  String get infoEdition => 'Édition';
+
+  @override
+  String get datasheetHistoryEmpty =>
+      'Aucune partie enregistrée avec cette fiche pour l\'instant.';
+
+  @override
+  String datasheetHistoryBattleSubtitle(String opponent, String result) {
+    return '$opponent • $result';
+  }
+
+  @override
   String unitSizeRange(int min, int max, int defaultSize) {
     return '$min - $max figurines (par défaut : $defaultSize)';
   }

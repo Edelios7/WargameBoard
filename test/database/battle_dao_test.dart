@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wargameboard/database/app_database.dart';
+import 'package:wargameboard/database/seed/datasheet_seed.dart';
 import 'package:wargameboard/database/seed/faction_seed.dart';
 import 'package:wargameboard/database/tables/battle_unit_modifiers_table.dart';
 import 'package:wargameboard/database/tables/battles_table.dart';
@@ -56,6 +57,57 @@ void main() {
 
     expect(battles.first.opponentName, 'Partie récente');
     expect(battles.last.opponentName, 'Ancienne partie');
+  });
+
+  test(
+      'listBattlesForDatasheet only returns completed battles fought with an '
+      'army that actually contains this datasheet', () async {
+    final withUnit = await database.armyDao.createArmy(
+      name: 'Avec Intercessors',
+      factionId: seedFactionId,
+    );
+    await database.armyDao.addUnit(
+      armyId: withUnit,
+      datasheetId: dsIntercessorSquad,
+      modelCount: 5,
+    );
+    final withoutUnit = await database.armyDao.createArmy(
+      name: 'Sans Intercessors',
+      factionId: seedFactionId,
+    );
+
+    await database.battleDao.addBattle(
+      armyId: withUnit,
+      opponentName: 'Match avec la fiche',
+      result: BattleResult.victory,
+    );
+    await database.battleDao.addBattle(
+      armyId: withoutUnit,
+      opponentName: 'Match sans la fiche',
+      result: BattleResult.defeat,
+    );
+    // Partie en cours de suivi en direct (status setup) : ne doit pas
+    // apparaître dans l'historique, même si elle utilise la bonne armée.
+    await database.battleDao.startBattle(armyId: withUnit);
+
+    final history = await database.battleDao.listBattlesForDatasheet(
+      dsIntercessorSquad,
+    );
+
+    expect(history, hasLength(1));
+    expect(history.single.opponentName, 'Match avec la fiche');
+  });
+
+  test(
+      'a datasheet never fielded in any army has an empty battle history',
+      () async {
+    await database.battleDao.addBattle(opponentName: 'Sans rapport');
+
+    final history = await database.battleDao.listBattlesForDatasheet(
+      dsIntercessorSquad,
+    );
+
+    expect(history, isEmpty);
   });
 
   test('deleteBattle removes the entry', () async {

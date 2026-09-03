@@ -251,6 +251,38 @@ void main() {
 
       expect(find.text('Sauv. Invul.'), findsNothing);
     });
+
+    testWidgets(
+        'the detail panel opens on the Fiche tab, and the Historique tab '
+        'reaches the battle-history empty state for a datasheet never used '
+        'in a battle',
+        (tester) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(wrap(database, prefs));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField).first, 'Sanguinary');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Sanguinary Guard'));
+      await tester.pumpAndSettle();
+
+      // Onglet Fiche affiché par défaut : le bloc Informations y est
+      // (les titres de section sont affichés en majuscules, voir _section).
+      expect(find.text('INFORMATIONS'), findsOneWidget);
+
+      await tester.tap(find.text('Historique'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Aucune partie enregistrée avec cette fiche pour '
+            'l\'instant.'),
+        findsOneWidget,
+      );
+    });
   });
 
   testWidgets(

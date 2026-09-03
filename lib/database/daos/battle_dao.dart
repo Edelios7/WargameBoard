@@ -8,6 +8,7 @@ import '../models/battle_unit_modifier_details.dart';
 import '../models/battle_unit_state_details.dart';
 import '../models/battle_unit_wound_details.dart';
 import '../tables/armies_table.dart';
+import '../tables/army_units_table.dart';
 import '../tables/battle_events_table.dart';
 import '../tables/battle_unit_modifiers_table.dart';
 import '../tables/battle_unit_states_table.dart';
@@ -36,6 +37,7 @@ const _battlePhaseOrder = [
     BattleUnitModifiers,
     BattleUnitWounds,
     Armies,
+    ArmyUnits,
     Factions,
   ],
 )
@@ -153,6 +155,29 @@ class BattleDao extends DatabaseAccessor<AppDatabase> with _$BattleDaoMixin {
       ..where(
         battles.status.isNull() |
             battles.status.equalsValue(BattleStatus.completed),
+      )
+      ..orderBy([OrderingTerm.desc(battles.playedAt)]);
+
+    final rows = await query.get();
+    return rows.map(_fromRow).toList();
+  }
+
+  /// Parties (terminées) où une armée contenant cette fiche a été jouée —
+  /// pour l'onglet "Historique" de la fiche catalogue. Passe par les ids
+  /// d'armée plutôt qu'une sous-requête EXISTS : plus simple à lire et le
+  /// volume (quelques dizaines d'armées/batailles par utilisateur) ne
+  /// justifie pas l'optimisation.
+  Future<List<BattleDetails>> listBattlesForDatasheet(String datasheetId) async {
+    final armyIds = (await (select(
+      armyUnits,
+    )..where((au) => au.datasheetId.equals(datasheetId))).map((au) => au.armyId).get()).toSet();
+    if (armyIds.isEmpty) return [];
+
+    final query = select(battles).join(_baseJoins())
+      ..where(
+        (battles.status.isNull() |
+                battles.status.equalsValue(BattleStatus.completed)) &
+            battles.armyId.isIn(armyIds),
       )
       ..orderBy([OrderingTerm.desc(battles.playedAt)]);
 

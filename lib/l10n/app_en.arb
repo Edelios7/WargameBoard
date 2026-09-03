@@ -225,6 +225,25 @@
   "abilityNoTextAvailable": "Faction-specific rule — text not available on this datasheet, check the rulebook.",
   "sectionEquipment": "Equipment",
 
+  "datasheetTabSheet": "Sheet",
+  "datasheetTabEquipment": "Equipment",
+  "datasheetTabAbilities": "Abilities",
+  "datasheetTabHistory": "History",
+  "sectionInformation": "Information",
+  "infoFaction": "Faction",
+  "infoRole": "Role",
+  "infoUnitType": "Type",
+  "infoUnitSize": "Unit size",
+  "infoEdition": "Edition",
+  "datasheetHistoryEmpty": "No recorded battle with this datasheet yet.",
+  "datasheetHistoryBattleSubtitle": "{opponent} • {result}",
+  "@datasheetHistoryBattleSubtitle": {
+    "placeholders": {
+      "opponent": { "type": "String" },
+      "result": { "type": "String" }
+    }
+  },
+
   "unitSizeRange": "{min} - {max} models (default: {defaultSize})",
   "@unitSizeRange": {
     "placeholders": {
