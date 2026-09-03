@@ -539,6 +539,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Faction-specific rule — text not available on this datasheet, check the rulebook.';
 
   @override
+  String get datasheetNoAbilities => 'This datasheet has no abilities.';
+
+  @override
+  String get datasheetNoEquipment =>
+      'This datasheet has no weapons or equipment.';
+
+  @override
   String get sectionEquipment => 'Equipment';
 
   @override

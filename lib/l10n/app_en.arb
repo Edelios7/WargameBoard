@@ -223,6 +223,8 @@
   "sectionAbilities": "Abilities",
   "abilityGenericRuleTag": "Generic rule",
   "abilityNoTextAvailable": "Faction-specific rule — text not available on this datasheet, check the rulebook.",
+  "datasheetNoAbilities": "This datasheet has no abilities.",
+  "datasheetNoEquipment": "This datasheet has no weapons or equipment.",
   "sectionEquipment": "Equipment",
 
   "datasheetTabSheet": "Sheet",

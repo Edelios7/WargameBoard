@@ -605,8 +605,7 @@ class _PhaseBlockState extends ConsumerState<_PhaseBlock> {
                   ),
                   onPressed:
                       _phasePending ||
-                          (currentIndex == 0 &&
-                              (battle.currentRound ?? 1) <= 1)
+                          (currentIndex == 0 && (battle.currentRound ?? 1) <= 1)
                       ? null
                       : () async {
                           setState(() => _phasePending = true);
@@ -1413,8 +1412,7 @@ class _UnitManageDialogState extends ConsumerState<_UnitManageDialog> {
                               size: 20,
                             ),
                             color: AppColors.error,
-                            onPressed: () =>
-                                _adjustWounds(i, maxWounds, -1),
+                            onPressed: () => _adjustWounds(i, maxWounds, -1),
                           ),
                           SizedBox(
                             width: 52,

@@ -8,6 +8,7 @@ import '../../../core/utils/local_catalog_images.dart';
 import '../../../core/widgets/app_chip.dart';
 import '../../../core/widgets/app_loading_indicator.dart';
 import '../../../core/widgets/archetype_badge.dart';
+import '../../../core/widgets/retry_error_state.dart';
 import '../../../core/widgets/unit_photo_thumbnail.dart';
 import '../../../database/models/ability_details.dart';
 import '../../../database/models/battle_details.dart';
@@ -158,12 +159,26 @@ class DatasheetDetailPanel extends ConsumerWidget {
   }
 
   Widget _equipmentTab(DatasheetDetails sheet, AppLocalizations l10n) {
+    // Avant la mise en onglets, une fiche sans arme se noyait parmi
+    // d'autres sections dans une seule longue page — désormais isolée
+    // dans son propre onglet, un tableau réduit à sa seule ligne d'en-tête
+    // ressemblerait à un bug plutôt qu'à "cette fiche n'a rien à équiper".
+    if (sheet.weapons.isEmpty && sheet.equipment.isEmpty) {
+      return Center(
+        child: Text(
+          l10n.datasheetNoEquipment,
+          style: AppTextStyles.caption,
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(28, 20, 28, 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _section(l10n.sectionWeapons, _weaponsList(l10n, sheet)),
+          if (sheet.weapons.isNotEmpty)
+            _section(l10n.sectionWeapons, _weaponsList(l10n, sheet)),
           if (sheet.equipment.isNotEmpty)
             _section(l10n.sectionEquipment, _equipmentList(sheet)),
         ],
@@ -175,7 +190,7 @@ class DatasheetDetailPanel extends ConsumerWidget {
     if (sheet.abilities.isEmpty) {
       return Center(
         child: Text(
-          l10n.abilityNoTextAvailable,
+          l10n.datasheetNoAbilities,
           style: AppTextStyles.caption,
           textAlign: TextAlign.center,
         ),
@@ -222,7 +237,8 @@ class DatasheetDetailPanel extends ConsumerWidget {
               sheet.unit.defaultSize,
             ),
           ),
-          if (editionName != null) _infoRow(l10n.infoEdition, editionName, last: true),
+          if (editionName != null)
+            _infoRow(l10n.infoEdition, editionName, last: true),
         ],
       ),
     );
@@ -258,8 +274,11 @@ class DatasheetDetailPanel extends ConsumerWidget {
 
     return historyAsync.when(
       loading: () => const AppLoadingIndicator(),
-      error: (_, _) => Center(
-        child: Text(l10n.datasheetHistoryEmpty, style: AppTextStyles.caption),
+      // Distinct de la liste vide ci-dessous : un vrai échec de requête ne
+      // doit pas se faire passer pour "aucune partie jouée", ce qui
+      // masquerait un incident réel derrière un état parfaitement normal.
+      error: (_, _) => RetryErrorState(
+        onRetry: () => ref.invalidate(datasheetBattleHistoryProvider(sheet.id)),
       ),
       data: (battles) {
         if (battles.isEmpty) {
@@ -333,7 +352,10 @@ class DatasheetDetailPanel extends ConsumerWidget {
           Container(
             width: 8,
             height: 8,
-            decoration: BoxDecoration(color: resultColor, shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: resultColor,
+              shape: BoxShape.circle,
+            ),
           ),
         ],
       ),
@@ -589,7 +611,15 @@ class DatasheetDetailPanel extends ConsumerWidget {
                     ),
                     const SizedBox(height: 6),
                   ],
-                  Row(
+                  // Wrap plutôt qu'un Row de cases Expanded : avec 6 cases
+                  // (7 quand la sauvegarde invulnérable est connue), un Row
+                  // rigide les comprimait jusqu'à l'illisible sur la largeur
+                  // minimale du panneau (colonne détail du Catalogue vers
+                  // 380px utiles) — ici, les cases en trop passent
+                  // simplement à la ligne suivante.
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       _statBox(l10n.statMovement, '${model.movement}"'),
                       _statBox(l10n.statToughness, '${model.toughness}'),
@@ -616,9 +646,9 @@ class DatasheetDetailPanel extends ConsumerWidget {
   }
 
   Widget _statBox(String label, String value) {
-    return Expanded(
+    return SizedBox(
+      width: 76,
       child: Container(
-        margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
         decoration: BoxDecoration(
           color: AppColors.surfaceElevated,

@@ -211,9 +211,8 @@ class CatalogPage extends ConsumerWidget {
                           color: AppColors.surface,
                           child: detailAsync.hasError
                               ? RetryErrorState(
-                                  onRetry: () => ref.invalidate(
-                                    selectedDatasheetProvider,
-                                  ),
+                                  onRetry: () =>
+                                      ref.invalidate(selectedDatasheetProvider),
                                 )
                               : DatasheetDetailPanel(
                                   datasheet: detailAsync.value,

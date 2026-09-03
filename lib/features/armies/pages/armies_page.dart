@@ -3266,40 +3266,44 @@ class _StatBlock extends StatelessWidget {
       l10n.statObjectiveControl: '${model.objectiveControl}',
     };
 
-    return Row(
+    // Wrap plutôt qu'un Row de cases Expanded : ce panneau ne fait que
+    // 340px de large — un Row rigide comprimait déjà 6 cases à la limite
+    // du lisible (texte 18px), la 7e (sauvegarde invulnérable) l'aurait
+    // rendu illisible. Les cases en trop passent à la ligne suivante.
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
       children: stats.entries
           .map(
-            (entry) => Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 3),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceElevated,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        entry.key,
-                        style: AppTextStyles.eyebrow.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+            (entry) => SizedBox(
+              width: 78,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceElevated,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      entry.key,
+                      style: AppTextStyles.eyebrow.copyWith(
+                        color: AppColors.textSecondary,
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        entry.value,
-                        style: AppTextStyles.title.copyWith(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 18,
-                        ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      entry.value,
+                      style: AppTextStyles.title.copyWith(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 18,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),

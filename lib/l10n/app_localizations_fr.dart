@@ -546,6 +546,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Règle propre à la faction — texte non disponible dans cette fiche, voir le livre de règles.';
 
   @override
+  String get datasheetNoAbilities =>
+      'Cette fiche n\'a aucune capacité particulière.';
+
+  @override
+  String get datasheetNoEquipment => 'Cette fiche n\'a ni arme ni équipement.';
+
+  @override
   String get sectionEquipment => 'Équipement';
 
   @override

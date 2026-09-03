@@ -1082,6 +1082,18 @@ abstract class AppLocalizations {
   /// **'Règle propre à la faction — texte non disponible dans cette fiche, voir le livre de règles.'**
   String get abilityNoTextAvailable;
 
+  /// No description provided for @datasheetNoAbilities.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette fiche n\'a aucune capacité particulière.'**
+  String get datasheetNoAbilities;
+
+  /// No description provided for @datasheetNoEquipment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette fiche n\'a ni arme ni équipement.'**
+  String get datasheetNoEquipment;
+
   /// No description provided for @sectionEquipment.
   ///
   /// In fr, this message translates to:

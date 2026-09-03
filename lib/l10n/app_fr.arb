@@ -223,6 +223,8 @@
   "sectionAbilities": "Capacités",
   "abilityGenericRuleTag": "Règle générique",
   "abilityNoTextAvailable": "Règle propre à la faction — texte non disponible dans cette fiche, voir le livre de règles.",
+  "datasheetNoAbilities": "Cette fiche n'a aucune capacité particulière.",
+  "datasheetNoEquipment": "Cette fiche n'a ni arme ni équipement.",
   "sectionEquipment": "Équipement",
 
   "datasheetTabSheet": "Fiche",
