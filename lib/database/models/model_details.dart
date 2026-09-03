@@ -15,6 +15,10 @@ class ModelDetails {
 
   final int objectiveControl;
 
+  /// Valeur "X" d'une sauvegarde invulnérable "X+", ou `null` si ce profil
+  /// n'en a pas.
+  final int? invulnerableSave;
+
   const ModelDetails({
     required this.id,
     required this.name,
@@ -24,5 +28,6 @@ class ModelDetails {
     required this.wounds,
     required this.leadership,
     required this.objectiveControl,
+    this.invulnerableSave,
   });
 }

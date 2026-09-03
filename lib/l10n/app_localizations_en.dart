@@ -487,6 +487,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statSave => 'Save';
 
   @override
+  String get statInvulnerableSave => 'Inv. Save';
+
+  @override
   String get statWounds => 'Wounds';
 
   @override

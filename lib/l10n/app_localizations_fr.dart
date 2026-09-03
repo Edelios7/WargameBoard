@@ -494,6 +494,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get statSave => 'Sauvegarde';
 
   @override
+  String get statInvulnerableSave => 'Sauv. Invul.';
+
+  @override
   String get statWounds => 'Points de vie';
 
   @override

@@ -4934,6 +4934,17 @@ class $ModelProfilesTable extends ModelProfiles
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _invulnerableSaveMeta = const VerificationMeta(
+    'invulnerableSave',
+  );
+  @override
+  late final GeneratedColumn<int> invulnerableSave = GeneratedColumn<int>(
+    'invulnerable_save',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -4969,6 +4980,7 @@ class $ModelProfilesTable extends ModelProfiles
     wounds,
     leadership,
     objectiveControl,
+    invulnerableSave,
     createdAt,
     updatedAt,
   ];
@@ -5059,6 +5071,15 @@ class $ModelProfilesTable extends ModelProfiles
     } else if (isInserting) {
       context.missing(_objectiveControlMeta);
     }
+    if (data.containsKey('invulnerable_save')) {
+      context.handle(
+        _invulnerableSaveMeta,
+        invulnerableSave.isAcceptableOrUnknown(
+          data['invulnerable_save']!,
+          _invulnerableSaveMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -5116,6 +5137,10 @@ class $ModelProfilesTable extends ModelProfiles
         DriftSqlType.int,
         data['${effectivePrefix}objective_control'],
       )!,
+      invulnerableSave: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}invulnerable_save'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -5143,6 +5168,13 @@ class ModelProfile extends DataClass implements Insertable<ModelProfile> {
   final int wounds;
   final int leadership;
   final int objectiveControl;
+
+  /// Valeur "X" d'une sauvegarde invulnérable "X+", ou `null` si le profil
+  /// n'en a pas. Volontairement à part de [save] (qui reste la sauvegarde
+  /// normale, jamais nulle) plutôt que de réutiliser un -1/0 comme valeur
+  /// sentinelle — un vrai `null` distingue sans ambiguïté "pas de sauvegarde
+  /// invulnérable" de "sauvegarde invulnérable de 0+".
+  final int? invulnerableSave;
   final DateTime createdAt;
   final DateTime updatedAt;
   const ModelProfile({
@@ -5155,6 +5187,7 @@ class ModelProfile extends DataClass implements Insertable<ModelProfile> {
     required this.wounds,
     required this.leadership,
     required this.objectiveControl,
+    this.invulnerableSave,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -5170,6 +5203,9 @@ class ModelProfile extends DataClass implements Insertable<ModelProfile> {
     map['wounds'] = Variable<int>(wounds);
     map['leadership'] = Variable<int>(leadership);
     map['objective_control'] = Variable<int>(objectiveControl);
+    if (!nullToAbsent || invulnerableSave != null) {
+      map['invulnerable_save'] = Variable<int>(invulnerableSave);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -5186,6 +5222,9 @@ class ModelProfile extends DataClass implements Insertable<ModelProfile> {
       wounds: Value(wounds),
       leadership: Value(leadership),
       objectiveControl: Value(objectiveControl),
+      invulnerableSave: invulnerableSave == null && nullToAbsent
+          ? const Value.absent()
+          : Value(invulnerableSave),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -5206,6 +5245,7 @@ class ModelProfile extends DataClass implements Insertable<ModelProfile> {
       wounds: serializer.fromJson<int>(json['wounds']),
       leadership: serializer.fromJson<int>(json['leadership']),
       objectiveControl: serializer.fromJson<int>(json['objectiveControl']),
+      invulnerableSave: serializer.fromJson<int?>(json['invulnerableSave']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -5223,6 +5263,7 @@ class ModelProfile extends DataClass implements Insertable<ModelProfile> {
       'wounds': serializer.toJson<int>(wounds),
       'leadership': serializer.toJson<int>(leadership),
       'objectiveControl': serializer.toJson<int>(objectiveControl),
+      'invulnerableSave': serializer.toJson<int?>(invulnerableSave),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -5238,6 +5279,7 @@ class ModelProfile extends DataClass implements Insertable<ModelProfile> {
     int? wounds,
     int? leadership,
     int? objectiveControl,
+    Value<int?> invulnerableSave = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => ModelProfile(
@@ -5250,6 +5292,9 @@ class ModelProfile extends DataClass implements Insertable<ModelProfile> {
     wounds: wounds ?? this.wounds,
     leadership: leadership ?? this.leadership,
     objectiveControl: objectiveControl ?? this.objectiveControl,
+    invulnerableSave: invulnerableSave.present
+        ? invulnerableSave.value
+        : this.invulnerableSave,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -5270,6 +5315,9 @@ class ModelProfile extends DataClass implements Insertable<ModelProfile> {
       objectiveControl: data.objectiveControl.present
           ? data.objectiveControl.value
           : this.objectiveControl,
+      invulnerableSave: data.invulnerableSave.present
+          ? data.invulnerableSave.value
+          : this.invulnerableSave,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -5287,6 +5335,7 @@ class ModelProfile extends DataClass implements Insertable<ModelProfile> {
           ..write('wounds: $wounds, ')
           ..write('leadership: $leadership, ')
           ..write('objectiveControl: $objectiveControl, ')
+          ..write('invulnerableSave: $invulnerableSave, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -5304,6 +5353,7 @@ class ModelProfile extends DataClass implements Insertable<ModelProfile> {
     wounds,
     leadership,
     objectiveControl,
+    invulnerableSave,
     createdAt,
     updatedAt,
   );
@@ -5320,6 +5370,7 @@ class ModelProfile extends DataClass implements Insertable<ModelProfile> {
           other.wounds == this.wounds &&
           other.leadership == this.leadership &&
           other.objectiveControl == this.objectiveControl &&
+          other.invulnerableSave == this.invulnerableSave &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -5334,6 +5385,7 @@ class ModelProfilesCompanion extends UpdateCompanion<ModelProfile> {
   final Value<int> wounds;
   final Value<int> leadership;
   final Value<int> objectiveControl;
+  final Value<int?> invulnerableSave;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -5347,6 +5399,7 @@ class ModelProfilesCompanion extends UpdateCompanion<ModelProfile> {
     this.wounds = const Value.absent(),
     this.leadership = const Value.absent(),
     this.objectiveControl = const Value.absent(),
+    this.invulnerableSave = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -5361,6 +5414,7 @@ class ModelProfilesCompanion extends UpdateCompanion<ModelProfile> {
     required int wounds,
     required int leadership,
     required int objectiveControl,
+    this.invulnerableSave = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -5383,6 +5437,7 @@ class ModelProfilesCompanion extends UpdateCompanion<ModelProfile> {
     Expression<int>? wounds,
     Expression<int>? leadership,
     Expression<int>? objectiveControl,
+    Expression<int>? invulnerableSave,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -5397,6 +5452,7 @@ class ModelProfilesCompanion extends UpdateCompanion<ModelProfile> {
       if (wounds != null) 'wounds': wounds,
       if (leadership != null) 'leadership': leadership,
       if (objectiveControl != null) 'objective_control': objectiveControl,
+      if (invulnerableSave != null) 'invulnerable_save': invulnerableSave,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -5413,6 +5469,7 @@ class ModelProfilesCompanion extends UpdateCompanion<ModelProfile> {
     Value<int>? wounds,
     Value<int>? leadership,
     Value<int>? objectiveControl,
+    Value<int?>? invulnerableSave,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
@@ -5427,6 +5484,7 @@ class ModelProfilesCompanion extends UpdateCompanion<ModelProfile> {
       wounds: wounds ?? this.wounds,
       leadership: leadership ?? this.leadership,
       objectiveControl: objectiveControl ?? this.objectiveControl,
+      invulnerableSave: invulnerableSave ?? this.invulnerableSave,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -5463,6 +5521,9 @@ class ModelProfilesCompanion extends UpdateCompanion<ModelProfile> {
     if (objectiveControl.present) {
       map['objective_control'] = Variable<int>(objectiveControl.value);
     }
+    if (invulnerableSave.present) {
+      map['invulnerable_save'] = Variable<int>(invulnerableSave.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -5487,6 +5548,7 @@ class ModelProfilesCompanion extends UpdateCompanion<ModelProfile> {
           ..write('wounds: $wounds, ')
           ..write('leadership: $leadership, ')
           ..write('objectiveControl: $objectiveControl, ')
+          ..write('invulnerableSave: $invulnerableSave, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -23252,6 +23314,7 @@ typedef $$ModelProfilesTableCreateCompanionBuilder =
       required int wounds,
       required int leadership,
       required int objectiveControl,
+      Value<int?> invulnerableSave,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -23267,6 +23330,7 @@ typedef $$ModelProfilesTableUpdateCompanionBuilder =
       Value<int> wounds,
       Value<int> leadership,
       Value<int> objectiveControl,
+      Value<int?> invulnerableSave,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -23323,6 +23387,11 @@ class $$ModelProfilesTableFilterComposer
 
   ColumnFilters<int> get objectiveControl => $composableBuilder(
     column: $table.objectiveControl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get invulnerableSave => $composableBuilder(
+    column: $table.invulnerableSave,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -23391,6 +23460,11 @@ class $$ModelProfilesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get invulnerableSave => $composableBuilder(
+    column: $table.invulnerableSave,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -23444,6 +23518,11 @@ class $$ModelProfilesTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<int> get invulnerableSave => $composableBuilder(
+    column: $table.invulnerableSave,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -23491,6 +23570,7 @@ class $$ModelProfilesTableTableManager
                 Value<int> wounds = const Value.absent(),
                 Value<int> leadership = const Value.absent(),
                 Value<int> objectiveControl = const Value.absent(),
+                Value<int?> invulnerableSave = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -23504,6 +23584,7 @@ class $$ModelProfilesTableTableManager
                 wounds: wounds,
                 leadership: leadership,
                 objectiveControl: objectiveControl,
+                invulnerableSave: invulnerableSave,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -23519,6 +23600,7 @@ class $$ModelProfilesTableTableManager
                 required int wounds,
                 required int leadership,
                 required int objectiveControl,
+                Value<int?> invulnerableSave = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -23532,6 +23614,7 @@ class $$ModelProfilesTableTableManager
                 wounds: wounds,
                 leadership: leadership,
                 objectiveControl: objectiveControl,
+                invulnerableSave: invulnerableSave,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,

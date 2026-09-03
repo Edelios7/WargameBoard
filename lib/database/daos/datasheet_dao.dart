@@ -553,6 +553,7 @@ class DatasheetDao extends DatabaseAccessor<AppDatabase>
         wounds: profile.wounds,
         leadership: profile.leadership,
         objectiveControl: profile.objectiveControl,
+        invulnerableSave: profile.invulnerableSave,
       );
     }).toList();
   }

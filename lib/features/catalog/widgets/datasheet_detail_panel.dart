@@ -360,6 +360,11 @@ class DatasheetDetailPanel extends StatelessWidget {
                       _statBox(l10n.statMovement, '${model.movement}"'),
                       _statBox(l10n.statToughness, '${model.toughness}'),
                       _statBox(l10n.statSave, '${model.save}+'),
+                      if (model.invulnerableSave != null)
+                        _statBox(
+                          l10n.statInvulnerableSave,
+                          '${model.invulnerableSave}+',
+                        ),
                       _statBox(l10n.statWounds, '${model.wounds}'),
                       _statBox(l10n.statLeadership, '${model.leadership}+'),
                       _statBox(

@@ -206,6 +206,7 @@
   "statMovement": "Movement",
   "statToughness": "Toughness",
   "statSave": "Save",
+  "statInvulnerableSave": "Inv. Save",
   "statWounds": "Wounds",
   "statLeadership": "Leadership",
   "statObjectiveControl": "Objective Control",

@@ -3259,6 +3259,8 @@ class _StatBlock extends StatelessWidget {
       l10n.statMovement: '${model.movement}"',
       l10n.statToughness: '${model.toughness}',
       l10n.statSave: '${model.save}+',
+      if (model.invulnerableSave != null)
+        l10n.statInvulnerableSave: '${model.invulnerableSave}+',
       l10n.statWounds: '${model.wounds}',
       l10n.statLeadership: '${model.leadership}+',
       l10n.statObjectiveControl: '${model.objectiveControl}',

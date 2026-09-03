@@ -206,6 +206,7 @@
   "statMovement": "Mouvement",
   "statToughness": "Endurance",
   "statSave": "Sauvegarde",
+  "statInvulnerableSave": "Sauv. Invul.",
   "statWounds": "Points de vie",
   "statLeadership": "Commandement",
   "statObjectiveControl": "Contrôle d'objectif",

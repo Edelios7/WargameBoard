@@ -980,6 +980,12 @@ abstract class AppLocalizations {
   /// **'Sauvegarde'**
   String get statSave;
 
+  /// No description provided for @statInvulnerableSave.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sauv. Invul.'**
+  String get statInvulnerableSave;
+
   /// No description provided for @statWounds.
   ///
   /// In fr, this message translates to:

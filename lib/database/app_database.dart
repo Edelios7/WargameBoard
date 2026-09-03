@@ -212,7 +212,7 @@ class AppDatabase extends _$AppDatabase {
   // =========================
 
   @override
-  int get schemaVersion => 24;
+  int get schemaVersion => 25;
 
   // =========================
   // Migrations
@@ -422,6 +422,11 @@ class AppDatabase extends _$AppDatabase {
       if (from < 24) {
         if (!await _hasColumn('datasheet_costs', 'min_copy_index')) {
           await m.addColumn(datasheetCosts, datasheetCosts.minCopyIndex);
+        }
+      }
+      if (from < 25) {
+        if (!await _hasColumn('model_profiles', 'invulnerable_save')) {
+          await m.addColumn(modelProfiles, modelProfiles.invulnerableSave);
         }
       }
     },

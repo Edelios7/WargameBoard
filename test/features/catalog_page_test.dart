@@ -1,9 +1,11 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wargameboard/database/app_database.dart';
+import 'package:wargameboard/database/seed/faction_seed.dart';
 import 'package:wargameboard/features/catalog/pages/catalog_page.dart';
 import 'package:wargameboard/l10n/app_localizations.dart';
 import 'package:wargameboard/providers/database_provider.dart';
@@ -179,6 +181,75 @@ void main() {
 
       expect(find.text('Sanguinary Guard'), findsOneWidget);
       expect(find.text('Captain'), findsNothing);
+    });
+
+    testWidgets(
+        'a model with an invulnerable save shows an extra stat box for it, '
+        'unlike a model without one',
+        (tester) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      const datasheetId = 'ds-test-invuln-preview';
+      await database
+          .into(database.datasheets)
+          .insert(
+            DatasheetsCompanion.insert(
+              id: datasheetId,
+              factionId: seedFactionId,
+              name: 'Porteuse de Bouclier de Test',
+              battlefieldRole: 'HQ',
+              unitType: 'Infantry',
+            ),
+          );
+      await database
+          .into(database.datasheetModels)
+          .insert(
+            DatasheetModelsCompanion.insert(
+              id: 'dm-test-invuln-preview',
+              datasheetId: datasheetId,
+              name: 'Porteuse de Bouclier de Test',
+            ),
+          );
+      await database
+          .into(database.modelProfiles)
+          .insert(
+            ModelProfilesCompanion.insert(
+              id: 'mp-test-invuln-preview',
+              datasheetModelId: 'dm-test-invuln-preview',
+              name: 'Porteuse de Bouclier de Test',
+              movement: 6,
+              toughness: 4,
+              save: 3,
+              wounds: 4,
+              leadership: 6,
+              objectiveControl: 1,
+              invulnerableSave: const Value(4),
+            ),
+          );
+
+      await tester.pumpWidget(wrap(database, prefs));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField).first, 'Bouclier de Test');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Porteuse de Bouclier de Test'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Sauv. Invul.'), findsOneWidget);
+      expect(find.text('4+'), findsOneWidget);
+
+      // Une autre fiche sans sauvegarde invulnérable n'affiche pas la case
+      // — l'absence de donnée doit rester invisible plutôt qu'afficher un
+      // "null+" ou une case vide trompeuse.
+      await tester.enterText(find.byType(TextField).first, 'Captain');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Captain').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Sauv. Invul.'), findsNothing);
     });
   });
 
